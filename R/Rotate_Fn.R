@@ -1,0 +1,104 @@
+
+#' Rotate results
+#'
+#' \code{Rotate_Fn} rotates results from a factor model
+#'
+#' @param Cov_jj Covariance calculated from loadings matrix
+#' @param L_pj Loadings matrix for `p` categories and `j` factors (calculated from \code{Cov_jj} if it is provided)
+#' @param Psi Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)
+#' @param RotationMethod Method used for rotation, Options: "PCA" (recommended) or "Varimax"
+#' @param testcutoff tolerance for numerical rounding when confirming that rotation doesn't effect results
+
+#' @return tagged list of outputs
+#' \describe{
+#'   \item{L_pj_rot}{Loadings matrix after rotation}
+#'   \item{Psi_rot}{Factors after rotation}
+#'   \item{Hinv}{Object used for rotation}
+#'   \item{L_pj}{Loadings matrix}
+#' }
+
+#' @export
+Rotate_Fn = function( Cov_jj=NULL, L_pj=NULL, Psi, RotationMethod="PCA", testcutoff=1e-10 ){
+
+  # If missing time, add a third dimension
+  if( length(dim(Psi))==2 ){
+    Psi = array( Psi, dim=c(dim(Psi),1) )
+  }
+
+  # Local functions
+  approx_equal = function(m1,m2,denominator=mean(m1+m2),d=1e-10) (2*abs(m1-m2)/denominator) < d
+  trunc_machineprec = function(n) ifelse(n<1e-10,0,n)
+  Nknots = dim(Psi)[1]
+  Nfactors = dim(Psi)[2]
+  Nyears = dim(Psi)[3]
+
+  # Optional inputs
+  if( !is.null(Cov_jj) ){
+    message( "Re-calculating L_pj from Cov_jj")
+    if( sum(eigen(Cov_jj)$values>testcutoff)<ncol(Cov_jj) ){
+      stop("Calculating L_pj from Cov_jj in 'Rotate_Fn' only works well when Cov_jj is full rank")
+    }
+    L_pj = t(chol(Cov_jj))[,1:Nfactors]
+  }else{
+    if( !is.null(L_pj) ){
+      message("Using L_pj for loadings matrix")
+    }else{
+      stop( "Must provide either L_pj or Cov_jj" )
+    }
+  }
+
+  # Varimax
+  if( RotationMethod=="Varimax" ){
+    Hinv = varimax( L_pj, normalize=FALSE )
+      L_pj_rot = L_pj %*% Hinv$rotmat
+    Psi_rot = array(NA, dim=dim(Psi))
+    for( n in 1:Nknots ) Psi_rot[n,,] = solve(Hinv$rotmat) %*% Psi[n,,]
+  }
+
+  # PCA
+  if( RotationMethod=="PCA" ){
+    Eigen = eigen(L_pj%*%t(L_pj))
+    Eigen$values_proportion = Eigen$values / sum(Eigen$values)
+    Eigen$values_cumulative_proportion = cumsum(Eigen$values) / sum(Eigen$values)
+    # Check decomposition
+    #all(approx_equal( Eigen$vectors%*%diag(Eigen$values)%*%t(Eigen$vectors), L_pj%*%t(L_pj)))
+    # My attempt at new loadings matrix
+    L_pj_rot = (Eigen$vectors%*%diag(sqrt(trunc_machineprec(Eigen$values))))[,1:Nfactors,drop=FALSE]
+    rownames(L_pj_rot) = rownames(L_pj)
+    # My new factors
+    Hinv = list("rotmat"=corpcor::pseudoinverse(L_pj_rot)%*%L_pj)
+    Psi_rot = array(NA, dim=dim(Psi))
+    for( n in 1:Nknots ) Psi_rot[n,,] = Hinv$rotmat %*% Psi[n,,]
+  }
+
+  # Flip around
+  for( j in 1:dim(Psi)[2] ){
+    Psi_rot[,j,] = Psi_rot[,j,] * sign(sum(L_pj_rot[,j]))
+    L_pj_rot[,j] = L_pj_rot[,j] * sign(sum(L_pj_rot[,j]))
+  }
+
+  # Check for errors
+  # Check covariance matrix
+    # Should be identical for rotated and unrotated
+  if( !is.na(testcutoff) ){
+    if( !all(approx_equal(L_pj%*%t(L_pj),L_pj_rot%*%t(L_pj_rot), d=testcutoff)) ) stop("Covariance matrix is changed by rotation")
+    # Check linear predictor
+      # Should give identical predictions as unrotated
+    for(i in 1:dim(Psi)[[1]]){
+    for(j in 1:dim(Psi)[[3]]){
+      MaxDiff = max(L_pj%*%Psi[i,,j] - L_pj_rot%*%Psi_rot[i,,j])
+      if( !all(approx_equal(L_pj%*%Psi[i,,j],L_pj_rot%*%Psi_rot[i,,j], d=testcutoff, denominator=1)) ) stop(paste0("Linear predictor is wrong for site ",i," and time ",j," with difference ",MaxDiff))
+    }}
+    # Check rotation matrix
+      # Should be orthogonal (R %*% transpose = identity matrix) with determinant one
+      # Doesn't have det(R) = 1; determinant(Hinv$rotmat)!=1 ||
+    Diag = Hinv$rotmat %*% t(Hinv$rotmat)
+    diag(Diag) = ifelse( diag(Diag)==0,1,diag(Diag) )
+    if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff)) ) stop("Rotation matrix is not a rotation")
+  }
+
+  # Return stuff
+  Return = list( "L_pj_rot"=L_pj_rot, "Psi_rot"=Psi_rot, "Hinv"=Hinv, "L_pj"=L_pj )
+  if(RotationMethod=="PCA") Return[["Eigen"]] = Eigen
+  return( Return )
+}
