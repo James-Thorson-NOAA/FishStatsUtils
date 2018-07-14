@@ -19,7 +19,7 @@
 #' }
 
 #' @export
-make_extrapolation_data = function( Region, strata.limits, observations_LL=NULL, input_grid=NULL, ... ){
+make_extrapolation_info = function( Region, strata.limits, observations_LL=NULL, input_grid=NULL, ... ){
 
   Extrapolation_List = NULL
   if( tolower(Region) == "california_current" ){
