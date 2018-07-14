@@ -29,6 +29,9 @@ Plot_range_shifts = function( Sdreport, Report, TmbData, Year_Set=NULL, PlotDir=
   FileName_Area=paste0(PlotDir,"/Area.png"), FileName_EffArea=paste0(PlotDir,"/Effective_Area.png"), Znames=rep("",ncol(TmbData$Z_xm)), use_biascorr=TRUE,
   category_names=NULL, interval_width=1, ...){
 
+  # Informative errors
+  if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
+
   # Which parameters
   if( "ln_Index_tl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
     # SpatialDeltaGLMM

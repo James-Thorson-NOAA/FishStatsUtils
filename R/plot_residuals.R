@@ -140,7 +140,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, savedir=getwd(),
       Q_xy = list( Q1_xy, Q2_xy )[[zI]]
       zlim = c(-1,1) * ceiling(max(abs(Q_xy),na.rm=TRUE))
       #Q_xt = ifelse( abs(Q_xt)>3, 3*sign(Q_xt), Q_xt )
-      FishStatsUtils:::PlotMap_Fn( MappingDetails=MappingDetails, Mat=Q_xy, PlotDF=PlotDF, Col=Col, zlim=zlim, ignore.na=TRUE, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(savedir,"/",c("maps--encounter_pearson_resid","maps--catchrate_pearson_resid")[zI]), Year_Set=paste0("Residuals--",1:ncol(Q_xy)), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin, add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+      PlotMap_Fn( MappingDetails=MappingDetails, Mat=Q_xy, PlotDF=PlotDF, Col=Col, zlim=zlim, ignore.na=TRUE, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(savedir,"/",c("maps--encounter_pearson_resid","maps--catchrate_pearson_resid")[zI]), Year_Set=paste0("Residuals--",1:ncol(Q_xy)), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin, add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
     }
   }
 

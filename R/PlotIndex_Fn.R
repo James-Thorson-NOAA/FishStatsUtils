@@ -33,6 +33,9 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
   strata_names=NULL, category_names=NULL, use_biascorr=TRUE, plot_legend=TRUE, total_area_km2=NULL, plot_log=FALSE, width=4, height=4,
   treat_missing_as_zero=FALSE, create_covariance_table=FALSE, ... ){
 
+  # Informative errors
+  if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
+
   # Which parameters
   if( "ln_Index_tl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
     # SpatialDeltaGLMM
