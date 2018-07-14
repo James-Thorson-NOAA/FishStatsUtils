@@ -10,7 +10,7 @@
 #' @examples Q <- QQ_Fn(TmbData = TmbData, Report = Report)
 #' @return A list containing results for each specified categories
 #' @export
-QQ_Fn <- function(TmbData, 
+plot_quantile_diagnostic <- function(TmbData,
                   Report, 
                   DateFile=paste0(getwd(),"/"),
                   save_dir=paste0(DateFile,"/QQ_Fn/"),

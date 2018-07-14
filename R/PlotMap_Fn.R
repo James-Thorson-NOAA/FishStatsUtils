@@ -4,7 +4,7 @@
 #' @description
 #' \code{PlotMap_Fn} is a hidden function to plot a map and fill in regions with colors to represent intensity in an areal-interpretion of model results
 #'
-#' @inheritParams PlotResultsOnMap_Fn
+#' @inheritParams plot_maps
 #' @param plot_legend_fig Boolean, whether to plot a separate figure for the heatmap legend or not
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
 #' @param ... arguments passed to \code{par}

@@ -1,7 +1,7 @@
 
 #' Build objects related to spatial information
 #'
-#' \code{Spatial_Information_Fn} builds a tagged list with all the spatial information needed for \code{Data_Fn}
+#' \code{make_spatial_info} builds a tagged list with all the spatial information needed for \code{Data_Fn}
 #'
 #' @param n_x, the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")
 #' @param Lon_i, Longitude for each sample
@@ -28,7 +28,7 @@
 #' }
 
 #' @export
-Spatial_Information_Fn = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intensity=Lat_i, Extrapolation_List, Method="Mesh", grid_size_km=50, grid_size_LL=1,
+make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intensity=Lat_i, Extrapolation_List, Method="Mesh", grid_size_km=50, grid_size_LL=1,
   randomseed=1, nstart=100, iter.max=1000, ... ){
 
   # Convert to an Eastings-Northings coordinate system

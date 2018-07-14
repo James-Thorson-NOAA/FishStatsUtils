@@ -3,7 +3,7 @@
 #' Plot location of sampling data
 #'
 #' @description
-#' \code{Plot_data_and_knots} produces diagnostics plots for the spatial distribution of data and knots
+#' \code{plot_data} produces diagnostics plots for the spatial distribution of data and knots
 #'
 #' @param Extrapolation_List Output from \code{Prepare_Extrapolation_Data_Fn}
 #' @param Spatial_List Output from \code{Spatial_Information_Fn}
@@ -13,7 +13,7 @@
 #'
 
 #' @export
-Plot_data_and_knots = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=paste0(getwd(),"/"),
+plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=paste0(getwd(),"/"),
   Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col=rep("red",nrow(Data_Geostat)), ...){
 
   # avoid attaching maps and mapdata to use worldHires plotting

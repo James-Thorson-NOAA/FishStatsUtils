@@ -2,7 +2,7 @@
 #' Plot standard maps
 #'
 #' @description
-#' \code{PlotResultsOnMap_Fn} plots a standard set of diagnostic maps
+#' \code{plot_maps} plots a standard set of diagnostic maps
 #'
 #' @param plot_set integer-vector defining plots to create
 #' \describe{
@@ -40,7 +40,7 @@
 #'
 
 #' @export
-PlotResultsOnMap_Fn <-
+plot_maps <-
 function(plot_set=3, MappingDetails, Report, Sdreport=NULL, Nknots=Inf, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Xlim, Ylim,
          FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png", Res=200,
          zone=NA, Cex=0.01, add=FALSE, category_names=NULL, textmargin=NULL, pch=NULL,

@@ -3,7 +3,7 @@
 #' Plot shifts in distribution and area occupied
 #'
 #' @description
-#' \code{Plot_range_shifts} plots center-of-gravity, kernel-area occupied, and effective-area occupied
+#' \code{plot_range_index} plots center-of-gravity, kernel-area occupied, and effective-area occupied
 #'
 #' @param Sdreport TMB output from `TMB::sdreport(Obj)`
 #' @param Report Reporting output from `Obj$report()`
@@ -14,7 +14,7 @@
 #' @param FileName_Area Full filename (including directory) for center-of-gravity plot
 #' @param FileName_EffArea Full filename (including directory) for center-of-gravity plot
 #' @param Znames Names for center-of-gravity summary statistics
-#' @inheritParams PlotIndex_Fn
+#' @inheritParams plot_biomass_index
 #'
 #' @return Return Tagged list of output
 #' \describe{
@@ -25,7 +25,7 @@
 #'
 
 #' @export
-Plot_range_shifts = function( Sdreport, Report, TmbData, Year_Set=NULL, PlotDir=paste0(getwd(),"/"), FileName_COG=paste0(PlotDir,"/center_of_gravity.png"),
+plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, PlotDir=paste0(getwd(),"/"), FileName_COG=paste0(PlotDir,"/center_of_gravity.png"),
   FileName_Area=paste0(PlotDir,"/Area.png"), FileName_EffArea=paste0(PlotDir,"/Effective_Area.png"), Znames=rep("",ncol(TmbData$Z_xm)), use_biascorr=TRUE,
   category_names=NULL, interval_width=1, ...){
 

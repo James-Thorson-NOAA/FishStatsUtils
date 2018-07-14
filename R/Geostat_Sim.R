@@ -4,7 +4,7 @@
 #' \code{Geostat_Sim} simulates data for use when testing \code{VAST}
 #'
 #' @param Sim_Settings an optional tagged list for specifying input parameters (see function code to determine settings)
-#' @inheritParams Spatial_Information_Fn
+#' @inheritParams make_spatial_info
 #' @param Data_Geostat A data frame with column headers \code{c('Lon','Lat','Year','Vessel','AreaSwept_km2')} containing sample design to mimic
 #' @param standardize_fields Boolean, whether to ensure that random fields have sample mean and standard deviation equal to their inputted values
 

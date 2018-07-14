@@ -3,7 +3,7 @@
 #' Plot index of abundance
 #'
 #' @description
-#' \code{PlotIndex_Fn} plots an index proportion to population abundance
+#' \code{plot_biomass_index} plots an index proportion to population abundance
 #'
 #' @param TmbData Formatted data inputs, from `VAST::Data_Fn(...)`
 #' @param DirName Directory for saving plot and table
@@ -19,7 +19,7 @@
 #' @param height plot height in inches
 #' @param treat_missing_as_zero Boolean whether to treat years and species with no (or only NA) data as instances where the index should be zero
 #' @param ... Other inputs to `par()`
-#' @inheritParams PlotResultsOnMap_Fn
+#' @inheritParams plot_maps
 #'
 #' @return Return Tagged list of output
 #' \describe{
@@ -28,7 +28,7 @@
 #'
 
 #' @export
-PlotIndex_Fn <-
+plot_biomass_index <-
 function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(getwd(),"/"), PlotName="Index.png", interval_width=1,
   strata_names=NULL, category_names=NULL, use_biascorr=TRUE, plot_legend=TRUE, total_area_km2=NULL, plot_log=FALSE, width=4, height=4,
   treat_missing_as_zero=FALSE, create_covariance_table=FALSE, ... ){

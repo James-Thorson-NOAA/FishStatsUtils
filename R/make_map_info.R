@@ -1,6 +1,9 @@
-
+#' Get information for adequate mapping for regions
+#'
+#' Function provides information to be used when plotting results
+#'
 #' @export
-MapDetails_Fn = function( Region, NN_Extrap, Extrapolation_List, Include=(Extrapolation_List[["Area_km2_x"]]>0&Extrapolation_List[["a_el"]][,1]>0) ){
+make_map_info = function( Region, NN_Extrap, Extrapolation_List, Include=(Extrapolation_List[["Area_km2_x"]]>0&Extrapolation_List[["a_el"]][,1]>0) ){
 
   PlotDF = NULL
 

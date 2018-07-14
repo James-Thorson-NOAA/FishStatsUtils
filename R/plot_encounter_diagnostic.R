@@ -3,10 +3,10 @@
 #' Check predicted encounter probability against observed encounter frequency
 #'
 #' @description
-#' \code{Check_encounter_prob} is a diagnostic function for checking validity of the encounter-probability component of a spatio-temporal model
+#' \code{plot_encounter_diagnostic} is a diagnostic function for checking validity of the encounter-probability component of a spatio-temporal model
 #'
-#' @inheritParams PlotResultsOnMap_Fn
-#' @inheritParams PlotIndex_Fn
+#' @inheritParams plot_maps
+#' @inheritParams plot_biomass_index
 #' @param ... arguments passed to \code{par}
 #'
 #' @return Return Tagged list of output
@@ -16,7 +16,7 @@
 #' }
 
 #' @export
-Check_encounter_prob = function( Report, Data_Geostat, cutpoints_z=seq(0,1,length=21), interval_width=1.96, DirName=paste0(getwd(),"/"),
+plot_encounter_diagnostic = function( Report, Data_Geostat, cutpoints_z=seq(0,1,length=21), interval_width=1.96, DirName=paste0(getwd(),"/"),
   PlotName="Diag--Encounter_prob.png", ... ){
 
   # Get bin for each datum

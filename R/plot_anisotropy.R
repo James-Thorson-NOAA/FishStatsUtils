@@ -1,6 +1,6 @@
 
 #' @export
-PlotAniso_Fn <-
+plot_anisotropy <-
 function( FileName, Report, ControlList=list("Width"=4, "Height"=5, "Res"=200, "Units"='in'), type="ellipse", TmbData=list("Options_vec"=c("Aniso"=1)) ){
   if( TmbData$Options_vec['Aniso']!=1 ){
     message("Skipping plot of geometric anisotropy because it has been turned off")

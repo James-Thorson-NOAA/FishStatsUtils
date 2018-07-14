@@ -1,7 +1,7 @@
 
 #' Build extrapolation grid
 #'
-#' \code{Prepare_Extrapolation_Data_Fn} builds an object used to determine areas to extrapolation densities to when calculating indices
+#' \code{make_extrapolation_data} builds an object used to determine areas to extrapolation densities to when calculating indices
 #'
 #' @param Region a character entry that is matched against potential values to determine the region for the extrapolation grid.
 #' @param strata.limits an input for determining stratification of indices (see example script)
@@ -19,7 +19,7 @@
 #' }
 
 #' @export
-Prepare_Extrapolation_Data_Fn = function( Region, strata.limits, observations_LL=NULL, input_grid=NULL, ... ){
+make_extrapolation_data = function( Region, strata.limits, observations_LL=NULL, input_grid=NULL, ... ){
 
   Extrapolation_List = NULL
   if( tolower(Region) == "california_current" ){
