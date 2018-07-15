@@ -31,7 +31,9 @@ Imports:
     rgdal,
     ThorsonUtilities,
     abind,
-    TMBhelper
+    TMBhelper,
+    pander,
+    formatR
 Depends:
     R (>= 3.1.0),
 Suggests:
