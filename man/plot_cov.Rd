@@ -25,4 +25,3 @@ plot_cov(Cov, zlim = NULL, names = 1:nrow(Cov), names2 = names,
 \description{
 \code{plot_cov} plots and formats a covariance matrix
 }
-

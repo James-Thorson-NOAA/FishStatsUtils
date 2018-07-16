@@ -32,4 +32,3 @@ tagged list of outputs
 \description{
 \code{PlotLoadings} plots elements of a column of the loadings matrix
 }
-

@@ -45,6 +45,6 @@ Additional_repositories: https://www.math.ntnu.no/inla/R/stable
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 URL: http://github.com/james-thorson/FishStatsUtils
 BugReports: http://github.com/james-thorson/FishStatsUtils/issues

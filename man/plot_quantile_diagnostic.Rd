@@ -34,4 +34,3 @@ Diagnostic QQ function
 \examples{
 Q <- QQ_Fn(TmbData = TmbData, Report = Report)
 }
-

@@ -11,4 +11,3 @@ FishStatsUtils provides utilities (shared code and data) for spatio-temporal mod
 \details{
 Please see examples folder on github \url{http://github.com/james-thorson/VAST/tree/master/examples} for up-to-date examples
 }
-

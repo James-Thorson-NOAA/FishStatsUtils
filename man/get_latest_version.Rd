@@ -22,4 +22,3 @@ Determine latest version of VAST
 \author{
 Kelli Faye Johnson
 }
-

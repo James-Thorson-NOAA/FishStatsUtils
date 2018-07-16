@@ -55,4 +55,3 @@ Return Tagged list of output
 \description{
 \code{plot_biomass_index} plots an index proportion to population abundance
 }
-

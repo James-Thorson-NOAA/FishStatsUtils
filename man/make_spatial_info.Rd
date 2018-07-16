@@ -52,4 +52,3 @@ Tagged list containing objects for running a VAST model
 \description{
 \code{make_spatial_info} builds a tagged list with all the spatial information needed for \code{Data_Fn}
 }
-

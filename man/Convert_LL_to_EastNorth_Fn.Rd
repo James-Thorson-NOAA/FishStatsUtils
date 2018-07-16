@@ -23,4 +23,3 @@ A data frame with the following columns
 \description{
 \code{Convert_LL_to_EastNorth_Fn} converts from Latitude-Longitude to World Geodetic System Eastings-Northings for a given location
 }
-

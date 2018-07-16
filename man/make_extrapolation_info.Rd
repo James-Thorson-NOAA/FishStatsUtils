@@ -31,4 +31,3 @@ Tagged list used in other functions
 \description{
 \code{make_extrapolation_data} builds an object used to determine areas to extrapolation densities to when calculating indices
 }
-

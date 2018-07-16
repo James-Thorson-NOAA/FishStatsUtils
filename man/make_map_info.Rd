@@ -11,4 +11,3 @@ make_map_info(Region, NN_Extrap, Extrapolation_List,
 \description{
 Function provides information to be used when plotting results
 }
-

@@ -34,4 +34,3 @@ Tagged list of useful output
 \description{
 \code{format_covariates} formats an array used by \code{Data_Fn} for habitat (a.k.a. density) covariates
 }
-

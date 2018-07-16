@@ -30,4 +30,3 @@ tagged list of outputs
 \description{
 \code{Rotate_Fn} rotates results from a factor model
 }
-

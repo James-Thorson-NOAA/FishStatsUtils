@@ -21,4 +21,3 @@ map_hypervariance(report = Save$Report,
                   Spatial_List = Spatial_List, 
                   method = "anisotropic")
 }
-

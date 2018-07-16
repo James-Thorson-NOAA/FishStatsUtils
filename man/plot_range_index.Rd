@@ -49,4 +49,3 @@ Return Tagged list of output
 \description{
 \code{plot_range_index} plots center-of-gravity, kernel-area occupied, and effective-area occupied
 }
-
