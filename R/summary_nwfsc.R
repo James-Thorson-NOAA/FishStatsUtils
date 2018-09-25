@@ -27,6 +27,8 @@ summary_nwfsc = function( obj, sdreport, savedir=NULL ){
   TableA[3,] = c("Is hessian positive definite?", switch(as.character(sdreport$pdHess),"FALSE"="No","TRUE"="Yes") )
   TableA[4,] = c("Was bias correction used?", ifelse("Est. (bias.correct)"%in%colnames(TMB::summary.sdreport(sdreport)),"Yes","No") )
   TableA[5,] = c("Distribution for measurement errors", switch(as.character(obj$env$data$ObsModel[1]),"1"="Lognormal","2"="Gamma") )
+  TableA[5, 2] = ifelse(obj$env$data$ObsModel[1] == 2 && obj$env$data$ObsModel[2] == 1,
+    "Poisson-Link", TableA[5, 2])
   TableA[6,] = c("Spatial effect for encounter probability", switch(as.character(obj$env$data$FieldConfig[1]),"-1"="No","1"="Yes") )
   TableA[7,] = c("Spatio-temporal effect for encounter probability", switch(as.character(obj$env$data$FieldConfig[2]),"-1"="No","1"="Yes") )
   TableA[8,] = c("Spatial effect for positive catch rate", switch(as.character(obj$env$data$FieldConfig[3]),"-1"="No","1"="Yes") )
