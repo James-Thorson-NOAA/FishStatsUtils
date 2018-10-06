@@ -34,6 +34,9 @@ function( strata.limits, observations_LL, grid_dim_km=c(2,2), maximum_distance_f
     attr(TmpUTM, "projection") = "UTM"
     attr(TmpUTM, "zone") = attr(observations_UTM,"zone")
     TmpLL = PBSmapping::convUL(TmpUTM, southern=!NorthernTF )
+    if( flip_around_dateline==TRUE ){
+      TmpLL[,1] = TmpLL[,1] - 180
+    }
     Data_Extrap = cbind( Data_Extrap, rename_columns(TmpLL,newname=c("Lon","Lat")) )
 
     # Restrict to grid locations near samples

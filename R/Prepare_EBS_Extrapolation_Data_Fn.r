@@ -1,6 +1,6 @@
 #' @export
 Prepare_EBS_Extrapolation_Data_Fn <-
-function( strata.limits=NULL, zone=NA, ... ){
+function( strata.limits=NULL, zone=NA, flip_around_dateline=TRUE, ... ){
   # Infer strata
   if( is.null(strata.limits)){
     strata.limits = data.frame('STRATA'="All_areas")
@@ -24,7 +24,7 @@ function( strata.limits=NULL, zone=NA, ... ){
   }
              #
   # Convert extrapolation-data to an Eastings-Northings coordinate system
-  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=TRUE)                                                         #$
+  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
            #
 
   # Extra junk
@@ -32,6 +32,6 @@ function( strata.limits=NULL, zone=NA, ... ){
   Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('X','Y')]
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=TRUE, "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
   return( Return )
 }
