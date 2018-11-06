@@ -37,11 +37,9 @@ Imports:
 Depends:
     R (>= 3.1.0),
 Suggests:
-    INLA,
     testthat
 Remotes: james-thorson/utilities,
     kaskr/TMB_contrib_R/TMBhelper
-Additional_repositories: https://www.math.ntnu.no/inla/R/stable
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
