@@ -34,38 +34,59 @@ format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spa
     Loc_e = Convert_LL_to_EastNorth_Fn( Lon=Lon_e, Lat=Lat_e, crs=Extrapolation_List$zone )
   }
 
-  # Step 2: Determine nearest knot for each LatLon_e
-  NN = RANN::nn2( data=Spatial_List$loc_x, query=Loc_e, k=1 )$nn.idx[,1]
+  # Associate each knot with all covariate measurements that are closest to that knot
+  if( na.omit %in% c("error","time-average") ){
+    # Step 2: Determine nearest knot for each LatLon_e
+    NN = RANN::nn2( data=Spatial_List$loc_x, query=Loc_e, k=1 )$nn.idx[,1]
 
-  # Step 3: Determine average covariate for each knot and year
-  Cov_xtp = NULL
-  for(pI in 1:ncol(Cov_ep)){
-    Cov_xt = tapply( Cov_ep[,pI], INDEX=list(factor(NN,levels=1:nrow(Spatial_List$loc_x)), factor(t_e,levels=Year_Set)), FUN=FUN )
-    Cov_xtp = abind::abind( Cov_xtp, Cov_xt, along=3 )
+    # Step 3: Determine average covariate for each knot and year
+    Cov_xtp = NULL
+    for(pI in 1:ncol(Cov_ep)){
+      Cov_xt = tapply( Cov_ep[,pI], INDEX=list(factor(NN,levels=1:nrow(Spatial_List$loc_x)), factor(t_e,levels=Year_Set)), FUN=FUN )
+      Cov_xtp = abind::abind( Cov_xtp, Cov_xt, along=3 )
+    }
+
+    # Step 4: QAQC
+    if( any(is.na(Cov_xtp)) ){
+      if( na.omit=="error" ){
+        stop("No covariate value for some combination of knot and year")
+      }
+      if( na.omit=="time-average"){
+        Cov_xtp = ifelse( is.na(Cov_xtp), aperm(apply(Cov_xtp,MARGIN=c(1,3),FUN=mean, na.rm=TRUE)%o%rep(1,length(Year_Set)),c(1,3,2)), Cov_xtp )
+      }
+    }
+
+    # Step 5: Calculate variance lost when aggregating to knots
+    KnotVar_p = apply( Cov_xtp, MARGIN=3, FUN=function(vec){var(as.vector(vec))} )
+    DataVar_p = apply( Cov_ep, MARGIN=2, FUN=var )
+    LostVar_p = 1 - KnotVar_p / DataVar_p
+    var_p = matrix( c(KnotVar_p,DataVar_p,LostVar_p), nrow=3, byrow=TRUE)
+    dimnames(var_p) = list( c("Variance_among_knots","Variance_among_observations","Proportion_of_variance_lost"), colnames(Cov_ep) )
+    for(pI in 1:ncol(Cov_ep)){
+      message( "Projecting to knots lost ", formatC(100*LostVar_p[pI],format="f",digits=1), "% of variance for variable ", ifelse(is.null(colnames(Cov_ep)[pI]),pI,colnames(Cov_ep)[pI]))
+    }
   }
 
-  # Step 4: QAQC
-  if( any(is.na(Cov_xtp)) ){
-    if( na.omit=="error" ){
-      stop("No covariate value for some combination of knot and year")
-    }
-    if( na.omit=="time-average"){
-      Cov_xtp = ifelse( is.na(Cov_xtp), aperm(apply(Cov_xtp,MARGIN=c(1,3),FUN=mean, na.rm=TRUE)%o%rep(1,length(Year_Set)),c(1,3,2)), Cov_xtp )
-    }
-  }
+  # Associate each knot with the X closest measurements in a given year
+  if( is.numeric(na.omit) ){
+    Cov_xtp = array(NA, dim=c(nrow(Spatial_List$loc_x),length(Year_Set),ncol(Cov_ep)), dimnames=list(NULL,Year_Set,colnames(Cov_ep)) )
 
-  # Step 5: Calculate variance lost when aggregating to knots
-  KnotVar_p = apply( Cov_xtp, MARGIN=3, FUN=function(vec){var(as.vector(vec))} )
-  DataVar_p = apply( Cov_ep, MARGIN=2, FUN=var )
-  LostVar_p = 1 - KnotVar_p / DataVar_p
-  var_p = matrix( c(KnotVar_p,DataVar_p,LostVar_p), nrow=3, byrow=TRUE)
-  dimnames(var_p) = list( c("Variance_among_knots","Variance_among_observations","Proportion_of_variance_lost"), colnames(Cov_ep) )
-  for(pI in 1:ncol(Cov_ep)){
-    message( "Projecting to knots lost ", formatC(100*LostVar_p[pI],format="f",digits=1), "% of variance for variable ", ifelse(is.null(colnames(Cov_ep)[pI]),pI,colnames(Cov_ep)[pI]))
+    for(tI in 1:length(Year_Set)){
+      Locprime_e = Loc_e[which(t_e==Year_Set[tI]),,drop=FALSE]
+      if( nrow(Locprime_e) == 0 ) stop("No measurements for year ", Year_Set[tI] )
+      NN = RANN::nn2( data=Locprime_e, query=Spatial_List$loc_x, k=na.omit )$nn.idx
+      for(xI in 1:dim(Cov_xtp)[1] ){
+      for(pI in 1:dim(Cov_xtp)[3] ){
+        Cov_xtp[xI,tI,pI] = FUN( Cov_ep[which(t_e==Year_Set[tI]),pI][NN[xI,]] )
+      }}
+    }
   }
 
   # Calculate interpolated value
-  Return = list( Cov_xtp=Cov_xtp, var_p=var_p )
+  Return = list( Cov_xtp=Cov_xtp )
+  if( na.omit %in% c("error","time-average") ){
+    Return[["var_p"]] = var_p
+  }
   return( Return )
 }
 

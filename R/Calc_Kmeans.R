@@ -51,8 +51,10 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
           Kmeans = Tmp
         }
       }
-      if(Save_Results==TRUE) save( Kmeans, file=paste0(DirPath,"/","Kmeans-",n_x,".RData"))
-      message( "Calculated and saved to ",DirPath,"/","Kmeans-",n_x,".RData" )
+      if(Save_Results==TRUE){
+        save( Kmeans, file=paste0(DirPath,"/","Kmeans-",n_x,".RData"))
+        message( "Calculated and saved to ",DirPath,"/","Kmeans-",n_x,".RData" )
+      }
     }
   }
 

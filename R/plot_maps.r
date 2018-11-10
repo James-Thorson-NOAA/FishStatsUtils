@@ -16,6 +16,7 @@
 #'   \item{plot_set=8}{Linear predictor for encounter probability}
 #'   \item{plot_set=9}{Linear predictor for positive catch rates}
 #'   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
+#'   \item{plot_set=11}{Covariates that are included in the model}
 #' }
 #' @param MappingDetails tagged list of plot-settings from \code{MapDetails_Fn}
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
@@ -41,8 +42,9 @@
 
 #' @export
 plot_maps <-
-function(plot_set=3, MappingDetails, Report, Sdreport=NULL, Nknots=Inf, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Xlim, Ylim,
-         FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png", Res=200,
+function(plot_set=3, MappingDetails, Report, Sdreport=NULL, TmbData=NULL, Nknots=Inf, PlotDF,
+         Xlim, Ylim, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200,
+         FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png",
          zone=NA, Cex=0.01, add=FALSE, category_names=NULL, textmargin=NULL, pch=NULL,
          Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, ...){
 
@@ -98,9 +100,9 @@ function(plot_set=3, MappingDetails, Report, Sdreport=NULL, Nknots=Inf, PlotDF, 
   }
 
   # Extract elements
-  plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV")
+  plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV", "Covariates")
   if( is.null(textmargin)){
-    textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)")
+    textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value")
   }
 
   # Select locations to plot
@@ -199,6 +201,12 @@ function(plot_set=3, MappingDetails, Report, Sdreport=NULL, Nknots=Inf, PlotDF, 
       # Convert to CV
       Array_xct = sqrt( exp(Array_xct^2) - 1 )
     }
+    if(plot_num==11){
+      if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
+      if(!("X_xtp" %in% names(TmbData))) stop( "Can only plot covariates for VAST version >= 2.0.0" )
+      Array_xct = aperm( TmbData$X_xtp, perm=c(1,3,2) )
+      category_names = 1:dim(Array_xct)[2]
+    }
 
 
 
@@ -211,7 +219,7 @@ function(plot_set=3, MappingDetails, Report, Sdreport=NULL, Nknots=Inf, PlotDF, 
 
       # Do plot
       if(add==FALSE) par( mfrow=mfrow )
-      Return = PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xt[,Years2Include,drop=FALSE], PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Ncategories>1,paste0("--",category_names[cI]),"")), Year_Set=Year_Set[Years2Include], Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+      Return = PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xt[,Years2Include,drop=FALSE], PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",category_names[cI]),"")), Year_Set=Year_Set[Years2Include], Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
     }
   }
 

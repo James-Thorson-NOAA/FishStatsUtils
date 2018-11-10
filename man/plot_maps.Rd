@@ -5,11 +5,11 @@
 \title{Plot standard maps}
 \usage{
 plot_maps(plot_set = 3, MappingDetails, Report, Sdreport = NULL,
-  Nknots = Inf, PlotDF, MapSizeRatio = c(`Width(in)` = 4, `Height(in)` = 4),
-  Xlim, Ylim, FileName = paste0(getwd(), "/"), Year_Set = NULL,
-  Years2Include = NULL, Rescale = FALSE, Rotate = 0, Format = "png",
-  Res = 200, zone = NA, Cex = 0.01, add = FALSE,
-  category_names = NULL, textmargin = NULL, pch = NULL,
+  TmbData = NULL, Nknots = Inf, PlotDF, Xlim, Ylim,
+  MapSizeRatio = c(`Width(in)` = 4, `Height(in)` = 4), Res = 200,
+  FileName = paste0(getwd(), "/"), Year_Set = NULL, Years2Include = NULL,
+  Rescale = FALSE, Rotate = 0, Format = "png", zone = NA, Cex = 0.01,
+  add = FALSE, category_names = NULL, textmargin = NULL, pch = NULL,
   Legend = list(use = FALSE, x = c(10, 30), y = c(10, 30)), mfrow = NULL,
   plot_legend_fig = TRUE, ...)
 }
@@ -26,6 +26,7 @@ plot_maps(plot_set = 3, MappingDetails, Report, Sdreport = NULL,
   \item{plot_set=8}{Linear predictor for encounter probability}
   \item{plot_set=9}{Linear predictor for positive catch rates}
   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
+  \item{plot_set=11}{Covariates that are included in the model}
 }}
 
 \item{MappingDetails}{tagged list of plot-settings from \code{MapDetails_Fn}}
@@ -36,11 +37,11 @@ plot_maps(plot_set = 3, MappingDetails, Report, Sdreport = NULL,
 
 \item{Nknots}{Number of knots used for plotting (default is all grid cells in \code{Extrapolation_grid}}
 
-\item{MapSizeRatio}{Default size for each panel}
-
 \item{Xlim}{xlimits for each panel}
 
 \item{Ylim}{ylimits for each panel}
+
+\item{MapSizeRatio}{Default size for each panel}
 
 \item{FileName}{Directory (absolute path) and base for filenames of plots}
 
