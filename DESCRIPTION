@@ -31,6 +31,7 @@ Imports:
     rgdal,
     ThorsonUtilities,
     abind,
+    corpcor,
     TMBhelper,
     pander,
     formatR
