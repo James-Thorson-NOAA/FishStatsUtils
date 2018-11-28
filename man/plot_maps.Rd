@@ -4,8 +4,8 @@
 \alias{plot_maps}
 \title{Plot standard maps}
 \usage{
-plot_maps(plot_set = 3, MappingDetails, Report, Sdreport = NULL,
-  TmbData = NULL, Nknots = Inf, PlotDF, Xlim, Ylim,
+plot_maps(plot_set = 3, MappingDetails, Report, PlotDF, Sdreport = NULL,
+  Xlim, Ylim, TmbData = NULL, Nknots = Inf, Panel = "Category",
   MapSizeRatio = c(`Width(in)` = 4, `Height(in)` = 4), Res = 200,
   FileName = paste0(getwd(), "/"), Year_Set = NULL, Years2Include = NULL,
   Rescale = FALSE, Rotate = 0, Format = "png", zone = NA, Cex = 0.01,
@@ -35,11 +35,13 @@ plot_maps(plot_set = 3, MappingDetails, Report, Sdreport = NULL,
 
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
-\item{Nknots}{Number of knots used for plotting (default is all grid cells in \code{Extrapolation_grid}}
-
 \item{Xlim}{xlimits for each panel}
 
 \item{Ylim}{ylimits for each panel}
+
+\item{Nknots}{Number of knots used for plotting (default is all grid cells in \code{Extrapolation_grid}}
+
+\item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
 
 \item{MapSizeRatio}{Default size for each panel}
 

@@ -23,10 +23,12 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
          Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE, ...){
 
   # avoid attaching maps and mapdata to use worldHires plotting
-  require(maps)
-  require(mapdata)
-  on.exit( detach("package:mapdata") )
-  on.exit( detach("package:maps"), add=TRUE )
+  if( !(all(c("maps","mapdata") %in% search())) ){
+    require(maps)
+    require(mapdata)
+    on.exit( detach("package:mapdata") )
+    on.exit( detach("package:maps"), add=TRUE )
+  }
 
   # Transform to grid or other coordinates
   Mat = Mat[PlotDF[,'x2i'],,drop=FALSE]

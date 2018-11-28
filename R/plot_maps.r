@@ -22,6 +22,7 @@
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
 #' @param Nknots Number of knots used for plotting (default is all grid cells in \code{Extrapolation_grid}
+#' @param Panel Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure
 #' @param MapSizeRatio Default size for each panel
 #' @param Ylim ylimits for each panel
 #' @param Xlim xlimits for each panel
@@ -42,11 +43,20 @@
 
 #' @export
 plot_maps <-
-function(plot_set=3, MappingDetails, Report, Sdreport=NULL, TmbData=NULL, Nknots=Inf, PlotDF,
-         Xlim, Ylim, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200,
+function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
+         TmbData=NULL, Nknots=Inf, Panel="Category",
+         MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200,
          FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png",
          zone=NA, Cex=0.01, add=FALSE, category_names=NULL, textmargin=NULL, pch=NULL,
          Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, ...){
+
+  # avoid attaching maps and mapdata to use worldHires plotting
+  if( !(all(c("maps","mapdata") %in% search())) ){
+    require(maps)
+    require(mapdata)
+    on.exit( detach("package:mapdata") )
+    on.exit( detach("package:maps"), add=TRUE )
+  }
 
   # Fill in missing inputs
   if( "D_xt" %in% names(Report)){
@@ -89,7 +99,6 @@ function(plot_set=3, MappingDetails, Report, Sdreport=NULL, TmbData=NULL, Nknots
     Ncategories = dim(Report$dpred_ktp)[3]
     Nyears = dim(Report$dpred_ktp)[2]
   }
-  if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
 
   # Errors
   if( Nyears != length(Year_Set) ){
@@ -208,20 +217,35 @@ function(plot_set=3, MappingDetails, Report, Sdreport=NULL, TmbData=NULL, Nknots
       category_names = 1:dim(Array_xct)[2]
     }
 
-
-
     # Plot for each category
-    if(length(dim(Array_xct))==2) Nplot = 1
-    if(length(dim(Array_xct))==3) Nplot = dim(Array_xct)[2]
-    for( cI in 1:Nplot){
-      if(length(dim(Array_xct))==2) Mat_xt = Array_xct
-      if(length(dim(Array_xct))==3) Mat_xt = Array_xct[,cI,]
+    if( tolower(Panel)=="category" ){
+      if(length(dim(Array_xct))==2) Nplot = 1
+      if(length(dim(Array_xct))==3) Nplot = dim(Array_xct)[2]
+      for( cI in 1:Nplot){
+        if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
+        if(length(dim(Array_xct))==3) Return = Mat_xt = Array_xct[,cI,]
 
-      # Do plot
-      if(add==FALSE) par( mfrow=mfrow )
-      Return = PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xt[,Years2Include,drop=FALSE], PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",category_names[cI]),"")), Year_Set=Year_Set[Years2Include], Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+        # Do plot
+        if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
+        if(add==FALSE) par( mfrow=mfrow )
+        PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xt[,Years2Include,drop=FALSE], PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",category_names[cI]),"")), Year_Set=Year_Set[Years2Include], Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+      }
+    }
+    # Plot for each year
+    if( tolower(Panel)=="year" ){
+      Nplot = length(Years2Include)
+      for( tI in 1:Nplot){
+        if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,Years2Include[tI],drop=TRUE]
+        if(length(dim(Array_xct))==3) Mat_xc = Array_xct[,,Years2Include[tI],drop=TRUE]
+        Return = Mat_xc = array( as.vector(Mat_xc), dim=c(dim(Array_xct)[1],Ncategories)) # Reformat to make sure it has same format for everything
+
+        # Do plot
+        if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(category_names))), ceiling(length(category_names)/ceiling(sqrt(length(category_names)))))
+        if(add==FALSE) par( mfrow=mfrow )
+        PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xc, PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",Year_Set[Years2Include][tI]),"")), Year_Set=category_names, Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+      }
     }
   }
 
-  return( invisible(Mat_xt) )
+  return( invisible(Return) )
 }
