@@ -51,11 +51,11 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
          Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, ...){
 
   # avoid attaching maps and mapdata to use worldHires plotting
-  if( !(all(c("maps","mapdata") %in% search())) ){
+  if( !(all(c("package:maps","package:mapdata") %in% search())) ){
     require(maps)
     require(mapdata)
-    on.exit( detach("package:mapdata") )
-    on.exit( detach("package:maps"), add=TRUE )
+    on.exit( if("package:mapdata"%in% search()){detach("package:mapdata")} )
+    on.exit( if("package:maps"%in% search()){detach("package:maps")}, add=TRUE )
   }
 
   # Fill in missing inputs

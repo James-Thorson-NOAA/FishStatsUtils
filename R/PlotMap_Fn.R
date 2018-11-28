@@ -23,11 +23,11 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
          Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE, ...){
 
   # avoid attaching maps and mapdata to use worldHires plotting
-  if( !(all(c("maps","mapdata") %in% search())) ){
+  if( !(all(c("package:maps","package:mapdata") %in% search())) ){
     require(maps)
     require(mapdata)
-    on.exit( detach("package:mapdata") )
-    on.exit( detach("package:maps"), add=TRUE )
+    on.exit( if("package:mapdata"%in% search()){detach("package:mapdata")} )
+    on.exit( if("package:maps"%in% search()){detach("package:maps")}, add=TRUE )
   }
 
   # Transform to grid or other coordinates
