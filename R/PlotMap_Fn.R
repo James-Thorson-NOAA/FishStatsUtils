@@ -30,6 +30,12 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
     on.exit( if("package:maps"%in% search()){detach("package:maps")}, add=TRUE )
   }
 
+  # Check for problems
+  if( length(Year_Set) != ncol(Mat) ){
+    warning( "Year_Set and `ncol(Mat)` don't match: Changing Year_Set'")
+    Year_Set = 1:ncol(Mat)
+  }
+
   # Transform to grid or other coordinates
   Mat = Mat[PlotDF[,'x2i'],,drop=FALSE]
   Which = which( PlotDF[,'Include']>0 )
