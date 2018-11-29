@@ -95,7 +95,7 @@ plot_quantile_diagnostic <- function(TmbData,
           pred_y[ObsI] = TmbData$a_i[Which[ObsI]] * exp(Report$P2_i[Which[ObsI]])
         }
       }
-      if( length(ObsModel_ez[i_e,])>=2 && ObsModel_ez[i_e,2]==1 ){
+      if( length(ObsModel_ez[i_e,])>=2 && ObsModel_ez[i_e,2]%in%c(1,4) ){
         for(ObsI in 1:length(Which)){
           if(sigmaM[e_i[Which[ObsI]]+1,3]!=1) stop("`QQ_Fn` will not work with Poisson-link delta model across all VAST versions given values for turned-off parameters")
           R1_i = 1 - exp( -1 * sigmaM[e_i[Which[ObsI]]+1,3] * TmbData$a_i[Which[ObsI]] * exp(Report$P1_i[Which[ObsI]]) )
