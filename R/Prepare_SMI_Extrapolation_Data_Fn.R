@@ -1,5 +1,5 @@
 #' @export
-Prepare_EBS_Extrapolation_Data_Fn <-
+Prepare_SMI_Extrapolation_Data_Fn <-
 function( strata.limits=NULL, zone=NA, flip_around_dateline=TRUE, ... ){
   # Infer strata
   if( is.null(strata.limits)){
