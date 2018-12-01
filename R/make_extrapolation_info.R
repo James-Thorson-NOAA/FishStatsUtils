@@ -37,6 +37,9 @@ make_extrapolation_info = function( Region, strata.limits, observations_LL=NULL,
   if( tolower(Region) == "northern_bering_sea" ){ #
     Extrapolation_List = Prepare_NBS_Extrapolation_Data_Fn( strata.limits=strata.limits, ... )
   }
+  if( tolower(Region) %in% c("st_matthews_island","SMI") ){ #
+    Extrapolation_List = Prepare_SMI_Extrapolation_Data_Fn( strata.limits=strata.limits, ... )
+  }
   if( tolower(Region) == "aleutian_islands" ){ #
     Extrapolation_List = Prepare_AI_Extrapolation_Data_Fn( strata.limits=strata.limits, ... )
   }
