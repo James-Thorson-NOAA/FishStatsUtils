@@ -22,9 +22,10 @@ PlotLoadings = function( L_pj, whichfactor=1, addtitle=TRUE, LabelPosition="Righ
   legend_text="Proportion of explained variance", ... ){
 
   # Plotting window
-  Ylim = range(L_pj)+diff(range(L_pj))*Buffer
+  Ylim = range(L_pj)
   Ylim[1] = ifelse( Ylim[1]>0, 0, Ylim[1] )
   Ylim[2] = ifelse( Ylim[2]<0, 0, Ylim[2] )
+  Ylim = Ylim + diff(Ylim)*Buffer
   plot(1, type="n", xlim=c(0.5,nrow(L_pj)+0.5), ylim=Ylim, xlab="", ylab="", xaxt="n", xaxs="i", ... )
   if(LabelPosition=="Xaxis") axis( side=1, at=1:nrow(L_pj), labels=TRUE, las=3)
   if(addtitle==TRUE) mtext( text=paste("Factor",whichfactor), side=3, line=0.1, adj=0)
