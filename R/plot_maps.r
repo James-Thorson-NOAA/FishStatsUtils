@@ -17,6 +17,7 @@
 #'   \item{plot_set=9}{Linear predictor for positive catch rates}
 #'   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
 #'   \item{plot_set=11}{Covariates that are included in the model}
+#'   \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
 #' }
 #' @param MappingDetails tagged list of plot-settings from \code{MapDetails_Fn}
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
@@ -57,6 +58,9 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     on.exit( if("package:mapdata"%in% search()){detach("package:mapdata")} )
     on.exit( if("package:maps"%in% search()){detach("package:maps")}, add=TRUE )
   }
+
+  # local functions
+  logsum = function(vec){ max(vec) + log(sum(exp(vec-max(vec)))) }
 
   # Fill in missing inputs
   if( "D_xt" %in% names(Report)){
@@ -109,9 +113,9 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
   }
 
   # Extract elements
-  plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV", "Covariates")
+  plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV", "Covariates", "Total_dens")
   if( is.null(textmargin)){
-    textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value")
+    textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value", "Density, ln(kg. per square km.)")
   }
 
   # Select locations to plot
@@ -215,6 +219,14 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if(!("X_xtp" %in% names(TmbData))) stop( "Can only plot covariates for VAST version >= 2.0.0" )
       Array_xct = aperm( TmbData$X_xtp, perm=c(1,3,2) )
       category_names = 1:dim(Array_xct)[2]
+    }
+    if(plot_num==12){
+      # Total density ("Dens")
+      if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt)
+      if("D_xct"%in%names(Report)) Array_xct = log(apply(Report$D_xct,FUN=sum,MARGIN=c(1,3)))
+      if("D_xcy"%in%names(Report)) Array_xct = log(apply(Report$D_xcy,FUN=sum,MARGIN=c(1,3)))
+      if("dhat_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dhat_ktp,c(1,3,2)),FUN=logsum,MARGIN=c(1,3))
+      if("dpred_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dpred_ktp,c(1,3,2)),FUN=logsum,MARGIN=c(1,3))
     }
 
     # Plot for each category
