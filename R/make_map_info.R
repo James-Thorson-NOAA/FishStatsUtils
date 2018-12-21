@@ -128,7 +128,7 @@ make_map_info = function( Region, NN_Extrap, Extrapolation_List, Include=(Extrap
     Xlim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lon'])
     Ylim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lat'])
     Rotate = 0
-    Cex = 1.0
+    Cex = 0.1
     Legend = list(use=FALSE,x=c(10,30),y=c(10,30))
   }
 
