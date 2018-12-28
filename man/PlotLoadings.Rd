@@ -5,8 +5,9 @@
 \title{Plotting loadings matrix}
 \usage{
 PlotLoadings(L_pj, whichfactor = 1, addtitle = TRUE,
-  LabelPosition = "Right", Buffer = c(0, 0.1), Labels = rownames(L_pj),
-  Cex = 1.2)
+  LabelPosition = "Right", Buffer = c(0, 0.1),
+  Labels = rownames(L_pj), Cex = 1.2,
+  legend_text = "Proportion of explained variance", ...)
 }
 \arguments{
 \item{L_pj}{Loadings matrix for `p` categories and `j` factors}

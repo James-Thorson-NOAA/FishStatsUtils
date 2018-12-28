@@ -18,6 +18,8 @@
 #'   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
 #'   \item{plot_set=11}{Covariates that are included in the model}
 #'   \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
+#'   \item{plot_set=13}{Covariate effects on encounter probability}
+#'   \item{plot_set=14}{Covariate effects on positive catch rates}
 #' }
 #' @param MappingDetails tagged list of plot-settings from \code{MapDetails_Fn}
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
@@ -113,9 +115,9 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
   }
 
   # Extract elements
-  plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV", "Covariates", "Total_dens")
+  plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV", "Covariates", "Total_dens", "Cov_effects_Pres", "Cov_effects_Pos")
   if( is.null(textmargin)){
-    textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value", "Density, ln(kg. per square km.)")
+    textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value", "Density, ln(kg. per square km.)", "", "")
   }
 
   # Select locations to plot
@@ -227,6 +229,22 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xcy"%in%names(Report)) Array_xct = log(apply(Report$D_xcy,FUN=sum,MARGIN=c(1,3)))
       if("dhat_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dhat_ktp,c(1,3,2)),FUN=logsum,MARGIN=c(1,3))
       if("dpred_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dpred_ktp,c(1,3,2)),FUN=logsum,MARGIN=c(1,3))
+    }
+    if(plot_num==13){
+      # Covariate effects for probability of encounter
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) Array_xct = Report$eta1_xct
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+    }
+    if(plot_num==14){
+      # Covariate effects for positive catch rates
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) Array_xct = Report$eta2_xct
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
     }
 
     # Plot for each category

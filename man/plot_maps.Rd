@@ -4,14 +4,15 @@
 \alias{plot_maps}
 \title{Plot standard maps}
 \usage{
-plot_maps(plot_set = 3, MappingDetails, Report, PlotDF, Sdreport = NULL,
-  Xlim, Ylim, TmbData = NULL, Nknots = Inf, Panel = "Category",
-  MapSizeRatio = c(`Width(in)` = 4, `Height(in)` = 4), Res = 200,
-  FileName = paste0(getwd(), "/"), Year_Set = NULL, Years2Include = NULL,
-  Rescale = FALSE, Rotate = 0, Format = "png", zone = NA, Cex = 0.01,
-  add = FALSE, category_names = NULL, textmargin = NULL, pch = NULL,
-  Legend = list(use = FALSE, x = c(10, 30), y = c(10, 30)), mfrow = NULL,
-  plot_legend_fig = TRUE, ...)
+plot_maps(plot_set = 3, MappingDetails, Report, PlotDF,
+  Sdreport = NULL, Xlim, Ylim, TmbData = NULL, Nknots = Inf,
+  Panel = "Category", MapSizeRatio = c(`Width(in)` = 4, `Height(in)` =
+  4), Res = 200, FileName = paste0(getwd(), "/"), Year_Set = NULL,
+  Years2Include = NULL, Rescale = FALSE, Rotate = 0,
+  Format = "png", zone = NA, Cex = 0.01, add = FALSE,
+  category_names = NULL, textmargin = NULL, pch = NULL,
+  Legend = list(use = FALSE, x = c(10, 30), y = c(10, 30)),
+  mfrow = NULL, plot_legend_fig = TRUE, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -27,6 +28,9 @@ plot_maps(plot_set = 3, MappingDetails, Report, PlotDF, Sdreport = NULL,
   \item{plot_set=9}{Linear predictor for positive catch rates}
   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
   \item{plot_set=11}{Covariates that are included in the model}
+  \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
+  \item{plot_set=13}{Covariate effects on encounter probability}
+  \item{plot_set=14}{Covariate effects on positive catch rates}
 }}
 
 \item{MappingDetails}{tagged list of plot-settings from \code{MapDetails_Fn}}
