@@ -2,7 +2,18 @@
 #' @export
 plot_anisotropy <-
 function( FileName, Report, ControlList=list("Width"=4, "Height"=5, "Res"=200, "Units"='in'), type="ellipse", TmbData=list("Options_vec"=c("Aniso"=1)) ){
-  if( TmbData$Options_vec['Aniso']!=1 ){
+
+  # Extract Options and Options_vec (depends upon version)
+  if( all(c("Options","Options_vec") %in% names(TmbData)) ){
+    Options_vec = TmbData$Options_vec
+    Options = TmbData$Options
+  }
+  if( "Options_list" %in% names(TmbData) ){
+    Options_vec = TmbData$Options_list$Options_vec
+    Options = TmbData$Options_list$Options
+  }
+
+  if( Options_vec['Aniso']!=1 ){
     message("Skipping plot of geometric anisotropy because it has been turned off")
   }else{
     # Decomposition
