@@ -1,7 +1,7 @@
 
 #' @export
 plot_anisotropy <-
-function( FileName, Report, ControlList=list("Width"=4, "Height"=5, "Res"=200, "Units"='in'), type="ellipse", TmbData=list("Options_vec"=c("Aniso"=1)) ){
+function( FileName, Report, ControlList=list("Width"=4, "Height"=5, "Res"=200, "Units"='in'), type="ellipse", TmbData=list("Options_vec"=c("Aniso"=1),"Options"=NULL) ){
 
   # Extract Options and Options_vec (depends upon version)
   if( all(c("Options","Options_vec") %in% names(TmbData)) ){
