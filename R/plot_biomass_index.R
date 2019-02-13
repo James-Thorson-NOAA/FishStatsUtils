@@ -86,8 +86,17 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
 
   # Objects
   SD = TMB::summary.sdreport(Sdreport)
-  SD_estimate = as.list( Sdreport, what="Estimate", report=TRUE )
-  SD_stderr = as.list( Sdreport, what="Std. Error", report=TRUE )
+  if( !"report" %in% names(as.list(args(TMB:::as.list.sdreport))) ){
+    warning( "package `TMB` should be updated to easily access standard errors")
+  }
+  SD_stderr = TMB:::as.list.sdreport( Sdreport, what="Std. Error", report=TRUE )
+  SD_estimate = TMB:::as.list.sdreport( Sdreport, what="Estimate", report=TRUE )
+  if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
+    SD_estimate_biascorrect = TMB:::as.list.sdreport( Sdreport, what="Est. (bias.correct)", report=TRUE )
+  }
+  if( any(is.na(SD_estimate)) | any(is.na(SD_stderr)) ){
+    stop( "Problem: Standard errors contain NAs")
+  }
 
   # Extract index (using bias-correctino if available and requested)
   if( ParName %in% c("Index_tl","Index_ctl","Index_cyl")){
