@@ -24,8 +24,6 @@ Imports:
     devtools,
     mixtools,
     sp,
-    maps,
-    mapdata,
     TMB,
     MatrixModels,
     rgdal,
@@ -36,7 +34,9 @@ Imports:
     pander,
     formatR
 Depends:
-    R (>= 3.1.0),
+    maps,
+    mapdata,
+    R (>= 3.1.0)
 Suggests:
     testthat
 Remotes: james-thorson/utilities,
