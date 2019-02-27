@@ -16,12 +16,6 @@
 plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=paste0(getwd(),"/"),
   Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col=rep("red",nrow(Data_Geostat)), cex=0.01, ...){
 
-  # avoid attaching maps and mapdata to use worldHires plotting
-  require(maps)
-  require(mapdata)
-  on.exit( detach("package:mapdata") )
-  on.exit( detach("package:maps"), add=TRUE )
-
   # Plot data and grid
   png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
     par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )

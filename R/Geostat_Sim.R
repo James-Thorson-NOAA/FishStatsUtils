@@ -51,12 +51,7 @@ function(Sim_Settings, Extrapolation_List, Data_Geostat=NULL, MakePlot=FALSE, Da
     }
   }
 
-  # Attach stuff
   start_time = Sys.time()
-  library( maps )
-  library( mapdata )
-  on.exit( detach(package:mapdata), add=TRUE )
-  on.exit( detach(package:maps), add=TRUE )
 
   # Local functions
   RFsim = function(model, x, y, standardize=TRUE){
