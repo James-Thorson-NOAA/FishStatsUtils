@@ -53,14 +53,6 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
          zone=NA, Cex=0.01, add=FALSE, category_names=NULL, textmargin=NULL, pch=NULL,
          Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, ...){
 
-  # avoid attaching maps and mapdata to use worldHires plotting
-  if( !(all(c("package:maps","package:mapdata") %in% search())) ){
-    require(maps)
-    require(mapdata)
-    on.exit( if("package:mapdata"%in% search()){detach("package:mapdata")} )
-    on.exit( if("package:maps"%in% search()){detach("package:maps")}, add=TRUE )
-  }
-
   # local functions
   logsum = function(vec){ max(vec) + log(sum(exp(vec-max(vec)))) }
 

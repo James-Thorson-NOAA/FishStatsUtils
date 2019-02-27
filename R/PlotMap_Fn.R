@@ -22,14 +22,6 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
          outermargintext=c("Eastings","Northings"), zlim=NULL, Col=NULL,
          Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE, ...){
 
-  # avoid attaching maps and mapdata to use worldHires plotting
-  if( !(all(c("package:maps","package:mapdata") %in% search())) ){
-    require(maps)
-    require(mapdata)
-    on.exit( if("package:mapdata"%in% search()){detach("package:mapdata")} )
-    on.exit( if("package:maps"%in% search()){detach("package:maps")}, add=TRUE )
-  }
-
   # Check for problems
   if( length(Year_Set) != ncol(Mat) ){
     warning( "Year_Set and `ncol(Mat)` don't match: Changing Year_Set'")
@@ -40,7 +32,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
   Mat = Mat[PlotDF[,'x2i'],,drop=FALSE]
   Which = which( PlotDF[,'Include']>0 )
   if( Rescale!=FALSE ) Mat = Mat / outer(rep(Rescale,nrow(Mat)), colMeans(Mat[Which,]))
-  
+
   # Plotting functions
   f = function(Num, zlim=NULL){
     if( is.null(zlim)) Return = ((Num)-min(Num,na.rm=TRUE))/max(diff(range(Num,na.rm=TRUE)),0.01)
@@ -48,7 +40,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
     return( Return )
   }
   if( is.null(Col)) Col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
-  
+
   # Plot
   Par = list( mfrow=mfrow, ...)
   if(Format=="png"){
