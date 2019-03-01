@@ -23,6 +23,17 @@ function(loc_x, Method="Mesh", anisotropic_mesh=NULL, refine=FALSE, ...){
   if( is.null(anisotropic_mesh)) anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, ...)
   anisotropic_spde = INLA::inla.spde2.matern(anisotropic_mesh, alpha=2)
 
+  # Exploring how to add projection matrix from knots to extrapolation-grid cells
+  if( FALSE ){
+    loc_i = as.matrix( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0),c("E_km","N_km")] )
+    outer_hull = INLA::inla.nonconvex.hull(loc_i, convex = -0.05, concave = -0.05)
+    if( is.null(anisotropic_mesh)) anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, refine=refine, ...)
+    plot(anisotropic_mesh)
+    A = INLA::inla.spde.make.A( anisotropic_mesh, loc_i )
+    Check = apply( A, MARGIN=1, FUN=function(vec){sum(vec>0)})
+    if( any(Check!=3) ) stop("Problem")
+  }
+
   # Pre-processing in R for anisotropy
   Dset = 1:2
   # Triangle info
