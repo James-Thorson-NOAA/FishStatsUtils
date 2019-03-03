@@ -4,8 +4,9 @@
 \alias{Calc_Kmeans}
 \title{Calculate location for knots approximating spatial variation}
 \usage{
-Calc_Kmeans(n_x, loc_orig, nstart = 100, randomseed = 1, iter.max = 1000,
-  DirPath = paste0(getwd(), "/"), Save_Results = TRUE)
+Calc_Kmeans(n_x, loc_orig, nstart = 100, randomseed = 1,
+  iter.max = 1000, DirPath = paste0(getwd(), "/"),
+  Save_Results = TRUE)
 }
 \arguments{
 \item{n_x}{the number of knots to select}

@@ -4,9 +4,9 @@
 \alias{smallPlot}
 \title{Inset small plot within figure}
 \usage{
-smallPlot(expr, x = c(5, 70), y = c(50, 100), x1, y1, x2, y2, mar = c(12,
-  14, 3, 3), mgp = c(1.8, 0.8, 0), bg = par("bg"), border = par("fg"),
-  las = 1, resetfocus = TRUE, ...)
+smallPlot(expr, x = c(5, 70), y = c(50, 100), x1, y1, x2, y2,
+  mar = c(12, 14, 3, 3), mgp = c(1.8, 0.8, 0), bg = par("bg"),
+  border = par("fg"), las = 1, resetfocus = TRUE, ...)
 }
 \value{
 parameters of small plot, invisible.

@@ -4,8 +4,8 @@
 \alias{plot_encounter_diagnostic}
 \title{Check predicted encounter probability against observed encounter frequency}
 \usage{
-plot_encounter_diagnostic(Report, Data_Geostat, cutpoints_z = seq(0, 1, length
-  = 21), interval_width = 1.96, DirName = paste0(getwd(), "/"),
+plot_encounter_diagnostic(Report, Data_Geostat, cutpoints_z = seq(0, 1,
+  length = 21), interval_width = 1.96, DirName = paste0(getwd(), "/"),
   PlotName = "Diag--Encounter_prob.png", ...)
 }
 \arguments{
