@@ -5,12 +5,12 @@
 \title{Plot Pearson residuals on map}
 \usage{
 plot_residuals(Lat_i, Lon_i, TmbData, Report, Q, savedir = getwd(),
-  MappingDetails, PlotDF, MapSizeRatio = c(`Width(in)` = 4, `Height(in)` = 4),
-  Xlim, Ylim, FileName = paste0(getwd(), "/"), Year_Set = NULL,
-  Years2Include = NULL, Rescale = FALSE, Rotate = 0, Format = "png",
-  Res = 200, zone = NA, Cex = 0.01, add = FALSE, textmargin = NULL,
-  pch = NULL, Legend = list(use = FALSE, x = c(10, 30), y = c(10, 30)),
-  mfrow = NULL, plot_legend_fig = TRUE, ...)
+  MappingDetails, PlotDF, MapSizeRatio = c(`Width(in)` = 4, `Height(in)`
+  = 4), Xlim, Ylim, FileName = paste0(getwd(), "/"), Year_Set = NULL,
+  Years2Include = NULL, Rescale = FALSE, Rotate = 0,
+  Format = "png", Res = 200, zone = NA, Cex = 0.01, add = FALSE,
+  textmargin = NULL, pch = NULL, Legend = list(use = FALSE, x = c(10,
+  30), y = c(10, 30)), mfrow = NULL, plot_legend_fig = TRUE, ...)
 }
 \arguments{
 \item{Lat_i}{Latitude for every observation \code{i}}

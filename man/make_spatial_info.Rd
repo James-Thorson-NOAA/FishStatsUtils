@@ -6,8 +6,8 @@
 \usage{
 make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
   LAT_intensity = Lat_i, Extrapolation_List, Method = "Mesh",
-  grid_size_km = 50, grid_size_LL = 1, randomseed = 1, nstart = 100,
-  iter.max = 1000, ...)
+  grid_size_km = 50, grid_size_LL = 1, randomseed = 1,
+  nstart = 100, iter.max = 1000, ...)
 }
 \arguments{
 \item{n_x, }{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}

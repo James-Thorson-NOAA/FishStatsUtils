@@ -85,14 +85,14 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   a_xl = PolygonList[["a_xl"]]
 
   # Convert loc_x back to location in lat-long coordinates loc_x_LL
-  # if zone=NA or NULL, then it automatically detects appropriate zone
+  # if zone=NA or NTULL, then it automatically detects appropriate zone
   #tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_x),'X'=loc_x[,'E_km'],'Y'=loc_x[,'N_km'])
   #attr(tmpUTM,"projection") = "UTM"
   #attr(tmpUTM,"zone") = Extrapolation_List$zone
   #loc_x_LL = PBSmapping::convUL(tmpUTM)                                                         #$
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
-  MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers )
+  MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, Extrapolation_List=Extrapolation_List )
 
   # Make matrices for 2D AR1 process
   Dist_grid = dist(loc_grid, diag=TRUE, upper=TRUE)

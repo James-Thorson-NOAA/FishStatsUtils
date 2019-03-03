@@ -12,8 +12,11 @@
 #'
 #' @export
 get_latest_version <- function(version = NULL, package = "VAST") {
+
+  # Determine location of files on machine
   thedir <- system.file("executables", package = package)
 
+  # Determine list of available files
   if (!is.null(version)) {
     thefile <- dir(thedir, pattern = version, ignore.case = TRUE, full.names = FALSE)
     if( length(thefile)==0 ){
@@ -24,9 +27,16 @@ get_latest_version <- function(version = NULL, package = "VAST") {
     if( length(thefile)==0 ){
       stop("cpp files were not found in the dir, ", thedir, ".")
     }
-    thefile <- tail(thefile, 1)
   }
 
+  # Determine which is latest version
+  for(i in 1:length(thefile)){
+    if(i==1) semantic_version = convert_version_name(thefile[1])
+    if(i>=2) semantic_version = c( semantic_version, convert_version_name(thefile[i]) )
+  }
+  thefile = thefile[which(semantic_version==max(semantic_version))]
+
+  # Remove .cpp from end and return
   thefile <- strsplit( thefile, ".", fixed=TRUE )[[1]][1]
   return(thefile)
 }
