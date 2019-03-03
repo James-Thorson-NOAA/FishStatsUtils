@@ -34,6 +34,7 @@ get_latest_version <- function(version = NULL, package = "VAST") {
     if(i==1) semantic_version = convert_version_name(thefile[1])
     if(i>=2) semantic_version = c( semantic_version, convert_version_name(thefile[i]) )
   }
+  if( max(semantic_version) == numeric_version("0.0.0") ) stop("Problem with `get_latest_version`")
   thefile = thefile[which(semantic_version==max(semantic_version))]
 
   # Remove .cpp from end and return
