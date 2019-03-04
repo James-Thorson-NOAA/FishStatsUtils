@@ -13,19 +13,28 @@
 
 #' @export
 Calc_Anisotropic_Mesh <-
-function(loc_x, Method, Extrapolation_List, anisotropic_mesh=NULL, refine=FALSE, ...){
+function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL, refine=FALSE, fine_scale=FALSE, ...){
 
   #######################
   # Create the anisotropic SPDE mesh using 2D coordinates
   #######################
 
   # 2D coordinates SPDE
-  if( is.null(anisotropic_mesh)) anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, ...)
+  if( fine_scale==FALSE ){
+    if( is.null(anisotropic_mesh)){
+      anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, ...)
+    }
+  }else{
+    loc_z = rbind( loc_x, loc_g, loc_i )
+    outer_hull = INLA::inla.nonconvex.hull(loc_i, convex = -0.05, concave = -0.05)
+    anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, boundary=outer_hull, ...)
+  }
+
   anisotropic_spde = INLA::inla.spde2.matern(anisotropic_mesh, alpha=2)
 
   # Exploring how to add projection matrix from knots to extrapolation-grid cells
   if( FALSE ){
-    loc_i = as.matrix( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0),c("E_km","N_km")] )
+    loc_g = as.matrix( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0),c("E_km","N_km")] )
     outer_hull = INLA::inla.nonconvex.hull(loc_i, convex = -0.05, concave = -0.05)
     if( is.null(anisotropic_mesh)) anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, refine=refine, ...)
     plot(anisotropic_mesh)
@@ -67,7 +76,7 @@ function(loc_x, Method, Extrapolation_List, anisotropic_mesh=NULL, refine=FALSE,
   ####################
   # Return stuff
   ####################
-  if( isotropic_mesh$n != anisotropic_mesh$n ) stop("Check `Calc_Anisotropic_Mesh` for problem")
+  #if( isotropic_mesh$n != anisotropic_mesh$n ) stop("Check `Calc_Anisotropic_Mesh` for problem")
 
   Return = list("loc_x"=loc_x, "loc_isotropic_mesh"=loc_isotropic_mesh, "isotropic_mesh"=isotropic_mesh, "isotropic_spde"=isotropic_spde, "anisotropic_mesh"=anisotropic_mesh, "anisotropic_spde"=anisotropic_spde, "Tri_Area"=Tri_Area, "TV"=TV, "E0"=E0, "E1"=E1, "E2"=E2 )
   return(Return)

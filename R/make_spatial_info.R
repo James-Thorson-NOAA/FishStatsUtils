@@ -12,7 +12,7 @@
 #' @param Extrapolation_List, the output from \code{Prepare_Extrapolation_Data_Fn}
 #' @param grid_size_km, the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}
 #' @param grid_size_LL, the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}
-#' @param ..., additional arguments passed to \code{Calc_Kmeans}
+#' @param ..., additional arguments passed to \code{INLA::inla.mesh.create}
 #' @inheritParams Calc_Kmeans
 
 #' @return Tagged list containing objects for running a VAST model
@@ -28,14 +28,20 @@
 #' }
 
 #' @export
-make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intensity=Lat_i, Extrapolation_List, Method="Mesh", grid_size_km=50, grid_size_LL=1,
-  randomseed=1, nstart=100, iter.max=1000, ... ){
+make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intensity=Lat_i, Extrapolation_List, Method="Mesh",
+  grid_size_km=50, grid_size_LL=1, fine_scale=FALSE,
+  iter.max=1000, randomseed=1, nstart=100, DirPath=paste0(getwd(),"/"), Save_Results=FALSE, ... ){
+
+  # Deprecated options
+  if( Method=="Spherical_mesh" ){
+    stop("Method=`Spherical_mesh` is not being maintained, but please write the package author if you need to explore this option")
+  }
 
   # Convert to an Eastings-Northings coordinate system
   if( Method=="Spherical_mesh" ){
     loc_i = data.frame( 'Lon'=Lon_i, 'Lat'=Lat_i )
     # Bounds for 2D AR1 grid
-    Grid_bounds = (grid_size_km/110) * apply(Extrapolation_List$Data_Extrap[,c('Lon','Lat')]/(grid_size_km/110), MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
+    Grid_bounds = (grid_size_km/110) * apply(loc_e/(grid_size_km/110), MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
     Kmeans = Calc_Kmeans(n_x=n_x, loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, ... )
@@ -62,7 +68,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     Grid_bounds = grid_size_km * apply(Extrapolation_List$Data_Extrap[,c('E_km','N_km')]/grid_size_km, MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
-    Kmeans = Calc_Kmeans(n_x=n_x, loc_orig=loc_intensity[,c("E_km", "N_km")], randomseed=randomseed, ... )
+    Kmeans = Calc_Kmeans(n_x=n_x, loc_orig=loc_intensity[,c("E_km", "N_km")], randomseed=randomseed, nstart=nstart, DirPath=DirPath, Save_Results=Save_Results )
     NN_i = RANN::nn2( data=Kmeans[["centers"]], query=loc_i, k=1)$nn.idx[,1]
 
     # Calculate grid for 2D AR1 process
@@ -81,8 +87,14 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     knot_i = NN_i
     loc_x = Kmeans[["centers"]]
   }
-  PolygonList = Calc_Polygon_Areas_and_Polygons_Fn( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
-  a_xl = PolygonList[["a_xl"]]
+
+  # Bookkeeping for extrapolation-grid
+  if( fine_scale==FALSE ){
+    loc_g = loc_x
+  }
+  if( fine_scale==TRUE ){
+    loc_g = Extrapolation_List$Data_Extrap[ which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0), c('E_km','N_km') ]
+  }
 
   # Convert loc_x back to location in lat-long coordinates loc_x_LL
   # if zone=NA or NTULL, then it automatically detects appropriate zone
@@ -92,7 +104,8 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   #loc_x_LL = PBSmapping::convUL(tmpUTM)                                                         #$
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
-  MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, Extrapolation_List=Extrapolation_List )
+  MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+  n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x), "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x) )
 
   # Make matrices for 2D AR1 process
   Dist_grid = dist(loc_grid, diag=TRUE, upper=TRUE)
@@ -102,7 +115,35 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   if( Method=="Spherical_mesh" ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_LL)
   if( Method %in% c("Mesh","Grid","Stream_network") ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_km)
 
+  # Make projection matrices
+  if( fine_scale==FALSE ){
+    A_is = matrix(0, nrow=nrow(loc_i), ncol=n_s)
+    A_is[ cbind(1:nrow(loc_i),knot_i) ] = 1
+    A_is = as( A_is, "dgTMatrix" )
+    A_gs = as( diag(n_x), "dgTMatrix" )
+  }
+  if( fine_scale==TRUE ){
+    A_is = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_i) )
+    if( class(A_is)=="dgCMatrix" ) A_is = as( A_is, "dgTMatrix" )
+    A_gs = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_g) )
+    if( class(A_gs)=="dgCMatrix" ) A_gs = as( A_gs, "dgTMatrix" )
+    Check_i = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})
+    Check_g = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})
+    if( any(c(Check_i,Check_g) !=3 ) ) stop("Problem with boundary")
+  }
+
+  # Calculate areas
+  PolygonList = Calc_Polygon_Areas_and_Polygons_Fn( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
+  if( fine_scale==FALSE ){
+    a_gl = PolygonList[["a_xl"]]
+  }
+  if( fine_scale==TRUE ){
+    a_gl = as.matrix(Extrapolation_List[["a_el"]][ which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0), ])
+  }
+
   # Return
-  Return = list("MeshList"=MeshList, "GridList"=GridList, "a_xl"=a_xl, "loc_i"=loc_i, "Kmeans"=Kmeans, "knot_i"=knot_i, "Method"=Method, "loc_x"=loc_x, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap)
+  Return = list("MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "loc_i"=loc_i, "Kmeans"=Kmeans, "knot_i"=knot_i,
+    "Method"=Method, "loc_x"=loc_x, "loc_g"=loc_g, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap,
+    "n_s"=n_s, "A_is"=A_is, "A_gs"=A_gs, "fine_scale"=fine_scale, "n_g"=nrow(a_gl) )
   return( Return )
 }

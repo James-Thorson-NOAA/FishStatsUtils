@@ -81,6 +81,14 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     Ncategories = dim(Report$D_xcy)[2]
     Nyears = dim(Report$D_xcy)[3]
   }
+  if( "D_gcy" %in% names(Report)){
+    # VAST Version >= 8.0.0
+    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_gcy)[3]
+    if( is.null(Years2Include) ) Years2Include = 1:dim(Report$D_gcy)[3]
+    if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
+    Ncategories = dim(Report$D_gcy)[2]
+    Nyears = dim(Report$D_gcy)[3]
+  }
   if("dhat_ktp" %in% names(Report)){
     # MIST Version <= 14
     if( is.null(Year_Set) ) Year_Set = 1:dim(Report$dhat_ktp)[2]
@@ -129,6 +137,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = Report$R1_xt
       if("D_xct"%in%names(Report)) Array_xct = Report$R1_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$R1_xcy
+      #if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("Not implemented for SpatialVAM")
       message( "plot_num=1 doesn't work well when using ObsModel[2]==1" )
     }
@@ -137,6 +146,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = log(Report$R2_xt)
       if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct)
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy)
+      #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy)
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==3){
@@ -144,6 +154,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt)
       if("D_xct"%in%names(Report)) Array_xct = log(Report$D_xct)
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$D_xcy)
+      if("D_gcy"%in%names(Report)) Array_xct = log(Report$D_gcy)
       if("dhat_ktp" %in% names(Report)) Array_xct = aperm(Report$dhat_ktp[,,cI],c(1,3,2))
       if("dpred_ktp" %in% names(Report)) Array_xct = aperm(Report$dpred_ktp[,,cI],c(1,3,2))
     }
@@ -152,6 +163,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = log(Report$R2_xt+quantile(Report$R2_xt,0.25))
       if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct+quantile(Report$R2_xct,0.25))
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy+quantile(Report$R2_xcy,0.25))
+      #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy+quantile(Report$R2_gcy,0.25))
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==5){
@@ -159,6 +171,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt+quantile(Report$D_xt,0.25))
       if("D_xct"%in%names(Report)) Array_xct = log(Report$D_xct+quantile(Report$D_xct,0.25))
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$D_xcy+quantile(Report$D_xcy,0.25))
+      #if("D_gcy"%in%names(Report)) Array_xct = log(Report$D_gcy+quantile(Report$D_gcy,0.25))
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==6){
@@ -166,6 +179,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = Report$Epsilon1_st
       if("D_xct"%in%names(Report)) Array_xct = Report$Epsilon1_sct
       if("D_xcy"%in%names(Report)) Array_xct = Report$Epsilon1_sct
+      if("D_gcy"%in%names(Report)) Array_xct = Report$Epsilon1_gct
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==7){
