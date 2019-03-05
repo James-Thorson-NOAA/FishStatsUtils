@@ -142,8 +142,9 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   }
 
   # Return
-  Return = list("MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "loc_i"=loc_i, "Kmeans"=Kmeans, "knot_i"=knot_i,
-    "Method"=Method, "loc_x"=loc_x, "loc_g"=loc_g, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap,
-    "n_s"=n_s, "A_is"=A_is, "A_gs"=A_gs, "fine_scale"=fine_scale, "n_g"=nrow(a_gl) )
+  Return = list( "fine_scale"=fine_scale, "A_is"=A_is, "A_gs"=A_gs, "n_x"=n_x, "n_s"=n_s, "n_g"=nrow(a_gl), "n_i"=nrow(loc_i),
+    "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
+    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g),
+    "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap )
   return( Return )
 }

@@ -8,6 +8,9 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
 
   # Fix defaults
   if( is.null(fine_scale) ) fine_scale = FALSE
+  if( is.null(spatial_list) ){
+    warning("Current versions of `make_map_info` require input `spatial_list` to properly allow feature `fine_scale=TRUE`")
+  }
 
   # Initialize
   PlotDF = NULL
@@ -139,7 +142,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
 
   #
   if( fine_scale==FALSE ){
-    PlotDF[,'x2i'] = spatial_list$PolygonList$NN_Extrap$nn.idx[,1]
+    PlotDF[,'x2i'] = NN_Extrap$nn.idx[,1]
   }else{
     PlotDF[,'x2i'] = NA
     PlotDF[ which(Extrapolation_List[["Area_km2_x"]]>0),'x2i'] = 1:length(which(Extrapolation_List[["Area_km2_x"]]>0))

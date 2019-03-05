@@ -241,6 +241,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$eta1_xct
+      if("D_gcy"%in%names(Report)) Array_xct = Report$eta1_gct
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
@@ -249,6 +250,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$eta2_xct
+      if("D_gcy"%in%names(Report)) Array_xct = Report$eta2_gct
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
