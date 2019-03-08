@@ -93,7 +93,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     loc_g = loc_x
   }
   if( fine_scale==TRUE ){
-    loc_g = Extrapolation_List$Data_Extrap[ which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0), c('E_km','N_km') ]
+    loc_g = Extrapolation_List$Data_Extrap[ which(Extrapolation_List$Area_km2_x>0), c('E_km','N_km') ]
   }
 
   # Convert loc_x back to location in lat-long coordinates loc_x_LL
@@ -138,7 +138,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     a_gl = PolygonList[["a_xl"]]
   }
   if( fine_scale==TRUE ){
-    a_gl = as.matrix(Extrapolation_List[["a_el"]][ which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0), ])
+    a_gl = as.matrix(Extrapolation_List[["a_el"]][ which(Extrapolation_List$Area_km2_x>0), ])
   }
 
   # Return
