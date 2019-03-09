@@ -40,6 +40,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
     return( Return )
   }
   if( is.null(Col)) Col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
+  if( is.function(Col)) Col = Col(50)
 
   # Plot
   Par = list( mfrow=mfrow, ...)
@@ -62,7 +63,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
     for(tI in 1:length(Year_Set)){
       if( is.null(MappingDetails) ){
         plot(1, type="n", ylim=Ylim, xlim=Xlim, main="", xlab="", ylab="", mar=par()$mar )#, main=Year_Set[t])
-        points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col(n=50)[ceiling(f(Mat[Which,],zlim=zlim)[,t]*49)+1], cex=0.01)
+        points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[ceiling(f(Mat[Which,],zlim=zlim)[,t]*(length(Col)-1))+1], cex=0.01)
       }else{
         # If not rotating:  Use simple plot
         if( Rotate==0 ){
@@ -70,8 +71,8 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
           plot( 1, type="n", ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), xaxt="n", yaxt="n" )
           map( Map, add=TRUE )  # , col=land_color, fill=TRUE ->  Using land-fill color produces weird plotting artefacts
           #map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE)
-          Col_Bin = ceiling( f(Mat[Which,,drop=FALSE],zlim=zlim)[,tI]*49 ) + 1
-          points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col(n=50)[Col_Bin], cex=Cex, pch=pch)
+          Col_Bin = ceiling( f(Mat[Which,,drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
+          points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
         }
         # If rotating:  Record all polygons; Rotate them and all points;  Plot rotated polygons;  Plot points
         if( Rotate!=0 ){
@@ -92,9 +93,9 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
           sp::coordinates(tmpUTM) = c("X","Y")
           tmpUTM_rotated <- maptools::elide( tmpUTM, rotate=Rotate)
           plot( 1, type="n", xlim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x']), ylim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y']), xaxt="n", yaxt="n" )
-          Col_Bin = ceiling( f(tmpUTM_rotated@data[-c(1:nrow(Tmp1)),-c(1:2),drop=FALSE],zlim=zlim)[,tI]*49 ) + 1
+          Col_Bin = ceiling( f(tmpUTM_rotated@data[-c(1:nrow(Tmp1)),-c(1:2),drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
           if( ignore.na==FALSE && any(Col_Bin<1 | Col_Bin>50) ) stop("zlim doesn't span the range of the variable")
-          points(x=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x'], y=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y'], col=Col(n=50)[Col_Bin], cex=Cex, pch=pch)
+          points(x=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x'], y=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y'], col=Col[Col_Bin], cex=Cex, pch=pch)
           # Plot map features
           lev = levels(as.factor(tmpUTM_rotated@data$PID))
           for(levI in 1:(length(lev)-1)) {
@@ -112,7 +113,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
     }
     # Include legend
     if( Legend$use==TRUE ){
-      FishStatsUtils:::smallPlot( FishStatsUtils:::Heatmap_Legend(colvec=Col(50), heatrange=list(range(Mat[Which,],na.rm=TRUE),zlim)[[ifelse(is.null(zlim),1,2)]], dopar=FALSE), x=Legend$x, y=Legend$y, mar=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.2, font=2 )  #
+      FishStatsUtils:::smallPlot( FishStatsUtils:::Heatmap_Legend(colvec=Col, heatrange=list(range(Mat[Which,],na.rm=TRUE),zlim)[[ifelse(is.null(zlim),1,2)]], dopar=FALSE), x=Legend$x, y=Legend$y, mar=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.2, font=2 )  #
     }
     # Margin text
     if(add==FALSE) mtext(side=1, outer=TRUE, outermargintext[1], cex=1.75, line=par()$oma[1]/2)
@@ -133,7 +134,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
            width=1, height=2*MapSizeRatio['Height(in)'], res=Res, units='in')
     }
     if(Format %in% c("png","jpg","tif","tiff")){
-      FishStatsUtils:::Heatmap_Legend( colvec=Col(n=50), heatrange=list(range(Mat,na.rm=TRUE),zlim)[[ifelse(is.null(zlim),1,2)]], textmargin=textmargin )
+      FishStatsUtils:::Heatmap_Legend( colvec=Col, heatrange=list(range(Mat,na.rm=TRUE),zlim)[[ifelse(is.null(zlim),1,2)]], textmargin=textmargin )
       dev.off()
     }
   }
