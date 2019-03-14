@@ -129,7 +129,11 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     if( class(A_gs)=="dgCMatrix" ) A_gs = as( A_gs, "dgTMatrix" )
     Check_i = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})
     Check_g = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})
-    if( any(c(Check_i,Check_g) !=3 ) ) stop("Problem with boundary")
+    if( any(c(Check_i,Check_g) <= 0 ) ){
+      # stop("Problem with boundary")
+      # plot(MeshList$anisotropic_mesh)
+      # points( x=loc_i[which(Check_i!=3),'E_km'], y=loc_i[which(Check_i!=3),'N_km'], col="red" )
+    }
   }
 
   # Calculate areas
