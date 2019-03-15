@@ -6,8 +6,9 @@
 \usage{
 make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
   LAT_intensity = Lat_i, Extrapolation_List, Method = "Mesh",
-  grid_size_km = 50, grid_size_LL = 1, randomseed = 1,
-  nstart = 100, iter.max = 1000, ...)
+  grid_size_km = 50, grid_size_LL = 1, fine_scale = FALSE,
+  iter.max = 1000, randomseed = 1, nstart = 100,
+  DirPath = paste0(getwd(), "/"), Save_Results = FALSE, ...)
 }
 \arguments{
 \item{n_x, }{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
@@ -28,13 +29,17 @@ make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
 
 \item{grid_size_LL, }{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}}
 
+\item{iter.max}{the number of iterations used per k-means algorithm (default=1000)}
+
 \item{randomseed}{a random number seed}
 
 \item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
 
-\item{iter.max}{the number of iterations used per k-means algorithm (default=1000)}
+\item{DirPath}{a directory where the algorithm looks for a previously-saved output (default is working directory)}
 
-\item{..., }{additional arguments passed to \code{Calc_Kmeans}}
+\item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
+
+\item{..., }{additional arguments passed to \code{INLA::inla.mesh.create}}
 }
 \value{
 Tagged list containing objects for running a VAST model
