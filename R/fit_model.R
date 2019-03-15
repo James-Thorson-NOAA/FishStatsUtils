@@ -22,8 +22,8 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i )
   # Decide which years to plot
-  Year_Set = seq( min(t_iz), max(t_iz) )
-  Years2Include = which( t_iz %in% sort(unique(t_iz)))
+  year_labels = seq( min(t_iz), max(t_iz) )
+  years_to_plot = which( t_iz %in% sort(unique(t_iz)))
 
   # Save record
   save( settings, file=file.path(working_dir,"Record.RData"))
@@ -62,6 +62,6 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
 
   # Build and output
   Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list, "data_list"=data_list,
-    "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report, "ParHat"=ParHat, "Year_Set"=Year_Set, "Years2Include"=Years2Include)
+    "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report, "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot)
   return( Return )
 }
