@@ -3,12 +3,17 @@
 #'
 #' \code{make_spatial_info} builds a tagged list with all the spatial information needed for \code{Data_Fn}
 #'
+#' \code{fine_scale=TRUE} is a new feature starting in V8.0.0 which triggers two major changes: (1) projecting Gaussian Markov random fields from knots to sampling and extrapolation-grid locations using bilinear interpolation (i.e., piecewise linear smoothing), and (2) including density covariates individually for extrapolation-grid and sampling locations. \code{fine_scale=FALSE} is designed to be backwards compatible with earlier versions, although V8.0.0 may also require changes to input naming conventions for covariates to specify the same model and attain the same fit.
+#'
+#' \code{LON_intensity} and \code{LAT_intensity} allow users to specify locations that are used by the k-means algorithm to determine the location of knots, where e.g. users can either hard-code the desired knot locations via these inputs (using \code{n_x} greater than this number of locations), or use the extrapolation-grid to ensure that knots are located proportional to that grid.
+#'
 #' @param n_x, the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")
 #' @param Lon_i, Longitude for each sample
 #' @param Lat_i, Latitude for each sample
 #' @param LON_intensity, Longitude for each location to use during k-means algorithm to decide upon the location of knots
 #' @param LAT_intensity, Latitude for each location to use during k-means algorithm to decide upon the location of knots
 #' @param Method, a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy
+#' @param fine_scale a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino
 #' @param Extrapolation_List, the output from \code{Prepare_Extrapolation_Data_Fn}
 #' @param grid_size_km, the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}
 #' @param grid_size_LL, the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}
@@ -26,6 +31,7 @@
 #'   \item{Method}{The Method input (for archival purposes)}
 #'   \item{loc_x}{The UTM location for each knot}
 #' }
+#'
 
 #' @export
 make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intensity=Lat_i, Extrapolation_List, Method="Mesh",

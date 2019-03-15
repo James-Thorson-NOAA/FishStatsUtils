@@ -12,7 +12,13 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid.}
 
+\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate.}
+
+\item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
+
 \item{strata.limits}{an input for determining stratification of indices (see example script)}
+
+\item{zone}{UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone}
 }
 \description{
 \code{make_settings} makes a list of settings for a given purpose

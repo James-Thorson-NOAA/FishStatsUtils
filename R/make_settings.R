@@ -5,9 +5,11 @@
 #' @description
 #' \code{make_settings} makes a list of settings for a given purpose
 #'
+#' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate.
 #' @inheritParams VAST::make_data
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
+#' @inheritParams Convert_LL_to_UTM_Fn
 #'
 
 #' @export

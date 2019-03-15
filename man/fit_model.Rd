@@ -4,17 +4,29 @@
 \alias{fit_model}
 \title{Fit VAST to data}
 \usage{
-fit_model(settings, Lat_i, Lon_i, t_i, c_i, b_i, a_i, v_i,
+fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
   working_dir = paste0(getwd(), "/"), getsd = TRUE, newtonsteps = 1,
   X_xtp = NULL, Xconfig_zcp = NULL, X_gtp = NULL, X_itp = NULL,
-  Q_ik = NULL, ...)
+  Q_ik = NULL)
 }
 \arguments{
+\item{Lat_i}{Latitude for each sample}
+
+\item{Lon_i}{Longitude for each sample}
+
+\item{t_iz}{Matrix where each row species the time for each observation i (if t_iz is a vector, it is coerced to a matrix with one column; if it is a matrix with two or more columns, it specifies multiple times for each observation, e.g., both year and season)}
+
+\item{c_iz}{Category (e.g., species, length-bin) for each observation i}
+
 \item{b_i}{Sampled biomass for each observation i}
 
 \item{a_i}{Sampled area for each observation i}
 
 \item{v_i}{OPTIONAL, sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i}
+
+\item{getsd}{Boolean whether to run standard error calculation}
+
+\item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
 
 \item{X_xtp}{OPTIONAL, array of dynamic (varying among time intervals) density covariates}
 
@@ -27,6 +39,8 @@ fit_model(settings, Lat_i, Lon_i, t_i, c_i, b_i, a_i, v_i,
 }}
 
 \item{Q_ik}{OPTIONAL, matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
+
+\item{...}{additional parameters to pass to \code{VAST::make_data}}
 }
 \description{
 \code{fit_model} fits a spatio-temporal model to data
