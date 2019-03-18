@@ -19,7 +19,8 @@
 #' }
 
 #' @export
-make_extrapolation_info = function( Region, strata.limits, observations_LL=NULL, input_grid=NULL, ... ){
+make_extrapolation_info = function( Region, strata.limits=data.frame('STRATA'="All_areas"),
+  observations_LL=NULL, input_grid=NULL, ... ){
 
   Extrapolation_List = NULL
   if( tolower(Region) == "california_current" ){
@@ -36,6 +37,9 @@ make_extrapolation_info = function( Region, strata.limits, observations_LL=NULL,
   }
   if( tolower(Region) == "northern_bering_sea" ){ #
     Extrapolation_List = Prepare_NBS_Extrapolation_Data_Fn( strata.limits=strata.limits, ... )
+  }
+  if( tolower(Region) == "bering_sea_slope" ){ #
+    Extrapolation_List = Prepare_BSslope_Extrapolation_Data_Fn( strata.limits=strata.limits, ... )
   }
   if( tolower(Region) %in% c("st_matthews_island","SMI") ){ #
     Extrapolation_List = Prepare_SMI_Extrapolation_Data_Fn( strata.limits=strata.limits, ... )
