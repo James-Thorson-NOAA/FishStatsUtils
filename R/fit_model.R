@@ -23,7 +23,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i )
   # Decide which years to plot
   year_labels = seq( min(t_iz), max(t_iz) )
-  years_to_plot = which( t_iz %in% sort(unique(t_iz)))
+  years_to_plot = which( unique(t_iz) %in% sort(unique(t_iz)))
 
   # Save record
   save( settings, file=file.path(working_dir,"Record.RData"))

@@ -4,8 +4,8 @@
 \alias{make_extrapolation_info}
 \title{Build extrapolation grid}
 \usage{
-make_extrapolation_info(Region, strata.limits, observations_LL = NULL,
-  input_grid = NULL, ...)
+make_extrapolation_info(Region, strata.limits = data.frame(STRATA =
+  "All_areas"), observations_LL = NULL, input_grid = NULL, ...)
 }
 \arguments{
 \item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid.}

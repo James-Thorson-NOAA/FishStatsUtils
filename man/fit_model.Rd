@@ -7,7 +7,7 @@
 fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
   working_dir = paste0(getwd(), "/"), getsd = TRUE, newtonsteps = 1,
   X_xtp = NULL, Xconfig_zcp = NULL, X_gtp = NULL, X_itp = NULL,
-  Q_ik = NULL)
+  Q_ik = NULL, ...)
 }
 \arguments{
 \item{Lat_i}{Latitude for each sample}
