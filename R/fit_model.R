@@ -26,6 +26,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
   years_to_plot = which( unique(t_iz) %in% sort(unique(t_iz)))
 
   # Save record
+  dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
   save( settings, file=file.path(working_dir,"Record.RData"))
   capture.output( settings, file=file.path(working_dir,"Record.txt"))
 
