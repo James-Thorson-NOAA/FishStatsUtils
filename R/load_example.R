@@ -72,7 +72,8 @@ load_example = function( data_set="EBS_pollock" ){
     data( georges_bank_haddock_fall, package="FishStatsUtils" )
     Print_Message( "GB_haddock" )
     sampling_data = data.frame( "Catch_KG"=georges_bank_haddock_fall[,'CATCH_WT_CAL'], "Year"=georges_bank_haddock_fall[,'YEAR'], "Vessel"="missing", "AreaSwept_km2"=0.0112*1.852^2, "Lat"=georges_bank_haddock_fall[,'LATITUDE'], "Lon"=georges_bank_haddock_fall[,'LONGITUDE'])
-    strata.limits = data.frame('STRATA'="All_areas")
+    # For NEFSC indices, strata must be specified as a named list of area codes
+    strata.limits = list( 'Georges_Bank'=c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210, 1220, 1230, 1240, 1250, 1290, 1300) )
   }
   if( data_set=="SAWC_jacopever"){
     data( south_africa_westcoast_jacopever, package="FishStatsUtils" )
