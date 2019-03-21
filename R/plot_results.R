@@ -12,7 +12,7 @@
 plot_results = function( fit, settings, working_dir=paste0(getwd(),"/"), year_labels=fit$year_labels, years_to_plot=fit$years_to_plot ){
 
   # Make directory
-  dir.create(working_dir, showWarnings=FALSE, recursive=TRUE
+  dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
 
   # plot data
   #plot_data(Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list, Data_Geostat=Data_Geostat, PlotDir=working_dir )
