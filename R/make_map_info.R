@@ -75,7 +75,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Ylim=c(32,45)
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=3)
     Rotate = 0
-    Cex = 1
+    Cex = 0.01
     Legend = list(use=TRUE,x=c(70,80),y=c(5,35))
   }
   if( tolower(Region) == "south_africa" ){

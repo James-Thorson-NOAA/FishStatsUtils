@@ -9,7 +9,8 @@
 #'
 
 #' @export
-plot_results = function( fit, settings, working_dir=paste0(getwd(),"/"), year_labels=fit$year_labels, years_to_plot=fit$years_to_plot ){
+plot_results = function( fit, settings, working_dir=paste0(getwd(),"/"), year_labels=fit$year_labels,
+  years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list=NULL ){
 
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
@@ -18,7 +19,10 @@ plot_results = function( fit, settings, working_dir=paste0(getwd(),"/"), year_la
   #plot_data(Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list, Data_Geostat=Data_Geostat, PlotDir=working_dir )
 
   # PLot settings
-  map_list = make_map_info( "Region"=settings$Region, "spatial_list"=fit$spatial_list, "Extrapolation_List"=fit$extrapolation_list )
+  if( is.null(map_list) ){
+    message("\n### Obtaining default settings for plotting maps")
+    map_list = make_map_info( "Region"=settings$Region, "spatial_list"=fit$spatial_list, "Extrapolation_List"=fit$extrapolation_list )
+  }
 
   # Plot diagnostic for encounter probability
   message("\n### Making plot of encounter probability")
@@ -30,11 +34,11 @@ plot_results = function( fit, settings, working_dir=paste0(getwd(),"/"), year_la
 
   # Plot index
   message("\n### Making plot of abundance index")
-  Index = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels, Years2Include=years_to_plot, use_biascorr=TRUE )
+  Index = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels, Years2Include=years_to_plot, use_biascorr=use_biascorr )
 
   # Plot range indices
   message("\n### Making plot of spatial indices")
-  plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm), PlotDir=working_dir, Year_Set=year_labels)
+  plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm), PlotDir=working_dir, Year_Set=year_labels, use_biascorr=use_biascorr )
 
   # Plot densities
   message("\n### Making plot of densities")
@@ -53,7 +57,7 @@ plot_results = function( fit, settings, working_dir=paste0(getwd(),"/"), year_la
   }
 
   # return
-  Return = list( "Q"=Q, "Index"=Index, "Dens_xt"=Dens_xt )
+  Return = list( "Q"=Q, "Index"=Index, "Dens_xt"=Dens_xt, "map_list"=map_list )
   return( invisible(Return) )
 }
 
