@@ -7,7 +7,7 @@
 fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
   working_dir = paste0(getwd(), "/"), getsd = TRUE, newtonsteps = 1,
   X_xtp = NULL, Xconfig_zcp = NULL, X_gtp = NULL, X_itp = NULL,
-  Q_ik = NULL, ...)
+  Q_ik = NULL, observations_LL = NULL, input_grid = NULL, ...)
 }
 \arguments{
 \item{Lat_i}{Latitude for each sample}
@@ -39,6 +39,10 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
 }}
 
 \item{Q_ik}{OPTIONAL, matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
+
+\item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation (only used when Region doesn't match known entries)}
+
+\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid (only used when \code{Region=="User"})}
 
 \item{...}{additional parameters to pass to \code{VAST::make_data}}
 }

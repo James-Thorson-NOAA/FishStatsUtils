@@ -10,7 +10,7 @@
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
 #' @inheritParams TMBhelper::Optimize
-#' @inheritParams TMBhelper::Optimize
+#' @inheritParams make_extrapolation_info
 #' @param ... additional parameters to pass to \code{VAST::make_data}
 #'
 #'
