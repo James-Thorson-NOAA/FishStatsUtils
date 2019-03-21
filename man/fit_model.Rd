@@ -5,9 +5,9 @@
 \title{Fit VAST to data}
 \usage{
 fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
-  working_dir = paste0(getwd(), "/"), getsd = TRUE, newtonsteps = 1,
-  X_xtp = NULL, Xconfig_zcp = NULL, X_gtp = NULL, X_itp = NULL,
-  Q_ik = NULL, observations_LL = NULL, input_grid = NULL, ...)
+  working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
+  X_gtp = NULL, X_itp = NULL, Q_ik = NULL, newtonsteps = 1,
+  extrapolation_args = list(), optimize_args = list(), ...)
 }
 \arguments{
 \item{Lat_i}{Latitude for each sample}
@@ -24,12 +24,6 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
 
 \item{v_i}{OPTIONAL, sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i}
 
-\item{getsd}{Boolean whether to run standard error calculation}
-
-\item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
-
-\item{X_xtp}{OPTIONAL, array of dynamic (varying among time intervals) density covariates}
-
 \item{Xconfig_zcp}{OPTIONAL, 3D array of settings for each dynamic density covariate, where the first dimension corresponds to 1st or 2nd linear predictors, second dimension corresponds to model category, and third dimension corresponds to each density covariate
 \describe{
   \item{Xconfig_zcp[z,c,p]=0}{\code{X_xtp[,,p]} has no effect on linear predictor z for category c}
@@ -40,9 +34,11 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
 
 \item{Q_ik}{OPTIONAL, matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
 
-\item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation (only used when Region doesn't match known entries)}
+\item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
 
-\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid (only used when \code{Region=="User"})}
+\item{extrapolation_args}{tagged list of optional arguments to pass to \code{make_extrapolation_info}}
+
+\item{optimize_args}{tagged list of optional arguments to pass to \code{TMBhelper::Optimize}}
 
 \item{...}{additional parameters to pass to \code{VAST::make_data}}
 }

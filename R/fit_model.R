@@ -10,15 +10,16 @@
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
 #' @inheritParams TMBhelper::Optimize
-#' @inheritParams make_extrapolation_info
+#' @param extrapolation_args tagged list of optional arguments to pass to \code{make_extrapolation_info}
+#' @param optimize_args tagged list of optional arguments to pass to \code{TMBhelper::Optimize}
 #' @param ... additional parameters to pass to \code{VAST::make_data}
 #'
 #'
 #'
 #' @export
 fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working_dir=paste0(getwd(),"/"),
-  getsd=TRUE, newtonsteps=1, X_xtp=NULL, Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL,
-  observations_LL=NULL, input_grid=NULL, ... ){
+  Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
+  extrapolation_args=list(), optimize_args=list(), ... ){
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i )
@@ -33,8 +34,8 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
-  extrapolation_list = make_extrapolation_info( Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone,
-    observations_LL=observations_LL, input_grid=input_grid )
+  extrapolation_args = c( list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone), extrapolation_args )
+  extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args )
 
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
@@ -55,16 +56,18 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
 
   # Optimize object
   message("\n### Estimating parameters")
-  parameter_estimates = TMBhelper::Optimize( obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    getsd=getsd, savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
-    bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct) )
+  optimize_args = c( list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+    savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps, getsd=getsd,
+    bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct)), optimize_args )
+  parameter_estimates = do.call( what=TMBhelper::Optimize, args=optimize_args )
 
   # Extract standard outputs
   Report = tmb_list$Obj$report()
   ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
 
   # Build and output
-  Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list, "data_list"=data_list,
-    "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report, "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot)
+  Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
+    "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
+    "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot)
   return( Return )
 }
