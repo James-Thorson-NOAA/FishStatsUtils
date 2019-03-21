@@ -17,7 +17,8 @@
 #'
 #' @export
 fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working_dir=paste0(getwd(),"/"),
-  getsd=TRUE, newtonsteps=1, X_xtp=NULL, Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, ... ){
+  getsd=TRUE, newtonsteps=1, X_xtp=NULL, Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL,
+  observations_LL=NULL, input_grid=NULL, ... ){
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i )
@@ -32,12 +33,13 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
-  extrapolation_list = make_extrapolation_info( Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone, ... )
+  extrapolation_list = make_extrapolation_info( Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone )
 
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
   spatial_list = make_spatial_info( grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
-    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale )
+    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale,
+    observations_LL=observations_LL, input_grid=input_grid )
 
   # Build data
   message("\n### Making data object")
