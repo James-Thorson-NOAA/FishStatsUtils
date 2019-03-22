@@ -57,7 +57,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
   # Optimize object
   message("\n### Estimating parameters")
   optimize_args = c( list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps, getsd=getsd,
+    savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
     bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct)), optimize_args )
   parameter_estimates = do.call( what=TMBhelper::Optimize, args=optimize_args )
 
