@@ -66,11 +66,12 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   # Mesh and SPDE for different inputs
   if(Method %in% c("Mesh","Grid","Stream_network")){
     loc_isotropic_mesh = loc_x
+    isotropic_mesh = anisotropic_mesh
   }
   if(Method %in% c("Spherical_mesh")){
     loc_isotropic_mesh = INLA::inla.mesh.map(loc_x, projection="longlat", inverse=TRUE) # Project from lat/long to mesh coordinates
+    isotropic_mesh = INLA::inla.mesh.create( loc_isotropic_mesh, plot.delay=NULL, refine=refine, ...)
   }
-  isotropic_mesh = INLA::inla.mesh.create( loc_isotropic_mesh, plot.delay=NULL, refine=refine, ...)
   isotropic_spde = INLA::inla.spde2.matern(isotropic_mesh, alpha=2)
 
   ####################
