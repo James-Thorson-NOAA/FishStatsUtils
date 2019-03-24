@@ -95,7 +95,8 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
       stop("Because you're using a new region, please provide 'observations_LL' input")
     }
     Extrapolation_List = Prepare_Other_Extrapolation_Data_Fn( strata.limits=strata.limits, observations_LL=observations_LL,
-      grid_dim_km=c(2,2), maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1), zone=zone, ... )
+      grid_dim_km=grid_dim_km, maximum_distance_from_sample=maximum_distance_from_sample,
+      grid_in_UTM=grid_in_UTM, grid_dim_LL=grid_dim_LL, zone=zone, ... )
   }
 
   # Return
