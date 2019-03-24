@@ -10,7 +10,7 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
 
-\item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid.}
+\item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
 
 \item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate.}
 
@@ -18,7 +18,7 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{strata.limits}{an input for determining stratification of indices (see example script)}
 
-\item{zone}{UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone}
+\item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 }
 \description{
 \code{make_settings} makes a list of settings for a given purpose

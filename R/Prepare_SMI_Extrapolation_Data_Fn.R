@@ -25,7 +25,6 @@ function( strata.limits=NULL, zone=NA, flip_around_dateline=TRUE, ... ){
              #
   # Convert extrapolation-data to an Eastings-Northings coordinate system
   tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
-           #
 
   # Extra junk
   Data_Extrap = cbind( Data_Extrap, 'Include'=1)

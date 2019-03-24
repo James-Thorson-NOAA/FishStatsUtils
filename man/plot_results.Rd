@@ -5,7 +5,8 @@
 \title{Plot results}
 \usage{
 plot_results(fit, settings, working_dir = paste0(getwd(), "/"),
-  year_labels = fit$year_labels, years_to_plot = fit$years_to_plot)
+  year_labels = fit$year_labels, years_to_plot = fit$years_to_plot,
+  use_biascorr = TRUE, map_list = NULL)
 }
 \description{
 \code{plot_results} plots diagnostics, results, and indices for a given fitted model
