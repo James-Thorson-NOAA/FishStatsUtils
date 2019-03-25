@@ -1,17 +1,21 @@
 
-#' @title
 #' Make list of settings
 #'
-#' @description
 #' \code{make_settings} makes a list of settings for a given purpose
 #'
-#' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate.
+#' This function assembles a default set of user-decisions for a specified modelling purpose. The default settings are guessed based on generic guidance, and should be carefully reviewed for real-world purposes.
+#'
+#' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}
 #' @inheritParams VAST::make_data
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
 #' @inheritParams Convert_LL_to_UTM_Fn
 #'
-
+#' @return Tagged list containing default settings for a given purpose.
+#'
+#' @family wrapper functions
+#' @seealso \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+#'
 #' @export
 make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
   strata.limits=data.frame('STRATA'="All_areas"), zone=NA ){

@@ -12,7 +12,7 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
 
-\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate.}
+\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
 
@@ -20,6 +20,19 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 }
+\value{
+Tagged list containing default settings for a given purpose.
+}
 \description{
 \code{make_settings} makes a list of settings for a given purpose
 }
+\details{
+This function assembles a default set of user-decisions for a specified modelling purpose. The default settings are guessed based on generic guidance, and should be carefully reviewed for real-world purposes.
+}
+\seealso{
+\code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+
+Other wrapper functions: \code{\link{fit_model}},
+  \code{\link{plot_results}}
+}
+\concept{wrapper functions}

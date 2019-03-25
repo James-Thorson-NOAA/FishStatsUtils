@@ -10,6 +10,8 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
   extrapolation_args = list(), optimize_args = list(), ...)
 }
 \arguments{
+\item{settings}{Output from \code{make_settings}}
+
 \item{Lat_i}{Latitude for each sample}
 
 \item{Lon_i}{Longitude for each sample}
@@ -42,6 +44,45 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
 
 \item{...}{additional parameters to pass to \code{VAST::make_data}}
 }
+\value{
+Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates
+}
 \description{
 \code{fit_model} fits a spatio-temporal model to data
 }
+\details{
+This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, assemble data, build model, and estimate parameters.
+}
+\examples{
+\dontrun{
+# Load packages
+library(TMB)
+library(VAST)
+
+# load data set
+# see `?load_example` for list of stocks with example data
+# that are installed automatically with `FishStatsUtils`.
+example = load_example( data_set="EBS_pollock" )
+
+# Make settings
+settings = make_settings( n_x=50, Region=example$Region, purpose="index",
+  strata.limits=example$strata.limits )
+
+# Run model
+fit = fit_model( "settings"=settings, "Lat_i"=example$sampling_data[,'Lat'],
+  "Lon_i"=example$sampling_data[,'Lon'], "t_i"=example$sampling_data[,'Year'],
+  "c_i"=rep(0,nrow(example$sampling_data)), "b_i"=example$sampling_data[,'Catch_KG'],
+  "a_i"=example$sampling_data[,'AreaSwept_km2'], "v_i"=example$sampling_data[,'Vessel'] )
+
+# Plot results
+plot_results( settings=settings, fit=fit )
+}
+
+}
+\seealso{
+\code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+
+Other wrapper functions: \code{\link{make_settings}},
+  \code{\link{plot_results}}
+}
+\concept{wrapper functions}
