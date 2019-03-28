@@ -48,7 +48,7 @@
 #' @export
 fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
-  extrapolation_args=list(), optimize_args=list(), ... ){
+  extrapolation_args=list(), optimize_args=list(), silent=TRUE, ... ){
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i )
@@ -82,12 +82,14 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
   message("\n### Making TMB object")
   tmb_list = VAST::make_model("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version, "RhoConfig"=settings$RhoConfig,
     "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method)
+  if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
   # Optimize object
   message("\n### Estimating parameters")
   optimize_args = c( list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
     savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
-    bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct)), optimize_args )
+    bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
+    control=list(eval.max=10000,iter.max=10000,trace=1)), optimize_args )
   parameter_estimates = do.call( what=TMBhelper::Optimize, args=optimize_args )
 
   # Extract standard outputs
