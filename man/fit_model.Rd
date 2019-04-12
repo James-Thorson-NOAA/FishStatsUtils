@@ -7,7 +7,8 @@
 fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
   working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
   X_gtp = NULL, X_itp = NULL, Q_ik = NULL, newtonsteps = 1,
-  extrapolation_args = list(), optimize_args = list(), ...)
+  extrapolation_args = list(), optimize_args = list(), silent = TRUE,
+  ...)
 }
 \arguments{
 \item{settings}{Output from \code{make_settings}}
@@ -34,7 +35,7 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i,
   \item{Xconfig_zcp[z,c,p]=3}{\code{X_xtp[,,p]} has a spatially varying linear effect on linear predictor z for category c}
 }}
 
-\item{Q_ik}{OPTIONAL, matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
+\item{Q_ik}{matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
 
 \item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
 
