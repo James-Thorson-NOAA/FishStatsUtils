@@ -22,6 +22,7 @@ load_example = function( data_set="EBS_pollock" ){
                    "GB_fall_haddock"="Northwest_Atlantic",
                    "SAWC_jacopever"="South_Africa",
                    "Aleutian_islands_POP"="Aleutian_Islands",
+                   "condition_and_density"="Eastern_Bering_Sea",
                    "Other")
 
   if(data_set=="WCGBTS_canary"){
@@ -89,6 +90,11 @@ load_example = function( data_set="EBS_pollock" ){
   if( data_set %in% c("Chatham_rise_hake")){
     data( chatham_rise_hake, package="FishStatsUtils" )
     sampling_data = data.frame( "Catch_KG"=chatham_rise_hake[,'Hake_kg_per_km2'], "Year"=chatham_rise_hake[,'Year'], "Vessel"=1, "AreaSwept_km2"=1, "Lat"=chatham_rise_hake[,'Lat'], "Lon"=chatham_rise_hake[,'Lon'])
+    strata.limits = data.frame('STRATA'="All_areas")
+  }
+  if( tolower(data_set) %in% c("condition_and_density") ){
+    data( condition_and_density_example, package="FishStatsUtils" )
+    sampling_data = data.frame( "Response_variable"=condition_and_density_example[,'Response_variable'], "Year"=condition_and_density_example[,'Year'], "Vessel"=1, "AreaSwept_km2"=condition_and_density_example[,'AreaSwept'], "Lat"=condition_and_density_example[,'Lat'], "Lon"=condition_and_density_example[,'Lon'], 'logLength_lncm'=condition_and_density_example[,'log_Length'] )
     strata.limits = data.frame('STRATA'="All_areas")
   }
   sampling_data = na.omit( sampling_data )
