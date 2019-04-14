@@ -94,7 +94,7 @@ load_example = function( data_set="EBS_pollock" ){
   }
   if( tolower(data_set) %in% c("condition_and_density") ){
     data( condition_and_density_example, package="FishStatsUtils" )
-    sampling_data = data.frame( "Response_variable"=condition_and_density_example[,'Response_variable'], "Year"=condition_and_density_example[,'Year'], "Vessel"=1, "AreaSwept_km2"=condition_and_density_example[,'AreaSwept'], "Lat"=condition_and_density_example[,'Lat'], "Lon"=condition_and_density_example[,'Lon'], 'logLength_lncm'=condition_and_density_example[,'log_Length'] )
+    sampling_data = data.frame( "Category"=condition_and_density_example[,'Category'], "Response_variable"=condition_and_density_example[,'Response_variable'], "Year"=condition_and_density_example[,'Year'], "Vessel"=1, "AreaSwept_km2"=condition_and_density_example[,'AreaSwept'], "Lat"=condition_and_density_example[,'Lat'], "Lon"=condition_and_density_example[,'Lon'], 'logLength_lncm'=condition_and_density_example[,'logLength_lncm'] )
     strata.limits = data.frame('STRATA'="All_areas")
   }
   sampling_data = na.omit( sampling_data )
