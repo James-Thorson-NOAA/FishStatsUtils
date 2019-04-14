@@ -14,7 +14,7 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
 
-\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}.}
+\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"} or \code{purpose="condition_and_density"}.}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
 
