@@ -39,7 +39,7 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
   if( tolower(Region) == "california_current" ){
     Extrapolation_List = Prepare_WCGBTS_Extrapolation_Data_Fn( strata.limits=strata.limits, surveyname=surveyname, zone=zone, ... )
   }
-  if( tolower(Region) %in% c("wcghl","wcghl_domain","West_Coast_hook_and_line") ){
+  if( tolower(Region) %in% c("wcghl","wcghl_domain","west_coast_hook_and_line") ){
     Extrapolation_List = Prepare_WCGHL_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, ... )
   }                      #
   if( tolower(Region) == "british_columbia" ){
@@ -54,7 +54,7 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
   if( tolower(Region) == "bering_sea_slope" ){ #
     Extrapolation_List = Prepare_BSslope_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, ... )
   }
-  if( tolower(Region) %in% c("st_matthews_island","SMI") ){ #
+  if( tolower(Region) %in% c("st_matthews_island","smi") ){ #
     Extrapolation_List = Prepare_SMI_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, ... )
   }
   if( tolower(Region) == "aleutian_islands" ){ #

@@ -53,7 +53,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
     if(missing(ObsModel)) ObsModel = c(1,4)
     if(missing(bias.correct)) bias.correct = TRUE
-    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE )
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
   }
 
