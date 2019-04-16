@@ -11,8 +11,10 @@
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
 #' @inheritParams TMBhelper::Optimize
-#' @param extrapolation_args tagged list of optional arguments to pass to \code{make_extrapolation_info}
+#' @param extrapolation_args tagged list of optional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}
 #' @param optimize_args tagged list of optional arguments to pass to \code{TMBhelper::Optimize}
+#' @param model_args tagged list of optional arguments to pass to \code{VAST::make_model}
+#' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param ... additional parameters to pass to \code{VAST::make_data}
 #'
 #' @return Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates
@@ -46,9 +48,23 @@
 #' }
 #'
 #' @export
-fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working_dir=paste0(getwd(),"/"),
+fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
+  v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
-  extrapolation_args=list(), optimize_args=list(), silent=TRUE, ... ){
+  extrapolation_args=list(), optimize_args=list(), model_args=list(), silent=TRUE, run_model=TRUE, ... ){
+
+  # Local function -- combine two lists
+  combine_lists = function( default, input ){
+    output = default
+    for( i in seq_along(input) ){
+      if( names(input)[i] %in% names(default) ){
+        output[[names(input)[i]]] = input[[i]]
+      }else{
+        output = c( output, input[i] )
+      }
+    }
+    return( output )
+  }
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i )
@@ -63,7 +79,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
-  extrapolation_args = c( list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone), extrapolation_args )
+  extrapolation_args = combine_lists( input=extrapolation_args, default=list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone) )
   extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args )
 
   # Build information regarding spatial location and correlation
@@ -75,30 +91,41 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i, working
   message("\n### Making data object")
   data_list = VAST::make_data("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
-    "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy, ... )
-  #return( list("data_list"=data_list, "spatial_list"=spatial_list) )
+    "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
+    Xconfig_zcp=Xconfig_zcp, X_gtp=X_gtp, X_itp=X_itp, Q_ik=Q_ik, ... )
+   #return( list("data_list"=data_list, "spatial_list"=spatial_list) )
 
   # Build object
   message("\n### Making TMB object")
-  tmb_list = VAST::make_model("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version, "RhoConfig"=settings$RhoConfig,
-    "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method)
+  model_args = combine_lists( input=model_args, default=list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
+    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method) )
+  tmb_list = do.call( what=VAST::make_model, args=model_args )
   if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
-  # Optimize object
-  message("\n### Estimating parameters")
-  optimize_args = c( list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
-    bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
-    control=list(eval.max=10000,iter.max=10000,trace=1)), optimize_args )
-  parameter_estimates = do.call( what=TMBhelper::Optimize, args=optimize_args )
+  # Run the model or optionally don't
+  if( run_model==TRUE ){
+    # Optimize object
+    message("\n### Estimating parameters")
+    optimize_args = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+      savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
+      bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
+      control=list(eval.max=10000,iter.max=10000,trace=1)) )
+    parameter_estimates = do.call( what=TMBhelper::Optimize, args=optimize_args )
 
-  # Extract standard outputs
-  Report = tmb_list$Obj$report()
-  ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+    # Extract standard outputs
+    Report = tmb_list$Obj$report()
+    ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
 
-  # Build and output
-  Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
-    "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
-    "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot)
+    # Build and output
+    Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
+      "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
+      "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
+      "extrapolation_args"=extrapolation_args, "model_args"=model_args, "optimize_args"=optimize_args)
+  }else{
+    # Build and output
+    Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
+      "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
+      "settings"=settings, "extrapolation_args"=extrapolation_args, "model_args"=model_args)
+  }
   return( Return )
 }
