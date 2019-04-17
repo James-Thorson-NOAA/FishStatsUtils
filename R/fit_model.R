@@ -100,7 +100,6 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   model_args = combine_lists( input=model_args, default=list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
     "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method) )
   tmb_list = do.call( what=VAST::make_model, args=model_args )
-  if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
   # Run the model or optionally don't
   if( run_model==TRUE ){
@@ -110,6 +109,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
       savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
       bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
       control=list(eval.max=10000,iter.max=10000,trace=1)) )
+    if(silent==TRUE) tmb_list$Obj$env$beSilent()
     parameter_estimates = do.call( what=TMBhelper::Optimize, args=optimize_args )
 
     # Extract standard outputs

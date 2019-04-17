@@ -25,6 +25,7 @@ load_example = function( data_set="EBS_pollock" ){
                    "aleutian_islands_pop" = tolower("Aleutian_Islands"),
                    "condition_and_density" = tolower("Eastern_Bering_Sea"),
                    "multimodal_red_snapper" = tolower("Gulf_of_Mexico"),
+                   "lingcod_comp_expansion" = tolower("California_current"),
                    tolower("Other") )
 
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
@@ -103,6 +104,11 @@ load_example = function( data_set="EBS_pollock" ){
     data( multimodal_red_snapper_example, package="FishStatsUtils" )
     sampling_data = multimodal_red_snapper_example
     strata.limits = data.frame('STRATA'="All_areas")
+  }
+  if( tolower(data_set) %in% tolower("Lingcod_comp_expansion") ){
+    data( comp_expansion_example, package="FishStatsUtils" )
+    sampling_data = comp_expansion_example
+    strata.limits = data.frame( 'STRATA' = "ORWA", 'north_border' = 49.0, 'south_border' = 42.0 )
   }
   sampling_data = na.omit( sampling_data )
 
