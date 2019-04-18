@@ -10,8 +10,10 @@
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
 #' @inheritParams Convert_LL_to_UTM_Fn
+#' @inheritParams plot_biomass_index
 #' @param use_anisotropy Boolean indicating whether to estimate two additional parameters representing geometric anisotropy
 #' @param vars_to_correct a character-vector listing which parameters to include for bias-correction, as passed to \code{TMBhelper::Optimize}
+#' @param treat_nonencounter_as_zero Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates
 #'
 #' @return Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.
 #'
@@ -22,7 +24,7 @@
 make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
   strata.limits=data.frame('STRATA'="All_areas"), zone=NA, FieldConfig, RhoConfig,
   OverdispersionConfig, ObsModel, bias.correct, Options, use_anisotropy,
-  vars_to_correct, Version ){
+  vars_to_correct, Version, treat_nonencounter_as_zero ){
 
   # Get version
   if(missing(Version)) Version = FishStatsUtils::get_latest_version()
@@ -38,7 +40,8 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
     if(missing(ObsModel)) ObsModel = c(1,1)
     if(missing(bias.correct)) bias.correct = TRUE
-    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE )
+    if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = TRUE
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
   }
 
@@ -53,7 +56,8 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
     if(missing(ObsModel)) ObsModel = c(1,4)
     if(missing(bias.correct)) bias.correct = TRUE
-    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE )
+    if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = FALSE
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
   }
 

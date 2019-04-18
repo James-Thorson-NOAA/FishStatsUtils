@@ -7,7 +7,8 @@
 make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
   strata.limits = data.frame(STRATA = "All_areas"), zone = NA,
   FieldConfig, RhoConfig, OverdispersionConfig, ObsModel, bias.correct,
-  Options, use_anisotropy, vars_to_correct, Version)
+  Options, use_anisotropy, vars_to_correct, Version,
+  treat_nonencounter_as_zero)
 }
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
@@ -22,9 +23,21 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 
+\item{FieldConfig}{a vector of format c("Omega1"=0, "Epsilon1"=10, "Omega2"="AR1", "Epsilon2"=10), where Omega refers to spatial variation, Epsilon refers to spatio-temporal variation, Omega1 refers to variation in encounter probability, and Omega2 refers to variation in positive catch rates, where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance}
+
+\item{RhoConfig}{vector of form c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0) specifying whether either intercepts (Beta1 and Beta2) or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals (0: each year as fixed effect; 1: each year as random following IID distribution; 2: each year as random following a random walk; 3: constant among years as fixed effect; 4: each year as random following AR1 process);  If missing, assumed to be zero for each element}
+
+\item{OverdispersionConfig}{OPTIONAL, a vector of format c("eta1"=0, "eta2"="AR1") governing any correlated overdispersion among categories for each level of v_i, where eta1 is for encounter probability, and eta2 is for positive catch rates, where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance}
+
+\item{Options}{a vector of form c('SD_site_logdensity'=0,'Calculate_Range'=0,'Calculate_effective_area'=0,'Calculate_Cov_SE'=0,'Calculate_Synchrony'=0,'Calculate_proportion'=0), where Calculate_Range=1 turns on calculation of center of gravity, and Calculate_effective_area=1 turns on calculation of effective area occupied}
+
 \item{use_anisotropy}{Boolean indicating whether to estimate two additional parameters representing geometric anisotropy}
 
 \item{vars_to_correct}{a character-vector listing which parameters to include for bias-correction, as passed to \code{TMBhelper::Optimize}}
+
+\item{Version}{a version number;  If missing, defaults to latest version using \code{FishStatsUtils::get_latest_version(package="VAST")}}
+
+\item{treat_nonencounter_as_zero}{Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates}
 }
 \value{
 Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.

@@ -88,18 +88,17 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
     Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale )
 
   # Build data
-  message("\n### Making data object")
+  message("\n### Making data object") # VAST::
   data_list = VAST::make_data("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, X_gtp=X_gtp, X_itp=X_itp, Q_ik=Q_ik, ... )
-   #return( list("data_list"=data_list, "spatial_list"=spatial_list) )
 
   # Build object
   message("\n### Making TMB object")
   model_args = combine_lists( input=model_args, default=list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
     "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method) )
-  tmb_list = do.call( what=VAST::make_model, args=model_args )
+  tmb_list = do.call( what=VAST::make_model, args=model_args )  # VAST::
 
   # Run the model or optionally don't
   if( run_model==TRUE ){
