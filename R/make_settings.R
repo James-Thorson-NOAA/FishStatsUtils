@@ -5,7 +5,7 @@
 #'
 #' This function assembles a default set of user-decisions for a specified modelling purpose. The default settings are guessed based on generic guidance, and should be carefully reviewed for real-world purposes. If the user supplies values for individual settings e.g. \code{FieldConfig}, then these values override the defaults that are provided by interpreting \code{purpose}
 #'
-#' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"} or \code{purpose="condition_and_density"}.
+#' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}, \code{purpose="condition_and_density"}, \code{purpose="MICE"}, or \code{purpose="ordination"}.
 #' @inheritParams VAST::make_data
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
@@ -64,14 +64,14 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
   }
 
-  # Condition and density
+  # Spatial model of intermediate complexity for ecosystems (MICE-in-space)
   if( tolower(purpose) %in% c("mice","interactions") ){
+    if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`mice`")
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( c(n_categories,n_categories,"IID",n_categories,n_categories,"IID"), ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
     }else{
       if(missing(FieldConfig)) FieldConfig = c("Omega1"=n_categories, "Epsilon1"=n_categories, "Omega2"=n_categories, "Epsilon2"=n_categories)
     }
-    if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`mice`")
     if(missing(RhoConfig)) RhoConfig = c("Beta1"=3, "Beta2"=3, "Epsilon1"=4, "Epsilon2"=6)
     if(missing(VamConfig)) VamConfig = c("Method"=2, "Rank"=n_categories, "Timing"=1)
     if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
@@ -81,9 +81,26 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Bratio_cyl" )
   }
 
+  # Spatial model of intermediate complexity for ecosystems (MICE-in-space)
+  if( tolower(purpose) %in% c("ordination") ){
+    if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`ordination`")
+    if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
+      if(missing(FieldConfig)) FieldConfig = matrix( c(n_categories,n_categories,n_categories,n_categories,n_categories,n_categories), ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
+    }else{
+      if(missing(FieldConfig)) FieldConfig = c("Omega1"=n_categories, "Epsilon1"=n_categories, "Omega2"=n_categories, "Epsilon2"=n_categories)
+    }
+    if(missing(RhoConfig)) RhoConfig = c("Beta1"=4, "Beta2"=4, "Epsilon1"=4, "Epsilon2"=4)
+    if(missing(VamConfig)) VamConfig = c("Method"=0, "Rank"=0, "Timing"=0)
+    if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
+    if(missing(ObsModel)) ObsModel = c(1,1)
+    if(missing(bias.correct)) bias.correct = FALSE
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+  }
+
   # Check for bad input
-  if( !( tolower(purpose) %in% c("index","condition_and_density","mice")) ){
-    stop("'purpose' is currently set up only for index-standardization models and correlations between condition and density")
+  if( !( tolower(purpose) %in% c("index","condition_and_density","mice","ordination")) ){
+    stop("'purpose' is currently set up only for index-standardization models, correlations between condition and density, MICE-in-space models, or for ordination")
   }
 
   # Other defaults

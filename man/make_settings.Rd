@@ -8,14 +8,14 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
   strata.limits = data.frame(STRATA = "All_areas"), zone = NA,
   FieldConfig, RhoConfig, OverdispersionConfig, ObsModel, bias.correct,
   Options, use_anisotropy, vars_to_correct, Version,
-  treat_nonencounter_as_zero)
+  treat_nonencounter_as_zero, n_categories, VamConfig)
 }
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
 
 \item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
 
-\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"} or \code{purpose="condition_and_density"}.}
+\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}, \code{purpose="condition_and_density"}, \code{purpose="MICE"}, or \code{purpose="ordination"}.}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
 
@@ -38,6 +38,15 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 \item{Version}{a version number;  If missing, defaults to latest version using \code{FishStatsUtils::get_latest_version(package="VAST")}}
 
 \item{treat_nonencounter_as_zero}{Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates}
+
+\item{n_categories}{number of categories in a multivariate model (only necessary to specify given some values for \code{purpose})}
+
+\item{VamConfig}{Options to estimate interactions, containing three slots:
+\describe{
+  \item{VamConfig[0]}{selects method for forming interaction matrix; Turn off feature using 0, or I recommend using 2 by default}
+  \item{VamConfig[1]}{indicates the rank of the interaction matrix, indicating the number of community axes that have regulated dynamics}
+  \item{VamConfig[2]}{Indicates whether interactions occur before spatio-temporal variation (\code{VamConfig[2]=0}) or after \code{VamConfig[2]=1}}
+}}
 }
 \value{
 Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.
