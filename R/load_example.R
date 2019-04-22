@@ -112,7 +112,7 @@ load_example = function( data_set="EBS_pollock" ){
     sampling_data = comp_expansion_example
     strata.limits = data.frame( 'STRATA' = "ORWA", 'north_border' = 49.0, 'south_border' = 42.0 )
   }
-  if( tolower(data_set) %in% tolower("ordination","five_species_ordination") ){
+  if( tolower(data_set) %in% tolower(c("ordination","five_species_ordination")) ){
     data( five_species_ordination_example, package="FishStatsUtils" )
     sampling_data = five_species_ordination_example
     strata.limits = data.frame('STRATA'="All_areas")
