@@ -6,8 +6,7 @@
 \usage{
 plot_results(fit, settings, plot_set = 3, working_dir = paste0(getwd(),
   "/"), year_labels = fit$year_labels,
-  years_to_plot = fit$years_to_plot, use_biascorr = TRUE,
-  map_list = NULL)
+  years_to_plot = fit$years_to_plot, use_biascorr = TRUE, map_list)
 }
 \arguments{
 \item{fit}{Output from \code{fit_model}}

@@ -16,7 +16,7 @@
 #'
 #' @export
 plot_results = function( fit, settings, plot_set=3, working_dir=paste0(getwd(),"/"),
-  year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list=NULL ){
+  year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list ){
 
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
@@ -25,7 +25,7 @@ plot_results = function( fit, settings, plot_set=3, working_dir=paste0(getwd(),"
   #plot_data(Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list, Data_Geostat=Data_Geostat, PlotDir=working_dir )
 
   # PLot settings
-  if( is.null(map_list) ){
+  if( missing(map_list) ){
     message("\n### Obtaining default settings for plotting maps")
     map_list = make_map_info( "Region"=settings$Region, "spatial_list"=fit$spatial_list, "Extrapolation_List"=fit$extrapolation_list )
   }
