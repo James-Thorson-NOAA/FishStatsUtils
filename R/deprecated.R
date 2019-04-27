@@ -673,3 +673,62 @@ function( TmbData, Sdreport, FileName_VYplot=NULL ){
   # Return stuff
   return( Return )
 }
+
+
+#' Calculate weights for bilinear interpolation
+#'
+#' \code{bilinear_interp} calculates three coefficients, used to calculate height via blinear interpolation from height and location of three neighbors
+#'
+#' @param xyz1, 2D location and height of first neighbor
+#' @param xyz2, 2D location and height of second neighbor
+#' @param xyz3, 2D location and height of third neighbor
+#' @param xypred, 2D location of location to interpolate
+
+#' @return Tagged list of useful output
+#' \describe{
+#'   \item{zpred}{height at location \code{xypred}}
+#'   \item{phi}{Coefficients for interpolation}
+#' }
+
+#' @examples
+#'
+#'   \dontrun{
+#'   bilinear_interp( xyz1=c(0,0,0), xyz2=c(1,-1,1), xyz3=c(0,1,2), xypred=c(0.1,0.7))
+#'   # Should equal 1.7
+#'   }
+
+bilinear_interp = function( xyz1, xyz2, xyz3, xypred ){
+  # Make constaint matrix
+  #  1st row:  sum to one
+  #  2nd row:  sum to x locations
+  #  3rd row:  sum to y location
+  B = rbind( rep(1,3), cbind(xyz1[1:2],xyz2[1:2],xyz3[1:2]) )
+
+  # Calculate weighting vector that satisfies these constraints
+  phi = solve(B) %*% c(1,xypred)
+
+  # Calculate interpolated value
+  zpred = c(xyz1[3],xyz2[3],xyz3[3]) %*% phi
+  Return = list("phi"=phi, "zpred"=zpred)
+  return( Return )
+}
+# bilinear_interp( xyz1=c(0,0,0), xyz2=c(1,0,1), xyz3=c(0,1,2), xypred=c(0.25,0.5))
+
+
+Plot_States_in_UTM_Fn = function( MappingDetails, Rotate=0, fillcol=NA, zone=NA, ... ){
+  Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE, fill=TRUE) # , orientation=c(mean(y.lim),mean(x.lim),15)
+  Tmp1 = na.omit( cbind('PID'=cumsum(is.na(Map$x)), 'POS'=1:length(Map$x), 'X'=Map$x, 'Y'=Map$y ))
+  # Convert_LL_to_UTM_Fn
+  attr(Tmp1,"projection") = "LL"
+  attr(Tmp1,"zone") = zone
+  tmpUTM = suppressMessages(PBSmapping::convUL(Tmp1))                                                         #$
+  coordinates(tmpUTM) = c("X","Y")
+  tmp <- maptools::elide( tmpUTM, rotate=Rotate)
+  # Plot map
+  plot(1, pch="", ... )
+  lev = levels(as.factor(tmp@data$PID))
+  for(levI in 1:(length(lev))) {
+    indx = which(tmpUTM$PID == lev[levI])
+    polygon(tmp@coords[indx,'x'], tmp@coords[indx,'y'], col=fillcol)
+  }
+}

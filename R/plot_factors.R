@@ -3,8 +3,8 @@
 #'
 #' \code{plot_factors} plots factor loadings, average spatial factors, and spatio-temporal factors
 #'
-#' @inheritParams Plot_Overdispersion
-#' @inheritParams Summarize_Covariance
+#' @inheritParams plot_overdispersion
+#' @inheritParams summarize_covariance
 #' @param Year_Set plotting-names for time dimension
 #' @param mapdetails_list output from \code{FishStatsUtils::MapDetails_Fn}
 #' @param Dim_year Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)

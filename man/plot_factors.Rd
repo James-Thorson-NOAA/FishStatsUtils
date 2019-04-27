@@ -10,7 +10,17 @@ plot_factors(Report, ParHat, Data, SD, Year_Set = NULL,
   plotdir = paste0(getwd(), "/"), land_color = "grey")
 }
 \arguments{
+\item{Report}{output report, e.g., from \code{Report <- obj$report()}}
+
+\item{ParHat}{Tagged list of fitted data, e.g., from \code{ParHat <- obj$env$parList()}}
+
+\item{Data}{tagged list of input data}
+
+\item{SD}{standard deviation report, e.g., from \code{SD <- sdreport( obj )}}
+
 \item{Year_Set}{plotting-names for time dimension}
+
+\item{category_names}{character-vector listing name for each category}
 
 \item{mapdetails_list}{output from \code{FishStatsUtils::MapDetails_Fn}}
 

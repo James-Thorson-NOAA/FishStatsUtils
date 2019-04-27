@@ -11,7 +11,29 @@ calculate_proportion(TmbData, Index, Year_Set = NULL,
   height = 6, ...)
 }
 \arguments{
+\item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
+
 \item{Index}{output from \code{FishStatsUtils::plot_biomass_index}}
+
+\item{Year_Set}{Year names for labeling panels}
+
+\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+
+\item{strata_names}{names for spatial strata}
+
+\item{category_names}{names for categories (if using package `VAST`)}
+
+\item{plot_legend}{Add legend for labelling colors}
+
+\item{DirName}{Directory for saving plot and table}
+
+\item{PlotName}{Name for plot}
+
+\item{interval_width}{width for confidence intervals}
+
+\item{width}{plot width in inches}
+
+\item{height}{plot height in inches}
 
 \item{...}{list of settings to pass to \code{sdreport}}
 }

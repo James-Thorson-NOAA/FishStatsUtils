@@ -3,7 +3,7 @@
 #'
 #' \code{Summarize_Covariance} plots and returns spatio-temporal covariance among categories
 #'
-#' @inheritParams Plot_Overdispersion
+#' @inheritParams plot_overdispersion
 #' @param category_order integer-vector to re-order categories while plotting
 #' @param category_names character-vector listing name for each category
 #' @param plotdir directory (absolute path) for plots

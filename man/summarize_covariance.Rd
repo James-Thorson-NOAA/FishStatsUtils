@@ -11,6 +11,14 @@ summarize_covariance(Report, Data, ParHat, SD = NULL,
   2, 0), ...)
 }
 \arguments{
+\item{Report}{output report, e.g., from \code{Report <- obj$report()}}
+
+\item{Data}{tagged list of input data}
+
+\item{ParHat}{Tagged list of fitted data, e.g., from \code{ParHat <- obj$env$parList()}}
+
+\item{SD}{standard deviation report, e.g., from \code{SD <- sdreport( obj )}}
+
 \item{category_order}{integer-vector to re-order categories while plotting}
 
 \item{category_names}{character-vector listing name for each category}
