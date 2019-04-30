@@ -107,9 +107,9 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
     optimize_args = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
       savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
       bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
-      control=list(eval.max=10000,iter.max=10000,trace=1)) )
+      control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2) )
     if(silent==TRUE) tmb_list$Obj$env$beSilent()
-    parameter_estimates = do.call( what=TMBhelper::Optimize, args=optimize_args )
+    parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args )
 
     # Extract standard outputs
     Report = tmb_list$Obj$report()
