@@ -40,24 +40,33 @@ plot_results = function( fit, settings, plot_set=3, working_dir=paste0(getwd(),"
 
   # Plot index
   message("\n### Making plot of abundance index")
-  Index = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels, Years2Include=years_to_plot, use_biascorr=use_biascorr )
+  Index = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
+    Years2Include=years_to_plot, use_biascorr=use_biascorr )
 
   # Plot range indices
   message("\n### Making plot of spatial indices")
-  plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm), PlotDir=working_dir, Year_Set=year_labels, use_biascorr=use_biascorr )
+  plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm),
+    PlotDir=working_dir, Year_Set=year_labels, use_biascorr=use_biascorr )
 
   # Plot densities
   message("\n### Making plot of densities")
-  Dens_xt = plot_maps(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]], Report=fit$Report, Sdreport=Opt$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]], Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]], Cex=map_list[["Cex"]], Legend=map_list[["Legend"]], zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8, plot_legend_fig=FALSE)
+  Dens_xt = plot_maps(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]], Report=fit$Report, Sdreport=Opt$SD,
+    PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]], Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir,
+    Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]], Cex=map_list[["Cex"]], Legend=map_list[["Legend"]],
+    zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8, plot_legend_fig=FALSE)
 
   # Plot quantile-quantile plot
   message("\n### Making Q-Q plot")
-  Q = plot_quantile_diagnostic( TmbData=fit$data_list, Report=fit$Report, FileName_PP="Posterior_Predictive", FileName_Phist="Posterior_Predictive-Histogram", FileName_QQ="Q-Q_plot", FileName_Qhist="Q-Q_hist", save_dir=working_dir )
+  Q = plot_quantile_diagnostic( TmbData=fit$data_list, Report=fit$Report, FileName_PP="Posterior_Predictive",
+    FileName_Phist="Posterior_Predictive-Histogram", FileName_QQ="Q-Q_plot", FileName_Qhist="Q-Q_hist", save_dir=working_dir )
 
   # Pearson residuals
   if( "n_x" %in% names(fit$data_list) ){
     message("\n### Making plot of Pearson residuals")
-    plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report, Q=Q, savedir=working_dir, MappingDetails=map_list[["MappingDetails"]], PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]], Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]], Cex=map_list[["Cex"]], Legend=map_list[["Legend"]], zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8)
+    plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report,
+      Q=Q, savedir=working_dir, MappingDetails=map_list[["MappingDetails"]], PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
+      Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]],
+      Cex=map_list[["Cex"]], Legend=map_list[["Legend"]], zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8)
   }else{
     message("\n### Skipping plot of Pearson residuals")
   }

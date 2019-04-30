@@ -17,7 +17,6 @@
 #' @param plot_log Boolean, whether to plot y-axis in log-scale
 #' @param width plot width in inches
 #' @param height plot height in inches
-#' @param treat_missing_as_zero Boolean whether to treat years and species with no (or only NA) data as instances where the index should be zero
 #' @param ... Other inputs to `par()`
 #' @inheritParams plot_maps
 #'
@@ -31,7 +30,7 @@
 plot_biomass_index <-
 function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(getwd(),"/"), PlotName="Index", interval_width=1,
   strata_names=NULL, category_names=NULL, use_biascorr=TRUE, plot_legend=TRUE, total_area_km2=NULL, plot_log=FALSE, width=4, height=4,
-  treat_missing_as_zero=FALSE, create_covariance_table=FALSE, ... ){
+  create_covariance_table=FALSE, ... ){
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
@@ -82,6 +81,13 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
     if( all(is.na(Sdreport$unbiased$value)) ){
       stop("You appear to be using bias-correction, but all values are NA. Please report problem to package author.")
     }
+  }
+
+  # Defaults
+  if( "treat_nonencounter_as_zero" %in% names(TmbData$Options_list$Options) ){
+    treat_missing_as_zero = TmbData$Options_list$Options["treat_nonencounter_as_zero"]
+  }else{
+    treat_missing_as_zero = FALSE
   }
 
   # Objects
