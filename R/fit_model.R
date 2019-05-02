@@ -10,8 +10,9 @@
 #' @inheritParams make_spatial_info
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
-#' @inheritParams TMBhelper::Optimize
+#' @inheritParams TMBhelper::fit_tmb
 #' @param extrapolation_args tagged list of optional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}
+#' @param spatial_args tagged list of optional arguments to pass to \code{FishStatsUtils::make_spatial_info}
 #' @param optimize_args tagged list of optional arguments to pass to \code{TMBhelper::Optimize}
 #' @param model_args tagged list of optional arguments to pass to \code{VAST::make_model}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
@@ -51,7 +52,8 @@
 fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
-  extrapolation_args=list(), optimize_args=list(), model_args=list(), silent=TRUE, run_model=TRUE, ... ){
+  extrapolation_args=list(), spatial_args=list(), optimize_args=list(), model_args=list(),
+  silent=TRUE, run_model=TRUE, ... ){
 
   # Local function -- combine two lists
   combine_lists = function( default, input ){
@@ -84,8 +86,11 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
 
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
-  spatial_list = make_spatial_info( grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
-    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale )
+  spatial_args = combine_lists( input=spatial_args, default=list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
+    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale) )
+  #spatial_list = make_spatial_info( grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
+  #  Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale )
+  spatial_list = do.call( what=make_spatial_info, args=spatial_args )
 
   # Build data
   message("\n### Making data object") # VAST::

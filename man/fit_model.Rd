@@ -7,8 +7,9 @@
 fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
   length(b_i)), working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
   X_gtp = NULL, X_itp = NULL, Q_ik = NULL, newtonsteps = 1,
-  extrapolation_args = list(), optimize_args = list(),
-  model_args = list(), silent = TRUE, run_model = TRUE, ...)
+  extrapolation_args = list(), spatial_args = list(),
+  optimize_args = list(), model_args = list(), silent = TRUE,
+  run_model = TRUE, ...)
 }
 \arguments{
 \item{settings}{Output from \code{make_settings}}
@@ -40,6 +41,8 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
 \item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
 
 \item{extrapolation_args}{tagged list of optional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}}
+
+\item{spatial_args}{tagged list of optional arguments to pass to \code{FishStatsUtils::make_spatial_info}}
 
 \item{optimize_args}{tagged list of optional arguments to pass to \code{TMBhelper::Optimize}}
 

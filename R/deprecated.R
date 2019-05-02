@@ -11,7 +11,7 @@
 #' @param cov_to_turnoff which covariates to turn off, as indicated by their order in \code{TmbData$X_xtp} (which only matters if "gamma1_ctp" or "gamma2_ctp" is in \code{turnoff_pars})
 #' @param calculate_COG Boolean whether to calculate COG for each run
 #' @param figname name for figure to plot density in counter-factual scenario
-#' @inheritParams Build_TMB_Fn
+#' @inheritParams VAST::make_model
 #' @param MapDetails_List output from \code{FishStatsUtils::MapDetails_Fn}
 #' @param year_set set of parameters to include
 #' @param c_set set of categories to include

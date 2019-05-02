@@ -9,7 +9,7 @@ plot_biomass_index(TmbData, Sdreport, Year_Set = NULL,
   PlotName = "Index", interval_width = 1, strata_names = NULL,
   category_names = NULL, use_biascorr = TRUE, plot_legend = TRUE,
   total_area_km2 = NULL, plot_log = FALSE, width = 4, height = 4,
-  treat_missing_as_zero = FALSE, create_covariance_table = FALSE, ...)
+  create_covariance_table = FALSE, ...)
 }
 \arguments{
 \item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
@@ -41,8 +41,6 @@ plot_biomass_index(TmbData, Sdreport, Year_Set = NULL,
 \item{width}{plot width in inches}
 
 \item{height}{plot height in inches}
-
-\item{treat_missing_as_zero}{Boolean whether to treat years and species with no (or only NA) data as instances where the index should be zero}
 
 \item{...}{Other inputs to `par()`}
 }
