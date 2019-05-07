@@ -138,6 +138,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xct"%in%names(Report)) Array_xct = Report$R1_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$R1_xcy
       #if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
+      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("Not implemented for SpatialVAM")
       message( "plot_num=1 doesn't work well when using ObsModel[2]==1" )
     }
@@ -147,6 +148,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct)
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy)
       #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy)
+      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==3){
@@ -164,6 +166,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct+quantile(Report$R2_xct,0.25))
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy+quantile(Report$R2_xcy,0.25))
       #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy+quantile(Report$R2_gcy,0.25))
+      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==5){
@@ -172,6 +175,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xct"%in%names(Report)) Array_xct = log(Report$D_xct+quantile(Report$D_xct,0.25))
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$D_xcy+quantile(Report$D_xcy,0.25))
       #if("D_gcy"%in%names(Report)) Array_xct = log(Report$D_gcy+quantile(Report$D_gcy,0.25))
+      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==6){
@@ -187,6 +191,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = Report$Epsilon2_st
       if("D_xct"%in%names(Report)) Array_xct = Report$Epsilon2_sct
       if("D_xcy"%in%names(Report)) Array_xct = Report$Epsilon2_sct
+      if("D_gcy"%in%names(Report)) Array_xct = Report$Epsilon2_gct
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==8){
@@ -194,6 +199,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = Report$P1_xt
       if("D_xct"%in%names(Report)) Array_xct = Report$P1_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$P1_xcy
+      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==9){
@@ -201,6 +207,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xt"%in%names(Report)) Array_xct = Report$P2_xt
       if("D_xct"%in%names(Report)) Array_xct = Report$P2_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$P2_xcy
+      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==10){
@@ -221,6 +228,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("'plot_num=10' not implemented for 'SpatialVAM'")
       # Convert to CV
       Array_xct = sqrt( exp(Array_xct^2) - 1 )
+      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
     }
     if(plot_num==11){
       if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
