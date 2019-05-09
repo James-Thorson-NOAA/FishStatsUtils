@@ -9,7 +9,11 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
   # Fix defaults
   if( is.null(fine_scale) ) fine_scale = FALSE
   if( is.null(spatial_list) ){
-    warning("Current versions of `make_map_info` require input `spatial_list` to properly allow feature `fine_scale=TRUE`")
+    if( fine_scale==FALSE ){
+      warning("Consider updating inputs to `make_map_info` to enable future use of feature `fine_scale=TRUE`")
+    }else{
+      stop("Must update inputs to `make_map_info` to enable feature `fine_scale=TRUE`")
+    }
   }
 
   # Initialize
