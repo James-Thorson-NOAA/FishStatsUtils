@@ -4,7 +4,9 @@
 \alias{make_map_info}
 \title{Get information for adequate mapping for regions}
 \usage{
-make_map_info(Region, NN_Extrap, Extrapolation_List,
+make_map_info(Region, Extrapolation_List, spatial_list = NULL,
+  NN_Extrap = spatial_list$PolygonList$NN_Extrap,
+  fine_scale = spatial_list$fine_scale,
   Include = (Extrapolation_List[["Area_km2_x"]] > 0 &
   Extrapolation_List[["a_el"]][, 1] > 0))
 }

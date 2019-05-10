@@ -24,25 +24,37 @@ format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spa
   # Knots in UTM: Spatial_List$loc_x
   # Info for projection:  Extrapolation_List[c('zone','flip_around_dateline')]
 
+  # Backwards compatibility
+  if( is.null(Spatial_List$fine_scale) ) Spatial_List$fine_scale = FALSE
+
+  # Determine grids to use
+  if( Spatial_List$fine_scale==FALSE ){
+    loc_g = Spatial_List$loc_x
+  }else{
+    if(is.null(Spatial_List)) stop("Problem with `Spatial_List`")
+    loc_g = Spatial_List$loc_g
+  }
+
+  #
   if( is.vector(Cov_ep)) Cov_ep = matrix(Cov_ep,ncol=1)
 
   # Step 1:  Project Lat_e and Lon_e to same coordinate system as knots
   if( is.numeric(Extrapolation_List$zone) ){
-    Loc_e = Convert_LL_to_UTM_Fn( Lon=Lon_e, Lat=Lat_e, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
-    Loc_e = cbind( 'E_km'=Loc_e[,'X'], 'N_km'=Loc_e[,'Y'])
+    loc_e = Convert_LL_to_UTM_Fn( Lon=Lon_e, Lat=Lat_e, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
+    loc_e = cbind( 'E_km'=loc_e[,'X'], 'N_km'=loc_e[,'Y'])
   }else{
-    Loc_e = Convert_LL_to_EastNorth_Fn( Lon=Lon_e, Lat=Lat_e, crs=Extrapolation_List$zone )
+    loc_e = Convert_LL_to_EastNorth_Fn( Lon=Lon_e, Lat=Lat_e, crs=Extrapolation_List$zone )
   }
 
   # Associate each knot with all covariate measurements that are closest to that knot
   if( na.omit %in% c("error","time-average") ){
     # Step 2: Determine nearest knot for each LatLon_e
-    NN = RANN::nn2( data=Spatial_List$loc_x, query=Loc_e, k=1 )$nn.idx[,1]
+    NN = RANN::nn2( data=loc_g[,c('E_km','N_km')], query=loc_e[,c('E_km','N_km')], k=1 )$nn.idx[,1]
 
     # Step 3: Determine average covariate for each knot and year
     Cov_xtp = NULL
     for(pI in 1:ncol(Cov_ep)){
-      Cov_xt = tapply( Cov_ep[,pI], INDEX=list(factor(NN,levels=1:nrow(Spatial_List$loc_x)), factor(t_e,levels=Year_Set)), FUN=FUN )
+      Cov_xt = tapply( Cov_ep[,pI], INDEX=list(factor(NN,levels=1:nrow(loc_g)), factor(t_e,levels=Year_Set)), FUN=FUN )
       Cov_xtp = abind::abind( Cov_xtp, Cov_xt, along=3 )
     }
 
@@ -69,12 +81,12 @@ format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spa
 
   # Associate each knot with the X closest measurements in a given year
   if( is.numeric(na.omit) ){
-    Cov_xtp = array(NA, dim=c(nrow(Spatial_List$loc_x),length(Year_Set),ncol(Cov_ep)), dimnames=list(NULL,Year_Set,colnames(Cov_ep)) )
+    Cov_xtp = array(NA, dim=c(nrow(loc_g),length(Year_Set),ncol(Cov_ep)), dimnames=list(NULL,Year_Set,colnames(Cov_ep)) )
 
     for(tI in 1:length(Year_Set)){
-      Locprime_e = Loc_e[which(t_e==Year_Set[tI]),,drop=FALSE]
-      if( nrow(Locprime_e) == 0 ) stop("No measurements for year ", Year_Set[tI] )
-      NN = RANN::nn2( data=Locprime_e, query=Spatial_List$loc_x, k=na.omit )$nn.idx
+      locprime_e = loc_e[which(t_e==Year_Set[tI]),c('E_km','N_km'),drop=FALSE]
+      if( nrow(locprime_e) == 0 ) stop("No measurements for year ", Year_Set[tI] )
+      NN = RANN::nn2( data=locprime_e[,c('E_km','N_km')], query=loc_g[,c('E_km','N_km')], k=na.omit )$nn.idx
       for(xI in 1:dim(Cov_xtp)[1] ){
       for(pI in 1:dim(Cov_xtp)[3] ){
         Cov_xtp[xI,tI,pI] = FUN( Cov_ep[which(t_e==Year_Set[tI]),pI][NN[xI,]] )

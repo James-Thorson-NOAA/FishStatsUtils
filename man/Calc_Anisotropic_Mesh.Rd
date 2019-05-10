@@ -4,8 +4,8 @@
 \alias{Calc_Anisotropic_Mesh}
 \title{Make mesh for distances among points}
 \usage{
-Calc_Anisotropic_Mesh(loc_x, Method, Extrapolation_List,
-  anisotropic_mesh = NULL, refine = FALSE, ...)
+Calc_Anisotropic_Mesh(loc_x, loc_g, loc_i, Method, Extrapolation_List,
+  anisotropic_mesh = NULL, refine = FALSE, fine_scale = FALSE, ...)
 }
 \arguments{
 \item{loc_x}{location (eastings and northings in kilometers, UTM) for each sample or knot}

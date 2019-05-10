@@ -6,8 +6,9 @@
 \usage{
 make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
   LAT_intensity = Lat_i, Extrapolation_List, Method = "Mesh",
-  grid_size_km = 50, grid_size_LL = 1, randomseed = 1,
-  nstart = 100, iter.max = 1000, ...)
+  grid_size_km = 50, grid_size_LL = 1, fine_scale = FALSE,
+  iter.max = 1000, randomseed = 1, nstart = 100,
+  DirPath = paste0(getwd(), "/"), Save_Results = FALSE, ...)
 }
 \arguments{
 \item{n_x, }{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
@@ -28,13 +29,19 @@ make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
 
 \item{grid_size_LL, }{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}}
 
+\item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
+
+\item{iter.max}{the number of iterations used per k-means algorithm (default=1000)}
+
 \item{randomseed}{a random number seed}
 
 \item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
 
-\item{iter.max}{the number of iterations used per k-means algorithm (default=1000)}
+\item{DirPath}{a directory where the algorithm looks for a previously-saved output (default is working directory)}
 
-\item{..., }{additional arguments passed to \code{Calc_Kmeans}}
+\item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
+
+\item{..., }{additional arguments passed to \code{INLA::inla.mesh.create}}
 }
 \value{
 Tagged list containing objects for running a VAST model
@@ -51,4 +58,9 @@ Tagged list containing objects for running a VAST model
 }
 \description{
 \code{make_spatial_info} builds a tagged list with all the spatial information needed for \code{Data_Fn}
+}
+\details{
+\code{fine_scale=TRUE} is a new feature starting in V8.0.0 which triggers two major changes: (1) projecting Gaussian Markov random fields from knots to sampling and extrapolation-grid locations using bilinear interpolation (i.e., piecewise linear smoothing), and (2) including density covariates individually for extrapolation-grid and sampling locations. \code{fine_scale=FALSE} is designed to be backwards compatible with earlier versions, although V8.0.0 may also require changes to input naming conventions for covariates to specify the same model and attain the same fit.
+
+\code{LON_intensity} and \code{LAT_intensity} allow users to specify locations that are used by the k-means algorithm to determine the location of knots, where e.g. users can either hard-code the desired knot locations via these inputs (using \code{n_x} greater than this number of locations), or use the extrapolation-grid to ensure that knots are located proportional to that grid.
 }

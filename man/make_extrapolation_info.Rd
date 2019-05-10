@@ -4,17 +4,40 @@
 \alias{make_extrapolation_info}
 \title{Build extrapolation grid}
 \usage{
-make_extrapolation_info(Region, strata.limits, observations_LL = NULL,
-  input_grid = NULL, ...)
+make_extrapolation_info(Region, zone = NA,
+  strata.limits = data.frame(STRATA = "All_areas"), input_grid = NULL,
+  observations_LL = NULL, grid_dim_km = c(2, 2),
+  maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
+  grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
+  strata_to_use = c("SOG", "WCVI", "QCS", "HS", "WCHG"),
+  survey = "Chatham_rise", surveyname = "propInWCGBTS", ...)
 }
 \arguments{
-\item{Region}{a character entry that is matched against potential values to determine the region for the extrapolation grid.}
+\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
+
+\item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 
 \item{strata.limits}{an input for determining stratification of indices (see example script)}
 
+\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid (only used when \code{Region=="User"})}
+
 \item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation (only used when Region doesn't match known entries)}
 
-\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid (only used when \code{Region=="User"})}
+\item{grid_dim_km}{numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region} doesn't match existing options}
+
+\item{maximum_distance_from_sample}{maximum distance that an extrapolation grid cell can be from the nearest sample and still be included in area-weighted extrapolation of density; only used if \code{Region} doesn't match existing options}
+
+\item{grid_in_UTM}{Boolean stating whether to automatically generate an extrapolation grid based on sampling locations in km within the UTM projection of within Lat-Lon coordinates; only used if \code{Region} doesn't match existing options}
+
+\item{grid_dim_LL}{same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region} doesn't match existing options}
+
+\item{region}{which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}}
+
+\item{strata_to_use}{strata to include by default for the BC coast extrapolation grid; only used if \code{Region="british_columbia"}}
+
+\item{survey}{survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}}
+
+\item{surveyname}{area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}}
 
 \item{...}{other objects passed for individual regions (see example script)}
 }
@@ -30,4 +53,7 @@ Tagged list used in other functions
 }
 \description{
 \code{make_extrapolation_data} builds an object used to determine areas to extrapolation densities to when calculating indices
+}
+\details{
+To do area-weighted extrapolation of estimated density for use in calculating abundance indices, it is necessary to have a precise measurement of the footprint for a given survey design. Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted at the location of each grid cell and where each grid cell is associated with a known area within a given survey design. Collaborators have worked with the package author to include the extrapolation-grid for several regions automatically in FishStatsUtils, but for new regions an analyst must either detect the grid automatically using \code{Region="Other"} or input an extrapolation-grid manually using \code{Region="User"}.  The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
 }

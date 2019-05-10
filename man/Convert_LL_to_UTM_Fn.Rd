@@ -11,7 +11,7 @@ Convert_LL_to_UTM_Fn(Lon, Lat, zone = NA, flip_around_dateline = FALSE)
 
 \item{Lat}{vector of latitudes}
 
-\item{zone}{zone used for UTM projection}
+\item{zone}{UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone}
 
 \item{flip_around_dateline}{boolean specifying whether to flip Lat-Lon locations around the dateline, and then retransform back (only useful if Lat-Lon straddle the dateline)}
 }
