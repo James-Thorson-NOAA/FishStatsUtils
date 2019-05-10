@@ -29,7 +29,7 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{OverdispersionConfig}{OPTIONAL, a vector of format c("eta1"=0, "eta2"="AR1") governing any correlated overdispersion among categories for each level of v_i, where eta1 is for encounter probability, and eta2 is for positive catch rates, where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance}
 
-\item{Options}{a vector of form c('SD_site_logdensity'=0,'Calculate_Range'=0,'Calculate_effective_area'=0,'Calculate_Cov_SE'=0,'Calculate_Synchrony'=0,'Calculate_proportion'=0), where Calculate_Range=1 turns on calculation of center of gravity, and Calculate_effective_area=1 turns on calculation of effective area occupied}
+\item{Options}{a vector of form c('SD_site_logdensity'=FALSE,'Calculate_Range'=FALSE,'Calculate_effective_area'=FALSE,'Calculate_Cov_SE'=FALSE,'Calculate_Synchrony'=FALSE,'Calculate_proportion'=FALSE), where Calculate_Range=1 turns on calculation of center of gravity, and Calculate_effective_area=1 turns on calculation of effective area occupied}
 
 \item{use_anisotropy}{Boolean indicating whether to estimate two additional parameters representing geometric anisotropy}
 

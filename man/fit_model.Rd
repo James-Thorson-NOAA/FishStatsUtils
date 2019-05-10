@@ -30,11 +30,15 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
 
 \item{Xconfig_zcp}{OPTIONAL, 3D array of settings for each dynamic density covariate, where the first dimension corresponds to 1st or 2nd linear predictors, second dimension corresponds to model category, and third dimension corresponds to each density covariate
 \describe{
-  \item{Xconfig_zcp[z,c,p]=0}{\code{X_xtp[,,p]} has no effect on linear predictor z for category c}
-  \item{Xconfig_zcp[z,c,p]=1}{\code{X_xtp[,,p]} has a linear effect on linear predictor z for category c}
-  \item{Xconfig_zcp[z,c,p]=2}{\code{X_xtp[,,p]} has a spatially varying, zero-centered linear effect on linear predictor z for category c}
-  \item{Xconfig_zcp[z,c,p]=3}{\code{X_xtp[,,p]} has a spatially varying linear effect on linear predictor z for category c}
+  \item{Xconfig_zcp[z,c,p]=0}{\code{X_itp[,,p]} has no effect on linear predictor z for category c}
+  \item{Xconfig_zcp[z,c,p]=1}{\code{X_itp[,,p]} has a linear effect on linear predictor z for category c}
+  \item{Xconfig_zcp[z,c,p]=2}{\code{X_itp[,,p]} has a spatially varying, zero-centered linear effect on linear predictor z for category c}
+  \item{Xconfig_zcp[z,c,p]=3}{\code{X_itp[,,p]} has a spatially varying linear effect on linear predictor z for category c}
 }}
+
+\item{X_gtp}{array of density covariates for each extrapolation-grid cell g, time t, and covariate p; if missing, assumed to not include covariates}
+
+\item{X_itp}{array of density covariates for each extrapolation-grid cell i, time t, and covariate p}
 
 \item{Q_ik}{matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
 

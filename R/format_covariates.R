@@ -40,16 +40,16 @@ format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spa
 
   # Step 1:  Project Lat_e and Lon_e to same coordinate system as knots
   if( is.numeric(Extrapolation_List$zone) ){
-    Loc_e = Convert_LL_to_UTM_Fn( Lon=Lon_e, Lat=Lat_e, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
-    Loc_e = cbind( 'E_km'=Loc_e[,'X'], 'N_km'=Loc_e[,'Y'])
+    loc_e = Convert_LL_to_UTM_Fn( Lon=Lon_e, Lat=Lat_e, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
+    loc_e = cbind( 'E_km'=loc_e[,'X'], 'N_km'=loc_e[,'Y'])
   }else{
-    Loc_e = Convert_LL_to_EastNorth_Fn( Lon=Lon_e, Lat=Lat_e, crs=Extrapolation_List$zone )
+    loc_e = Convert_LL_to_EastNorth_Fn( Lon=Lon_e, Lat=Lat_e, crs=Extrapolation_List$zone )
   }
 
   # Associate each knot with all covariate measurements that are closest to that knot
   if( na.omit %in% c("error","time-average") ){
     # Step 2: Determine nearest knot for each LatLon_e
-    NN = RANN::nn2( data=loc_g, query=Loc_e, k=1 )$nn.idx[,1]
+    NN = RANN::nn2( data=loc_g[,c('E_km','N_km')], query=loc_e[,c('E_km','N_km')], k=1 )$nn.idx[,1]
 
     # Step 3: Determine average covariate for each knot and year
     Cov_xtp = NULL
@@ -84,9 +84,9 @@ format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spa
     Cov_xtp = array(NA, dim=c(nrow(loc_g),length(Year_Set),ncol(Cov_ep)), dimnames=list(NULL,Year_Set,colnames(Cov_ep)) )
 
     for(tI in 1:length(Year_Set)){
-      Locprime_e = Loc_e[which(t_e==Year_Set[tI]),,drop=FALSE]
-      if( nrow(Locprime_e) == 0 ) stop("No measurements for year ", Year_Set[tI] )
-      NN = RANN::nn2( data=Locprime_e, query=loc_g, k=na.omit )$nn.idx
+      locprime_e = loc_e[which(t_e==Year_Set[tI]),c('E_km','N_km'),drop=FALSE]
+      if( nrow(locprime_e) == 0 ) stop("No measurements for year ", Year_Set[tI] )
+      NN = RANN::nn2( data=locprime_e[,c('E_km','N_km')], query=loc_g[,c('E_km','N_km')], k=na.omit )$nn.idx
       for(xI in 1:dim(Cov_xtp)[1] ){
       for(pI in 1:dim(Cov_xtp)[3] ){
         Cov_xtp[xI,tI,pI] = FUN( Cov_ep[which(t_e==Year_Set[tI]),pI][NN[xI,]] )
