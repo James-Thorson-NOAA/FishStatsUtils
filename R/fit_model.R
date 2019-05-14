@@ -104,32 +104,48 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   model_args = combine_lists( input=model_args, default=list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
     "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method) )
   tmb_list = do.call( what=VAST::make_model, args=model_args )  # VAST::
+  if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
   # Run the model or optionally don't
-  if( run_model==TRUE ){
-    # Optimize object
-    message("\n### Estimating parameters")
-    optimize_args = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-      savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
-      bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
-      control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2) )
-    if(silent==TRUE) tmb_list$Obj$env$beSilent()
-    parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args )
-
-    # Extract standard outputs
-    Report = tmb_list$Obj$report()
-    ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
-
-    # Build and output
-    Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
-      "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
-      "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
-      "extrapolation_args"=extrapolation_args, "model_args"=model_args, "optimize_args"=optimize_args)
-  }else{
+  if( run_model==FALSE ){
     # Build and output
     Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
       "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
       "settings"=settings, "extrapolation_args"=extrapolation_args, "model_args"=model_args)
+    return(Return)
   }
+
+  # Optimize object
+  message("\n### Estimating parameters")
+  optimize_args = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+    savedir=working_dir, getsd=FALSE, newtonsteps=0,
+    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2) )
+  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args )
+
+  # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
+  if(exists("check_fit")){
+    problem_found = VAST::check_fit( parameter_estimates )
+    if( problem_found==TRUE ){
+      message("\n")
+      stop("Please change model structure to avoid problems with parameter estimates and then re-try\n", call.=FALSE)
+    }
+  }
+
+  # Restart estimates after checking parameters
+  optimize_args = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+    savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
+    bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
+    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1, startpar=parameter_estimates$par) )
+  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args )
+
+  # Extract standard outputs
+  Report = tmb_list$Obj$report()
+  ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+
+  # Build and output
+  Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
+    "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
+    "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
+    "extrapolation_args"=extrapolation_args, "model_args"=model_args, "optimize_args"=optimize_args)
   return( Return )
 }
