@@ -117,10 +117,10 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
 
   # Optimize object
   message("\n### Estimating parameters")
-  optimize_args = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    savedir=working_dir, getsd=FALSE, newtonsteps=0,
+  optimize_args_phase1 = combine_lists( input=list(), default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+    savedir=working_dir, getsd=FALSE, newtonsteps=0, bias.correct=FALSE,
     control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2) )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args )
+  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_phase1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
   if(exists("check_fit")){
@@ -132,11 +132,11 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   }
 
   # Restart estimates after checking parameters
-  optimize_args = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+  optimize_args_phase2 = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
     savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
     bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
     control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1, startpar=parameter_estimates$par) )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args )
+  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_phase2 )
 
   # Extract standard outputs
   Report = tmb_list$Obj$report()
