@@ -118,7 +118,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   # Optimize object
   message("\n### Estimating parameters")
   optimize_args_phase1 = combine_lists( input=list(), default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    savedir=working_dir, getsd=FALSE, newtonsteps=0, bias.correct=FALSE,
+    savedir=working_dir, getsd=FALSE, newtonsteps=0, bias.correct=FALSE, quiet=TRUE,
     control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2) )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_phase1 )
 
