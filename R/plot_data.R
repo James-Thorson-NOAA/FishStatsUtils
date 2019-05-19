@@ -16,13 +16,20 @@
 plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=paste0(getwd(),"/"),
   Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col=rep("red",nrow(Data_Geostat)), cex=0.01, ...){
 
+  # Override defaults
+  if( length(cex) == 1 ){
+    cex = rep( cex, nrow(Data_Geostat) )
+  }else{
+    if(length(cex)!=nrow(Data_Gestat)) stop("input `cex` has wrong length")
+  }
+
   # Plot data and grid
   png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
     par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
     plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
     map( "world", add=TRUE )
     if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){
-      plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
+      plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)", ... )
     }
     plot( Spatial_List$loc_x, col="red", pch=20, main="Knots (North-East)")
     if( all(c('E_km','N_km')%in%names(Data_Geostat)) ){
@@ -40,7 +47,7 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=pa
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(Year_Set) ){
       Which = which( Data_Geostat[,'Year'] == Year_Set[t] )
-      plot( x=Data_Geostat[Which,'Lon'], y=Data_Geostat[Which,'Lat'], cex=cex, main=Year_Set[t], xlim=range(Data_Geostat[,'Lon']), ylim=range(Data_Geostat[,'Lat']), xaxt="n", yaxt="n", col=col[Which], ... )
+      plot( x=Data_Geostat[Which,'Lon'], y=Data_Geostat[Which,'Lat'], cex=cex[Which], main=Year_Set[t], xlim=range(Data_Geostat[,'Lon']), ylim=range(Data_Geostat[,'Lat']), xaxt="n", yaxt="n", col=col[Which], ... )
       map( "world", add=TRUE )
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
