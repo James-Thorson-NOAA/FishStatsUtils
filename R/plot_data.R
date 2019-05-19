@@ -20,7 +20,7 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=pa
   if( length(cex) == 1 ){
     cex = rep( cex, nrow(Data_Geostat) )
   }else{
-    if(length(cex)!=nrow(Data_Gestat)) stop("input `cex` has wrong length")
+    if(length(cex)!=nrow(Data_Geostat)) stop("input `cex` has wrong length")
   }
 
   # Plot data and grid
