@@ -81,7 +81,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Bratio_cyl" )
   }
 
-  # Spatial model of intermediate complexity for ecosystems (MICE-in-space)
+  # Spatial model for ordinating species
   if( tolower(purpose) %in% c("ordination") ){
     if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`ordination`")
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
@@ -98,9 +98,26 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
   }
 
+  # Spatial EOF analysis
+  if( tolower(purpose) %in% c("eof") ){
+    if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`eof`")
+    if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
+      if(missing(FieldConfig)) FieldConfig = matrix( c(0,n_categories,"IID", 0,0,"IID"), ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
+    }else{
+      if(missing(FieldConfig)) FieldConfig = c("Omega1"=0, "Epsilon1"=n_categories, "Omega2"=0, "Epsilon2"=0)
+    }
+    if(missing(RhoConfig)) RhoConfig = c("Beta1"=0, "Beta2"=0, "Epsilon1"=0, "Epsilon2"=0)
+    if(missing(VamConfig)) VamConfig = c("Method"=0, "Rank"=0, "Timing"=0)
+    if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
+    if(missing(ObsModel)) ObsModel = c(1,1)
+    if(missing(bias.correct)) bias.correct = FALSE
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "Project_factors"=TRUE )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+  }
+
   # Check for bad input
-  if( !( tolower(purpose) %in% c("index","condition_and_density","mice","ordination")) ){
-    stop("'purpose' is currently set up only for index-standardization models, correlations between condition and density, MICE-in-space models, or for ordination")
+  if( !( tolower(purpose) %in% c("index","condition_and_density","mice","ordination","eof")) ){
+    stop("'purpose' is currently set up only for index-standardization models, correlations between condition and density, MICE-in-space models, ordination, or empirical-orthogonal-function analysis")
   }
 
   # Other defaults
