@@ -45,7 +45,12 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
   if( "D_xcy" %in% names(Report) ){
     if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_xcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
-    Report[["D_xct"]] = Report[["D_xcy"]]
+    #Report[["D_xct"]] = Report[["D_xcy"]]
+  }
+  if( "D_gcy" %in% names(Report) ){
+    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_gcy)[3]
+    if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
+    #Report[["D_gct"]] = Report[["D_gcy"]]
   }
 
   # Dimensions for plotting
@@ -92,6 +97,7 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
       if(Options_vec[8]==1) tau = 1 / sqrt(1-exp(logkappa*2));
       if( is.null(tau)) stop("Check 'Options_vec[8]' for allowable entries")
       Var_rot = FishStatsUtils::Rotate_Fn( L_pj=L_list[[i]], Psi=Psi_sjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
+      Report_tmp = list("D_xct"=Var_rot$Psi_rot, "Epsilon1_sct"=Var_rot$Psi_rot, "Epsilon2_sct"=Var_rot$Psi_rot)
       Lprime_list[[i]] = Var_rot$L_pj_rot
       rownames(Lprime_list[[i]]) = category_names
       Psiprime_list[[i]] = Var_rot$Psi_rot
@@ -99,6 +105,7 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
       # Extract projected factors is available
       if( !is.null(Psi_gjt) ){
         Var2_rot = FishStatsUtils::Rotate_Fn( L_pj=L_list[[i]], Psi=Psi_gjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
+        Report_tmp = list("D_xct"=Var2_rot$Psi_rot, "Epsilon1_sct"=Var2_rot$Psi_rot, "Epsilon2_sct"=Var2_rot$Psi_rot)
         Psi2prime_list[[i]] = Var2_rot$Psi_rot
       }
 
@@ -113,13 +120,13 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
       if( !is.null(mapdetails_list) ){
         # Plot factors by year
         if( Par_name %in% c("Epsilon1","Epsilon2")){
-          FishStatsUtils::plot_maps(plot_set=c(NA,6,NA,NA,7,NA)[i], MappingDetails=mapdetails_list[["MappingDetails"]], Report=list("D_xct"=Var_rot$Psi_rot,"Epsilon1_sct"=Var_rot$Psi_rot,"Epsilon2_sct"=Var_rot$Psi_rot), PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]], Xlim=mapdetails_list[["Xlim"]], Ylim=mapdetails_list[["Ylim"]], FileName=plotdir, Year_Set=Year_Set, Rotate=mapdetails_list[["Rotate"]], category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), mar=c(0,0,2,0), oma=c(1.5,1.5,0,0), pch=20, Cex=mapdetails_list[["Cex"]], cex=1.8, mfrow=Dim_year, cex.main=1.0, Legend=mapdetails_list[["Legend"]], zone=mapdetails_list[["Zone"]], plot_legend_fig=FALSE, land_color=land_color)
+          FishStatsUtils::plot_maps(plot_set=c(NA,6,NA,NA,7,NA)[i], MappingDetails=mapdetails_list[["MappingDetails"]], Report=Report_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]], Xlim=mapdetails_list[["Xlim"]], Ylim=mapdetails_list[["Ylim"]], FileName=plotdir, Year_Set=Year_Set, Rotate=mapdetails_list[["Rotate"]], category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), mar=c(0,0,2,0), oma=c(1.5,1.5,0,0), pch=20, Cex=mapdetails_list[["Cex"]], cex=1.8, mfrow=Dim_year, cex.main=1.0, Legend=mapdetails_list[["Legend"]], zone=mapdetails_list[["Zone"]], plot_legend_fig=FALSE, land_color=land_color)
         }  #
 
         # Plot average factors across years
         if( !Par_name %in% c("Beta1", "Beta2")){
           ## Doesn't make sense to make maps of beta factors since they aren't spatial
-          Mat_sf = apply(Var_rot$Psi_rot, MARGIN=1:2, FUN=mean)
+          Mat_sf = apply(Report_tmp$D_xct, MARGIN=1:2, FUN=mean)
           FishStatsUtils::PlotMap_Fn( MappingDetails=mapdetails_list[["MappingDetails"]], Mat=Mat_sf, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]], Xlim=mapdetails_list[["Xlim"]], Ylim=mapdetails_list[["Ylim"]], FileName=paste0(plotdir,"Factor_maps--",Par_name), Year_Set=paste0("Factor_",1:ncol(Mat_sf)), Rotate=mapdetails_list[["Rotate"]], zone=mapdetails_list[["Zone"]], mar=c(0,0,2,0), oma=c(2.5,2.5,0,0), pch=20, Cex=mapdetails_list[["Cex"]], mfrow=Dim_factor, Legend=mapdetails_list[["Legend"]], plot_legend_fig=FALSE, land_color=land_color)
         }
       }
