@@ -20,3 +20,15 @@
   #  devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
   #}
 }
+
+#' Copy of FishStatsUtils::plot_loadings
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::plot_loadings} to see list of arguments and usage
+#' @export
+PlotLoadings = function( ... ){
+  .Deprecated( new="FishStatsUtils::plot_loadings" )
+  FishStatsUtils::plot_loadings( ... )
+}
+

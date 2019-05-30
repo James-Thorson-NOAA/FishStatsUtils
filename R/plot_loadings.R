@@ -1,7 +1,7 @@
 
 #' Plotting loadings matrix
 #'
-#' \code{PlotLoadings} plots elements of a column of the loadings matrix
+#' \code{plot_loadings} plots elements of a column of the loadings matrix
 #'
 #' @param L_pj Loadings matrix for `p` categories and `j` factors
 #' @param whichfactor Integer, giving column of the loadings matrix to plot
@@ -18,7 +18,7 @@
 #' }
 
 #' @export
-PlotLoadings = function( L_pj, whichfactor=1, addtitle=TRUE, LabelPosition="Right", Buffer=c(0,0.1), Labels=rownames(L_pj), Cex=1.2,
+plot_loadings = function( L_pj, whichfactor=1, addtitle=TRUE, LabelPosition="Right", Buffer=c(0,0.1), Labels=rownames(L_pj), Cex=1.2,
   legend_text="Proportion of explained variance", ... ){
 
   # Plotting window
