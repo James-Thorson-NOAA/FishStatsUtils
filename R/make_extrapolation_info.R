@@ -82,6 +82,15 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
     if( tolower(Region[rI]) == "gulf_of_mexico" ){
       Extrapolation_List = Prepare_GOM_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, ... )
     }
+    if( tolower(Region[rI]) == "stream_network" ){
+      if( is.null(input_grid)){
+        stop("Because you're using a stream network, please provide 'input_grid' input")
+      }
+      if( !(all(c("Lat","Lon","Area_km2","child_i") %in% colnames(input_grid))) ){
+        stop("'input_grid' must contain columns named 'Lat', 'Lon', 'Area_km2', and 'child_i'")
+      }
+      Extrapolation_List = Prepare_User_Extrapolation_Data_Fn( strata.limits=strata.limits, input_grid=input_grid, zone=zone, ... )
+    }
     if( tolower(Region[rI]) == "user" ){
       if( is.null(input_grid)){
         stop("Because you're using a user-supplied region, please provide 'input_grid' input")

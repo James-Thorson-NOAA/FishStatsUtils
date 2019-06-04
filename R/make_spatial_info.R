@@ -7,17 +7,18 @@
 #'
 #' \code{LON_intensity} and \code{LAT_intensity} allow users to specify locations that are used by the k-means algorithm to determine the location of knots, where e.g. users can either hard-code the desired knot locations via these inputs (using \code{n_x} greater than this number of locations), or use the extrapolation-grid to ensure that knots are located proportional to that grid.
 #'
-#' @param n_x, the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")
-#' @param Lon_i, Longitude for each sample
-#' @param Lat_i, Latitude for each sample
-#' @param LON_intensity, Longitude for each location to use during k-means algorithm to decide upon the location of knots
-#' @param LAT_intensity, Latitude for each location to use during k-means algorithm to decide upon the location of knots
-#' @param Method, a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy
+#' @param n_x the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")
+#' @param Lon_i Longitude for each sample
+#' @param Lat_i Latitude for each sample
+#' @param LON_intensity Longitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lon_i}
+#' @param LAT_intensity Latitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lat_i}
+#' @param Method a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy
 #' @param fine_scale a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino
-#' @param Extrapolation_List, the output from \code{Prepare_Extrapolation_Data_Fn}
-#' @param grid_size_km, the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}
-#' @param grid_size_LL, the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}
-#' @param ..., additional arguments passed to \code{INLA::inla.mesh.create}
+#' @param Extrapolation_List the output from \code{Prepare_Extrapolation_Data_Fn}
+#' @param grid_size_km the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}
+#' @param grid_size_LL the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}
+#' @param Network_sz_LL data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"
+#' @param ... additional arguments passed to \code{INLA::inla.mesh.create}
 #' @inheritParams Calc_Kmeans
 
 #' @return Tagged list containing objects for running a VAST model
@@ -35,12 +36,15 @@
 
 #' @export
 make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intensity=Lat_i, Extrapolation_List, Method="Mesh",
-  grid_size_km=50, grid_size_LL=1, fine_scale=FALSE,
+  grid_size_km=50, grid_size_LL=1, fine_scale=FALSE, Network_sz_LL=NULL,
   iter.max=1000, randomseed=1, nstart=100, DirPath=paste0(getwd(),"/"), Save_Results=FALSE, ... ){
 
   # Deprecated options
   if( Method=="Spherical_mesh" ){
     stop("Method=`Spherical_mesh` is not being maintained, but please write the package author if you need to explore this option")
+  }
+  if( Method == "Stream_network" & fine_scale == TRUE ){
+    stop("Please use fine_scale=FALSE with stream network spatial model; feature fine_scale=TRUE not yet supported for stream network spatial model.")
   }
 
   # Convert to an Eastings-Northings coordinate system
@@ -89,9 +93,14 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     knot_i = grid_num
     loc_x = loc_grid
   }
-  if( Method %in% c("Mesh","Spherical_mesh","Stream_network") ){
+  if( Method %in% c("Mesh","Spherical_mesh") ){
     knot_i = NN_i
     loc_x = Kmeans[["centers"]]
+  }
+  if( Method == "Stream_network" ){
+    knot_i = Extrapolation_List$Data_Extrap[,"child_i"]
+    loc_x_recalc = Convert_LL_to_UTM_Fn( Lon=Network_sz_LL[,"Lon"], Lat=Network_sz_LL[,"Lat"], zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )
+    loc_x = cbind( 'E_km'=loc_x_rescale[,"X"], 'N_km'=loc_x_recalc[,"Y"])
   }
 
   # Bookkeeping for extrapolation-grid
@@ -143,12 +152,19 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   }
 
   # Calculate areas
-  PolygonList = Calc_Polygon_Areas_and_Polygons_Fn( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
-  if( fine_scale==FALSE ){
-    a_gl = PolygonList[["a_xl"]]
-  }
-  if( fine_scale==TRUE ){
-    a_gl = as.matrix(Extrapolation_List[["a_el"]][ which(Extrapolation_List$Area_km2_x>0), ])
+  if( Method != "Stream_network" ){
+    PolygonList = Calc_Polygon_Areas_and_Polygons_Fn( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
+    if( fine_scale==FALSE ){
+      a_gl = PolygonList[["a_xl"]]
+    }
+    if( fine_scale==TRUE ){
+      a_gl = as.matrix(Extrapolation_List[["a_el"]][ which(Extrapolation_List$Area_km2_x>0), ])
+    }
+  }else{
+    PolygonList = NULL
+    dist_inp = Network_sz_LL[,"dist_s"]
+    dist_inp[which(is.infinite(dist_inp))] <- 0
+    a_gl = matrix(dist_inp, nrow=n_x)
   }
 
   # Return
