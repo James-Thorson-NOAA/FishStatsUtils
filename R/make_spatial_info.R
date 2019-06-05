@@ -100,7 +100,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   if( Method == "Stream_network" ){
     knot_i = Extrapolation_List$Data_Extrap[,"child_i"]
     loc_x_recalc = Convert_LL_to_UTM_Fn( Lon=Network_sz_LL[,"Lon"], Lat=Network_sz_LL[,"Lat"], zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )
-    loc_x = cbind( 'E_km'=loc_x_rescale[,"X"], 'N_km'=loc_x_recalc[,"Y"])
+    loc_x = cbind( 'E_km'=loc_x_recalc[,"X"], 'N_km'=loc_x_recalc[,"Y"])
   }
 
   # Bookkeeping for extrapolation-grid
