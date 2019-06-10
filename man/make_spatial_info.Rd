@@ -7,29 +7,32 @@
 make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
   LAT_intensity = Lat_i, Extrapolation_List, Method = "Mesh",
   grid_size_km = 50, grid_size_LL = 1, fine_scale = FALSE,
-  iter.max = 1000, randomseed = 1, nstart = 100,
-  DirPath = paste0(getwd(), "/"), Save_Results = FALSE, ...)
+  Network_sz_LL = NULL, iter.max = 1000, randomseed = 1,
+  nstart = 100, DirPath = paste0(getwd(), "/"), Save_Results = FALSE,
+  ...)
 }
 \arguments{
-\item{n_x, }{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
+\item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
 
-\item{Lon_i, }{Longitude for each sample}
+\item{Lon_i}{Longitude for each sample}
 
-\item{Lat_i, }{Latitude for each sample}
+\item{Lat_i}{Latitude for each sample}
 
-\item{LON_intensity, }{Longitude for each location to use during k-means algorithm to decide upon the location of knots}
+\item{LON_intensity}{Longitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lon_i}}
 
-\item{LAT_intensity, }{Latitude for each location to use during k-means algorithm to decide upon the location of knots}
+\item{LAT_intensity}{Latitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lat_i}}
 
-\item{Extrapolation_List, }{the output from \code{Prepare_Extrapolation_Data_Fn}}
+\item{Extrapolation_List}{the output from \code{Prepare_Extrapolation_Data_Fn}}
 
-\item{Method, }{a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy}
+\item{Method}{a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy}
 
-\item{grid_size_km, }{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}}
+\item{grid_size_km}{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}}
 
-\item{grid_size_LL, }{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}}
+\item{grid_size_LL}{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
+
+\item{Network_sz_LL}{data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"}
 
 \item{iter.max}{the number of iterations used per k-means algorithm (default=1000)}
 
@@ -41,7 +44,7 @@ make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
 
 \item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
 
-\item{..., }{additional arguments passed to \code{INLA::inla.mesh.create}}
+\item{...}{additional arguments passed to \code{INLA::inla.mesh.create}}
 }
 \value{
 Tagged list containing objects for running a VAST model

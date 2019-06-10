@@ -9,7 +9,7 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
   X_gtp = NULL, X_itp = NULL, Q_ik = NULL, newtonsteps = 1,
   extrapolation_args = list(), spatial_args = list(),
   optimize_args = list(), model_args = list(), silent = TRUE,
-  run_model = TRUE, ...)
+  run_model = TRUE, test_fit = TRUE, ...)
 }
 \arguments{
 \item{settings}{Output from \code{make_settings}}
@@ -53,6 +53,8 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
 \item{model_args}{tagged list of optional arguments to pass to \code{VAST::make_model}}
 
 \item{run_model}{Boolean indicating whether to run the model or simply return the inputs and built TMB object}
+
+\item{test_fit}{Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
 
 \item{...}{additional parameters to pass to \code{VAST::make_data}}
 }

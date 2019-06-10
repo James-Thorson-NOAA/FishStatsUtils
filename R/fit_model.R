@@ -16,6 +16,7 @@
 #' @param optimize_args tagged list of optional arguments to pass to \code{TMBhelper::Optimize}
 #' @param model_args tagged list of optional arguments to pass to \code{VAST::make_model}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
+#' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
 #' @param ... additional parameters to pass to \code{VAST::make_data}
 #'
 #' @return Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates
@@ -53,7 +54,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
   extrapolation_args=list(), spatial_args=list(), optimize_args=list(), model_args=list(),
-  silent=TRUE, run_model=TRUE, ... ){
+  silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
 
   # Local function -- combine two lists
   combine_lists = function( default, input ){
@@ -76,8 +77,8 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
 
   # Save record
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
-  save( settings, file=file.path(working_dir,"Record.RData"))
-  capture.output( settings, file=file.path(working_dir,"Record.txt"))
+  #save( settings, file=file.path(working_dir,"Record.RData"))
+  capture.output( settings, file=file.path(working_dir,"settings.txt"))
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
@@ -118,12 +119,12 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   # Optimize object
   message("\n### Estimating parameters")
   optimize_args_phase1 = combine_lists( default=optimize_args, input=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    savedir=working_dir, getsd=FALSE, newtonsteps=0, bias.correct=FALSE, quiet=TRUE,
+    savedir=NULL, getsd=FALSE, newtonsteps=0, bias.correct=FALSE, quiet=TRUE,
     control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2) )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_phase1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
-  if(exists("check_fit")){
+  if(exists("check_fit") & test_fit==TRUE ){
     problem_found = VAST::check_fit( parameter_estimates )
     if( problem_found==TRUE ){
       message("\n")
