@@ -32,3 +32,15 @@ PlotLoadings = function( ... ){
   FishStatsUtils::plot_loadings( ... )
 }
 
+#' Copy of FishStatsUtils::Rotate_Fn
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::rotate_factors} to see list of arguments and usage
+#' @export
+Rotate_Fn = function( ... ){
+  .Deprecated( new="FishStatsUtils::rotate_factors" )
+  FishStatsUtils::rotate_factors( ... )
+}
+
+
