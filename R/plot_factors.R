@@ -13,7 +13,7 @@
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
 
 #' @export
-plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
+plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
   mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey" ){
 
   # Extract Options and Options_vec (depends upon version)
@@ -25,8 +25,6 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
     Options_vec = Data$Options_list$Options_vec
     Options = Data$Options_list$Options
   }
-
-
 
   # Adds intercept defaults to FieldConfig if missing
   if( is.vector(Data[["FieldConfig"]]) && length(Data[["FieldConfig"]])==4 ){
@@ -62,7 +60,7 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
   #Cov_List = Summarize_Covariance( Report=Report, ParHat=ParHat, Data=Data, SD=SD, category_names=category_names, figname=NULL )
 
   # Extract loadings matrices (more numerically stable than extracting covariances, and then re-creating Cholesky)
-  Psi2prime_list = Psiprime_list = Lprime_list = L_list = vector("list", length=6)    # Add names at end so that NULL doesn't interfere
+  Psi2prime_list = Psiprime_list = Lprime_SE_list = Hinv_list = L_SE_list = Lprime_list = L_list = vector("list", length=6)    # Add names at end so that NULL doesn't interfere
 
   # Loop through
   for(i in 1:6){
@@ -81,7 +79,25 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
       L_list[[i]] = calc_cov( L_z=ParHat[[paste0("L_",tolower(Par_name),"_z")]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
       rownames(L_list[[i]]) = category_names
 
-      # Get covariance # SpatialDFA::
+      # Load SE
+      if( class(SD)=="sdreport" ){
+        #L_SE_list[[i]] = calc_cov( L_z=ParHat_SE[[paste0("L_",tolower(Par_name),"_z")]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
+        #rownames(L_SE_list[[i]]) = category_names
+        rowindex = grep( paste0("L_",tolower(Par_name),"_z"), rownames(SD$cov.fixed) )
+        L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[paste0("L_",tolower(Par_name),"_z")]], sigma=SD$cov.fixed[rowindex,rowindex] )
+        L_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
+        for( rI in 1:nrow(L_rz) ){
+          L_rcf[rI,,] = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
+        }
+        Lmean_cf = apply(L_rcf, MARGIN=2:3, FUN=mean)
+        Lsd_cf = apply(L_rcf, MARGIN=2:3, FUN=sd)
+        L_SE_list[[i]] = Lsd_cf
+        rownames(L_SE_list[[i]]) = category_names
+      }else{
+        #L_SE_list[[i]] = NULL    # Must be NULL to pass to later functions
+      }
+
+      # Get covariance
       Psi_sjt = ParHat[[Var_name]]
       Psi_gjt = Report[[Var2_name]]
       ## the betas are transposed compared to others so fix that here
@@ -96,15 +112,37 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
       if(Options_vec[8]==0) tau = 1 / (exp(logkappa) * sqrt(4*pi));
       if(Options_vec[8]==1) tau = 1 / sqrt(1-exp(logkappa*2));
       if( is.null(tau)) stop("Check 'Options_vec[8]' for allowable entries")
-      Var_rot = FishStatsUtils::Rotate_Fn( L_pj=L_list[[i]], Psi=Psi_sjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
+
+      # Rotate stuff
+      Var_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_sjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
       Report_tmp = list("D_xct"=Var_rot$Psi_rot, "Epsilon1_sct"=Var_rot$Psi_rot, "Epsilon2_sct"=Var_rot$Psi_rot)
       Lprime_list[[i]] = Var_rot$L_pj_rot
       rownames(Lprime_list[[i]]) = category_names
       Psiprime_list[[i]] = Var_rot$Psi_rot
+      Hinv_list[[i]] = Var_rot$Hinv
+
+      # Extract SEs if available
+      if( class(SD)=="sdreport" ){
+        #Lprime_SE_list[[i]] = Var_rot$L_pj_SE_rot
+        rowindex = grep( paste0("L_",tolower(Par_name),"_z"), rownames(SD$cov.fixed) )
+        L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[paste0("L_",tolower(Par_name),"_z")]], sigma=SD$cov.fixed[rowindex,rowindex] )
+        Lprime_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
+        for( rI in 1:nrow(L_rz) ){
+          tmpmat = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
+          Lprime_rcf[rI,,] = rotate_factors( L_pj=tmpmat, RotationMethod="PCA", testcutoff=1e-4, quiet=TRUE )$L_pj_rot
+        }
+        Lmean_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=mean)
+        Lsd_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=sd)
+        Lprime_SE_list[[i]] = Lsd_cf
+        rownames(Lprime_SE_list[[i]]) = category_names
+      }else{
+        #Lprime_SE_list[[i]] = NULL  # Must be NULL to pass to later functions
+      }
+
 
       # Extract projected factors is available
       if( !is.null(Psi_gjt) ){
-        Var2_rot = FishStatsUtils::Rotate_Fn( L_pj=L_list[[i]], Psi=Psi_gjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
+        Var2_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_gjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
         Report_tmp = list("D_xct"=Var2_rot$Psi_rot, "Epsilon1_sct"=Var2_rot$Psi_rot, "Epsilon2_sct"=Var2_rot$Psi_rot)
         Psi2prime_list[[i]] = Var2_rot$Psi_rot
       }
@@ -131,12 +169,16 @@ plot_factors = function( Report, ParHat, Data, SD, Year_Set=NULL, category_names
         }
       }
     }else{
-      Psi2prime_list[[i]] = Psiprime_list[[i]] = Lprime_list[[i]] = L_list[[i]] = "Element not estimated, and therefore empty"
+      Lprime_SE_list[[i]] = L_SE_list[[i]] = L_SE_list[[i]] = Psi2prime_list[[i]] = Psiprime_list[[i]] = Lprime_list[[i]] = L_list[[i]] = "Element not estimated, and therefore empty"
     }
   }
 
   # Return stuff invisibly
-  names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "Omega2", "Epsilon2", "Beta2")
-  Return = list("Loadings"=L_list, "Rotated_loadings"=Lprime_list, "Rotated_factors"=Psiprime_list, "Rotated_projected_factors"=Psi2prime_list)
+  names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(L_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "Omega2", "Epsilon2", "Beta2")
+  Return = list("Loadings"=L_list, "Rotated_loadings"=Lprime_list, "Rotated_factors"=Psiprime_list, "Rotated_projected_factors"=Psi2prime_list, "Rotation_matrices"=Hinv_list)
+  if( class(SD)=="sdreport" ){
+    Return[["Loadings_SE"]] = L_SE_list
+    Return[["Rotated_loadings_SE"]] = Lprime_SE_list
+  }
   return( invisible(Return) )
 }
