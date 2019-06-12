@@ -94,7 +94,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
           tmpUTM_rotated <- maptools::elide( tmpUTM, rotate=Rotate)
           plot( 1, type="n", xlim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x']), ylim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y']), xaxt="n", yaxt="n" )
           Col_Bin = ceiling( f(tmpUTM_rotated@data[-c(1:nrow(Tmp1)),-c(1:2),drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
-          if( ignore.na==FALSE && any(Col_Bin<1 | Col_Bin>50) ) stop("zlim doesn't span the range of the variable")
+          if( ignore.na==FALSE && any(Col_Bin<1 | Col_Bin>length(Col)) ) stop("zlim doesn't span the range of the variable")
           points(x=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x'], y=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y'], col=Col[Col_Bin], cex=Cex, pch=pch)
           # Plot map features
           lev = levels(as.factor(tmpUTM_rotated@data$PID))
