@@ -96,7 +96,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   # Build data
   message("\n### Making data object") # VAST::
   data_list = VAST::make_data("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
-    "RhoConfig"=settings$RhoConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
+    "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, X_gtp=X_gtp, X_itp=X_itp, Q_ik=Q_ik, ... )
 
