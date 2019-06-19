@@ -6,7 +6,7 @@
 #'
 #' @param Index output from \code{FishStatsUtils::plot_biomass_index}
 #' @inheritParams plot_biomass_index
-#' @param ... list of settings to pass to \code{sdreport}
+#' @param ... list of settings to pass to \code{par} when making plot
 #'
 #' @return Tagged list of output
 #' \describe{
@@ -15,8 +15,9 @@
 #' }
 #'
 #' @export
-calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL, plot_legend=TRUE,
-  DirName=paste0(getwd(),"/"), PlotName="Proportion.png", interval_width=1, width=6, height=6, ... ){
+calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL,
+  plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), DirName=paste0(getwd(),"/"), PlotName="Proportion.png",
+  interval_width=1, width=6, height=6, ... ){
 
   # Warnings and errors
   if( !all(TmbData[['FieldConfig']] %in% c(-2,-1)) ){
@@ -60,11 +61,12 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
       # Calculate y-axis limits
       Ylim = c(0, max(Prop_ctl[,tI,]%o%c(1,1) + sqrt(var_Prop_ctl[,tI,])%o%c(-interval_width,interval_width),na.rm=TRUE))
       # Plot stuff
-      plot(1, type="n", xlim=range(category_names), ylim=1.05*Ylim, xlab="", ylab="", main=ifelse(TmbData$n_t>1,paste0("Year ",Year_Set[tI]),"") )
+      plot(1, type="n", xlim=c(1,TmbData$n_c), ylim=1.05*Ylim, xlab="", ylab="", main=ifelse(TmbData$n_t>1,paste0("Year ",Year_Set[tI]),""), xaxt="n" )
       for(l in 1:TmbData$n_l){
         FishStatsUtils::plot_lines( y=Prop_ctl[,tI,l], x=1:TmbData$n_c+seq(-0.1,0.1,length=TmbData$n_l)[l], ybounds=Prop_ctl[,tI,]%o%c(1,1) + sqrt(var_Prop_ctl[,tI,])%o%c(-interval_width,interval_width), type="b", col=rainbow(TmbData[['n_l']])[l], col_bounds=rainbow(TmbData[['n_l']])[l], ylim=Ylim)
       }
       if(plot_legend==TRUE) legend( "top", bty="n", fill=rainbow(TmbData[['n_l']]), legend=as.character(strata_names), ncol=2 )
+      axis(1, at=1:TmbData$n_c, labels=category_names)
     }
     mtext( side=1:2, text=c("Age","Proportion of biomass"), outer=TRUE, line=c(0,0) )
   dev.off()
