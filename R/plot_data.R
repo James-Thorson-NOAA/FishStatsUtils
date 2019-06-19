@@ -13,20 +13,31 @@
 #'
 
 #' @export
-plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=paste0(getwd(),"/"),
-  Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col=rep("red",nrow(Data_Geostat)), cex=0.01, pch=19,
+plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
+  Lat_i=Data_Geostat[,'Lat'], Lon_i=Data_Geostat[,'Lon'], Year_i=Data_Geostat[,'Year'], PlotDir=paste0(getwd(),"/"),
+  Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col="red", cex=0.01, pch=19,
   Year_Set, ...){
+
+  # Check for issues
+  if( is.null(Lat_i) | is.null(Lon_i) | is.null(Year_i) ){
+    stop("Problem with inputs")
+  }
 
   # Override defaults
   if( length(cex) == 1 ){
-    cex = rep( cex, nrow(Data_Geostat) )
+    cex = rep( cex, length(Year_i) )
   }else{
-    if(length(cex)!=nrow(Data_Geostat)) stop("input `cex` has wrong length")
+    if(length(cex)!=length(Year_i)) stop("input `cex` has wrong length")
   }
   if( length(pch) == 1 ){
-    pch = rep( pch, nrow(Data_Geostat) )
+    pch = rep( pch, length(Year_i) )
   }else{
-    if(length(pch)!=nrow(Data_Geostat)) stop("input `pch` has wrong length")
+    if(length(pch)!=length(Year_i)) stop("input `pch` has wrong length")
+  }
+  if( length(col) == 1 ){
+    col = rep( col, length(Year_i) )
+  }else{
+    if(length(col)!=length(Year_i)) stop("input `col` has wrong length")
   }
 
   # Plot data and grid
@@ -38,22 +49,21 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=pa
       plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
     }
     plot( Spatial_List$loc_x, col="red", pch=20, main="Knots (North-East)")
-    if( all(c('E_km','N_km')%in%names(Data_Geostat)) ){
-      plot( Data_Geostat[,c('E_km','N_km')], col="blue", pch=20, cex=0.1, main="Data (North-East)")
-    }
+    #if( all(c('E_km','N_km')%in%names(Data_Geostat)) ){
+    #  plot( Data_Geostat[,c('E_km','N_km')], col="blue", pch=20, cex=0.1, main="Data (North-East)")
+    #}
   dev.off()
 
   # Plot data by year
   # Use Data_Geostat, instead of TmbData, because I want raw locations, not locations at knots
-  if(missing(Year_Set)) Year_Set = min(Data_Geostat[,'Year']):max(Data_Geostat[,'Year'])
+  if(missing(Year_Set)) Year_Set = min(Year_i):max(Year_i)
     Nrow = ceiling( sqrt(length(Year_Set)) )
     Ncol = ceiling( length(Year_Set)/Nrow )
-    if( is.null(Year_Set) ) Year_Set = Year_Set
   png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(Year_Set) ){
-      Which = which( Data_Geostat[,'Year'] == Year_Set[t] )
-      plot( x=Data_Geostat[Which,'Lon'], y=Data_Geostat[Which,'Lat'], cex=cex[Which], main=Year_Set[t], xlim=range(Data_Geostat[,'Lon']), ylim=range(Data_Geostat[,'Lat']), xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
+      Which = which( Year_i == Year_Set[t] )
+      plot( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], main=Year_Set[t], xlim=range(Lon_i), ylim=range(Lat_i), xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
       map( "world", add=TRUE, fill=TRUE, col="grey" )
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
