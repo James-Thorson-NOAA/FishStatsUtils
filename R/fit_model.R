@@ -113,6 +113,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
     Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
       "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
       "settings"=settings, "extrapolation_args"=extrapolation_args, "model_args"=model_args)
+    class(Return) = "fit_model"
     return(Return)
   }
 
@@ -149,5 +150,27 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
     "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
     "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
     "extrapolation_args"=extrapolation_args, "model_args"=model_args, "optimize_args"=optimize_args)
+  class(Return) = "fit_model"
   return( Return )
 }
+
+#' Print parameter estimates and standard errors.
+#'
+#' @title Print parameter estimates
+#' @param x Output from \code{\link{fit_model}}
+#' @param ... Not used
+#' @return NULL
+#' @method print fit_model
+#' @export
+print.fit_model <- function(x, ...)
+{
+  cat("fit_model(.) result\n")
+  if( "parameter_estimates" %in% names(x) ){
+    print( x$parameter_estimates )
+  }else{
+    message("`parameter_estimates` not available in `fit_model`")
+  }
+  invisible(x$parameter_estimates)
+}
+
+

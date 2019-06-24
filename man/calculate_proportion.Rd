@@ -6,9 +6,9 @@
 \usage{
 calculate_proportion(TmbData, Index, Year_Set = NULL,
   Years2Include = NULL, strata_names = NULL, category_names = NULL,
-  plot_legend = TRUE, DirName = paste0(getwd(), "/"),
-  PlotName = "Proportion.png", interval_width = 1, width = 6,
-  height = 6, ...)
+  plot_legend = ifelse(TmbData$n_l > 1, TRUE, FALSE),
+  DirName = paste0(getwd(), "/"), PlotName = "Proportion.png",
+  interval_width = 1, width = 6, height = 6, ...)
 }
 \arguments{
 \item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
@@ -35,7 +35,7 @@ calculate_proportion(TmbData, Index, Year_Set = NULL,
 
 \item{height}{plot height in inches}
 
-\item{...}{list of settings to pass to \code{sdreport}}
+\item{...}{list of settings to pass to \code{par} when making plot}
 }
 \value{
 Tagged list of output
