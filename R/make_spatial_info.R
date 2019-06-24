@@ -182,7 +182,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
 #' @param x Output from \code{\link{make_spatial_info}}
 #' @param ... Not used
 #' @return NULL
-#' @method print make_spatial_info
+#' @method plot make_spatial_info
 #' @export
 plot.make_spatial_info <- function(x, ...)
 {

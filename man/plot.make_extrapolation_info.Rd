@@ -4,7 +4,7 @@
 \alias{plot.make_extrapolation_info}
 \title{Plot extrapolation-grid}
 \usage{
-\method{print}{make_extrapolation_info}(x, cex = 0.01, ...)
+\method{plot}{make_extrapolation_info}(x, cex = 0.01, ...)
 }
 \arguments{
 \item{x}{Output from \code{\link{make_extrapolation_info}}}

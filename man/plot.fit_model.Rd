@@ -4,7 +4,7 @@
 \alias{plot.fit_model}
 \title{Print parameter estimates}
 \usage{
-\method{print}{fit_model}(x, ...)
+\method{plot}{fit_model}(x, ...)
 }
 \arguments{
 \item{x}{Output from \code{\link{fit_model}}}

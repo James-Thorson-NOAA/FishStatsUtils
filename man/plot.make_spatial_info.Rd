@@ -4,7 +4,7 @@
 \alias{plot.make_spatial_info}
 \title{Plot spatial information}
 \usage{
-\method{print}{make_spatial_info}(x, ...)
+\method{plot}{make_spatial_info}(x, ...)
 }
 \arguments{
 \item{x}{Output from \code{\link{make_spatial_info}}}

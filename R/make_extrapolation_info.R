@@ -128,7 +128,7 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
 #' @param x Output from \code{\link{make_extrapolation_info}}
 #' @param ... Not used
 #' @return NULL
-#' @method print make_extrapolation_info
+#' @method plot make_extrapolation_info
 #' @export
 plot.make_extrapolation_info <- function(x, cex=0.01, ...)
 {

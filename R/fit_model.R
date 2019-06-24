@@ -179,7 +179,7 @@ print.fit_model <- function(x, ...)
 #' @param x Output from \code{\link{fit_model}}
 #' @param ... Arguments passed to \code{\link{plot_results}}
 #' @return NULL
-#' @method print fit_model
+#' @method plot fit_model
 #' @export
 plot.fit_model <- function(x, ...)
 {
