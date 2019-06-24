@@ -4,8 +4,8 @@
 \alias{plot_results}
 \title{Plot results}
 \usage{
-plot_results(fit, settings, plot_set = 3, working_dir = paste0(getwd(),
-  "/"), year_labels = fit$year_labels,
+plot_results(fit, settings = fit$settings, plot_set = 3,
+  working_dir = paste0(getwd(), "/"), year_labels = fit$year_labels,
   years_to_plot = fit$years_to_plot, use_biascorr = TRUE, map_list,
   ...)
 }

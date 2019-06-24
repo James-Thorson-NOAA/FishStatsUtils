@@ -172,5 +172,26 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
     "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g),
     "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap )
+  class(Return) = "make_spatial_info"
   return( Return )
+}
+
+#' Plot spatial representation used for model
+#'
+#' @title Plot spatial information
+#' @param x Output from \code{\link{make_spatial_info}}
+#' @param ... Not used
+#' @return NULL
+#' @method print make_spatial_info
+#' @export
+plot.make_spatial_info <- function(x, ...)
+{
+  if( x$Method == "Mesh" ){
+    plot(x$MeshList$anisotropic_mesh)
+    ans = x$MeshList$anisotropic_mesh
+  }else{
+    message( "`plot` not implemented for `Method` used" )
+  }
+
+  invisible(ans)
 }

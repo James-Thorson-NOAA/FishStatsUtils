@@ -118,5 +118,26 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
   }
 
   # Return
+  class(Return) = "make_extrapolation_info"
   return( Return )
+}
+
+#' Plot extrapolation-grid used for spatial inference
+#'
+#' @title Plot extrapolation-grid
+#' @param x Output from \code{\link{make_extrapolation_info}}
+#' @param ... Not used
+#' @return NULL
+#' @method print make_extrapolation_info
+#' @export
+plot.make_extrapolation_info <- function(x, cex=0.01, ...)
+{
+  par( mfrow=c(1,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
+  plot( x$Data_Extrap[which(x$Area_km2_x>0),c('Lon','Lat')], cex=cex, main="Extrapolation (Lat-Lon)", ... )
+  map( "world", add=TRUE )
+  if( !any(is.na(x$Data_Extrap[,c('E_km','N_km')])) ){
+    plot( x$Data_Extrap[which(x$Area_km2_x>0),c('E_km','N_km')], cex=cex, main="Extrapolation (North-East)", ... )
+  }
+
+  invisible(x)
 }

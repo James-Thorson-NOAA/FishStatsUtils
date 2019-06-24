@@ -16,7 +16,7 @@
 #' @seealso \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
 #'
 #' @export
-plot_results = function( fit, settings, plot_set=3, working_dir=paste0(getwd(),"/"),
+plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list, ... ){
 
   # Local function -- combine two lists

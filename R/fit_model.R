@@ -173,4 +173,19 @@ print.fit_model <- function(x, ...)
   invisible(x$parameter_estimates)
 }
 
+#' Print parameter estimates and standard errors.
+#'
+#' @title Print parameter estimates
+#' @param x Output from \code{\link{fit_model}}
+#' @param ... Arguments passed to \code{\link{plot_results}}
+#' @return NULL
+#' @method print fit_model
+#' @export
+plot.fit_model <- function(x, ...)
+{
+  ans = plot_results( x, ... )
+  invisible(ans)
+}
+
+
 
