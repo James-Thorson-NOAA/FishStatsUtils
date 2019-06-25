@@ -50,7 +50,7 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=pa
     Ncol = ceiling( length(Year_Set)/Nrow )
     if( is.null(Year_Set) ) Year_Set = Year_Set
   png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
-    par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
+    par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.45,0), oma=c(3,3,0.1,0.1) )
     for( t in 1:length(Year_Set) ){
       Which = which( Data_Geostat[,'Year'] == Year_Set[t] )
       plot( x=Data_Geostat[Which,'Lon'], y=Data_Geostat[Which,'Lat'], cex=cex[Which], main=Year_Set[t], xlim=range(Data_Geostat[,'Lon']), ylim=range(Data_Geostat[,'Lat']), xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
