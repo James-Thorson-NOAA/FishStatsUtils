@@ -23,7 +23,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, savedir=getwd(),
          MappingDetails, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Xlim, Ylim,
          FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png", Res=200,
          zone=NA, Cex=0.01, add=FALSE, textmargin=NULL, pch=NULL,
-         Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, ... ){
+         Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, maxpanel = 2, ... ){
 
   ##################
   # Basic inputs
@@ -132,7 +132,6 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, savedir=getwd(),
   #################
   # Plots
   #################
-
   if( !is.null(savedir) ){
     Col = colorRampPalette(colors=c("blue","white","red"))
     textmargin = "Pearson residual"
@@ -140,7 +139,16 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, savedir=getwd(),
       Q_xy = list( Q1_xy, Q2_xy )[[zI]]
       zlim = c(-1,1) * ceiling(max(abs(Q_xy),na.rm=TRUE))
       #Q_xt = ifelse( abs(Q_xt)>3, 3*sign(Q_xt), Q_xt )
-      PlotMap_Fn( MappingDetails=MappingDetails, Mat=Q_xy[,Years2Include], PlotDF=PlotDF, Col=Col, zlim=zlim, ignore.na=TRUE, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(savedir,"/",c("maps--encounter_pearson_resid","maps--catchrate_pearson_resid")[zI]), Year_Set=paste0("Residuals--",Year_Set[Years2Include]), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin, add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+      mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
+      if (any(mfrow > maxpanel)) mfrow <- rep(maxpanel, 2)
+      Nyearplot <- ceiling(length(Years2Include) / (mfrow[1] * mfrow[2]))
+      splits <- split(Years2Include, ceiling(seq_along(Years2Include)/Nyearplot))
+      if (all(lapply(splits, length) == 1)) splits <- list(unlist(splits))
+      for (yeari in splits){
+        PlotMap_Fn( MappingDetails=MappingDetails, Mat=Q_xy[, yeari, drop = FALSE], PlotDF=PlotDF, Col=Col, zlim=zlim, ignore.na=TRUE, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, 
+          FileName=paste0(savedir,"/",c("maps--encounter_pearson_resid","maps--catchrate_pearson_resid")[zI], ifelse(Nyearplot == 1, "", which(sapply(splits, "[[",1) == yeari[1]))), 
+          Year_Set=paste0("Residuals--",yeari), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin, add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+      }
     }
   }
 

@@ -39,6 +39,8 @@
 #'   \item{x}{Left and right-hand limits for legend in percentage of panel}
 #'   \item{y}{bottom and top limits for legend in percentage of panel}
 #' }
+#' @param maxpanel The maximum number of rows or columns you want per panel. The default
+#' generates 2 x 2 panels of years, where each set is saved as a separate file.
 #' @param ... arguments passed to \code{PlotMap_Fn}
 #'
 #' @return Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}
@@ -51,7 +53,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
          MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200,
          FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png",
          zone=NA, Cex=0.01, add=FALSE, category_names=NULL, textmargin=NULL, pch=NULL,
-         Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, ...){
+         Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, maxpanel = 2, ...){
 
   # local functions
   logsum = function(vec){ max(vec) + log(sum(exp(vec-max(vec)))) }
@@ -273,9 +275,18 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
 
         # Do plot
         if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
+        if (any(mfrow > maxpanel)) {
+          mfrow <- c(maxpanel, maxpanel)
+        }
+        Nyearplot <- ceiling(length(Years2Include) / (mfrow[1] * mfrow[2]))
+        yearsall <- Years2Include
         if(add==FALSE) par( mfrow=mfrow )
-        PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xt[,Years2Include,drop=FALSE], PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",category_names[cI]),"")), Year_Set=Year_Set[Years2Include], Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+        for (yeari in 1:Nyearplot) {
+          if (Nyearplot > 1) Years2Include <- yearsall[1:(maxpanel * maxpanel)]
+        PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xt[,na.omit(Years2Include),drop=FALSE], PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",category_names[cI]),""),ifelse(Nyearplot>1,yeari,"")), Year_Set=na.omit(Year_Set[Years2Include]), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, zlim = extendrange(Mat_xt, f = 0.03), ...)
+        yearsall <- yearsall[-c(1:(maxpanel * maxpanel))]
       }
+    }
     }
     # Plot for each year
     if( tolower(Panel)=="year" ){
