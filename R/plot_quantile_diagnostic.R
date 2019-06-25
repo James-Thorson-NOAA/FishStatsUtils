@@ -7,6 +7,7 @@
 #' @param FileName_Phist If NULL is specified then do not save this type of plot
 #' @param FileName_QQ If NULL is specified then do not save this type of plot
 #' @param FileName_Qhist If NULL is specified then do not save this type of plot
+#' @param mgp A vector of three values specifying the mgp pars in \code{par()}.
 #' @examples Q <- QQ_Fn(TmbData = TmbData, Report = Report)
 #' @return A list containing results for each specified categories
 #' @export
@@ -17,7 +18,8 @@ plot_quantile_diagnostic <- function(TmbData,
                   FileName_PP="Posterior_Predictive",
                   FileName_Phist="Posterior_Predictive-Histogram",
                   FileName_QQ="Q-Q_plot",
-                  FileName_Qhist="Q-Q_hist"){
+                  FileName_Qhist="Q-Q_hist",
+                  mgp = c(1.5,0.5,0)){
     
     # Retrieve data based on model type
     if("n_e" %in% names(TmbData)){
@@ -118,8 +120,8 @@ plot_quantile_diagnostic <- function(TmbData,
 
       # Make plot while calculating posterior predictives
       if(!is.null(FileName_PP) & !is.null(save_dir)) jpeg(save_PP, width=10, height=3, res=200, units="in")
-      par(mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
       plot(TmbData$b_i[Which], ylab="", xlab="", log="y", main="", col="blue")
+      par(mar=c(3,3,2,0), mgp=mgp, tck=-0.02)
 
       # Add results to plot: Loop through observations
       for(ObsI in 1:length(Which)){
@@ -135,7 +137,7 @@ plot_quantile_diagnostic <- function(TmbData,
 
       # Q-Q plot
       if(!is.null(FileName_Phist) & !is.null(save_dir)) jpeg(save_Phist, width=4, height=4, res=200, units="in")
-      par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      par(mfrow=c(1,1), mar=c(3,3,3,0), mgp=mgp, tck=-0.02)
       Qtemp = na.omit(Q)
       Order = order(Qtemp)
       plot(x=seq(0,1,length=length(Order)), y=Qtemp[Order], main="Q-Q plot", xlab="Uniform", ylab="Empirical", type="l", lwd=3)
@@ -144,13 +146,13 @@ plot_quantile_diagnostic <- function(TmbData,
 
       # Aggregate predictive distribution
       if(!is.null(FileName_QQ) & !is.null(save_dir)) jpeg(save_QQ, width=4, height=4, res=200, units="in")
-      par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      par(mfrow=c(1,1), mar=c(3,3,3,0), mgp=mgp, tck=-0.02)
       hist( log(y), main="Aggregate predictive dist.", xlab="ln(Obs)", ylab="Density")
       if(!is.null(FileName_QQ) & !is.null(save_dir)) dev.off()
 
       # Quantile histogram
       if(!is.null(FileName_Qhist) & !is.null(save_dir)) jpeg(save_Qhist, width=4, height=4, res=200, units="in")
-      par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      par(mfrow=c(1,1), mar=c(3,3,2,0), mgp=mgp, tck=-0.02)
       hist(na.omit(Q), main="Histogram of quantiles", xlab="Quantile", ylab="Number")
       if(!is.null(FileName_Qhist) & !is.null(save_dir)) dev.off()
 
