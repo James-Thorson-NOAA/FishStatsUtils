@@ -227,13 +227,14 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
         Ylim = c(0, max(Array_ctl[cI,Years2Include,,'Estimate']%o%c(1,1) * exp(log_Array_ctl[cI,Years2Include,,'Std. Error']%o%c(-interval_width,interval_width)),na.rm=TRUE) )
         if( plot_log==TRUE ) Ylim[1] = min(Array_ctl[cI,Years2Include,,'Estimate']%o%c(1,1) * exp(log_Array_ctl[cI,Years2Include,,'Std. Error']%o%c(-interval_width,interval_width)),na.rm=TRUE)
         # Plot stuff
-        plot(1, type="n", xlim=range(Year_Set), ylim=ifelse(plot_legend==TRUE,1.25,1.05)*Ylim, xlab="", ylab="", main=ifelse(TmbData$n_c>1,category_names[cI],""), log=ifelse(plot_log==TRUE,"y","") )
+        plot(1, type="n", xlim=range(Year_Set), ylim=ifelse(plot_legend==TRUE,1.25,1.05)*Ylim, xlab="", ylab="", main=ifelse(TmbData$n_c>1,category_names[cI],""), log=ifelse(plot_log==TRUE,"y",""), xaxt = "n")
         for(l in 1:TmbData$n_l){
           plot_lines( y=Array_ctl[cI,Years2Include,l,'Estimate'], x=Year_Set[Years2Include]+seq(-0.1,0.1,length=TmbData$n_l)[l], ybounds=(Array_ctl[cI,Years2Include,l,'Estimate']%o%c(1,1))*exp(log_Array_ctl[cI,Years2Include,l,'Std. Error']%o%c(-interval_width,interval_width)), type="b", col=rainbow(TmbData[['n_l']])[l], col_bounds=rainbow(TmbData[['n_l']])[l], ylim=Ylim)
         }
         if(plot_legend==TRUE & cI==TmbData$n_c) legend( "top", bty="n", fill=c(na.omit(ifelse(Calc_design==TRUE,"black",NA)),rainbow(TmbData[['n_l']])), legend=c(na.omit(ifelse(Calc_design==TRUE,"Design-based",NA)),as.character(strata_names)), ncol=2 )
       }
-      mtext( side=1:2, text=c("Year",switch(Plot_suffix[plotI], "Biomass"="Abundance (metric tonnes)", "Bratio"="Biomass ratio")), outer=TRUE, line=c(0,0) )
+      mtext( side=1:2, text=c("Year",switch(Plot_suffix[plotI], "Biomass"="Abundance (mt)", "Bratio"="Biomass ratio")), outer=TRUE, line=c(0,0) )
+      text(x = Year_Set[Years2Include][seq(1, length(Years2Include), by = 2)], par("usr")[3], labels = Year_Set[Years2Include][seq(1, length(Years2Include), by = 2)], srt = 45, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
     dev.off()
   }
 

@@ -35,11 +35,11 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=pa
     plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
     map( "world", add=TRUE )
     if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){
-      plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
+      plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)", ylab = "Northing (km)", xlab = "Easting (km)" )
     }
     plot( Spatial_List$loc_x, col="red", pch=20, main="Knots (North-East)")
     if( all(c('E_km','N_km')%in%names(Data_Geostat)) ){
-      plot( Data_Geostat[,c('E_km','N_km')], col="blue", pch=20, cex=0.1, main="Data (North-East)")
+      plot( Data_Geostat[,c('E_km','N_km')], col="blue", pch=20, cex=0.1, main="Data (North-East)", ylab = "Northing (km)", xlab = "Easting (km)")
     }
   dev.off()
 
@@ -57,7 +57,7 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat, PlotDir=pa
       map( "world", add=TRUE, fill=TRUE, col="grey" )
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
-      mtext( side=c(1,2), text=c("Longitude","Latitude"), outer=TRUE, line=1)
+      mtext( side=c(1,2), text=c("Longitude","Latitude"), outer=TRUE, line=1.35)
     }
   dev.off()
 }

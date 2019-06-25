@@ -145,13 +145,13 @@ plot_quantile_diagnostic <- function(TmbData,
       # Aggregate predictive distribution
       if(!is.null(FileName_QQ) & !is.null(save_dir)) jpeg(save_QQ, width=4, height=4, res=200, units="in")
       par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
-      hist( log(y), main="Aggregate predictive dist.", xlab="log(Obs)", ylab="Density")
+      hist( log(y), main="Aggregate predictive dist.", xlab="ln(Obs)", ylab="Density")
       if(!is.null(FileName_QQ) & !is.null(save_dir)) dev.off()
 
       # Quantile histogram
       if(!is.null(FileName_Qhist) & !is.null(save_dir)) jpeg(save_Qhist, width=4, height=4, res=200, units="in")
       par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
-      hist(na.omit(Q), main="Quantile_histogram", xlab="Quantile", ylab="Number")
+      hist(na.omit(Q), main="Histogram of quantiles", xlab="Quantile", ylab="Number")
       if(!is.null(FileName_Qhist) & !is.null(save_dir)) dev.off()
 
       # Return stuff
