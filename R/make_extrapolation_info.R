@@ -141,3 +141,22 @@ plot.make_extrapolation_info <- function(x, cex=0.01, ...)
 
   invisible(x)
 }
+
+#' Extract extrapolation-grid used for spatial inference
+#'
+#' @title Extract extrapolation-grid
+#' @param x Output from \code{\link{make_extrapolation_info}}
+#' @param quiet Boolean indicating whether to print to terminal or not
+#' @param ... Not used
+#' @return Data frame of Latitude and Longitude for each extrapolation-grid cell
+#' @method print make_extrapolation_info
+#' @export
+print.make_extrapolation_info <- function(x, quiet=FALSE, ...)
+{
+  loc_gz = cbind( x$Data_Extrap[,c('Lon','Lat')], "Area_km2"=x$Area_km2_x )[ which(x$Area_km2_x>0), ]
+  rownames(loc_gz) = paste0("Grid_",1:nrow(loc_gz))
+  #ans = c( x[c('zone','flip_around_dateline')], list("extrapolation_grid"=loc_gz) )
+
+  if(quiet==FALSE) print( summary(loc_gz) )
+  invisible(loc_gz)
+}

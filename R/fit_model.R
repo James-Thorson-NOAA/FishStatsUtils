@@ -176,15 +176,80 @@ print.fit_model <- function(x, ...)
 #' Print parameter estimates and standard errors.
 #'
 #' @title Print parameter estimates
-#' @param x Output from \code{\link{fit_model}}
+#' @param fit Output from \code{\link{fit_model}}
+#' @param what String specifying what elements of results to plot;  options include `extrapolation_grid`, `spatial_mesh`, and `results`
 #' @param ... Arguments passed to \code{\link{plot_results}}
 #' @return NULL
 #' @method plot fit_model
 #' @export
-plot.fit_model <- function(x, ...)
+plot.fit_model <- function(x, what="results", ...)
 {
-  ans = plot_results( x, ... )
-  invisible(ans)
+  ## Plot extrapolation-grid
+  if( length(grep(what, "extrapolation_grid")) ){
+    message("\n### Running `plot.make_extrapolation_info`")
+    plot( x$extrapolation_list )
+    return(invisible(NULL))
+  }
+
+  ## Plot extrapolation-grid
+  if( length(grep(what, c("spatial_info","inla_mesh"))) ){
+    message("\n### Running `plot.make_spatial_info`")
+    plot( x$spatial_list )
+    return(invisible(NULL))
+  }
+
+  # diagnostic plots
+  if( length(grep(what, "results")) ){
+    message("\n### Running `plot_results`")
+    ans = plot_results( x, ... )
+    return(invisible(ans))
+  }
+
+  stop( "input `what` not matching available options" )
+}
+
+#' Extract summary of spatial estimates
+#'
+#' @title Extract spatial estimates
+#' @param fit Output from \code{\link{fit_model}}
+#' @param ... Not used
+#' @return NULL
+#' @method summary fit_model
+#' @export
+summary.fit_model <- function(x, what="density", ...)
+{
+  ans = NULL
+
+  if( what=="density" ){
+    # Load location of extrapolation-grid
+    ans[["extrapolation_grid"]] = print( x$extrapolation_list, quiet=TRUE )
+
+    # Load density estimates
+    if( "D_gcy" %in% names(x$Report)){
+      ans[["Density_array"]] =  x$Report$D_gcy
+      if( !( x$settings$fine_scale==TRUE | x$spatial_list$Method=="Stream_network" ) ){
+        index_tmp = x$spatial_list$NN_Extrap$nn.idx[ which(x$extrapolation_list[["Area_km2_x"]]>0), 1 ]
+        ans[["Density_array"]] = ans[["Density_array"]][ index_tmp,,,drop=FALSE]
+      }
+      dimnames(ans[["Density_array"]]) = list( rownames(ans[["extrapolation_grid"]]), paste0("Category_",1:dim(ans[["Density_array"]])[[2]]), x$year_labels )
+      # Expand as grid
+      Density_dataframe = expand.grid("Grid"=1:dim(ans[["Density_array"]])[[1]], "Category"=dimnames(ans[["Density_array"]])[[2]], "Year"=dimnames(ans[["Density_array"]])[[3]])
+      Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Grid'],], "Density"=as.vector(ans[["Density_array"]]) )
+      ans[["Density_dataframe"]] = Density_dataframe
+      rownames(Density_dataframe) = NULL
+      message("\n### Printing head of `Density_dataframe`")
+      print(head(Density_dataframe))
+      message("\n### Printing tail of `Density_dataframe`")
+      print(tail(Density_dataframe))
+    }else{
+      stop( "`summary.fit_model` not implemented for the version of `VAST` being used" )
+    }
+  }else{
+    stop( "`summary.fit_model` only implemented for `what='density'`" )
+  }
+
+  # diagnostic plots
+  return(invisible(ans))
 }
 
 
