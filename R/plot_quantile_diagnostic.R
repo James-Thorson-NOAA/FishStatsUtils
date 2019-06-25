@@ -120,8 +120,8 @@ plot_quantile_diagnostic <- function(TmbData,
 
       # Make plot while calculating posterior predictives
       if(!is.null(FileName_PP) & !is.null(save_dir)) jpeg(save_PP, width=10, height=3, res=200, units="in")
-      plot(TmbData$b_i[Which], ylab="", xlab="", log="y", main="", col="blue")
       par(mar=c(3,3,2,0), mgp=mgp, tck=-0.02)
+      plot(TmbData$b_i[Which], ylab="Quantiles", xlab="", log="y", main="", col="blue", xaxt = "n")
 
       # Add results to plot: Loop through observations
       for(ObsI in 1:length(Which)){
@@ -133,6 +133,11 @@ plot_quantile_diagnostic <- function(TmbData,
           points(x=ObsI,y=TmbData$b_i[Which[ObsI]],pch=4,col="red",cex=2)
         }
       }
+      legend("bottomleft", xpd = TRUE, inset=c(0, -0.1), 
+        legend = c("raw data", "data outside 97.5% quantile", "75% quantile", "97.5% quantile"),
+        ncol = 2, col = c("blue", "red", "black", "black"), bty = "n",
+        pch = c(1, 4, NA, NA),
+        lty = c(NA, NA, 1, 2))
       if(!is.null(FileName_PP) & !is.null(save_dir)) dev.off()
 
       # Q-Q plot
