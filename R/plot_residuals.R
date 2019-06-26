@@ -147,7 +147,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, savedir=getwd(),
       for (yeari in splits){
         PlotMap_Fn( MappingDetails=MappingDetails, Mat=Q_xy[, yeari, drop = FALSE], PlotDF=PlotDF, Col=Col, zlim=zlim, ignore.na=TRUE, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, 
           FileName=paste0(savedir,"/",c("maps--encounter_pearson_resid","maps--catchrate_pearson_resid")[zI], ifelse(Nyearplot == 1, "", which(sapply(splits, "[[",1) == yeari[1]))), 
-          Year_Set=paste0("Residuals--",yeari), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin, add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+          Year_Set=paste0("Residuals--", Year_Set[yeari]), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin, add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
       }
     }
   }
