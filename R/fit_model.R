@@ -181,6 +181,7 @@ print.fit_model <- function(x, ...)
 #' @param ... Arguments passed to \code{\link{plot_results}}
 #' @return NULL
 #' @method plot fit_model
+#' @export plot
 #' @export
 plot.fit_model <- function(x, what="results", ...)
 {
@@ -212,6 +213,7 @@ plot.fit_model <- function(x, what="results", ...)
 #'
 #' @title Extract spatial estimates
 #' @param fit Output from \code{\link{fit_model}}
+#' @param what Boolean indicating what to summarize; only option is `density`
 #' @param ... Not used
 #' @return NULL
 #' @method summary fit_model
