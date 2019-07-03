@@ -30,7 +30,7 @@ Imports:
     ThorsonUtilities,
     abind,
     corpcor,
-    TMBhelper (>= 1.1.0),
+    TMBhelper,
     pander,
     formatR
 Depends:
@@ -40,7 +40,7 @@ Depends:
 Suggests:
     testthat
 Remotes: james-thorson/utilities,
-    kaskr/TMB_contrib_R/TMBhelper
+    kaskr/TMB_contrib_R/TMBhelper@a9b34c6
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
