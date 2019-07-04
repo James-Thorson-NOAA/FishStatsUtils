@@ -11,7 +11,7 @@ PlotMap_Fn(MappingDetails, Mat, PlotDF, MapSizeRatio = c(`Width(in)` = 4,
   outermargintext = c("Eastings", "Northings"), zlim = NULL,
   Col = NULL, Legend = list(use = FALSE, x = c(10, 30), y = c(10, 30)),
   mfrow = c(1, 1), plot_legend_fig = TRUE, land_color = "grey",
-  ignore.na = FALSE, ...)
+  ignore.na = FALSE, map_style = "rescale", ...)
 }
 \arguments{
 \item{MappingDetails}{tagged list of plot-settings from \code{MapDetails_Fn}}

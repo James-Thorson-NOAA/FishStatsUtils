@@ -138,7 +138,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xct"%in%names(Report)) Array_xct = Report$R1_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$R1_xcy
       #if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
+      if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("Not implemented for SpatialVAM")
       message( "plot_num=1 doesn't work well when using ObsModel[2]==1" )
     }
@@ -148,7 +148,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct)
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy)
       #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy)
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
+      if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==3){

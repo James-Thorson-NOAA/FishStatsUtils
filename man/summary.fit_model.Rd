@@ -7,6 +7,8 @@
 \method{summary}{fit_model}(x, what = "density", ...)
 }
 \arguments{
+\item{what}{Boolean indicating what to summarize; only option is `density`}
+
 \item{...}{Not used}
 
 \item{fit}{Output from \code{\link{fit_model}}}

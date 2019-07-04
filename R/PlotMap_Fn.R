@@ -20,7 +20,8 @@ PlotMap_Fn <-
 function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Xlim, Ylim, FileName=paste0(getwd(),"/"), Year_Set,
          Rescale=FALSE, Rotate=0, Format="png", Res=200, zone=NA, Cex=0.01, textmargin="", add=FALSE, pch=15,
          outermargintext=c("Eastings","Northings"), zlim=NULL, Col=NULL,
-         Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE, ...){
+         Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE,
+         map_style="rescale", ...){
 
   # Check for problems
   if( length(Year_Set) != ncol(Mat) ){
@@ -68,9 +69,12 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
         # If not rotating:  Use simple plot
         if( Rotate==0 ){
           Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE)
-          plot( 1, type="n", ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), xaxt="n", yaxt="n", xlab="", ylab="" )
-          map( Map, add=TRUE )  # , col=land_color, fill=TRUE ->  Using land-fill color produces weird plotting artefacts
-          #map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE)
+          if( map_style=="rescale" ){
+            plot( 1, type="n", ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), xaxt="n", yaxt="n", xlab="", ylab="" )
+            map( Map, add=TRUE ) #, col=land_color, fill=TRUE )  # ->  Using land-fill color produces weird plotting artefacts
+          }else{
+            map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE, col=land_color, fill=TRUE)
+          }
           Col_Bin = ceiling( f(Mat[Which,,drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
           points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
         }

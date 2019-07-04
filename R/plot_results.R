@@ -106,7 +106,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   }
 
   # return
-  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "map_list"=map_list )
+  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "map_list"=map_list, "plot_args"=plot_args )
   return( invisible(Return) )
 }
 
