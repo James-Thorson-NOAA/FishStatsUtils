@@ -157,6 +157,9 @@ print.make_extrapolation_info <- function(x, quiet=FALSE, ...)
   rownames(loc_gz) = paste0("Grid_",1:nrow(loc_gz))
   #ans = c( x[c('zone','flip_around_dateline')], list("extrapolation_grid"=loc_gz) )
 
-  if(quiet==FALSE) print( summary(loc_gz) )
+  if(quiet==FALSE){
+    cat("make_extrapolation_info(.) result\n")
+    print( summary(loc_gz) )
+  }
   invisible(loc_gz)
 }

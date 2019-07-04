@@ -168,7 +168,7 @@ print.fit_model <- function(x, ...)
   if( "parameter_estimates" %in% names(x) ){
     print( x$parameter_estimates )
   }else{
-    message("`parameter_estimates` not available in `fit_model`")
+    cat("`parameter_estimates` not available in `fit_model`\n")
   }
   invisible(x$parameter_estimates)
 }
@@ -187,21 +187,21 @@ plot.fit_model <- function(x, what="results", ...)
 {
   ## Plot extrapolation-grid
   if( length(grep(what, "extrapolation_grid")) ){
-    message("\n### Running `plot.make_extrapolation_info`")
+    cat("\n### Running `plot.make_extrapolation_info`\n")
     plot( x$extrapolation_list )
     return(invisible(NULL))
   }
 
   ## Plot extrapolation-grid
   if( length(grep(what, c("spatial_info","inla_mesh"))) ){
-    message("\n### Running `plot.make_spatial_info`")
+    cat("\n### Running `plot.make_spatial_info`\n")
     plot( x$spatial_list )
     return(invisible(NULL))
   }
 
   # diagnostic plots
   if( length(grep(what, "results")) ){
-    message("\n### Running `plot_results`")
+    cat("\n### Running `plot_results`\n")
     ans = plot_results( x, ... )
     return(invisible(ans))
   }

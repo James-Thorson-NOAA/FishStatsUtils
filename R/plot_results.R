@@ -76,12 +76,12 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # Plot densities
   message("\n### Making plot of densities")
-  plot_args = list(...)
-  plot_args = combine_lists( input=plot_args, default=list(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]], Report=fit$Report, Sdreport=fit$parameter_estimates$SD,
+  plot_maps_args = list(...)
+  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]], Report=fit$Report, Sdreport=fit$parameter_estimates$SD,
     PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]], Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir,
     Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]], Cex=map_list[["Cex"]], Legend=map_list[["Legend"]],
     zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8, plot_legend_fig=FALSE) )
-  Dens_xt = do.call( what=plot_maps, args=plot_args )
+  Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
 
   # Plot quantile-quantile plot
   if( check_residuals == TRUE ){
@@ -106,7 +106,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   }
 
   # return
-  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "map_list"=map_list, "plot_args"=plot_args )
+  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "map_list"=map_list, "plot_maps_args"=plot_maps_args )
   return( invisible(Return) )
 }
 

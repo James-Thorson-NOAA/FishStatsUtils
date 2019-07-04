@@ -68,15 +68,16 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
       }else{
         # If not rotating:  Use simple plot
         if( Rotate==0 ){
-          Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE)
+          Col_Bin = ceiling( f(Mat[Which,,drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
           if( map_style=="rescale" ){
             plot( 1, type="n", ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), xaxt="n", yaxt="n", xlab="", ylab="" )
+            Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE)
             map( Map, add=TRUE ) #, col=land_color, fill=TRUE )  # ->  Using land-fill color produces weird plotting artefacts
           }else{
-            map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE, col=land_color, fill=TRUE)
+            map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE, fill=FALSE, mar=c(0.1,0.1,par("mar")[3],0), myborder=0 )
+            points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
+            map(MappingDetails[[1]], MappingDetails[[2]], plot=TRUE, col=land_color, fill=TRUE, add=TRUE )
           }
-          Col_Bin = ceiling( f(Mat[Which,,drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
-          points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
         }
         # If rotating:  Record all polygons; Rotate them and all points;  Plot rotated polygons;  Plot points
         if( Rotate!=0 ){

@@ -186,12 +186,32 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
 #' @export
 plot.make_spatial_info <- function(x, ...)
 {
+  cat("\n### Running `plot.make_spatial_info`\n")
   if( x$Method == "Mesh" ){
     plot(x$MeshList$anisotropic_mesh)
     ans = x$MeshList$anisotropic_mesh
   }else{
-    message( "`plot` not implemented for `Method` used" )
+    cat( "`plot` not implemented for `Method` used\n" )
   }
 
   invisible(ans)
+}
+
+#' Print spatial representation used for model
+#'
+#' @title Print spatial information
+#' @param x Output from \code{\link{make_spatial_info}}
+#' @param ... Not used
+#' @return NULL
+#' @method print make_spatial_info
+#' @export
+print.make_spatial_info <- function(x, ...)
+{
+  cat("\n### Running `print.make_spatial_info`\n")
+  cat( paste0("`Method` = ", x$Method,"\n") )
+  cat( paste0("`n_x` = ", x$n_x,"\n") )
+  cat( paste0("`n_s` = ", x$n_s,"\n") )
+  cat( paste0("Extrapolating results to `n_g` = ", x$n_g, " extrapolation-grid cells\n") )
+
+  return(invisible(NULL))
 }
