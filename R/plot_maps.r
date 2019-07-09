@@ -140,7 +140,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       #if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
       if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("Not implemented for SpatialVAM")
-      message( "plot_num=1 doesn't work well when using ObsModel[2]==1" )
+      message( "`plot_num=1` doesn't work well when using ObsModel[2]==1, because average area-swept doesn't generally match area of extrapolation-grid cells" )
     }
     if(plot_num==2){
       # Positive values ("Pos")
@@ -150,6 +150,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy)
       if("D_gcy"%in%names(Report)) Array_xct = Report$R2_gcy
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
+      message( "`plot_num=2` doesn't work well when using ObsModel[2]==1, because average area-swept doesn't generally match area of extrapolation-grid cells" )
     }
     if(plot_num==3){
       # Density ("Dens")
