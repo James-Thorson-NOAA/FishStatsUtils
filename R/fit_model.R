@@ -222,7 +222,7 @@ summary.fit_model <- function(x, what="density", ...)
 {
   ans = NULL
 
-  if( what=="density" ){
+  if( tolower(what) == "density" ){
     # Load location of extrapolation-grid
     ans[["extrapolation_grid"]] = print( x$extrapolation_list, quiet=TRUE )
 
@@ -239,15 +239,22 @@ summary.fit_model <- function(x, what="density", ...)
       Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Grid'],], "Density"=as.vector(ans[["Density_array"]]) )
       ans[["Density_dataframe"]] = Density_dataframe
       rownames(Density_dataframe) = NULL
-      message("\n### Printing head of `Density_dataframe`")
+      cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object")
       print(head(Density_dataframe))
-      message("\n### Printing tail of `Density_dataframe`")
       print(tail(Density_dataframe))
     }else{
       stop( "`summary.fit_model` not implemented for the version of `VAST` being used" )
     }
-  }else{
-    stop( "`summary.fit_model` only implemented for `what='density'`" )
+  }
+
+  if( tolower(what) %in% c("parhat","estimates") ){
+    ans[["estimates"]] = x$ParHat
+    cat("\n### Printing slots of `ParHat`, and returning list in output object")
+    print(names(x$ParHat))
+  }
+
+  if( is.null(ans) ){
+    stop( "`summary.fit_model` not implemented for inputted value of argument `what`" )
   }
 
   # diagnostic plots
