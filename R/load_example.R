@@ -124,7 +124,7 @@ load_example = function( data_set="EBS_pollock" ){
     data( GOA_pcod_covariate_example, package="FishStatsUtils" )
     sampling_data = GOA_pcod_covariate_example$sampling_data
     strata.limits = data.frame('STRATA'="All_areas")
-    X_gtp = GOA_pcod_covariate_example$X_xtp
+    X_xtp = GOA_pcod_covariate_example$X_xtp
   }
   sampling_data = na.omit( sampling_data )
 
