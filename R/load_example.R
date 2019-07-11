@@ -28,8 +28,11 @@ load_example = function( data_set="EBS_pollock" ){
                    "lingcod_comp_expansion" = tolower("California_current"),
                    "ordination" = tolower("Eastern_Bering_Sea"),
                    "five_species_ordination" = tolower("Eastern_Bering_Sea"),
+                   "covariate_example" = tolower("Gulf_of_Alaska"),
+                   "GOA_pcod_covariate_example" = tolower("Gulf_of_Alaska"),
                    tolower("Other") )
 
+  X_xtp = X_gtp = X_itp = Q_ik = NULL
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
     Year = as.numeric(sapply(WCGBTS_Canary_example[,'PROJECT_CYCLE'], FUN=function(Char){strsplit(as.character(Char)," ")[[1]][2]}))
@@ -117,8 +120,20 @@ load_example = function( data_set="EBS_pollock" ){
     sampling_data = five_species_ordination_example
     strata.limits = data.frame('STRATA'="All_areas")
   }
+  if( tolower(data_set) %in% tolower(c("covariate_example","GOA_pcod_covariate_example")) ){
+    data( GOA_pcod_covariate_example, package="FishStatsUtils" )
+    sampling_data = GOA_pcod_covariate_example$samping_data
+    strata.limits = data.frame('STRATA'="All_areas")
+    X_gtp = GOA_pcod_covariate_example$X_xtp
+  }
   sampling_data = na.omit( sampling_data )
 
   Return = list("sampling_data"=sampling_data, "Region"=region, "strata.limits"=strata.limits)
+  if( !is.null(X_xtp)) Return[["X_xtp"]] = X_xtp
+  if( !is.null(X_gtp)) Return[["X_gtp"]] = X_gtp
+  if( !is.null(X_itp)) Return[["X_xtp"]] = X_itp
+  if( !is.null(Q_ik)) Return[["X_xtp"]] = Q_ik
+
+  # return stuff
   return(Return)
 }
