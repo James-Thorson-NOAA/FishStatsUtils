@@ -27,7 +27,7 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{RhoConfig}{vector of form c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0) specifying whether either intercepts (Beta1 and Beta2) or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals (0: each year as fixed effect; 1: each year as random following IID distribution; 2: each year as random following a random walk; 3: constant among years as fixed effect; 4: each year as random following AR1 process);  If missing, assumed to be zero for each element}
 
-\item{OverdispersionConfig}{OPTIONAL, a vector of format c("eta1"=0, "eta2"="AR1") governing any correlated overdispersion among categories for each level of v_i, where eta1 is for encounter probability, and eta2 is for positive catch rates, where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance}
+\item{OverdispersionConfig}{a vector of format c("eta1"=0, "eta2"="AR1") governing any correlated overdispersion among categories for each level of v_i, where eta1 is for encounter probability, and eta2 is for positive catch rates, where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance (by default, c("eta1"=0, "eta2"=0) and this turns off overdispersion)}
 
 \item{Options}{a vector of form c('SD_site_logdensity'=FALSE,'Calculate_Range'=FALSE,'Calculate_effective_area'=FALSE,'Calculate_Cov_SE'=FALSE,'Calculate_Synchrony'=FALSE,'Calculate_proportion'=FALSE), where Calculate_Range=1 turns on calculation of center of gravity, and Calculate_effective_area=1 turns on calculation of effective area occupied}
 

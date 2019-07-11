@@ -26,7 +26,7 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
 
 \item{a_i}{Sampled area for each observation i}
 
-\item{v_i}{OPTIONAL, sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i}
+\item{v_i}{sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i (by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
 
 \item{Xconfig_zcp}{OPTIONAL, 3D array of settings for each dynamic density covariate, where the first dimension corresponds to 1st or 2nd linear predictors, second dimension corresponds to model category, and third dimension corresponds to each density covariate
 \describe{

@@ -3,7 +3,7 @@
 #'
 #' \code{load_example} loads a catch and effort data set from multiple surveys worldwide
 #'
-#' Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
+#' Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", "covariate_example", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
 #'
 #' @param data_set data set to load
 #'
