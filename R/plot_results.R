@@ -34,6 +34,9 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
     return( output )
   }
 
+  # Check for known issues
+  if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
+
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
 
@@ -75,7 +78,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   }
 
   # Plot densities
-  message("\n### Making plot of densities")
+  message("\n### Making plots of spatial predictions")
   plot_maps_args = list(...)
   plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]], Report=fit$Report, Sdreport=fit$parameter_estimates$SD,
     PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]], Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir,

@@ -73,7 +73,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_iz, "c_iz"=c_iz )
   # Decide which years to plot
   year_labels = seq( min(t_iz), max(t_iz) )
-  years_to_plot = which( unique(t_iz) %in% sort(unique(t_iz)))
+  years_to_plot = which( year_labels %in% t_iz )
 
   # Save record
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
