@@ -10,7 +10,8 @@ plot_index(Index_ctl, sd_Index_ctl = array(0, dim(Index_ctl)),
   DirName = paste0(getwd(), "/"), PlotName = "Index.png",
   interval_width = 1, width = NULL, height = NULL, xlab = "Year",
   ylab = "Index", bounds_type = "whiskers", col = NULL,
-  col_bounds = NULL, Ymin = 0, ...)
+  col_bounds = NULL, Yrange = c(0, NA), type = "b",
+  plot_lines_args = list(), ...)
 }
 \arguments{
 \item{Index_ctl}{A matrix or array of time-series estimates for multiple categories \code{c}, years \code{t}, and strata \code{l}}
@@ -37,7 +38,9 @@ plot_index(Index_ctl, sd_Index_ctl = array(0, dim(Index_ctl)),
 
 \item{height}{plot height in inches}
 
-\item{Ymin}{lower bound for y-axis (use \code{Ymin=NA} for using the lower range of estimate intervals)}
+\item{Yrange}{lower and upper bound for y-axis (use \code{Yrange[1]=NA} and/or \code{Yrange[2]=NA} for using the lower and upper bound of estimate intervals)}
+
+\item{plot_lines_args}{additional arguments to pass to \code{plot_lines}}
 
 \item{...}{list of settings to pass to \code{par} when making plot}
 }

@@ -148,7 +148,7 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
       sd_Index_ctl=array(SD_log_effective_area_ctl[,,,'Std. Error'],dim(SD_log_effective_area_ctl)[1:3]),
       Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
       DirName="", PlotName=FileName_EffArea, scale="uniform",
-      interval_width=interval_width, xlab="Year", ylab="Effective area occupied, ln(km^2)", Ymin=NA,
+      interval_width=interval_width, xlab="Year", ylab="Effective area occupied, ln(km^2)", Yrange=c(NA,NA),
       width=ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))*4, height=ceiling(sqrt(TmbData$n_c))*4 )
     #png( file=FileName_EffArea, width=ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))*2.5, height=ceiling(sqrt(TmbData$n_c))*2.5, res=200, units="in")
     #  par( mfrow=c(1,1), mar=c(2,2,1,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(1,1,1,0), mfrow=c(ceiling(sqrt(TmbData$n_c)),ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))))

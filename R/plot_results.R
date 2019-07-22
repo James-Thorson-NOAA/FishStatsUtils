@@ -21,19 +21,6 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
   check_residuals=TRUE, ... ){
 
-  # Local function -- combine two lists
-  combine_lists = function( default, input ){
-    output = default
-    for( i in seq_along(input) ){
-      if( names(input)[i] %in% names(default) ){
-        output[[names(input)[i]]] = input[[i]]
-      }else{
-        output = c( output, input[i] )
-      }
-    }
-    return( output )
-  }
-
   # Check for known issues
   if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
 
@@ -80,8 +67,9 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   # Plot densities
   message("\n### Making plots of spatial predictions")
   plot_maps_args = list(...)
-  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]], Report=fit$Report, Sdreport=fit$parameter_estimates$SD,
-    PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]], Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir,
+  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]],
+    Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
+    Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir,
     Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]], Cex=map_list[["Cex"]], Legend=map_list[["Legend"]],
     zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8, plot_legend_fig=FALSE) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )

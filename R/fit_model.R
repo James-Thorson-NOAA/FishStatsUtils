@@ -56,19 +56,6 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   extrapolation_args=list(), spatial_args=list(), optimize_args=list(), model_args=list(),
   silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
 
-  # Local function -- combine two lists
-  combine_lists = function( default, input ){
-    output = default
-    for( i in seq_along(input) ){
-      if( names(input)[i] %in% names(default) ){
-        output[[names(input)[i]]] = input[[i]]
-      }else{
-        output = c( output, input[i] )
-      }
-    }
-    return( output )
-  }
-
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_iz, "c_iz"=c_iz )
   # Decide which years to plot
