@@ -8,6 +8,7 @@
 #' @inheritParams plot_biomass_index
 #' @inheritParams plot_lines
 #' @param Yrange lower and upper bound for y-axis (use \code{Yrange[1]=NA} and/or \code{Yrange[2]=NA} for using the lower and upper bound of estimate intervals)
+#' @param plot_args additional arguments to pass to \code{plot}
 #' @param plot_lines_args additional arguments to pass to \code{plot_lines}
 #' @param ... list of settings to pass to \code{par} when making plot
 #'
@@ -18,7 +19,7 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
   strata_names=NULL, category_names=NULL, scale="uniform",
   plot_legend=NULL, DirName=paste0(getwd(),"/"), PlotName="Index.png",
   interval_width=1, width=NULL, height=NULL, xlab="Year", ylab="Index", bounds_type="whiskers", col=NULL,
-  col_bounds=NULL, Yrange=c(0,NA), type="b", plot_lines_args=list(), ... ){
+  col_bounds=NULL, Yrange=c(0,NA), type="b", plot_lines_args=list(), plot_args=list(), ... ){
 
   # Change inputs
   if( length(dim(Index_ctl))==length(dim(sd_Index_ctl)) ){
@@ -61,7 +62,7 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
 
   # Plot
   Par = combine_lists( default=list(mar=c(2,2,1,0),mgp=c(2,0.5,0),tck=-0.02,yaxs="i",oma=c(2,2,0,0),mfrow=mfrow), input=list(...) )
-  png( file=paste0(DirName,PlotName), width=width, height=height, res=200, units="in")  # paste0(DirName,ifelse(DirName=="","","/"),PlotName)
+  if(!is.na(PlotName)) png( file=paste0(DirName,PlotName), width=width, height=height, res=200, units="in")  # paste0(DirName,ifelse(DirName=="","","/"),PlotName)
     par( Par )
     for( z1 in 1:n_categories ){
       # Calculate y-axis limits
@@ -70,7 +71,9 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
       Ylim = ifelse( is.na(Yrange), Ylim, Yrange )
       Xlim = range(Year_Set) + c(-1,1) * diff(range(Year_Set))/20
       # Plot stuff
-      plot(1, type="n", xlim=Xlim, ylim=Ylim, xlab="", ylab="", main=ifelse(n_categories>1,category_names[z1],""), xaxt="n" )
+      plot_inputs = combine_lists( default=list(1, type="n", xlim=Xlim, ylim=Ylim, xlab="", ylab="", main=ifelse(n_categories>1,category_names[z1],""), xaxt="n"),
+        input=plot_args )
+      do.call( what=plot, args=plot_inputs )
       for(z3 in 1:n_strata){
         if(scale=="uniform") ybounds = Index_ctl[z1,,z3]%o%c(1,1) + sd_Index_ctl[z1,,z3]%o%c(-interval_width,interval_width)
         if(scale=="log") ybounds = Index_ctl[z1,,z3]%o%c(1,1) * exp(sd_Index_ctl[z1,,z3]%o%c(-interval_width,interval_width))
@@ -84,7 +87,7 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
       axis( 1, at=Pretty(Year_Set), labels=year_names[match(Pretty(Year_Set),Year_Set)] )
     }
     mtext( side=1:2, text=c(xlab,ylab), outer=TRUE, line=c(0,0) )
-  dev.off()
+  if(!is.na(PlotName)) dev.off()
 
   return(invisible(plot_lines_inputs))
 }

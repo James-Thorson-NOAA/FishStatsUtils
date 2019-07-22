@@ -16,7 +16,7 @@
 #'
 #' @export
 calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL,
-  plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), DirName=paste0(getwd(),"/"), PlotName="Proportion.png",
+  plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), DirName=paste0(getwd(),"/"), PlotName="Proportion.png", PlotName2="Average.png",
   interval_width=1, width=6, height=6, xlab="Category", ylab="Proportion", ... ){
 
   # Warnings and errors
@@ -48,10 +48,12 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
   Neff_tl = apply(Neff_ctl, MARGIN=2:3, FUN=median, na.rm=TRUE)
 
   # Plot
-  plot_index( Index_ctl=Prop_ctl, sd_Index_ctl=sqrt(var_Prop_ctl), Year_Set=Year_Set, Years2Include=Years2Include,
-    strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
-    DirName=DirName, PlotName=PlotName, interval_width=interval_width, width=width, height=height,
-    xlab=xlab, ylab=ylab, scale="uniform", ... )
+  if( !is.na(PlotName) ){
+    plot_index( Index_ctl=Prop_ctl, sd_Index_ctl=sqrt(var_Prop_ctl), Year_Set=Year_Set, Years2Include=Years2Include,
+      strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
+      DirName=DirName, PlotName=PlotName, interval_width=interval_width, width=width, height=height,
+      xlab=xlab, ylab=ylab, scale="uniform", ... )
+  }
 
   # Calculate weighted mean
   sd_Mean_tl = Mean_tl = apply( Prop_ctl, MARGIN=2:3, FUN=function(vec){sum(vec*(1:length(vec)))} )
@@ -61,12 +63,15 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
   }}
 
   # Plot
-  plot_index( Index_ctl=1%o%Mean_tl, sd_Index_ctl=1%o%sd_Mean_tl, Year_Set=Year_Set, Years2Include=Years2Include,
-    strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
-    DirName=DirName, PlotName="Mean_category.png", interval_width=interval_width, width=width, height=height,
-    xlab=xlab, ylab=ylab, scale="uniform", Yrange=c(NA,NA), ... )     # , Yrange=c(1,dim(var_Prop_ctl)[1])
+  if( !is.na(PlotName2) ){
+    plot_index( Index_ctl=1%o%Mean_tl, sd_Index_ctl=1%o%sd_Mean_tl, Year_Set=Year_Set, Years2Include=Years2Include,
+      strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
+      DirName=DirName, PlotName=PlotName2, interval_width=interval_width, width=width, height=height,
+      xlab=xlab, ylab="Category", scale="uniform", Yrange=c(NA,NA), ... )     # , Yrange=c(1,dim(var_Prop_ctl)[1])
+  }
 
   # Return stuff
-  Return = list("Prop_ctl"=Prop_ctl, "Neff_tl"=Neff_tl, "var_Prop_ctl"=var_Prop_ctl, "Index_tl"=Index_tl, "Neff_ctl"=Neff_ctl)
+  Return = list("Prop_ctl"=Prop_ctl, "Neff_tl"=Neff_tl, "var_Prop_ctl"=var_Prop_ctl, "Index_tl"=Index_tl, "Neff_ctl"=Neff_ctl,
+    "Mean_tl"=Mean_tl, "sd_Mean_tl"=sd_Mean_tl )
   return( invisible(Return) )
 }

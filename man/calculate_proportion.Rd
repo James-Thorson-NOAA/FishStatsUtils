@@ -8,8 +8,8 @@ calculate_proportion(TmbData, Index, Year_Set = NULL,
   Years2Include = NULL, strata_names = NULL, category_names = NULL,
   plot_legend = ifelse(TmbData$n_l > 1, TRUE, FALSE),
   DirName = paste0(getwd(), "/"), PlotName = "Proportion.png",
-  interval_width = 1, width = 6, height = 6, xlab = "Category",
-  ylab = "Proportion", ...)
+  PlotName2 = "Average.png", interval_width = 1, width = 6,
+  height = 6, xlab = "Category", ylab = "Proportion", ...)
 }
 \arguments{
 \item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
