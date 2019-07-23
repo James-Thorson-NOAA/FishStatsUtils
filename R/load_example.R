@@ -134,7 +134,7 @@ load_example = function( data_set="EBS_pollock" ){
     sampling_data = sampling_data[ which(sampling_data[,'Year'] %in% unique(F_tc[,1])), ]
     strata.limits = data.frame('STRATA'="All_areas")
     F_ct = t( F_tc[which(F_tc[,'X'] %in% min(sampling_data[,'Year']):max(sampling_data[,'Year'])),-1] )
-    colnames(F_ct) = min(Data_Geostat[,'Year']):max(Data_Geostat[,'Year'])
+    colnames(F_ct) = min(sampling_data[,'Year']):max(sampling_data[,'Year'])
   }
   sampling_data = na.omit( sampling_data )
 
