@@ -29,10 +29,11 @@ load_example = function( data_set="EBS_pollock" ){
                    "ordination" = tolower("Eastern_Bering_Sea"),
                    "five_species_ordination" = tolower("Eastern_Bering_Sea"),
                    "covariate_example" = tolower("Gulf_of_Alaska"),
-                   "GOA_pcod_covariate_example" = tolower("Gulf_of_Alaska"),
+                   "goa_pcod_covariate_example" = tolower("Gulf_of_Alaska"),
+                   "goa_mice_example" = tolower("Gulf_of_Alaska"),
                    tolower("Other") )
 
-  X_xtp = X_gtp = X_itp = Q_ik = NULL
+  F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
     Year = as.numeric(sapply(WCGBTS_Canary_example[,'PROJECT_CYCLE'], FUN=function(Char){strsplit(as.character(Char)," ")[[1]][2]}))
@@ -126,13 +127,23 @@ load_example = function( data_set="EBS_pollock" ){
     strata.limits = data.frame('STRATA'="All_areas")
     X_xtp = GOA_pcod_covariate_example$X_xtp
   }
+  if( tolower(data_set) %in% tolower(c("GOA_MICE_example")) ){
+    data( goa_mice_example, package="FishStatsUtils" )
+    sampling_data = goa_mice_example$Data_Geostat
+    F_tc = goa_mice_example$F_tc
+    sampling_data = sampling_data[ which(sampling_data[,'Year'] %in% unique(F_tc[,1])), ]
+    strata.limits = data.frame('STRATA'="All_areas")
+    F_ct = t( F_tc[which(F_tc[,'X'] %in% min(sampling_data[,'Year']):max(sampling_data[,'Year'])),-1] )
+    colnames(F_ct) = min(Data_Geostat[,'Year']):max(Data_Geostat[,'Year'])
+  }
   sampling_data = na.omit( sampling_data )
 
   Return = list("sampling_data"=sampling_data, "Region"=region, "strata.limits"=strata.limits)
   if( !is.null(X_xtp)) Return[["X_xtp"]] = X_xtp
   if( !is.null(X_gtp)) Return[["X_gtp"]] = X_gtp
-  if( !is.null(X_itp)) Return[["X_xtp"]] = X_itp
-  if( !is.null(Q_ik)) Return[["X_xtp"]] = Q_ik
+  if( !is.null(X_itp)) Return[["X_itp"]] = X_itp
+  if( !is.null(Q_ik)) Return[["Q_ik"]] = Q_ik
+  if( !is.null(F_ct)) Return[["F_ct"]] = F_ct
 
   # return stuff
   return(Return)
