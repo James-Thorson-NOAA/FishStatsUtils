@@ -1,10 +1,12 @@
 
 #' @export
-plot_lines = function( x, y, ybounds, fn=lines, col_bounds="black", bounds_type="whiskers", border=NA, border_lty="solid", ... ){
+plot_lines = function( x, y, ybounds, fn=lines, col_bounds="black", bounds_type="whiskers", border=NA,
+  border_lty="solid", lwd_bounds=1, ... ){
+
   fn( y=y, x=x, ... )
   if( bounds_type=="whiskers" ){
     for(t in 1:length(y)){
-      lines( x=rep(x[t],2), y=ybounds[t,], col=col_bounds, lty=border_lty)
+      lines( x=rep(x[t],2), y=ybounds[t,], col=col_bounds, lty=border_lty, lwd=lwd_bounds)
     }
   }
   if( bounds_type=="shading" ){

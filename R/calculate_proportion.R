@@ -6,7 +6,7 @@
 #'
 #' @param Index output from \code{FishStatsUtils::plot_biomass_index}
 #' @inheritParams plot_biomass_index
-#' @param ... list of settings to pass to \code{sdreport}
+#' @param ... list of arguments to pass to \code{plot_index}
 #'
 #' @return Tagged list of output
 #' \describe{
@@ -15,8 +15,9 @@
 #' }
 #'
 #' @export
-calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL, plot_legend=TRUE,
-  DirName=paste0(getwd(),"/"), PlotName="Proportion.png", interval_width=1, width=6, height=6, ... ){
+calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL,
+  plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), DirName=paste0(getwd(),"/"), PlotName="Proportion.png", PlotName2="Average.png",
+  interval_width=1, width=6, height=6, xlab="Category", ylab="Proportion", ... ){
 
   # Warnings and errors
   if( !all(TmbData[['FieldConfig']] %in% c(-2,-1)) ){
@@ -26,7 +27,7 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
   SE_Index_ctl = array(Index$Index_ctl[,,,'Std. Error'],dim=dim(Index$Index_ctl)[1:3])
 
   # Calculate proportions, and total biomass
-  Prop_ctl = Index_ctl / outer(rep(1,TmbData$n_c),apply(Index_ctl,MARGIN=2:3,FUN=sum))
+  Prop_ctl = Index_ctl / outer(rep(1,dim(Index_ctl)[1]),apply(Index_ctl,MARGIN=2:3,FUN=sum))
   Index_tl = apply(Index_ctl,MARGIN=2:3,FUN=sum)
   SE_Index_tl = sqrt(apply(SE_Index_ctl^2,MARGIN=2:3,FUN=sum,na.rm=TRUE))
 
@@ -46,30 +47,31 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
   # Median effective sample size across categories
   Neff_tl = apply(Neff_ctl, MARGIN=2:3, FUN=median, na.rm=TRUE)
 
-  # Fill in missing
-  if( is.null(Year_Set) ) Year_Set = 1:TmbData$n_t
-  if( is.null(Years2Include) ) Years2Include = 1:TmbData$n_t
-  if( is.null(strata_names) ) strata_names = 1:TmbData$n_l
-  if( is.null(category_names) ) category_names = 1:TmbData$n_c
+  # Plot
+  if( !is.na(PlotName) ){
+    plot_index( Index_ctl=Prop_ctl, sd_Index_ctl=sqrt(var_Prop_ctl), Year_Set=Year_Set, Years2Include=Years2Include,
+      strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
+      DirName=DirName, PlotName=PlotName, interval_width=interval_width, width=width, height=height,
+      xlab=xlab, ylab=ylab, scale="uniform", ... )
+  }
+
+  # Calculate weighted mean
+  sd_Mean_tl = Mean_tl = apply( Prop_ctl, MARGIN=2:3, FUN=function(vec){sum(vec*(1:length(vec)))} )
+  for( tI in 1:nrow(sd_Mean_tl)){
+  for( lI in 1:ncol(sd_Mean_tl)){
+    sd_Mean_tl[tI,lI] = sqrt(sum( var_Prop_ctl[,tI,lI] * (1:dim(var_Prop_ctl)[1] - Mean_tl[tI,lI])^2 ))
+  }}
 
   # Plot
-  Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(2,2,0,0), mfrow=c(ceiling(sqrt(TmbData$n_t)),ceiling(TmbData$n_t/ceiling(sqrt(TmbData$n_t)))), ... )
-  png( file=paste0(DirName,"/",PlotName), width=width, height=height, res=200, units="in")
-    par( Par )
-    for( tI in 1:TmbData$n_t ){
-      # Calculate y-axis limits
-      Ylim = c(0, max(Prop_ctl[,tI,]%o%c(1,1) + sqrt(var_Prop_ctl[,tI,])%o%c(-interval_width,interval_width),na.rm=TRUE))
-      # Plot stuff
-      plot(1, type="n", xlim=range(category_names), ylim=1.05*Ylim, xlab="", ylab="", main=ifelse(TmbData$n_t>1,paste0("Year ",Year_Set[tI]),"") )
-      for(l in 1:TmbData$n_l){
-        FishStatsUtils::plot_lines( y=Prop_ctl[,tI,l], x=1:TmbData$n_c+seq(-0.1,0.1,length=TmbData$n_l)[l], ybounds=Prop_ctl[,tI,]%o%c(1,1) + sqrt(var_Prop_ctl[,tI,])%o%c(-interval_width,interval_width), type="b", col=rainbow(TmbData[['n_l']])[l], col_bounds=rainbow(TmbData[['n_l']])[l], ylim=Ylim)
-      }
-      if(plot_legend==TRUE) legend( "top", bty="n", fill=rainbow(TmbData[['n_l']]), legend=as.character(strata_names), ncol=2 )
-    }
-    mtext( side=1:2, text=c("Age","Proportion of biomass"), outer=TRUE, line=c(0,0) )
-  dev.off()
+  if( !is.na(PlotName2) ){
+    plot_index( Index_ctl=1%o%Mean_tl, sd_Index_ctl=1%o%sd_Mean_tl, Year_Set=Year_Set, Years2Include=Years2Include,
+      strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
+      DirName=DirName, PlotName=PlotName2, interval_width=interval_width, width=width, height=height,
+      xlab=xlab, ylab="Category", scale="uniform", Yrange=c(NA,NA), ... )     # , Yrange=c(1,dim(var_Prop_ctl)[1])
+  }
 
   # Return stuff
-  Return = list("Prop_ctl"=Prop_ctl, "Neff_tl"=Neff_tl, "var_Prop_ctl"=var_Prop_ctl, "Index_tl"=Index_tl, "Neff_ctl"=Neff_ctl)
+  Return = list("Prop_ctl"=Prop_ctl, "Neff_tl"=Neff_tl, "var_Prop_ctl"=var_Prop_ctl, "Index_tl"=Index_tl, "Neff_ctl"=Neff_ctl,
+    "Mean_tl"=Mean_tl, "sd_Mean_tl"=sd_Mean_tl )
   return( invisible(Return) )
 }

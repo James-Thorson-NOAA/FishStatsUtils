@@ -4,10 +4,11 @@
 \alias{plot_data}
 \title{Plot location of sampling data}
 \usage{
-plot_data(Extrapolation_List, Spatial_List, Data_Geostat,
-  PlotDir = paste0(getwd(), "/"), Plot1_name = "Data_and_knots.png",
-  Plot2_name = "Data_by_year.png", col = rep("red",
-  nrow(Data_Geostat)), cex = 0.01, pch = 19, Year_Set, ...)
+plot_data(Extrapolation_List, Spatial_List, Data_Geostat = NULL,
+  Lat_i = Data_Geostat[, "Lat"], Lon_i = Data_Geostat[, "Lon"],
+  Year_i = Data_Geostat[, "Year"], PlotDir = paste0(getwd(), "/"),
+  Plot1_name = "Data_and_knots.png", Plot2_name = "Data_by_year.png",
+  col = "red", cex = 0.01, pch = 19, Year_Set, ...)
 }
 \arguments{
 \item{Extrapolation_List}{Output from \code{Prepare_Extrapolation_Data_Fn}}

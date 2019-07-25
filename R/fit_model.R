@@ -56,24 +56,11 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   extrapolation_args=list(), spatial_args=list(), optimize_args=list(), model_args=list(),
   silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
 
-  # Local function -- combine two lists
-  combine_lists = function( default, input ){
-    output = default
-    for( i in seq_along(input) ){
-      if( names(input)[i] %in% names(default) ){
-        output[[names(input)[i]]] = input[[i]]
-      }else{
-        output = c( output, input[i] )
-      }
-    }
-    return( output )
-  }
-
   # Assemble inputs
-  data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i )
+  data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_iz, "c_iz"=c_iz )
   # Decide which years to plot
   year_labels = seq( min(t_iz), max(t_iz) )
-  years_to_plot = which( unique(t_iz) %in% sort(unique(t_iz)))
+  years_to_plot = which( year_labels %in% t_iz )
 
   # Save record
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
@@ -96,7 +83,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   # Build data
   message("\n### Making data object") # VAST::
   data_list = VAST::make_data("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
-    "RhoConfig"=settings$RhoConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
+    "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, X_gtp=X_gtp, X_itp=X_itp, Q_ik=Q_ik, ... )
 
@@ -113,6 +100,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
     Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
       "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
       "settings"=settings, "extrapolation_args"=extrapolation_args, "model_args"=model_args)
+    class(Return) = "fit_model"
     return(Return)
   }
 
@@ -149,5 +137,116 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
     "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
     "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
     "extrapolation_args"=extrapolation_args, "model_args"=model_args, "optimize_args"=optimize_args)
+  class(Return) = "fit_model"
   return( Return )
 }
+
+#' Print parameter estimates and standard errors.
+#'
+#' @title Print parameter estimates
+#' @param x Output from \code{\link{fit_model}}
+#' @param ... Not used
+#' @return NULL
+#' @method print fit_model
+#' @export
+print.fit_model <- function(x, ...)
+{
+  cat("fit_model(.) result\n")
+  if( "parameter_estimates" %in% names(x) ){
+    print( x$parameter_estimates )
+  }else{
+    cat("`parameter_estimates` not available in `fit_model`\n")
+  }
+  invisible(x$parameter_estimates)
+}
+
+#' Print parameter estimates and standard errors.
+#'
+#' @title Print parameter estimates
+#' @param fit Output from \code{\link{fit_model}}
+#' @param what String specifying what elements of results to plot;  options include `extrapolation_grid`, `spatial_mesh`, and `results`
+#' @param ... Arguments passed to \code{\link{plot_results}}
+#' @return NULL
+#' @method plot fit_model
+#' @export plot
+#' @export
+plot.fit_model <- function(x, what="results", ...)
+{
+  ## Plot extrapolation-grid
+  if( length(grep(what, "extrapolation_grid")) ){
+    cat("\n### Running `plot.make_extrapolation_info`\n")
+    plot( x$extrapolation_list )
+    return(invisible(NULL))
+  }
+
+  ## Plot extrapolation-grid
+  if( length(grep(what, c("spatial_info","inla_mesh"))) ){
+    cat("\n### Running `plot.make_spatial_info`\n")
+    plot( x$spatial_list )
+    return(invisible(NULL))
+  }
+
+  # diagnostic plots
+  if( length(grep(what, "results")) ){
+    cat("\n### Running `plot_results`\n")
+    ans = plot_results( x, ... )
+    return(invisible(ans))
+  }
+
+  stop( "input `what` not matching available options" )
+}
+
+#' Extract summary of spatial estimates
+#'
+#' @title Extract spatial estimates
+#' @param fit Output from \code{\link{fit_model}}
+#' @param what Boolean indicating what to summarize; only option is `density`
+#' @param ... Not used
+#' @return NULL
+#' @method summary fit_model
+#' @export
+summary.fit_model <- function(x, what="density", ...)
+{
+  ans = NULL
+
+  if( tolower(what) == "density" ){
+    # Load location of extrapolation-grid
+    ans[["extrapolation_grid"]] = print( x$extrapolation_list, quiet=TRUE )
+
+    # Load density estimates
+    if( "D_gcy" %in% names(x$Report)){
+      ans[["Density_array"]] =  x$Report$D_gcy
+      if( !( x$settings$fine_scale==TRUE | x$spatial_list$Method=="Stream_network" ) ){
+        index_tmp = x$spatial_list$NN_Extrap$nn.idx[ which(x$extrapolation_list[["Area_km2_x"]]>0), 1 ]
+        ans[["Density_array"]] = ans[["Density_array"]][ index_tmp,,,drop=FALSE]
+      }
+      dimnames(ans[["Density_array"]]) = list( rownames(ans[["extrapolation_grid"]]), paste0("Category_",1:dim(ans[["Density_array"]])[[2]]), x$year_labels )
+      # Expand as grid
+      Density_dataframe = expand.grid("Grid"=1:dim(ans[["Density_array"]])[[1]], "Category"=dimnames(ans[["Density_array"]])[[2]], "Year"=dimnames(ans[["Density_array"]])[[3]])
+      Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Grid'],], "Density"=as.vector(ans[["Density_array"]]) )
+      ans[["Density_dataframe"]] = Density_dataframe
+      rownames(Density_dataframe) = NULL
+      cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object")
+      print(head(Density_dataframe))
+      print(tail(Density_dataframe))
+    }else{
+      stop( "`summary.fit_model` not implemented for the version of `VAST` being used" )
+    }
+  }
+
+  if( tolower(what) %in% c("parhat","estimates") ){
+    ans[["estimates"]] = x$ParHat
+    cat("\n### Printing slots of `ParHat`, and returning list in output object")
+    print(names(x$ParHat))
+  }
+
+  if( is.null(ans) ){
+    stop( "`summary.fit_model` not implemented for inputted value of argument `what`" )
+  }
+
+  # diagnostic plots
+  return(invisible(ans))
+}
+
+
+

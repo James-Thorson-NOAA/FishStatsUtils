@@ -12,7 +12,7 @@ plot_maps(plot_set = 3, MappingDetails, Report, PlotDF,
   Format = "png", zone = NA, Cex = 0.01, add = FALSE,
   category_names = NULL, textmargin = NULL, pch = NULL,
   Legend = list(use = FALSE, x = c(10, 30), y = c(10, 30)),
-  mfrow = NULL, plot_legend_fig = TRUE, ...)
+  mfrow = NULL, plot_legend_fig = TRUE, quiet = FALSE, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create

@@ -5,6 +5,7 @@
 \title{Plot shifts in distribution and area occupied}
 \usage{
 plot_range_index(Sdreport, Report, TmbData, Year_Set = NULL,
+  Years2Include = NULL, strata_names = NULL,
   PlotDir = paste0(getwd(), "/"), FileName_COG = paste0(PlotDir,
   "/center_of_gravity.png"), FileName_Area = paste0(PlotDir,
   "/Area.png"), FileName_EffArea = paste0(PlotDir,
@@ -20,6 +21,10 @@ plot_range_index(Sdreport, Report, TmbData, Year_Set = NULL,
 \item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
 
 \item{Year_Set}{Year names for plotting}
+
+\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+
+\item{strata_names}{names for spatial strata}
 
 \item{PlotDir}{Directory for plots}
 

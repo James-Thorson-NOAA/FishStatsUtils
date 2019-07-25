@@ -51,10 +51,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
          MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200,
          FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png",
          zone=NA, Cex=0.01, add=FALSE, category_names=NULL, textmargin=NULL, pch=NULL,
-         Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, ...){
-
-  # local functions
-  logsum = function(vec){ max(vec) + log(sum(exp(vec-max(vec)))) }
+         Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, quiet=FALSE, ...){
 
   # Fill in missing inputs
   if( "D_xt" %in% names(Report)){
@@ -129,30 +126,35 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
   }
 
   # Loop through plots
+  Return = NULL
   for(plot_num in plot_set){
 
     # Extract matrix to plot
     if(plot_num==1){
       # Presence/absence ("Pres")
+      if( quiet==FALSE ) message(" # Plotting presence/absense maps")
       if("D_xt"%in%names(Report)) Array_xct = Report$R1_xt
       if("D_xct"%in%names(Report)) Array_xct = Report$R1_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$R1_xcy
       #if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
+      if("D_gcy"%in%names(Report)) Array_xct = Report$R1_gcy
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("Not implemented for SpatialVAM")
-      message( "plot_num=1 doesn't work well when using ObsModel[2]==1" )
+      message( "`plot_num=1` doesn't work well when using ObsModel[2]==1, because average area-swept doesn't generally match area of extrapolation-grid cells" )
     }
     if(plot_num==2){
       # Positive values ("Pos")
+      if( quiet==FALSE ) message(" # Plotting positive catch rate maps")
       if("D_xt"%in%names(Report)) Array_xct = log(Report$R2_xt)
       if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct)
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy)
       #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy)
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
+      if("D_gcy"%in%names(Report)) Array_xct = Report$R2_gcy
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
+      message( "`plot_num=2` doesn't work well when using ObsModel[2]==1, because average area-swept doesn't generally match area of extrapolation-grid cells" )
     }
     if(plot_num==3){
       # Density ("Dens")
+      if( quiet==FALSE ) message(" # Plotting density maps")
       if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt)
       if("D_xct"%in%names(Report)) Array_xct = log(Report$D_xct)
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$D_xcy)
@@ -162,6 +164,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==4){
       # Positive values rescaled ("Pos_Rescaled")
+      stop( "`plot_num=4` is deprecated")
       if("D_xt"%in%names(Report)) Array_xct = log(Report$R2_xt+quantile(Report$R2_xt,0.25))
       if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct+quantile(Report$R2_xct,0.25))
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy+quantile(Report$R2_xcy,0.25))
@@ -171,6 +174,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==5){
       # Density rescaled ("Dens_Rescaled")
+      stop( "`plot_num=5` is deprecated")
       if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt+quantile(Report$D_xt,0.25))
       if("D_xct"%in%names(Report)) Array_xct = log(Report$D_xct+quantile(Report$D_xct,0.25))
       if("D_xcy"%in%names(Report)) Array_xct = log(Report$D_xcy+quantile(Report$D_xcy,0.25))
@@ -180,6 +184,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==6){
       # Epsilon for presence/absence ("Eps_Pres")
+      if( quiet==FALSE ) message(" # Plotting spatio-temporal variation in 1st linear predictor")
       if("D_xt"%in%names(Report)) Array_xct = Report$Epsilon1_st
       if("D_xct"%in%names(Report)) Array_xct = Report$Epsilon1_sct
       if("D_xcy"%in%names(Report)) Array_xct = Report$Epsilon1_sct
@@ -188,6 +193,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==7){
       # Epsilon for positive values ("Eps_Pos")
+      if( quiet==FALSE ) message(" # Plotting spatio-temporal variation in 2nd linear predictor")
       if("D_xt"%in%names(Report)) Array_xct = Report$Epsilon2_st
       if("D_xct"%in%names(Report)) Array_xct = Report$Epsilon2_sct
       if("D_xcy"%in%names(Report)) Array_xct = Report$Epsilon2_sct
@@ -196,6 +202,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==8){
       # Linear predictor for probability of encounter
+      if( quiet==FALSE ) message(" # Plotting 1st predictor after action of link function")
       if("D_xt"%in%names(Report)) Array_xct = Report$P1_xt
       if("D_xct"%in%names(Report)) Array_xct = Report$P1_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$P1_xcy
@@ -204,6 +211,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==9){
       # Linear predictor for positive catch rates
+      if( quiet==FALSE ) message(" # Plotting 2nd predictor after action of link function")
       if("D_xt"%in%names(Report)) Array_xct = Report$P2_xt
       if("D_xct"%in%names(Report)) Array_xct = Report$P2_xct
       if("D_xcy"%in%names(Report)) Array_xct = Report$P2_xcy
@@ -212,6 +220,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==10){
       # Density ("Dens") CV             # Index_xtl
+      if( quiet==FALSE ) message(" # Plotting density maps")
       if( is.null(Sdreport) ) stop("Must supply 'Sdreport' if 'plot_num=10'")
       if("D_xt"%in%names(Report)){
         if( !("log(Index_xtl)" %in% rownames(TMB::summary.sdreport(Sdreport))) ) stop("Please re-run with Options('SD_site_logdensity'=1,...) to use 'plot_num=10' in 'SpatialDeltaGLMM'")
@@ -231,6 +240,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
     }
     if(plot_num==11){
+      if( quiet==FALSE ) message(" # Plotting covariates")
       if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
       if(!("X_xtp" %in% names(TmbData))) stop( "Can only plot covariates for VAST version >= 2.0.0" )
       Array_xct = aperm( TmbData$X_xtp, perm=c(1,3,2) )
@@ -238,14 +248,18 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==12){
       # Total density ("Dens")
+      if( quiet==FALSE ) message(" # Plotting covariate effects for 1st linear predictor")
       if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt)
-      if("D_xct"%in%names(Report)) Array_xct = log(apply(Report$D_xct,FUN=sum,MARGIN=c(1,3)))
-      if("D_xcy"%in%names(Report)) Array_xct = log(apply(Report$D_xcy,FUN=sum,MARGIN=c(1,3)))
-      if("dhat_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dhat_ktp,c(1,3,2)),FUN=logsum,MARGIN=c(1,3))
-      if("dpred_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dpred_ktp,c(1,3,2)),FUN=logsum,MARGIN=c(1,3))
+      if("D_xct"%in%names(Report)) Array_xct = log(apply(Report$D_xct, FUN=sum, MARGIN=c(1,3)))
+      if("D_xcy"%in%names(Report)) Array_xct = log(apply(Report$D_xcy, FUN=sum, MARGIN=c(1,3)))
+      if("D_gcy"%in%names(Report)) Array_xct = log(apply(Report$D_gcy, FUN=sum, MARGIN=c(1,3)))
+      logsum = function(vec){ max(vec) + log(sum(exp(vec-max(vec)))) }
+      if("dhat_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dhat_ktp,c(1,3,2)), FUN=logsum, MARGIN=c(1,3))
+      if("dpred_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dpred_ktp,c(1,3,2)), FUN=logsum, MARGIN=c(1,3))
     }
     if(plot_num==13){
       # Covariate effects for probability of encounter
+      if( quiet==FALSE ) message(" # Plotting covariate effects for 1st linear predictor")
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$eta1_xct
@@ -255,6 +269,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
     }
     if(plot_num==14){
       # Covariate effects for positive catch rates
+      if( quiet==FALSE ) message(" # Plotting covariate effects for 2nd linear predictor")
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$eta2_xct
@@ -292,6 +307,7 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
       }
     }
   }
+  if( is.null(Return) & quiet==FALSE ) message(" # No plots selected in `plot_set`")
 
   return( invisible(Return) )
 }

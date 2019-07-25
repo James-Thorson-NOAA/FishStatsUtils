@@ -8,12 +8,12 @@
 #' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"
 #' @param strata.limits an input for determining stratification of indices (see example script)
 #' @param zone UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples
-#' @param observations_LL a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation (only used when Region doesn't match known entries)
-#' @param input_grid a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid (only used when \code{Region=="User"})
-#' @param grid_dim_km numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region} doesn't match existing options
-#' @param maximum_distance_from_sample maximum distance that an extrapolation grid cell can be from the nearest sample and still be included in area-weighted extrapolation of density; only used if \code{Region} doesn't match existing options
-#' @param grid_dim_LL same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region} doesn't match existing options
-#' @param grid_in_UTM Boolean stating whether to automatically generate an extrapolation grid based on sampling locations in km within the UTM projection of within Lat-Lon coordinates; only used if \code{Region} doesn't match existing options
+#' @param observations_LL a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="user"}
+#' @param input_grid a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}
+#' @param grid_dim_km numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region="other"}
+#' @param maximum_distance_from_sample maximum distance that an extrapolation grid cell can be from the nearest sample and still be included in area-weighted extrapolation of density; only used if \code{Region="other"}
+#' @param grid_dim_LL same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region="other"}
+#' @param grid_in_UTM Boolean stating whether to automatically generate an extrapolation grid based on sampling locations in km within the UTM projection of within Lat-Lon coordinates; only used if \code{Region="other"}
 #' @param strata_to_use strata to include by default for the BC coast extrapolation grid; only used if \code{Region="british_columbia"}
 #' @param survey survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}
 #' @param region which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}
@@ -118,5 +118,53 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
   }
 
   # Return
+  class(Return) = "make_extrapolation_info"
   return( Return )
+}
+
+#' Plot extrapolation-grid used for spatial inference
+#'
+#' @title Plot extrapolation-grid
+#' @param x Output from \code{\link{make_extrapolation_info}}
+#' @param ... Not used
+#' @return NULL
+#' @method plot make_extrapolation_info
+#' @export
+plot.make_extrapolation_info <- function(x, cex=0.01, ...)
+{
+  par( mfrow=c(1,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
+  plot( x$Data_Extrap[which(x$Area_km2_x>0),c('Lon','Lat')], cex=cex, main="Extrapolation (Lat-Lon)", ... )
+  map( "world", add=TRUE )
+  if( !any(is.na(x$Data_Extrap[,c('E_km','N_km')])) ){
+    plot( x$Data_Extrap[which(x$Area_km2_x>0),c('E_km','N_km')], cex=cex, main="Extrapolation (North-East)", ... )
+  }
+
+  invisible(x)
+}
+
+#' Extract extrapolation-grid used for spatial inference
+#'
+#' @title Extract extrapolation-grid
+#' @param x Output from \code{\link{make_extrapolation_info}}
+#' @param quiet Boolean indicating whether to print to terminal or not
+#' @param ... Not used
+#' @return Data frame of Latitude and Longitude for each extrapolation-grid cell
+#' @method print make_extrapolation_info
+#' @export
+print.make_extrapolation_info <- function(x, quiet=FALSE, ...)
+{
+  loc_gz = cbind( x$Data_Extrap[,c('Lon','Lat')], "Area_km2"=x$Area_km2_x )[ which(x$Area_km2_x>0), ]
+  rownames(loc_gz) = paste0("Grid_",1:nrow(loc_gz))
+  #ans = c( x[c('zone','flip_around_dateline')], list("extrapolation_grid"=loc_gz) )
+
+  if(quiet==FALSE){
+    cat("make_extrapolation_info(.) result\n")
+    print( summary(loc_gz) )
+    cat( paste0("\nUTM zone: ",x$zone,"\n") )
+    if( x$flip_around_dateline == TRUE ){
+      cat( "Note: Longitude was translated away from dateline (by adding 180, to avoid dateline projection issues in PBSmapping) prior projection using the UTM zone listed above\n" )
+    }
+  }
+
+  invisible(loc_gz)
 }

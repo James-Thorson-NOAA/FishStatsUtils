@@ -20,7 +20,8 @@ PlotMap_Fn <-
 function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Xlim, Ylim, FileName=paste0(getwd(),"/"), Year_Set,
          Rescale=FALSE, Rotate=0, Format="png", Res=200, zone=NA, Cex=0.01, textmargin="", add=FALSE, pch=15,
          outermargintext=c("Eastings","Northings"), zlim=NULL, Col=NULL,
-         Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE, ...){
+         Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE,
+         map_style="rescale", ...){
 
   # Check for problems
   if( length(Year_Set) != ncol(Mat) ){
@@ -67,12 +68,19 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
       }else{
         # If not rotating:  Use simple plot
         if( Rotate==0 ){
-          Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE)
-          plot( 1, type="n", ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), xaxt="n", yaxt="n", xlab="", ylab="" )
-          map( Map, add=TRUE )  # , col=land_color, fill=TRUE ->  Using land-fill color produces weird plotting artefacts
-          #map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE)
           Col_Bin = ceiling( f(Mat[Which,,drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
-          points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
+          if( map_style=="rescale" ){
+            # Make plot size using plot(.)
+            plot( 1, type="n", ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), xaxt="n", yaxt="n", xlab="", ylab="" )
+            points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
+            Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE)
+            map( Map, add=TRUE ) #, col=land_color, fill=TRUE )  # ->  Using land-fill color produces weird plotting artefacts
+          }else{
+            # Make plot size using map(.)
+            map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE, fill=FALSE, mar=c(0.1,0.1,par("mar")[3],0), myborder=0 )
+            points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
+            map(MappingDetails[[1]], MappingDetails[[2]], plot=TRUE, col=land_color, fill=TRUE, add=TRUE )
+          }
         }
         # If rotating:  Record all polygons; Rotate them and all points;  Plot rotated polygons;  Plot points
         if( Rotate!=0 ){
@@ -94,7 +102,7 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
           tmpUTM_rotated <- maptools::elide( tmpUTM, rotate=Rotate)
           plot( 1, type="n", xlim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x']), ylim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y']), xaxt="n", yaxt="n" )
           Col_Bin = ceiling( f(tmpUTM_rotated@data[-c(1:nrow(Tmp1)),-c(1:2),drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
-          if( ignore.na==FALSE && any(Col_Bin<1 | Col_Bin>50) ) stop("zlim doesn't span the range of the variable")
+          if( ignore.na==FALSE && any(Col_Bin<1 | Col_Bin>length(Col)) ) stop("zlim doesn't span the range of the variable")
           points(x=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x'], y=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y'], col=Col[Col_Bin], cex=Cex, pch=pch)
           # Plot map features
           lev = levels(as.factor(tmpUTM_rotated@data$PID))

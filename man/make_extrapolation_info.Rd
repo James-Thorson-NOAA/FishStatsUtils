@@ -19,17 +19,17 @@ make_extrapolation_info(Region, zone = NA,
 
 \item{strata.limits}{an input for determining stratification of indices (see example script)}
 
-\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid (only used when \code{Region=="User"})}
+\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}}
 
-\item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation (only used when Region doesn't match known entries)}
+\item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="user"}}
 
-\item{grid_dim_km}{numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region} doesn't match existing options}
+\item{grid_dim_km}{numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region="other"}}
 
-\item{maximum_distance_from_sample}{maximum distance that an extrapolation grid cell can be from the nearest sample and still be included in area-weighted extrapolation of density; only used if \code{Region} doesn't match existing options}
+\item{maximum_distance_from_sample}{maximum distance that an extrapolation grid cell can be from the nearest sample and still be included in area-weighted extrapolation of density; only used if \code{Region="other"}}
 
-\item{grid_in_UTM}{Boolean stating whether to automatically generate an extrapolation grid based on sampling locations in km within the UTM projection of within Lat-Lon coordinates; only used if \code{Region} doesn't match existing options}
+\item{grid_in_UTM}{Boolean stating whether to automatically generate an extrapolation grid based on sampling locations in km within the UTM projection of within Lat-Lon coordinates; only used if \code{Region="other"}}
 
-\item{grid_dim_LL}{same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region} doesn't match existing options}
+\item{grid_dim_LL}{same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region="other"}}
 
 \item{region}{which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}}
 

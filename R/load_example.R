@@ -3,7 +3,7 @@
 #'
 #' \code{load_example} loads a catch and effort data set from multiple surveys worldwide
 #'
-#' Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
+#' Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", "covariate_example", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
 #'
 #' @param data_set data set to load
 #'
@@ -28,8 +28,12 @@ load_example = function( data_set="EBS_pollock" ){
                    "lingcod_comp_expansion" = tolower("California_current"),
                    "ordination" = tolower("Eastern_Bering_Sea"),
                    "five_species_ordination" = tolower("Eastern_Bering_Sea"),
+                   "covariate_example" = tolower("Gulf_of_Alaska"),
+                   "goa_pcod_covariate_example" = tolower("Gulf_of_Alaska"),
+                   "goa_mice_example" = tolower("Gulf_of_Alaska"),
                    tolower("Other") )
 
+  F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
     Year = as.numeric(sapply(WCGBTS_Canary_example[,'PROJECT_CYCLE'], FUN=function(Char){strsplit(as.character(Char)," ")[[1]][2]}))
@@ -117,8 +121,30 @@ load_example = function( data_set="EBS_pollock" ){
     sampling_data = five_species_ordination_example
     strata.limits = data.frame('STRATA'="All_areas")
   }
+  if( tolower(data_set) %in% tolower(c("covariate_example","GOA_pcod_covariate_example")) ){
+    data( GOA_pcod_covariate_example, package="FishStatsUtils" )
+    sampling_data = GOA_pcod_covariate_example$sampling_data
+    strata.limits = data.frame('STRATA'="All_areas")
+    X_xtp = GOA_pcod_covariate_example$X_xtp
+  }
+  if( tolower(data_set) %in% tolower(c("GOA_MICE_example")) ){
+    data( goa_mice_example, package="FishStatsUtils" )
+    sampling_data = goa_mice_example$Data_Geostat
+    F_tc = goa_mice_example$F_tc
+    sampling_data = sampling_data[ which(sampling_data[,'Year'] %in% unique(F_tc[,1])), ]
+    strata.limits = data.frame('STRATA'="All_areas")
+    F_ct = t( F_tc[which(F_tc[,'X'] %in% min(sampling_data[,'Year']):max(sampling_data[,'Year'])),-1] )
+    colnames(F_ct) = min(sampling_data[,'Year']):max(sampling_data[,'Year'])
+  }
   sampling_data = na.omit( sampling_data )
 
   Return = list("sampling_data"=sampling_data, "Region"=region, "strata.limits"=strata.limits)
+  if( !is.null(X_xtp)) Return[["X_xtp"]] = X_xtp
+  if( !is.null(X_gtp)) Return[["X_gtp"]] = X_gtp
+  if( !is.null(X_itp)) Return[["X_itp"]] = X_itp
+  if( !is.null(Q_ik)) Return[["Q_ik"]] = Q_ik
+  if( !is.null(F_ct)) Return[["F_ct"]] = F_ct
+
+  # return stuff
   return(Return)
 }
