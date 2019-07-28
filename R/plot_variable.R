@@ -31,7 +31,7 @@ plot_variable <-
 function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution="medium",
          file_name="density", working_dir=paste0(getwd(),"/"), Format="png", Res=200, textmargin="", add=FALSE,
          outermargintext=c("Eastings","Northings"), zlim, col, mar=c(0,0,2,0), oma=c(4,4,0,0),
-         legend_x=c(0,0.05), legend_y=c(0,0.4), mfrow, land_color="grey",
+         legend_x=c(0,0.05), legend_y=c(0.05,0.45), mfrow, land_color="grey",
          ...){
 
   ###################
@@ -45,7 +45,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   if( missing(zlim)){
     zlim = range(Y_gt, na.rm=TRUE)
   }
-  if( missing(map_list) ){
+  if( missing(map_list) || is.null(map_list$MapSizeRatio) ){
     MapSizeRatio = c(3, 3)
   }else{
     MapSizeRatio = map_list$MapSizeRatio
@@ -65,8 +65,14 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   if( missing(col)){
     col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
   }
-  if( is.function(col)) col = col(1000)
-
+  if( is.function(col)){
+    col = col(1000)
+  }
+  if( all(is.numeric(c(legend_x,legend_y))) ){
+    if( any(c(legend_x,legend_y)>1) | any(c(legend_x,legend_y)<0) ){
+      stop("Check values for `legend_x` and `legend_y`")
+    }
+  }
   # Location of extrapolation-grid cells
   loc_g = map_list$PlotDF[which(map_list$PlotDF[,'Include']>0),c('Lon','Lat')]
 
@@ -85,19 +91,19 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   # Define device
   Par = list( mfrow=mfrow, mar=mar, oma=oma, ...)
   if(Format=="png"){
-    png(file=file.path(working_dir, paste0(file_name,".png")),
+    png(file=paste0(working_dir,file_name,".png"),
         width=Par$mfrow[2]*MapSizeRatio[2],
         height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )
   }
   if(Format=="jpg"){
-    jpeg(file=paste0(FileName, paste0(file_name,".jpg")),
+    jpeg(file=paste0(working_dir,file_name,".jpg"),
          width=Par$mfrow[2]*MapSizeRatio[2],
          height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )
   }
   if(Format%in%c("tif","tiff")){
-    tiff(file=paste0(FileName, paste0(file_name,".tif")),
+    tiff(file=paste0(working_dir,file_name,".tif"),
          width=Par$mfrow[2]*MapSizeRatio[2],
          height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )

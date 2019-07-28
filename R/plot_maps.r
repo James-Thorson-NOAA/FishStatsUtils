@@ -4,6 +4,8 @@
 #' @description
 #' \code{plot_maps} plots a standard set of diagnostic maps
 #'
+#' @inheritParams FishStatsUtils::plot_variable
+
 #' @param plot_set integer-vector defining plots to create
 #' \describe{
 #'   \item{plot_set=1}{Probability of encounter/non-encounter}
@@ -21,37 +23,25 @@
 #'   \item{plot_set=13}{Covariate effects on encounter probability}
 #'   \item{plot_set=14}{Covariate effects on positive catch rates}
 #' }
-#' @param MappingDetails tagged list of plot-settings from \code{MapDetails_Fn}
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
-#' @param Nknots Number of knots used for plotting (default is all grid cells in \code{Extrapolation_grid}
 #' @param Panel Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure
 #' @param MapSizeRatio Default size for each panel
-#' @param Ylim ylimits for each panel
-#' @param Xlim xlimits for each panel
-#' @param FileName Directory (absolute path) and base for filenames of plots
 #' @param Year_Set Year names for labeling panels
 #' @param Years2Include integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)
 #' @param category_names character vector specifying names for different categories (only used for R package \code{VAST})
-#' @param Legend tagged list specifying insert colorbar
-#' \describe{
-#'   \item{use}{Boolean whether to plot insert colorbar or not}
-#'   \item{x}{Left and right-hand limits for legend in percentage of panel}
-#'   \item{y}{bottom and top limits for legend in percentage of panel}
-#' }
-#' @param ... arguments passed to \code{PlotMap_Fn}
+#' @param ... arguments passed to \code{FishStatsUtils::plot_variable}
 #'
 #' @return Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}
 #'
 
 #' @export
 plot_maps <-
-function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
-         TmbData=NULL, Nknots=Inf, Panel="Category",
-         MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200,
-         FileName=paste0(getwd(),"/"), Year_Set=NULL, Years2Include=NULL, Rescale=FALSE, Rotate=0, Format="png",
-         zone=NA, Cex=0.01, add=FALSE, category_names=NULL, textmargin=NULL, pch=NULL,
-         Legend=list("use"=FALSE,"x"=c(10,30),"y"=c(10,30)), mfrow=NULL, plot_legend_fig=TRUE, quiet=FALSE, ...){
+function(plot_set=3, Report, PlotDF, Sdreport=NULL,
+         TmbData=NULL, Panel="Category", projargs='+proj=longlat',
+         MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200, Legend=NULL,
+         Year_Set=NULL, Years2Include=NULL, category_names=NULL, textmargin=NULL, quiet=FALSE,
+         working_dir=paste0(getwd(),"/"), ...){
 
   # Fill in missing inputs
   if( "D_xt" %in% names(Report)){
@@ -115,14 +105,6 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
   plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV", "Covariates", "Total_dens", "Cov_effects_Pres", "Cov_effects_Pos")
   if( is.null(textmargin)){
     textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value", "Density, ln(kg. per square km.)", "", "")
-  }
-
-  # Select locations to plot
-  if( Nknots<Inf ){
-    NN_plot = stats::kmeans(x=PlotDF[,c("Lon","Lat")], centers=Nknots, iter.max=50, nstart=2, trace=0)
-    Match = match( 1:Nknots, NN_plot$cluster)
-    PlotDF = PlotDF[Match,]
-    message( "Restricted plotting locations to ", Nknots, " locations" )
   }
 
   # Loop through plots
@@ -287,9 +269,11 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
         if(length(dim(Array_xct))==3) Return = Mat_xt = Array_xct[,cI,]
 
         # Do plot
-        if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
-        if(add==FALSE) par( mfrow=mfrow )
-        PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xt[,Years2Include,drop=FALSE], PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",category_names[cI]),"")), Year_Set=Year_Set[Years2Include], Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+        #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
+        #if(add==FALSE) par( mfrow=mfrow )
+        plot_variable( Y_gt=Mat_xt[,Years2Include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
+          panel_labels=Year_Set[Years2Include], file_name=plot_codes[plot_num], ... )
+
       }
     }
     # Plot for each year
@@ -301,9 +285,10 @@ function(plot_set=3, MappingDetails, Report, PlotDF, Sdreport=NULL, Xlim, Ylim,
         Return = Mat_xc = array( as.vector(Mat_xc), dim=c(dim(Array_xct)[1],Ncategories)) # Reformat to make sure it has same format for everything
 
         # Do plot
-        if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(category_names))), ceiling(length(category_names)/ceiling(sqrt(length(category_names)))))
-        if(add==FALSE) par( mfrow=mfrow )
-        PlotMap_Fn( MappingDetails=MappingDetails, Mat=Mat_xc, PlotDF=PlotDF, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(FileName,plot_codes[plot_num],ifelse(Nplot>1,paste0("--",Year_Set[Years2Include][tI]),"")), Year_Set=category_names, Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin[plot_num], add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
+        #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(category_names))), ceiling(length(category_names)/ceiling(sqrt(length(category_names)))))
+        #if(add==FALSE) par( mfrow=mfrow )
+        plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
+          panel_labels=category_names, file_name=plot_codes[plot_num], ... )
       }
     }
   }
