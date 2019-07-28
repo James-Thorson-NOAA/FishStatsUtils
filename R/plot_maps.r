@@ -102,7 +102,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL,
   }
 
   # Extract elements
-  plot_codes <- c("Pres", "Pos", "Dens", "Pos_Rescaled", "Dens_Rescaled", "Eps_Pres", "Eps_Pos", "LinPred_Pres", "LinPred_Pos", "Dens_CV", "Covariates", "Total_dens", "Cov_effects_Pres", "Cov_effects_Pos")
+  plot_codes <- c("encounter_prob", "pos_catch", "density", "", "", "epsilon_1", "epsilon_2", "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates", "total_density", "covariate_effects_1", "covariate_effects_2")
   if( is.null(textmargin)){
     textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value", "Density, ln(kg. per square km.)", "", "")
   }
@@ -147,22 +147,10 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL,
     if(plot_num==4){
       # Positive values rescaled ("Pos_Rescaled")
       stop( "`plot_num=4` is deprecated")
-      if("D_xt"%in%names(Report)) Array_xct = log(Report$R2_xt+quantile(Report$R2_xt,0.25))
-      if("D_xct"%in%names(Report)) Array_xct = log(Report$R2_xct+quantile(Report$R2_xct,0.25))
-      if("D_xcy"%in%names(Report)) Array_xct = log(Report$R2_xcy+quantile(Report$R2_xcy,0.25))
-      #if("D_gcy"%in%names(Report)) Array_xct = log(Report$R2_gcy+quantile(Report$R2_gcy,0.25))
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
-      if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==5){
       # Density rescaled ("Dens_Rescaled")
       stop( "`plot_num=5` is deprecated")
-      if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt+quantile(Report$D_xt,0.25))
-      if("D_xct"%in%names(Report)) Array_xct = log(Report$D_xct+quantile(Report$D_xct,0.25))
-      if("D_xcy"%in%names(Report)) Array_xct = log(Report$D_xcy+quantile(Report$D_xcy,0.25))
-      #if("D_gcy"%in%names(Report)) Array_xct = log(Report$D_gcy+quantile(Report$D_gcy,0.25))
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
-      if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==6){
       # Epsilon for presence/absence ("Eps_Pres")
