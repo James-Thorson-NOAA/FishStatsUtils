@@ -37,10 +37,8 @@
 
 #' @export
 plot_maps <-
-function(plot_set=3, Report, PlotDF, Sdreport=NULL,
-         TmbData=NULL, Panel="Category", projargs='+proj=longlat',
-         MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Res=200, Legend=NULL,
-         Year_Set=NULL, Years2Include=NULL, category_names=NULL, textmargin=NULL, quiet=FALSE,
+function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+proj=longlat',
+         Panel="Category", Year_Set=NULL, Years2Include=NULL, category_names=NULL, quiet=FALSE,
          working_dir=paste0(getwd(),"/"), ...){
 
   # Fill in missing inputs
@@ -275,7 +273,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL,
         # Do plot
         #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(category_names))), ceiling(length(category_names)/ceiling(sqrt(length(category_names)))))
         #if(add==FALSE) par( mfrow=mfrow )
-        plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
+        plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
           panel_labels=category_names, file_name=plot_codes[plot_num], ... )
       }
     }

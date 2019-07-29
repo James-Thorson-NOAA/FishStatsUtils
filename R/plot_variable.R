@@ -149,5 +149,5 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   if(add==FALSE) mtext(side=2, outer=TRUE, outermargintext[2], cex=1.75, line=par()$oma[2]/2)
 
   # return stuff as necessary
-  return( invisible(list("Par"=Par)) )
+  return( invisible(list("Par"=Par,"cell.size"=cell.size)) )
 }

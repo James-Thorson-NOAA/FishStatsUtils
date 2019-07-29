@@ -5,11 +5,9 @@
 \title{Plot standard maps}
 \usage{
 plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
-  TmbData = NULL, Panel = "Category", projargs = "+proj=longlat",
-  MapSizeRatio = c(`Width(in)` = 4, `Height(in)` = 4), Res = 200,
-  Legend = NULL, Year_Set = NULL, Years2Include = NULL,
-  category_names = NULL, textmargin = NULL, quiet = FALSE,
-  working_dir = paste0(getwd(), "/"), ...)
+  TmbData = NULL, projargs = "+proj=longlat", Panel = "Category",
+  Year_Set = NULL, Years2Include = NULL, category_names = NULL,
+  quiet = FALSE, working_dir = paste0(getwd(), "/"), ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -36,8 +34,6 @@ plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
 
 \item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
 
-\item{MapSizeRatio}{Default size for each panel}
-
 \item{Year_Set}{Year names for labeling panels}
 
 \item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
@@ -45,6 +41,8 @@ plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
 \item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
+
+\item{MapSizeRatio}{Default size for each panel}
 }
 \value{
 Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}

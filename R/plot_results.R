@@ -19,7 +19,7 @@
 #' @export
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
-  check_residuals=TRUE, ... ){
+  check_residuals=TRUE, projargs='+proj=longlat', ... ){
 
   # Check for known issues
   if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
