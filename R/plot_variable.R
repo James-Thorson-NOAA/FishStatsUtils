@@ -1,12 +1,10 @@
 #' @title
-#' Plot maps with areal results
+#' Plot results on a multi-panel figure of maps
 #'
 #' @description
-#' \code{PlotMap_Fn} is a hidden function to plot a map and fill in regions with colors to represent intensity in an areal-interpretion of model results
+#' \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 #'
-#' @inheritParams FishStatsUtils::plot_maps
 #' @inheritParams sp::CRS
-#' @inheritParams par
 #'
 #' @param Y_gt matrix where values for every column are plotted as a map
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
@@ -20,11 +18,6 @@
 #'
 #' @param ... arguments passed to \code{par}
 #'
-#' @details
-#' This function was necessary to build because \code{mapproj::mapproject} as used in \code{maps::map} has difficulties with both rotations (for most projections) and
-#' truncating the cocuntry boundaries within the plotting region (which \code{mapproj::mapproject} appears to do prior to projection,
-#' so that the post-projection is often missing boundaries that are within the plotting rectangle).  I use rectangular projections by default, but Lamberts or Albers conformal
-#' projections would also be useful for many cases.
 
 #' @export
 plot_variable <-

@@ -11,13 +11,9 @@
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
 #' @inheritParams TMBhelper::fit_tmb
-#' @param extrapolation_args tagged list of optional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}
-#' @param spatial_args tagged list of optional arguments to pass to \code{FishStatsUtils::make_spatial_info}
-#' @param optimize_args tagged list of optional arguments to pass to \code{TMBhelper::Optimize}
-#' @param model_args tagged list of optional arguments to pass to \code{VAST::make_model}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
-#' @param ... additional parameters to pass to \code{VAST::make_data}
+#' @param ... additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function
 #'
 #' @return Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates
 #'
@@ -53,8 +49,13 @@
 fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
-  extrapolation_args=list(), spatial_args=list(), optimize_args=list(), model_args=list(),
   silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
+
+  # Capture extra arguments to function
+  extra_args = list(...)
+  # Backwards-compatible way to capture previous format to input extra arguments for each function via specific input-lists
+  extra_args = c( extra_args, extra_args$extrapolation_args, extra_args$spatial_args, extra_args$optimize_args, extra_args$model_args )
+  print(extra_args)
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_iz, "c_iz"=c_iz )
@@ -69,29 +70,36 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
-  extrapolation_args = combine_lists( input=extrapolation_args, default=list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone) )
-  extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args )
+  extrapolation_args_default = list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone)
+  extrapolation_args_input = extra_args[intersect(names(extra_args),formalArgs(make_extrapolation_info))]
+  extrapolation_args_input = combine_lists( input=extrapolation_args_input, default=extrapolation_args_default )
+  extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
 
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
-  spatial_args = combine_lists( input=spatial_args, default=list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
-    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale) )
-  #spatial_list = make_spatial_info( grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
-  #  Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale )
-  spatial_list = do.call( what=make_spatial_info, args=spatial_args )
+  spatial_args_default = list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
+    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale)
+  spatial_args_input = extra_args[intersect(names(extra_args),formalArgs(make_spatial_info))]
+  spatial_args_input = combine_lists( input=spatial_args_input, default=spatial_args_default )
+  spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
   # Build data
   message("\n### Making data object") # VAST::
-  data_list = VAST::make_data("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
+  data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
-    Xconfig_zcp=Xconfig_zcp, X_gtp=X_gtp, X_itp=X_itp, Q_ik=Q_ik, ... )
+    Xconfig_zcp=Xconfig_zcp, X_gtp=X_gtp, X_itp=X_itp, Q_ik=Q_ik)
+  data_args_input = extra_args[intersect(names(extra_args),formalArgs(make_data))]
+  data_args_input = combine_lists( input=data_args_input, default=data_args_default )
+  data_list = do.call( what=make_data, args=data_args_input )
 
   # Build object
   message("\n### Making TMB object")
-  model_args = combine_lists( input=model_args, default=list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
-    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method) )
-  tmb_list = do.call( what=VAST::make_model, args=model_args )  # VAST::
+  model_args_default = list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
+    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method)
+  model_args_input = extra_args[intersect(names(extra_args),formalArgs(make_model))]
+  model_args_input = combine_lists( input=model_args_input, default=model_args_default )
+  tmb_list = do.call( what=make_model, args=model_args_input )
   if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
   # Run the model or optionally don't
@@ -99,17 +107,19 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
     # Build and output
     Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
       "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
-      "settings"=settings, "extrapolation_args"=extrapolation_args, "model_args"=model_args)
+      "settings"=settings)
     class(Return) = "fit_model"
     return(Return)
   }
 
   # Optimize object
   message("\n### Estimating parameters")
-  optimize_args_phase1 = combine_lists( default=optimize_args, input=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+  optimize_args_default1 = extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))]
+  optimize_args_input1 = list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
     savedir=NULL, getsd=FALSE, newtonsteps=0, bias.correct=FALSE, quiet=TRUE,
-    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2) )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_phase1 )
+    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2)
+  optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1 )
+  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
   if(exists("check_fit") & test_fit==TRUE ){
@@ -121,22 +131,27 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   }
 
   # Restart estimates after checking parameters
-  optimize_args_phase2 = combine_lists( input=optimize_args, default=list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
+  optimize_args_default2 = list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
     savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
     bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
-    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1) )
-  optimize_args_phase2 = combine_lists( input=list(startpar=parameter_estimates$par), default=optimize_args_phase2 )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_phase2 )
+    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1)
+  optimize_args_input2 = extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))]
+  optimize_args_input2 = combine_lists( input=optimize_args_input2, default=optimize_args_default2 )
+  optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates$par), default=optimize_args_input2 )
+  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 
   # Extract standard outputs
   Report = tmb_list$Obj$report()
   ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
 
   # Build and output
+  input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
+    "model_args_input"=model_args_input, "spatial_args_input"=spatial_args_input,
+    "optimize_args_input1"=optimize_args_input1, "optimize_args_input2"=optimize_args_input2)
   Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
     "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
     "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
-    "extrapolation_args"=extrapolation_args, "model_args"=model_args, "optimize_args"=optimize_args)
+    "input_args"=input_args )
   class(Return) = "fit_model"
   return( Return )
 }

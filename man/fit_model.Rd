@@ -7,9 +7,7 @@
 fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
   length(b_i)), working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
   X_gtp = NULL, X_itp = NULL, Q_ik = NULL, newtonsteps = 1,
-  extrapolation_args = list(), spatial_args = list(),
-  optimize_args = list(), model_args = list(), silent = TRUE,
-  run_model = TRUE, test_fit = TRUE, ...)
+  silent = TRUE, run_model = TRUE, test_fit = TRUE, ...)
 }
 \arguments{
 \item{settings}{Output from \code{make_settings}}
@@ -44,19 +42,11 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
 
 \item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
 
-\item{extrapolation_args}{tagged list of optional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}}
-
-\item{spatial_args}{tagged list of optional arguments to pass to \code{FishStatsUtils::make_spatial_info}}
-
-\item{optimize_args}{tagged list of optional arguments to pass to \code{TMBhelper::Optimize}}
-
-\item{model_args}{tagged list of optional arguments to pass to \code{VAST::make_model}}
-
 \item{run_model}{Boolean indicating whether to run the model or simply return the inputs and built TMB object}
 
 \item{test_fit}{Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
 
-\item{...}{additional parameters to pass to \code{VAST::make_data}}
+\item{...}{additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function}
 }
 \value{
 Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_variable.R
 \name{plot_variable}
 \alias{plot_variable}
-\title{Plot maps with areal results}
+\title{Plot results on a multi-panel figure of maps}
 \usage{
 plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
   map_resolution = "medium", file_name = "density",
@@ -36,11 +36,5 @@ plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
 \item{...}{arguments passed to \code{par}}
 }
 \description{
-\code{PlotMap_Fn} is a hidden function to plot a map and fill in regions with colors to represent intensity in an areal-interpretion of model results
-}
-\details{
-This function was necessary to build because \code{mapproj::mapproject} as used in \code{maps::map} has difficulties with both rotations (for most projections) and
-truncating the cocuntry boundaries within the plotting region (which \code{mapproj::mapproject} appears to do prior to projection,
-so that the post-projection is often missing boundaries that are within the plotting rectangle).  I use rectangular projections by default, but Lamberts or Albers conformal
-projections would also be useful for many cases.
+\code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 }
