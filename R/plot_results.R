@@ -23,12 +23,16 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # Check for known issues
   if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
+  if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
 
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
 
   # plot data
-  #plot_data(Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list, Data_Geostat=Data_Geostat, PlotDir=working_dir )
+  message("\n### Making plots of data availability and knots")
+  plot_data( Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list,
+    Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir,
+    Year_Set=year_labels )
 
   # PLot settings
   if( missing(map_list) ){

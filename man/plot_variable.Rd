@@ -7,10 +7,9 @@
 plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
   map_resolution = "medium", file_name = "density",
   working_dir = paste0(getwd(), "/"), Format = "png", Res = 200,
-  textmargin = "", add = FALSE, outermargintext = c("Eastings",
-  "Northings"), zlim, col, mar = c(0, 0, 2, 0), oma = c(4, 4, 0, 0),
-  legend_x = c(0, 0.05), legend_y = c(0.05, 0.45), mfrow,
-  land_color = "grey", ...)
+  add = FALSE, outermargintext = c("Eastings", "Northings"), zlim, col,
+  mar = c(0, 0, 2, 0), oma = c(4, 4, 0, 0), legend_x = c(0, 0.05),
+  legend_y = c(0.05, 0.45), mfrow, land_color = "grey", ...)
 }
 \arguments{
 \item{Y_gt}{matrix where values for every column are plotted as a map}

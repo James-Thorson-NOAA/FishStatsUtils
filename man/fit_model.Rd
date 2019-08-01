@@ -4,8 +4,9 @@
 \alias{fit_model}
 \title{Fit VAST to data}
 \usage{
-fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
-  length(b_i)), working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
+fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
+  length(b_i)), v_i = rep(0, length(b_i)),
+  working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
   X_gtp = NULL, X_itp = NULL, Q_ik = NULL, newtonsteps = 1,
   silent = TRUE, run_model = TRUE, test_fit = TRUE, ...)
 }
@@ -18,11 +19,11 @@ fit_model(settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i, v_i = rep(0,
 
 \item{t_iz}{Matrix where each row species the time for each observation i (if t_iz is a vector, it is coerced to a matrix with one column; if it is a matrix with two or more columns, it specifies multiple times for each observation, e.g., both year and season)}
 
-\item{c_iz}{Category (e.g., species, length-bin) for each observation i}
-
 \item{b_i}{Sampled biomass for each observation i}
 
 \item{a_i}{Sampled area for each observation i}
+
+\item{c_iz}{Category (e.g., species, length-bin) for each observation i}
 
 \item{v_i}{sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i (by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
 

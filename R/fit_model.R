@@ -46,7 +46,7 @@
 #' }
 #'
 #' @export
-fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
+fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
   silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
@@ -55,7 +55,6 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, c_iz, b_i, a_i,
   extra_args = list(...)
   # Backwards-compatible way to capture previous format to input extra arguments for each function via specific input-lists
   extra_args = c( extra_args, extra_args$extrapolation_args, extra_args$spatial_args, extra_args$optimize_args, extra_args$model_args )
-  print(extra_args)
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_iz, "c_iz"=c_iz )

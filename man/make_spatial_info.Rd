@@ -4,12 +4,12 @@
 \alias{make_spatial_info}
 \title{Build objects related to spatial information}
 \usage{
-make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
-  LAT_intensity = Lat_i, Extrapolation_List, Method = "Mesh",
-  grid_size_km = 50, grid_size_LL = 1, fine_scale = FALSE,
-  Network_sz_LL = NULL, iter.max = 1000, randomseed = 1,
-  nstart = 100, DirPath = paste0(getwd(), "/"), Save_Results = FALSE,
-  ...)
+make_spatial_info(n_x, Lon_i, Lat_i, Extrapolation_List,
+  knot_method = "samples", Method = "Mesh", grid_size_km = 50,
+  grid_size_LL = 1, fine_scale = FALSE, Network_sz_LL = NULL,
+  iter.max = 1000, randomseed = 1, nstart = 100,
+  DirPath = paste0(getwd(), "/"), Save_Results = FALSE, LON_intensity,
+  LAT_intensity, ...)
 }
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
@@ -18,11 +18,9 @@ make_spatial_info(n_x, Lon_i, Lat_i, LON_intensity = Lon_i,
 
 \item{Lat_i}{Latitude for each sample}
 
-\item{LON_intensity}{Longitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lon_i}}
-
-\item{LAT_intensity}{Latitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lat_i}}
-
 \item{Extrapolation_List}{the output from \code{Prepare_Extrapolation_Data_Fn}}
+
+\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}}
 
 \item{Method}{a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy}
 

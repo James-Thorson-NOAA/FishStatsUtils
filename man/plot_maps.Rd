@@ -7,7 +7,7 @@
 plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
   TmbData = NULL, projargs = "+proj=longlat", Panel = "Category",
   Year_Set = NULL, Years2Include = NULL, category_names = NULL,
-  quiet = FALSE, working_dir = paste0(getwd(), "/"), ...)
+  quiet = FALSE, working_dir = paste0(getwd(), "/"), MapSizeRatio, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -40,9 +40,9 @@ plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
 
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
-\item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
-
 \item{MapSizeRatio}{Default size for each panel}
+
+\item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
 }
 \value{
 Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}
