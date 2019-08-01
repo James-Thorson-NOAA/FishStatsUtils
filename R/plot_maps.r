@@ -260,7 +260,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
         # Do plot
         #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
         #if(add==FALSE) par( mfrow=mfrow )
-        file_name = paste0(plot_codes, ifelse(Nplot>1, paste0("--",category_names[cI]), "") )
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), "") )
         plot_variable( Y_gt=Mat_xt[,Years2Include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
           panel_labels=Year_Set[Years2Include], file_name=file_name, ... )
 
@@ -277,7 +277,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
         # Do plot
         #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(category_names))), ceiling(length(category_names)/ceiling(sqrt(length(category_names)))))
         #if(add==FALSE) par( mfrow=mfrow )
-        file_name = paste0(plot_codes, ifelse(Nplot>1, paste0("--",Year_Set[Years2Include][tI]), "") )
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",Year_Set[Years2Include][tI]), "") )
         plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
           panel_labels=category_names, file_name=file_name, ... )
       }
