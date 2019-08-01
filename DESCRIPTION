@@ -33,6 +33,7 @@ Imports:
     abind,
     corpcor,
     pander,
+    rnaturalearth,
     formatR
 Depends:
     maps,

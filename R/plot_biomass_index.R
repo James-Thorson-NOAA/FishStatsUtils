@@ -29,8 +29,8 @@
 #' @export
 plot_biomass_index <-
 function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(getwd(),"/"), PlotName="Index", interval_width=1,
-  strata_names=NULL, category_names=NULL, use_biascorr=TRUE, plot_legend=TRUE, total_area_km2=NULL, plot_log=FALSE, width=4, height=4,
-  create_covariance_table=FALSE, ... ){
+  strata_names=NULL, category_names=NULL, use_biascorr=TRUE, plot_legend=TRUE, total_area_km2=NULL, plot_log=FALSE,
+  width=NULL, height=NULL, create_covariance_table=FALSE, ... ){
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
@@ -71,6 +71,9 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
   }
 
   # Fill in missing
+  mfrow = c( ceiling(sqrt(TmbData$n_c)), ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c))) )
+  if( is.null(width)) width = mfrow[2] * 3
+  if( is.null(height)) height = mfrow[1] * 3
   if( is.null(Year_Set) ) Year_Set = 1:TmbData$n_t
   if( is.null(Years2Include) ) Years2Include = 1:TmbData$n_t
   if( is.null(strata_names) ) strata_names = 1:TmbData$n_l
@@ -224,24 +227,6 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
       Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
       DirName=DirName, PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"), scale="log",
       interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Index" )
-    #Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(1,2,0,0), mfrow=c(ceiling(sqrt(TmbData$n_c)),ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))), ... )
-    #png( file=paste0(DirName,"/",PlotName,"-",Plot_suffix[plotI],".png"), width=width, height=height, res=200, units="in")
-    #  par( Par )
-    #  for( cI in 1:TmbData$n_c ){
-    #    if( Plot_suffix[plotI]=="Biomass" ){ Array_ctl = Index_ctl; log_Array_ctl = log_Index_ctl }
-    #    if( Plot_suffix[plotI]=="Bratio" ){ Array_ctl = Bratio_ctl; log_Array_ctl = log_Bratio_ctl }
-    #    # Calculate y-axis limits
-    #    Ylim = c(0, max(Array_ctl[cI,Years2Include,,'Estimate']%o%c(1,1) * exp(log_Array_ctl[cI,Years2Include,,'Std. Error']%o%c(-interval_width,interval_width)),na.rm=TRUE) )
-    #    if( plot_log==TRUE ) Ylim[1] = min(Array_ctl[cI,Years2Include,,'Estimate']%o%c(1,1) * exp(log_Array_ctl[cI,Years2Include,,'Std. Error']%o%c(-interval_width,interval_width)),na.rm=TRUE)
-    #    # Plot stuff
-    #    plot(1, type="n", xlim=range(Year_Set), ylim=ifelse(plot_legend==TRUE,1.25,1.05)*Ylim, xlab="", ylab="", main=ifelse(TmbData$n_c>1,category_names[cI],""), log=ifelse(plot_log==TRUE,"y","") )
-    #    for(l in 1:TmbData$n_l){
-    #      plot_lines( y=Array_ctl[cI,Years2Include,l,'Estimate'], x=Year_Set[Years2Include]+seq(-0.1,0.1,length=TmbData$n_l)[l], ybounds=(Array_ctl[cI,Years2Include,l,'Estimate']%o%c(1,1))*exp(log_Array_ctl[cI,Years2Include,l,'Std. Error']%o%c(-interval_width,interval_width)), type="b", col=rainbow(TmbData[['n_l']])[l], col_bounds=rainbow(TmbData[['n_l']])[l], ylim=Ylim)
-    #    }
-    #    if(plot_legend==TRUE & cI==TmbData$n_c) legend( "top", bty="n", fill=c(na.omit(ifelse(Calc_design==TRUE,"black",NA)),rainbow(TmbData[['n_l']])), legend=c(na.omit(ifelse(Calc_design==TRUE,"Design-based",NA)),as.character(strata_names)), ncol=2 )
-    #  }
-    #  mtext( side=1:2, text=c("Year",switch(Plot_suffix[plotI], "Biomass"="Abundance (metric tonnes)", "Bratio"="Biomass ratio")), outer=TRUE, line=c(0,0) )
-    #dev.off()
   }
 
   # Plot
@@ -252,26 +237,11 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
       Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
       DirName=DirName, PlotName=paste0(PlotName,"-Fratio.png"), scale="uniform",
       interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Fishing ratio" )
-    #Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(1,2,0,0), mfrow=c(ceiling(sqrt(TmbData$n_c)),ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))), ... )
-    #png( file=paste0(DirName,"/",PlotName,"-Fratio.png"), width=width, height=height, res=200, units="in")
-    #  par( Par )
-    #  Array_ct = Fratio_ct
-    #  Array_ct = ifelse( Array_ct==0, NA, Array_ct )
-    #  for( cI in 1:TmbData$n_c ){
-    #    # Calculate y-axis limits
-    #    Ylim = c(0, max(Array_ct[cI,Years2Include,'Estimate']%o%c(1,1) + Array_ct[cI,Years2Include,'Std. Error']%o%c(-interval_width,interval_width),na.rm=TRUE) )
-    #    if( plot_log==TRUE ) Ylim[1] = min(Array_ct[cI,Years2Include,'Estimate']%o%c(1,1) + Array_ct[cI,Years2Include,'Std. Error']%o%c(-interval_width,interval_width),na.rm=TRUE)
-    #    # Plot stuff
-    #    plot(1, type="n", xlim=range(Year_Set), ylim=ifelse(plot_legend==TRUE,1.25,1.05)*Ylim, xlab="", ylab="", main=ifelse(TmbData$n_c>1,category_names[cI],""), log=ifelse(plot_log==TRUE,"y","") )
-    #    plot_lines( y=Array_ct[cI,Years2Include,'Estimate'], x=Year_Set[Years2Include], ybounds=(Array_ct[cI,Years2Include,'Estimate']%o%c(1,1))+Array_ct[cI,Years2Include,'Std. Error']%o%c(-interval_width,interval_width), type="b", col="black", col_bounds="black", ylim=Ylim)
-    #  }
-    #  mtext( side=1:2, text=c("Year","Fishing ratio"), outer=TRUE, line=c(0,0) )
-    #dev.off()
   }
 
   # Plot stock status
   if( !is.null(Bratio_ctl) & !is.null(Fratio_ct) ){
-    Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(1,2,0,0), mfrow=c(ceiling(sqrt(TmbData$n_c)),ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))), ... )
+    Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(1,2,0,0), mfrow=mfrow, ... )
     Col = colorRampPalette(colors=c("blue","purple","red"))
     png( file=paste0(DirName,"/",PlotName,"-Status.png"), width=width, height=height, res=200, units="in")
       par( Par )
