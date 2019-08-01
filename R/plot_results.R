@@ -19,11 +19,12 @@
 #' @export
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
-  check_residuals=TRUE, projargs='+proj=longlat', ... ){
+  category_names, check_residuals=TRUE, projargs='+proj=longlat', ... ){
 
   # Check for known issues
   if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
   if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
+  if( missing(category_names)) category_names = 1:fit$data_list$n_c
 
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
@@ -52,7 +53,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of abundance index")
     Index = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
-      Years2Include=years_to_plot, use_biascorr=use_biascorr )
+      Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
     Index = "Not run"
     message("\n### Skipping plot of abundance index; must re-run with standard errors to plot")
@@ -62,7 +63,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of spatial indices")
     Range = plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm),
-      PlotDir=working_dir, Year_Set=year_labels, use_biascorr=use_biascorr )
+      PlotDir=working_dir, Year_Set=year_labels, use_biascorr=use_biascorr, category_names=category_names )
   }else{
     Range = "Not run"
     message("\n### Skipping plot of spatial indices; must re-run with standard errors to plot")
@@ -71,7 +72,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   # Plot densities
   message("\n### Making plots of spatial predictions")
   plot_maps_args = list(...)
-  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set,
+  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, category_names=category_names,
     Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
     working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
