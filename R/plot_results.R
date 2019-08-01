@@ -69,7 +69,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   plot_maps_args = list(...)
   plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set,
     Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
-    working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, Legend=map_list[["Legend"]]) )
+    working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
 
   # Plot quantile-quantile plot
@@ -79,15 +79,11 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
       FileName_Phist="Posterior_Predictive-Histogram", FileName_QQ="Q-Q_plot", FileName_Qhist="Q-Q_hist", save_dir=working_dir )
 
     # Pearson residuals
-    if( "n_x" %in% names(fit$data_list) ){
-      message("\n### Making plot of Pearson residuals")
-      plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report,
-        Q=Q, savedir=working_dir, MappingDetails=map_list[["MappingDetails"]], PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
-        Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]],
-        Cex=map_list[["Cex"]], Legend=map_list[["Legend"]], zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8)
-    }else{
-      message("\n### Skipping plot of Pearson residuals")
-    }
+    message("\n### Making plot of Pearson residuals")
+    plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report,
+      Q=Q, working_dir=working_dir, spatial_list=fit$spatial_list, extrapolation_list=fit$extrapolation_list,
+      Year_Set=year_labels, Years2Include=years_to_plot,
+      legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100 )
   }else{
     Q = "Not run"
     message("\n### Skipping Q-Q plot")

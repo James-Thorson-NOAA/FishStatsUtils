@@ -126,9 +126,6 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
   #################
 
   if( !is.null(working_dir) ){
-    Col = colorRampPalette(colors=c("blue","white","red"))
-    textmargin = "Pearson residual"
-    plot_codes = c("pearson_residuals_1", "pearson_residuals_2")
     for( zI in 1:2 ){
       Q_xy = list( Q1_xy, Q2_xy )[[zI]]
       if( !missing(zrange) ){
@@ -140,15 +137,20 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
       }
       #Q_xt = ifelse( abs(Q_xt)>3, 3*sign(Q_xt), Q_xt )
 
+      # Plot settings
+      Col = colorRampPalette(colors=c("blue","white","red"))
+      textmargin = "Pearson residual"
+      plot_code = c("pearson_residuals_1", "pearson_residuals_2")[zI]
+
       # Spatial information
+      # Aggregate residual-values to knots regardless of value for fine_scale
       x2i = spatial_list$NN_Extrap$nn.idx[,1]
       Include = extrapolation_list[["Area_km2_x"]]>0 & extrapolation_list[["a_el"]][,1]>0
       DF = cbind( extrapolation_list$Data_Extrap[,c('Lon','Lat')], "x2i"=x2i, "Include"=Include )
 
       # Make plots
-      #PlotMap_Fn( MappingDetails=MappingDetails, Mat=Q_xy, PlotDF=PlotDF, Col=Col, zlim=zlim, ignore.na=TRUE, MapSizeRatio=MapSizeRatio, Xlim=Xlim, Ylim=Ylim, FileName=paste0(working_dir,c("maps--encounter_pearson_resid","maps--catchrate_pearson_resid")[zI]), Year_Set=paste0("Residuals--",1:ncol(Q_xy)), Rescale=Rescale, Rotate=Rotate, Format=Format, Res=Res, zone=zone, Cex=Cex, textmargin=textmargin, add=add, pch=pch, Legend=Legend, mfrow=mfrow, plot_legend_fig=plot_legend_fig, ...)
-      plot_args = plot_variable( Y_gt=Q_xy, map_list=list("PlotDF"=DF), projargs=projargs, working_dir=working_dir,
-        panel_labels=Year_Set[Years2Include], file_name=plot_codes[zI], zlim=zlim, ... )
+      plot_args = plot_variable( Y_gt=ifelse(is.na(Q_xy),mean(zlim),Q_xy), map_list=list("PlotDF"=DF), projargs=projargs, working_dir=working_dir,
+        panel_labels=Year_Set[Years2Include], file_name=plot_code, zlim=zlim, col=Col, ... )
     }
   }
 

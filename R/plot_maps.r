@@ -39,7 +39,7 @@
 plot_maps <-
 function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+proj=longlat',
          Panel="Category", Year_Set=NULL, Years2Include=NULL, category_names=NULL, quiet=FALSE,
-         working_dir=paste0(getwd(),"/"), ...){
+         working_dir=paste0(getwd(),"/"), MapSizeRatio, ...){
 
   # Fill in missing inputs
   if( "D_xt" %in% names(Report)){
@@ -90,6 +90,9 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
     Ncategories = dim(Report$dpred_ktp)[3]
     Nyears = dim(Report$dpred_ktp)[2]
   }
+  if( missing(MapSizeRatio) ){
+    MapSizeRatio = c(3, 3)
+  }
 
   # Errors
   if( Nyears != length(Year_Set) ){
@@ -99,15 +102,15 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
     stop("Problem with `category_names`")
   }
 
-  # Extract elements
-  plot_codes <- c("encounter_prob", "pos_catch", "density", "", "", "epsilon_1", "epsilon_2", "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates", "total_density", "covariate_effects_1", "covariate_effects_2")
-  if( is.null(textmargin)){
-    textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value", "Density, ln(kg. per square km.)", "", "")
-  }
-
   # Loop through plots
   Return = NULL
   for(plot_num in plot_set){
+
+    # Extract elements
+    plot_code <- c("encounter_prob", "pos_catch", "density", "", "", "epsilon_1", "epsilon_2", "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates", "total_density", "covariate_effects_1", "covariate_effects_2")[plot_num]
+    #if( missing(textmargin) ){
+    #  textmargin <- c("Probability of encounter", "Density, ln(kg. per square km.)", "Density, ln(kg. per square km.)", "", "", "", "", "", "", "CV of density (dimensionless)", "Covariate value", "Density, ln(kg. per square km.)", "", "")[plot_num]
+    #}
 
     # Extract matrix to plot
     if(plot_num==1){
@@ -258,7 +261,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
         #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
         #if(add==FALSE) par( mfrow=mfrow )
         plot_variable( Y_gt=Mat_xt[,Years2Include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=Year_Set[Years2Include], file_name=plot_codes[plot_num], ... )
+          panel_labels=Year_Set[Years2Include], file_name=plot_code, ... )
 
       }
     }
@@ -274,7 +277,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
         #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(category_names))), ceiling(length(category_names)/ceiling(sqrt(length(category_names)))))
         #if(add==FALSE) par( mfrow=mfrow )
         plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=category_names, file_name=plot_codes[plot_num], ... )
+          panel_labels=category_names, file_name=plot_code, ... )
       }
     }
   }
