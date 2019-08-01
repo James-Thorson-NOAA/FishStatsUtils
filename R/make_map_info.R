@@ -4,7 +4,7 @@
 #'
 #' @export
 make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extrap=spatial_list$PolygonList$NN_Extrap,
-  fine_scale=spatial_list$fine_scale, Include=(Extrapolation_List[["Area_km2_x"]]>0&Extrapolation_List[["a_el"]][,1]>0) ){
+  fine_scale=spatial_list$fine_scale, Include ){
 
   # Fix defaults
   if( is.null(fine_scale) ) fine_scale = FALSE
@@ -14,6 +14,9 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     }else{
       stop("Must update inputs to `make_map_info` to enable feature `fine_scale=TRUE`")
     }
+  }
+  if( missing(Include) ){
+    Include = Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0
   }
 
   # Initialize
