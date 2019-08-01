@@ -36,8 +36,6 @@ Imports:
     rnaturalearth,
     formatR
 Depends:
-    maps,
-    mapdata,
     R (>= 3.1.0)
 Suggests:
     testthat
