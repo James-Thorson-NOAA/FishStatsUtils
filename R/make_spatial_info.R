@@ -54,7 +54,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
       LAT_intensity = Lat_i
     }
     if( knot_method=="grid" ){
-      which_rows = which( Extrapolation_List$Data_Extrap[,'Include']==TRUE & Extrapolation_List[["Area_km2_x"]]>0 )
+      which_rows = which( Extrapolation_List$Data_Extrap[,'Include']==TRUE & Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
       LON_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lon']
       LAT_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lat']
     }
