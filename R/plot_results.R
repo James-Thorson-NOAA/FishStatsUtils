@@ -33,7 +33,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   message("\n### Making plots of data availability and knots")
   plot_data( Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list,
     Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir,
-    Year_Set=year_labels )
+    Year_Set=year_labels, ... )
 
   # PLot settings
   if( missing(map_list) ){

@@ -40,6 +40,7 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
     #var_Prop_ctl[cI,tI,lI] = Index_ctl[cI,tI,lI]^2/Index_tl[tI,lI]^2 * (SE_Index_ctl[cI,tI,lI]^2/Index_ctl[cI,tI,lI]^2  + SE_Index_tl[tI,lI]^2/Index_tl[tI,lI]^2 )
     # Slightly extended version
     var_Prop_ctl[cI,tI,lI] = Index_ctl[cI,tI,lI]^2/Index_tl[tI,lI]^2 * (SE_Index_ctl[cI,tI,lI]^2/Index_ctl[cI,tI,lI]^2 - 2*SE_Index_ctl[cI,tI,lI]^2/(Index_ctl[cI,tI,lI]*Index_tl[tI,lI]) + SE_Index_tl[tI,lI]^2/Index_tl[tI,lI]^2 )
+    var_Prop_ctl[cI,tI,lI] = ifelse( Index_ctl[cI,tI,lI]==0, 0, var_Prop_ctl[cI,tI,lI] )  # If dividing by zero, replace with 0
     # Covert to effective sample size
     Neff_ctl[cI,tI,lI] = Prop_ctl[cI,tI,lI] * (1-Prop_ctl[cI,tI,lI]) / var_Prop_ctl[cI,tI,lI]
   }}}

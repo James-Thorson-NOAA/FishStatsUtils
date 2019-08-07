@@ -3,20 +3,6 @@
 plot_timeseries = function( x, y, ybounds, fn=lines, bounds_type="whiskers",
   bounds_args=list(), ... ){
 
-  # Local function -- combine two lists
-  combine_lists = function( default, input ){
-    output = default
-    for( i in seq_along(input) ){
-      if( names(input)[i] %in% names(default) ){
-        output[[names(input)[i]]] = input[[i]]
-      }else{
-        output = c( output, input[i] )
-      }
-    }
-    return( output )
-  }
-
-
   # Plot lines
   fn( y=y, x=x, ... )
 
