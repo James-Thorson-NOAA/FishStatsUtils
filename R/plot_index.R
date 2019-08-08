@@ -7,7 +7,9 @@
 #' @param sd_Index_ctl A matrix or array of variances for each estimate
 #' @inheritParams plot_biomass_index
 #' @inheritParams plot_lines
-#' @param Yrange lower and upper bound for y-axis (use \code{Yrange[1]=NA} and/or \code{Yrange[2]=NA} for using the lower and upper bound of estimate intervals)
+#' @param Yrange lower and upper bound for left-hand y-axis, corresponding to input \code{Index_ctl} (use \code{Yrange[1]=NA} and/or \code{Yrange[2]=NA} for using the lower and upper bound of estimate intervals)
+#' @param Y2range lower and upper bound for right-hand y-axis, corresponding to input \code{SampleSize_ctz} (see Yrange for more info)
+#' @param SampleSize_ctz optional array of sample sizes for each category and year to be plotted on each panel
 #' @param plot_args additional arguments to pass to \code{plot}
 #' @param plot_lines_args additional arguments to pass to \code{plot_lines}
 #' @param ... list of settings to pass to \code{par} when making plot
@@ -20,7 +22,7 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
   plot_legend=NULL, DirName=paste0(getwd(),"/"), PlotName="Index.png",
   interval_width=1, width=NULL, height=NULL, xlab="Year", ylab="Index", bounds_type="whiskers", col=NULL,
   col_bounds=NULL, Yrange=c(0,NA), type="b", plot_lines_args=list(), plot_args=list(),
-  SampleSize_ctl=NULL, ... ){
+  SampleSize_ctz=NULL, Y2range=c(0,NA), y2lab="", ... ){
 
   # Change inputs
   if( length(dim(Index_ctl))==length(dim(sd_Index_ctl)) ){
@@ -35,9 +37,9 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
   n_years = dim(Index_ctl)[2]
   n_strata = dim(Index_ctl)[3]
   mfrow = c( ceiling(sqrt(n_categories)), ceiling(n_categories/ceiling(sqrt(n_categories))) )
-  if( !is.null(SampleSize_ctl) ){
-    if( !all( dim(SampleSize_ctl) == dim(Index_ctl) ) ){
-      stop("Check input `SampleSize_ctl`")
+  if( !is.null(SampleSize_ctz) ){
+    if( !all( dim(SampleSize_ctz)[1:2] == dim(Index_ctl)[1:2] ) ){
+      stop("Check input `SampleSize_ctz`")
     }
   }
 
@@ -93,14 +95,16 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
       do.call( what=plot_lines, args=plot_lines_inputs )
     }
     # Plot lines for sample size
-    if( !is.null(SampleSize_ctl) ){
-      Y2range = c(0, 1.2*max(SampleSize_ctl[z1,,], na.rm=TRUE) )
-      Labels = pretty(Y2range)
-      At = Labels / diff(range(Y2range,na.rm=TRUE)) * diff(Ylim) - Ylim[1]
+    if( !is.null(SampleSize_ctz) ){
+      Y2lim = c(1, 1.2) * range(SampleSize_ctz[z1,,], na.rm=TRUE)
+      Y2lim = ifelse( is.na(Y2range), Y2lim, Y2range )
+      Labels = pretty(Y2lim)
+      At = Labels / diff(range(Y2lim,na.rm=TRUE)) * diff(Ylim) + Ylim[1]
       axis( side=4, at=At, labels=Labels )
-      for( z3 in 1:n_strata ){
-        Y = SampleSize_ctl[z1,,z3] / diff(range(Y2range,na.rm=TRUE)) * diff(Ylim) - Ylim[1]
+      for( z3 in 1:dim(SampleSize_ctz)[3] ){
+        Y = SampleSize_ctz[z1,,z3] / diff(range(Y2lim,na.rm=TRUE)) * diff(Ylim) + Ylim[1]
         lines( x=Year_Set, y=Y, col=col[z3], lwd=3, lty="dotted" )
+        #points( x=Year_Set, y=Y, col=col[z3], cex=1.5 )
       }
     }
     if(plot_legend==TRUE){
@@ -108,7 +112,7 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
     }
     axis( 1, at=Pretty(Year_Set), labels=year_names[match(Pretty(Year_Set),Year_Set)] )
   }
-  mtext( side=1:2, text=c(xlab,ylab), outer=TRUE, line=c(0,0) )
+  mtext( side=c(1,2,4), text=c(xlab,ylab,y2lab), outer=TRUE, line=c(0,0) )
 
   return(invisible(plot_lines_inputs))
 }
