@@ -11,7 +11,7 @@ make_extrapolation_info(Region, zone = NA,
   grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
   strata_to_use = c("SOG", "WCVI", "QCS", "HS", "WCHG"),
   survey = "Chatham_rise", surveyname = "propInWCGBTS",
-  flip_around_dateline = FALSE, ...)
+  flip_around_dateline, ...)
 }
 \arguments{
 \item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
@@ -40,7 +40,7 @@ make_extrapolation_info(Region, zone = NA,
 
 \item{surveyname}{area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}}
 
-\item{flip_around_dateline}{used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline)}
+\item{flip_around_dateline}{used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used}
 
 \item{...}{other objects passed for individual regions (see example script)}
 }
