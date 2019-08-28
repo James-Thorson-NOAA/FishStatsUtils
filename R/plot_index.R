@@ -111,7 +111,7 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
     if(plot_legend==TRUE){
       legend( "top", bty="n", fill=rainbow(n_strata), legend=as.character(strata_names), ncol=2 )
     }
-    axis( 1, at=Pretty(Year_Set[Years2Include]), labels=year_names[match(Pretty(Year_Set[Years2Include]),Year_Set[Years2Include])] )
+    axis( 1, at=Pretty(Year_Set[Years2Include]), labels=year_names[match(Pretty(Year_Set[Years2Include]),Year_Set)] )
   }
   mtext( side=c(1,2,4), text=c(xlab,ylab,y2lab), outer=TRUE, line=c(0,0) )
 
