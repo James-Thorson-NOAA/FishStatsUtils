@@ -39,7 +39,7 @@
 plot_maps <-
 function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+proj=longlat',
          Panel="Category", Year_Set=NULL, Years2Include=NULL, category_names=NULL, quiet=FALSE,
-         working_dir=paste0(getwd(),"/"), MapSizeRatio, ...){
+         working_dir=paste0(getwd(),"/"), MapSizeRatio, n_cells, ...){
 
   # Fill in missing inputs
   if( "D_xt" %in% names(Report)){
@@ -261,8 +261,8 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
         #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
         #if(add==FALSE) par( mfrow=mfrow )
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), "") )
-        plot_variable( Y_gt=Mat_xt[,Years2Include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=Year_Set[Years2Include], file_name=file_name, ... )
+        plot_args = plot_variable( Y_gt=Mat_xt[,Years2Include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
+          panel_labels=Year_Set[Years2Include], file_name=file_name, n_cells=n_cells, ... )
 
       }
     }
@@ -279,7 +279,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
         #if(add==FALSE) par( mfrow=mfrow )
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",Year_Set[Years2Include][tI]), "") )
         plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=category_names, file_name=file_name, ... )
+          panel_labels=category_names, file_name=file_name, n_cells=n_cells, ... )
       }
     }
   }

@@ -25,7 +25,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
          file_name="density", working_dir=paste0(getwd(),"/"), Format="png", Res=200, add=FALSE,
          outermargintext=c("Eastings","Northings"), zlim, col, mar=c(0,0,2,0), oma=c(4,4,0,0),
          legend_x=c(0,0.05), legend_y=c(0.05,0.45), mfrow, land_color="grey",
-         ...){
+         n_cells, ...){
 
   ###################
   # Settings and inputs
@@ -44,6 +44,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     MapSizeRatio = map_list$MapSizeRatio
   }
   Y_gt = Y_gt[ map_list$PlotDF[which(map_list$PlotDF[,'Include']>0),'x2i'], , drop=FALSE]
+  if(missing(n_cells)) n_cells = nrow(Y_gt)
   if( missing(mfrow) ){
     mfrow = ceiling(sqrt(ncol(Y_gt)))
     mfrow = c( mfrow, ceiling(ncol(Y_gt)/mfrow) )
@@ -116,7 +117,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
 
     # Interpolate to raster
     # library(plotKML)
-    cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,]))/floor(sqrt(nrow(Y_gt)))
+    cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
     Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size )
     image( Raster_proj, col=col, zlim=zlim )
 
@@ -142,5 +143,5 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   if(add==FALSE) mtext(side=2, outer=TRUE, outermargintext[2], cex=1.75, line=par()$oma[2]/2)
 
   # return stuff as necessary
-  return( invisible(list("Par"=Par,"cell.size"=cell.size)) )
+  return( invisible(list("Par"=Par, "cell.size"=cell.size, "n_cells"=n_cells)) )
 }

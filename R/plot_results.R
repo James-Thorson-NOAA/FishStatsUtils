@@ -63,7 +63,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of spatial indices")
     Range = plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm),
-      PlotDir=working_dir, Year_Set=year_labels, use_biascorr=use_biascorr, category_names=category_names )
+      PlotDir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
     Range = "Not run"
     message("\n### Skipping plot of spatial indices; must re-run with standard errors to plot")

@@ -77,32 +77,33 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
   par( Par )
   for( z1 in 1:n_categories ){
     # Calculate y-axis limits
-    if(scale=="uniform") Ylim = range(Index_ctl[z1,,]%o%c(1,1) + sd_Index_ctl[z1,,]%o%c(-interval_width,interval_width)*1.05, na.rm=TRUE)
-    if(scale=="log") Ylim = range(Index_ctl[z1,,]%o%c(1,1) * exp(sd_Index_ctl[z1,,]%o%c(-interval_width,interval_width)*1.05), na.rm=TRUE)
+    if(scale=="uniform") Ylim = range(Index_ctl[z1,Years2Include,]%o%c(1,1) + sd_Index_ctl[z1,Years2Include,]%o%c(-interval_width,interval_width)*1.05, na.rm=TRUE)
+    if(scale=="log") Ylim = range(Index_ctl[z1,Years2Include,]%o%c(1,1) * exp(sd_Index_ctl[z1,Years2Include,]%o%c(-interval_width,interval_width)*1.05), na.rm=TRUE)
     Ylim = ifelse( is.na(Yrange), Ylim, Yrange )
-    Xlim = range(Year_Set) + c(-1,1) * diff(range(Year_Set))/20
+    Xlim = range(Year_Set[Years2Include]) + c(-1,1) * diff(range(Year_Set[Years2Include]))/20
     # Plot stuff
     plot_inputs = combine_lists( default=list(1, type="n", xlim=Xlim, ylim=Ylim, xlab="", ylab="", main=ifelse(n_categories>1,category_names[z1],""), xaxt="n"),
       input=plot_args )
     do.call( what=plot, args=plot_inputs )
     for(z3 in 1:n_strata){
-      if(scale=="uniform") ybounds = Index_ctl[z1,,z3]%o%c(1,1) + sd_Index_ctl[z1,,z3]%o%c(-interval_width,interval_width)
-      if(scale=="log") ybounds = Index_ctl[z1,,z3]%o%c(1,1) * exp(sd_Index_ctl[z1,,z3]%o%c(-interval_width,interval_width))
+      if(scale=="uniform") ybounds = Index_ctl[z1,Years2Include,z3]%o%c(1,1) + sd_Index_ctl[z1,Years2Include,z3]%o%c(-interval_width,interval_width)
+      if(scale=="log") ybounds = Index_ctl[z1,Years2Include,z3]%o%c(1,1) * exp(sd_Index_ctl[z1,Years2Include,z3]%o%c(-interval_width,interval_width))
       if( n_strata==1 ) x_offset = 0
       if( n_strata>=2 ) x_offset = seq(-0.1, 0.1, length=n_strata)[z3]
-      plot_lines_defaults = list(y=Index_ctl[z1,,z3], x=Year_Set+x_offset, ybounds=ybounds, type=type, col=col[z3], col_bounds=col_bounds[z3], ylim=Ylim, bounds_type=bounds_type)
+      plot_lines_defaults = list( y=Index_ctl[z1,Years2Include,z3], x=Year_Set[Years2Include]+x_offset, ybounds=ybounds, type=type, col=col[z3], col_bounds=col_bounds[z3],
+        ylim=Ylim, bounds_type=bounds_type )
       plot_lines_inputs = combine_lists( default=plot_lines_defaults, input=plot_lines_args )
       do.call( what=plot_lines, args=plot_lines_inputs )
     }
     # Plot lines for sample size
     if( !is.null(SampleSize_ctz) ){
-      Y2lim = c(1, 1.2) * range(SampleSize_ctz[z1,,], na.rm=TRUE)
+      Y2lim = c(1, 1.2) * range(SampleSize_ctz[z1,Years2Include,], na.rm=TRUE)
       Y2lim = ifelse( is.na(Y2range), Y2lim, Y2range )
       Labels = pretty(Y2lim)
       At = Labels / diff(range(Y2lim,na.rm=TRUE)) * diff(Ylim) + Ylim[1]
       axis( side=4, at=At, labels=Labels )
       for( z3 in 1:dim(SampleSize_ctz)[3] ){
-        Y = SampleSize_ctz[z1,,z3] / diff(range(Y2lim,na.rm=TRUE)) * diff(Ylim) + Ylim[1]
+        Y = SampleSize_ctz[z1,Years2Include,z3] / diff(range(Y2lim,na.rm=TRUE)) * diff(Ylim) + Ylim[1]
         lines( x=Year_Set, y=Y, col=col[z3], lwd=3, lty="dotted" )
         #points( x=Year_Set, y=Y, col=col[z3], cex=1.5 )
       }
@@ -110,7 +111,7 @@ plot_index = function( Index_ctl, sd_Index_ctl=array(0,dim(Index_ctl)), Year_Set
     if(plot_legend==TRUE){
       legend( "top", bty="n", fill=rainbow(n_strata), legend=as.character(strata_names), ncol=2 )
     }
-    axis( 1, at=Pretty(Year_Set), labels=year_names[match(Pretty(Year_Set),Year_Set)] )
+    axis( 1, at=Pretty(Year_Set[Years2Include]), labels=year_names[match(Pretty(Year_Set[Years2Include]),Year_Set[Years2Include])] )
   }
   mtext( side=c(1,2,4), text=c(xlab,ylab,y2lab), outer=TRUE, line=c(0,0) )
 
