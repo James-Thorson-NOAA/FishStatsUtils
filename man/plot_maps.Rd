@@ -7,7 +7,8 @@
 plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
   TmbData = NULL, projargs = "+proj=longlat", Panel = "Category",
   Year_Set = NULL, Years2Include = NULL, category_names = NULL,
-  quiet = FALSE, working_dir = paste0(getwd(), "/"), MapSizeRatio, ...)
+  quiet = FALSE, working_dir = paste0(getwd(), "/"), MapSizeRatio,
+  n_cells, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create

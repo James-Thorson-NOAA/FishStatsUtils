@@ -15,8 +15,8 @@
   #  packageStartupMessage("Installing TMB...")
   #  devtools::install_github("kaskr/adcomp/TMB")
   #}
-  if( !"TMBhelper" %in% utils::installed.packages()[,1] || utils::packageVersion("TMBhelper") < numeric_version("1.1.0") ){
-    packageStartupMessage("Installing TMBhelper, or updating package because previously using version < 1.1.0")
+  if( !"TMBhelper" %in% utils::installed.packages()[,1] || utils::packageVersion("TMBhelper") < numeric_version("1.2.0") ){
+    packageStartupMessage("Installing TMBhelper, or updating package because previously using version < 1.2.0")
     devtools::install_github("kaskr/TMB_contrib_R/TMBhelper")
   }
   #if( !"TMBhelper" %in% utils::installed.packages()[,1] ){
