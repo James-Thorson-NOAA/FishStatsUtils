@@ -69,6 +69,17 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
     message("\n### Skipping plot of spatial indices; must re-run with standard errors to plot")
   }
 
+  # Plot range edges
+  if( "jointPrecision" %in% names(fit$parameter_estimates$SD) ){
+    message("\n### Making plot of spatial indices")
+    Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
+      working_dir=paste0(getwd(),"/"), Year_Set=year_labels, Years2Include=years_to_plot,
+      category_names=category_names, n_samples=100, quantiles=c(0.05,0.5,0.95) )
+  }else{
+    Edge = "Not run"
+    message("\n### Skipping plot of range edge; must re-run with `getJointPrecision=TRUE` to plot")
+  }
+
   # Plot densities
   message("\n### Making plots of spatial predictions")
   plot_maps_args = list(...)
@@ -96,7 +107,8 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   }
 
   # return
-  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "map_list"=map_list, "plot_maps_args"=plot_maps_args )
+  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "Edge"=Edge,
+    "map_list"=map_list, "plot_maps_args"=plot_maps_args )
   return( invisible(Return) )
 }
 
