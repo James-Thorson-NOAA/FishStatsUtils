@@ -73,7 +73,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   if( "jointPrecision" %in% names(fit$parameter_estimates$SD) ){
     message("\n### Making plot of spatial indices")
     Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
-      working_dir=paste0(getwd(),"/"), Year_Set=year_labels, Years2Include=years_to_plot,
+      working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot,
       category_names=category_names, n_samples=100, quantiles=c(0.05,0.5,0.95) )
   }else{
     Edge = "Not run"
