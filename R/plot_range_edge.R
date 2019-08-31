@@ -20,14 +20,15 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
   category_names=NULL, working_dir=paste0(getwd(),"/"), quantiles=c(0.05,0.95), n_samples=100,
   interval_width=1, width=NULL, height=NULL, ...){
 
+  # Unpack
+  Report = Obj$report()
+  TmbData = Obj$env$data
+
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
   if( !("jointPrecision" %in% names(Sdreport))) stop("jointPrecision not present in Sdreport; please re-run with `getJointPrecision=TRUE`")
   if( any(quantiles<0) | any(quantiles>1) ) stop("Please provide `quantiles` between zero and one")
-
-  # Unpack
-  Report = Obj$report()
-  TmbData = Obj$env$data
+  if( all(TmbData$Z_gm==0) ) stop("Please re-run with 'Options['Calculate_Range']=TRUE' to calculate range edges")
 
   # Which parameters
   if( "ln_Index_tl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
