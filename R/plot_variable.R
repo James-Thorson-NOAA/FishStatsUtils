@@ -43,6 +43,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   }else{
     MapSizeRatio = map_list$MapSizeRatio
   }
+  if( !("PlotDF" %in% names(map_list)) ) stop("Check input `map_list`")
   Y_gt = Y_gt[ map_list$PlotDF[which(map_list$PlotDF[,'Include']>0),'x2i'], , drop=FALSE]
   if(missing(n_cells)) n_cells = nrow(Y_gt)
   if( missing(mfrow) ){

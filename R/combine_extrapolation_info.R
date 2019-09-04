@@ -29,8 +29,9 @@ combine_extrapolation_info = function( ... ){
 
   for( lI in 1:length(input_list) ){
     Tmp = input_list[[lI]]$Data_Extrap
-    colnames(Tmp) = ifelse( colnames(Tmp)=="Area_in_survey_km2", "Area_km2", colnames(Tmp) )
-    Data_Extrap = rbind( Data_Extrap, Tmp[,c('E_km','N_km','Lon','Lat','Include','Area_km2')] )
+    #colnames(Tmp) = ifelse( colnames(Tmp)=="Area_in_survey_km2", "Area_km2", colnames(Tmp) )
+    #Data_Extrap = rbind( Data_Extrap, Tmp[,c('E_km','N_km','Lon','Lat','Include','Area_km2')] )
+    Data_Extrap = rbind( Data_Extrap, Tmp[,c('E_km','N_km','Lon','Lat','Include')] )
     a_el = rbind( a_el, input_list[[lI]]$a_el )
     Area_km2_x = c( Area_km2_x, input_list[[lI]]$Area_km2_x )
   }
