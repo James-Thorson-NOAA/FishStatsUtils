@@ -5,7 +5,8 @@
 \title{Build extrapolation grid}
 \usage{
 make_extrapolation_info(Region, zone = NA,
-  strata.limits = data.frame(STRATA = "All_areas"), input_grid = NULL,
+  strata.limits = data.frame(STRATA = "All_areas"),
+  create_strata_per_region = FALSE, input_grid = NULL,
   observations_LL = NULL, grid_dim_km = c(2, 2),
   maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
   grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
@@ -19,6 +20,8 @@ make_extrapolation_info(Region, zone = NA,
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 
 \item{strata.limits}{an input for determining stratification of indices (see example script)}
+
+\item{create_strata_per_region}{Boolean indicating whether to create a single stratum for all regions listed in \code{Region} (the default), or a combined stratum in addition to a stratum for each individual Region}
 
 \item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}}
 

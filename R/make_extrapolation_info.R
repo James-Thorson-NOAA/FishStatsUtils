@@ -9,6 +9,7 @@
 #' @param strata.limits an input for determining stratification of indices (see example script)
 #' @param zone UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples
 #' @param flip_around_dateline used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used
+#' @param create_strata_per_region Boolean indicating whether to create a single stratum for all regions listed in \code{Region} (the default), or a combined stratum in addition to a stratum for each individual Region
 #' @param observations_LL a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="user"}
 #' @param input_grid a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}
 #' @param grid_dim_km numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region="other"}
@@ -32,10 +33,10 @@
 
 #' @export
 make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
-  input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2), maximum_distance_from_sample=NULL,
-  grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1), region=c("south_coast","west_coast"),
-  strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'), survey="Chatham_rise", surveyname='propInWCGBTS',
-  flip_around_dateline, ... ){
+  create_strata_per_region=FALSE, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
+  maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
+  region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
+  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
   # However, it requires a different default value for different regions; hence the input format being used.
@@ -136,8 +137,13 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
     if( rI==1 ){
       Return = Extrapolation_List
     }else{
-      Return = combine_extrapolation_info( Return, Extrapolation_List )
+      Return = combine_extrapolation_info( Return, Extrapolation_List, create_strata_per_region=create_strata_per_region )
     }
+  }
+
+  # Add total across regions if requested
+  if( length(Region)>1 & create_strata_per_region==TRUE ){
+    Return$a_el = cbind( "Total"=rowSums(Return$a_el), Return$a_el )
   }
 
   # Return
