@@ -8,6 +8,7 @@
 #' @param fit Output from \code{fit_model}
 #' @inheritParams fit_model
 #' @inheritParams plot_maps
+#' @inheritParams plot_residuals
 #' @param check_residuals Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)
 #' @param ... additional settings to pass to \code{FishStatsUtils::plot_maps}
 #'
@@ -19,7 +20,7 @@
 #' @export
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
-  category_names, check_residuals=TRUE, projargs='+proj=longlat', ... ){
+  category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, ... ){
 
   # Check for known issues
   if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
@@ -98,7 +99,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
     message("\n### Making plot of Pearson residuals")
     plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report,
       Q=Q, working_dir=working_dir, spatial_list=fit$spatial_list, extrapolation_list=fit$extrapolation_list,
-      Year_Set=year_labels, Years2Include=years_to_plot,
+      Year_Set=year_labels, Years2Include=years_to_plot, zrange=zrange,
       legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100 )
   }else{
     Q = "Not run"
