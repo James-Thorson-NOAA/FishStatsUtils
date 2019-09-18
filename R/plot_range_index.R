@@ -5,6 +5,7 @@
 #' @description
 #' \code{plot_range_index} plots center-of-gravity, kernel-area occupied, and effective-area occupied
 #'
+#' @inheritParams plot_biomass_index
 #' @param Sdreport TMB output from `TMB::sdreport(Obj)`
 #' @param Report Reporting output from `Obj$report()`
 #' @param TmbData Formatted data inputs, from `VAST::Data_Fn(...)`
@@ -14,7 +15,6 @@
 #' @param FileName_Area Full filename (including directory) for center-of-gravity plot
 #' @param FileName_EffArea Full filename (including directory) for center-of-gravity plot
 #' @param Znames Names for center-of-gravity summary statistics
-#' @inheritParams plot_biomass_index
 #'
 #' @return Return Tagged list of output
 #' \describe{

@@ -13,7 +13,7 @@
 #' @inheritParams TMBhelper::fit_tmb
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
-#' @param ... additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function
+#' @param ... additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{VAST::make_data}
 #'
 #' @return Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates
 #'
@@ -48,7 +48,7 @@
 #' @export
 fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
-  Xconfig_zcp=NULL, X_gtp=NULL, X_itp=NULL, Q_ik=NULL, newtonsteps=1,
+  Xconfig_zcp=NULL, covariate_data, formula=~0, Q_ik=NULL, newtonsteps=1,
   silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
 
   # Capture extra arguments to function
@@ -84,12 +84,12 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
 
   # Build data
   message("\n### Making data object") # VAST::
+  if(missing(covariate_data)) covariate_data = NULL
   data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
-    Xconfig_zcp=Xconfig_zcp, X_gtp=X_gtp, X_itp=X_itp, Q_ik=Q_ik)
-  data_args_input = extra_args[intersect(names(extra_args),formalArgs(make_data))]
-  data_args_input = combine_lists( input=data_args_input, default=data_args_default )
+    Xconfig_zcp=Xconfig_zcp, covariate_data=covariate_data, formula=formula, Q_ik=Q_ik)
+  data_args_input = combine_lists( input=extra_args, default=data_args_default )
   data_list = do.call( what=make_data, args=data_args_input )
 
   # Build object

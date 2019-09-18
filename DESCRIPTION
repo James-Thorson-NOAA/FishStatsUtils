@@ -1,8 +1,8 @@
 Package: FishStatsUtils
 Type: Package
 Title: Utilities (shared code and data) for FishStats spatio-temporal modeling toolbox
-Version: 2.2.0
-Date: 2019-07-25
+Version: 2.3.0
+Date: 2019-09-18
 Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov", role=c("aut","cre"))
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Description: FishStatsUtils contains utilities (shared code and data) used by multiple 

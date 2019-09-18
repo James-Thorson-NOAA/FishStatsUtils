@@ -7,11 +7,11 @@
 #' @description
 #' \code{plot_range_edge} plots range edges
 #'
+#' @inheritParams plot_biomass_index
 #' @param Sdreport TMB output from `TMB::sdreport(Obj)`
 #' @param Obj Fitted TMB object from package `VAST`, i.e., output from `fit_model(...)$tmb_list$Obj`
 #' @param working_dir Directory for plots
 #' @param quantiles vector
-#' @inheritParams plot_biomass_index
 #'
 #'
 

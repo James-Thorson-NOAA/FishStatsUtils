@@ -8,7 +8,7 @@ plot_results(fit, settings = fit$settings, plot_set = 3,
   working_dir = paste0(getwd(), "/"), year_labels = fit$year_labels,
   years_to_plot = fit$years_to_plot, use_biascorr = TRUE, map_list,
   category_names, check_residuals = TRUE, projargs = "+proj=longlat",
-  ...)
+  zrange, ...)
 }
 \arguments{
 \item{fit}{Output from \code{fit_model}}
@@ -36,6 +36,8 @@ plot_results(fit, settings = fit$settings, plot_set = 3,
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
 \item{check_residuals}{Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)}
+
+\item{zrange}{lower and upper bounds for plotted value of Pearson residuals, used to change plotting scale to eliminate influence of outliers on plotting scale}
 
 \item{...}{additional settings to pass to \code{FishStatsUtils::plot_maps}}
 }

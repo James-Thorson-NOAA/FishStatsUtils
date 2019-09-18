@@ -7,7 +7,7 @@
 fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
   length(b_i)), v_i = rep(0, length(b_i)),
   working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
-  X_gtp = NULL, X_itp = NULL, Q_ik = NULL, newtonsteps = 1,
+  covariate_data, formula, Q_ik = NULL, newtonsteps = 1,
   silent = TRUE, run_model = TRUE, test_fit = TRUE, ...)
 }
 \arguments{
@@ -34,10 +34,6 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
   \item{Xconfig_zcp[z,c,p]=2}{\code{X_itp[,,p]} has a spatially varying, zero-centered linear effect on linear predictor z for category c}
   \item{Xconfig_zcp[z,c,p]=3}{\code{X_itp[,,p]} has a spatially varying linear effect on linear predictor z for category c}
 }}
-
-\item{X_gtp}{array of density covariates for each extrapolation-grid cell g, time t, and covariate p; if missing, assumed to not include covariates}
-
-\item{X_itp}{array of density covariates for each observation i, time t, and covariate p}
 
 \item{Q_ik}{matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
 

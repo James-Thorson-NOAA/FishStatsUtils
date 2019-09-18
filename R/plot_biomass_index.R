@@ -5,6 +5,7 @@
 #' @description
 #' \code{plot_biomass_index} plots an index proportion to population abundance
 #'
+#' @inheritParams plot_maps
 #' @param TmbData Formatted data inputs, from `VAST::Data_Fn(...)`
 #' @param DirName Directory for saving plot and table
 #' @param PlotName Name for plot
@@ -18,7 +19,6 @@
 #' @param width plot width in inches
 #' @param height plot height in inches
 #' @param ... Other inputs to `par()`
-#' @inheritParams plot_maps
 #'
 #' @return Return Tagged list of output
 #' \describe{

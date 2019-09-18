@@ -124,12 +124,22 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     loc_g = Extrapolation_List$Data_Extrap[ which(Extrapolation_List$Area_km2_x>0), c('E_km','N_km') ]
   }
 
-  # Convert loc_x back to location in lat-long coordinates loc_x_LL
-  # if zone=NA or NTULL, then it automatically detects appropriate zone
-  #tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_x),'X'=loc_x[,'E_km'],'Y'=loc_x[,'N_km'])
-  #attr(tmpUTM,"projection") = "UTM"
-  #attr(tmpUTM,"zone") = Extrapolation_List$zone
-  #loc_x_LL = PBSmapping::convUL(tmpUTM)                                                         #$
+  # Convert loc_x back to location in lat-long coordinates latlon_x
+  tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_x),'X'=loc_x[,'E_km'],'Y'=loc_x[,'N_km'])
+  attr(tmpUTM,"projection") = "UTM"
+  attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
+  latlon_x = PBSmapping::convUL(tmpUTM)                                                         #$
+  latlon_x = cbind( 'Lat'=latlon_x[,"Y"], 'Lon'=latlon_x[,"X"])
+
+  # Convert loc_g back to location in lat-long coordinates latlon_g
+  tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_g),'X'=loc_g[,'E_km'],'Y'=loc_g[,'N_km'])
+  attr(tmpUTM,"projection") = "UTM"
+  attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
+  latlon_g = PBSmapping::convUL(tmpUTM)                                                         #$
+  latlon_g = cbind( 'Lat'=latlon_g[,"Y"], 'Lon'=latlon_g[,"X"])
+
+  # Bundle lat-lon
+  latlon_i = cbind( 'Lat'=Lat_i, 'Lon'=Lon_i )
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
   MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
@@ -184,7 +194,8 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   Return = list( "fine_scale"=fine_scale, "A_is"=A_is, "A_gs"=A_gs, "n_x"=n_x, "n_s"=n_s, "n_g"=nrow(a_gl), "n_i"=nrow(loc_i),
     "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
     "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g),
-    "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap, "knot_method"=knot_method )
+    "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap, "knot_method"=knot_method,
+    "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i )
   class(Return) = "make_spatial_info"
   return( Return )
 }
