@@ -7,7 +7,7 @@
 fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
   length(b_i)), v_i = rep(0, length(b_i)),
   working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
-  covariate_data, formula, Q_ik = NULL, newtonsteps = 1,
+  covariate_data, formula = ~0, Q_ik = NULL, newtonsteps = 1,
   silent = TRUE, run_model = TRUE, test_fit = TRUE, ...)
 }
 \arguments{
@@ -35,6 +35,10 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
   \item{Xconfig_zcp[z,c,p]=3}{\code{X_itp[,,p]} has a spatially varying linear effect on linear predictor z for category c}
 }}
 
+\item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}}
+
+\item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}}
+
 \item{Q_ik}{matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
 
 \item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
@@ -43,7 +47,7 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
 
 \item{test_fit}{Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
 
-\item{...}{additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function}
+\item{...}{additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{VAST::make_data}}
 }
 \value{
 Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates
@@ -52,7 +56,7 @@ Returns a tagged list of internal objects, the TMB object, and slot \code{parame
 \code{fit_model} fits a spatio-temporal model to data
 }
 \details{
-This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, assemble data, build model, and estimate parameters.
+This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, build covariates from a formula interface, assemble data, build model, estimate parameters, and check for obvious problems with the estimates.
 }
 \examples{
 \dontrun{

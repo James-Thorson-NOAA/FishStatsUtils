@@ -3,14 +3,15 @@
 #'
 #' \code{fit_model} fits a spatio-temporal model to data
 #'
-#' This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, assemble data, build model, and estimate parameters.
+#' This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, build covariates from a formula interface, assemble data, build model, estimate parameters, and check for obvious problems with the estimates.
 #'
-#' @param settings Output from \code{make_settings}
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
+#' @inheritParams make_covariates
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
 #' @inheritParams TMBhelper::fit_tmb
+#' @param settings Output from \code{make_settings}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
 #' @param ... additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{VAST::make_data}
