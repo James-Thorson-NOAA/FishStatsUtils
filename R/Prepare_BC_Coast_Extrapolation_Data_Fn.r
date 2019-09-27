@@ -1,6 +1,6 @@
 #' @export
 Prepare_BC_Coast_Extrapolation_Data_Fn <-
-function( strata.limits=NULL, strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'), zone=NA, ... ){
+function( strata.limits=NULL, strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'), zone=NA, flip_around_dateline=FALSE, ... ){
   # Infer strata
   if( is.null(strata.limits)){
     strata.limits = data.frame('STRATA'="All_areas")
@@ -24,13 +24,13 @@ function( strata.limits=NULL, strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'), z
   }
 
   # Convert extrapolation-data to an Eastings-Northings coordinate system
-  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone)
+  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)
   
   # Extra junk
   Data_Extrap = cbind( Data_Extrap, 'Include'=1)
   Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('X','Y')]
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=FALSE, "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
   return( Return )
 }

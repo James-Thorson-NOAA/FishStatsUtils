@@ -8,6 +8,7 @@
 #' @param fit Output from \code{fit_model}
 #' @inheritParams fit_model
 #' @inheritParams plot_maps
+#' @inheritParams plot_residuals
 #' @param check_residuals Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)
 #' @param ... additional settings to pass to \code{FishStatsUtils::plot_maps}
 #'
@@ -19,16 +20,21 @@
 #' @export
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
-  check_residuals=TRUE, ... ){
+  category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, ... ){
 
   # Check for known issues
   if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
+  if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
+  if( missing(category_names)) category_names = 1:fit$data_list$n_c
 
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
 
   # plot data
-  #plot_data(Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list, Data_Geostat=Data_Geostat, PlotDir=working_dir )
+  message("\n### Making plots of data availability and knots")
+  plot_data( Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list,
+    Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir,
+    Year_Set=year_labels, ... )
 
   # PLot settings
   if( missing(map_list) ){
@@ -48,7 +54,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of abundance index")
     Index = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
-      Years2Include=years_to_plot, use_biascorr=use_biascorr )
+      Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
     Index = "Not run"
     message("\n### Skipping plot of abundance index; must re-run with standard errors to plot")
@@ -58,20 +64,29 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of spatial indices")
     Range = plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm),
-      PlotDir=working_dir, Year_Set=year_labels, use_biascorr=use_biascorr )
+      PlotDir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
     Range = "Not run"
     message("\n### Skipping plot of spatial indices; must re-run with standard errors to plot")
   }
 
+  # Plot range edges
+  if( "jointPrecision" %in% names(fit$parameter_estimates$SD) ){
+    message("\n### Making plot of spatial indices")
+    Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
+      working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot,
+      category_names=category_names, n_samples=100, quantiles=c(0.05,0.5,0.95) )
+  }else{
+    Edge = "Not run"
+    message("\n### Skipping plot of range edge; must re-run with `getJointPrecision=TRUE` to plot")
+  }
+
   # Plot densities
   message("\n### Making plots of spatial predictions")
   plot_maps_args = list(...)
-  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, MappingDetails=map_list[["MappingDetails"]],
+  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, category_names=category_names,
     Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
-    Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir,
-    Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]], Cex=map_list[["Cex"]], Legend=map_list[["Legend"]],
-    zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8, plot_legend_fig=FALSE) )
+    working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
 
   # Plot quantile-quantile plot
@@ -81,15 +96,11 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
       FileName_Phist="Posterior_Predictive-Histogram", FileName_QQ="Q-Q_plot", FileName_Qhist="Q-Q_hist", save_dir=working_dir )
 
     # Pearson residuals
-    if( "n_x" %in% names(fit$data_list) ){
-      message("\n### Making plot of Pearson residuals")
-      plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report,
-        Q=Q, savedir=working_dir, MappingDetails=map_list[["MappingDetails"]], PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
-        Xlim=map_list[["Xlim"]], Ylim=map_list[["Ylim"]], FileName=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, Rotate=map_list[["Rotate"]],
-        Cex=map_list[["Cex"]], Legend=map_list[["Legend"]], zone=map_list[["Zone"]], mar=c(0,0,2,0), oma=c(3.5,3.5,0,0), cex=1.8)
-    }else{
-      message("\n### Skipping plot of Pearson residuals")
-    }
+    message("\n### Making plot of Pearson residuals")
+    plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report,
+      Q=Q, working_dir=working_dir, spatial_list=fit$spatial_list, extrapolation_list=fit$extrapolation_list,
+      Year_Set=year_labels, Years2Include=years_to_plot, zrange=zrange,
+      legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100 )
   }else{
     Q = "Not run"
     message("\n### Skipping Q-Q plot")
@@ -97,7 +108,8 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   }
 
   # return
-  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "map_list"=map_list, "plot_maps_args"=plot_maps_args )
+  Return = list( "Q"=Q, "Index"=Index, "Range"=Range, "Dens_xt"=Dens_xt, "Edge"=Edge,
+    "map_list"=map_list, "plot_maps_args"=plot_maps_args )
   return( invisible(Return) )
 }
 

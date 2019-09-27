@@ -6,9 +6,7 @@
 \usage{
 make_map_info(Region, Extrapolation_List, spatial_list = NULL,
   NN_Extrap = spatial_list$PolygonList$NN_Extrap,
-  fine_scale = spatial_list$fine_scale,
-  Include = (Extrapolation_List[["Area_km2_x"]] > 0 &
-  Extrapolation_List[["a_el"]][, 1] > 0))
+  fine_scale = spatial_list$fine_scale, Include)
 }
 \description{
 Function provides information to be used when plotting results

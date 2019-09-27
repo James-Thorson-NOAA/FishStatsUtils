@@ -3,6 +3,8 @@
 plot_lines = function( x, y, ybounds, fn=lines, col_bounds="black", bounds_type="whiskers", border=NA,
   border_lty="solid", lwd_bounds=1, ... ){
 
+  #warning( "`plot_lines` is soft-deprecated" )
+
   fn( y=y, x=x, ... )
   if( bounds_type=="whiskers" ){
     for(t in 1:length(y)){

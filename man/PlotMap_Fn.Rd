@@ -14,24 +14,9 @@ PlotMap_Fn(MappingDetails, Mat, PlotDF, MapSizeRatio = c(`Width(in)` = 4,
   ignore.na = FALSE, map_style = "rescale", ...)
 }
 \arguments{
-\item{MappingDetails}{tagged list of plot-settings from \code{MapDetails_Fn}}
-
 \item{MapSizeRatio}{Default size for each panel}
 
-\item{Xlim}{xlimits for each panel}
-
-\item{Ylim}{ylimits for each panel}
-
-\item{FileName}{Directory (absolute path) and base for filenames of plots}
-
 \item{Year_Set}{Year names for labeling panels}
-
-\item{Legend}{tagged list specifying insert colorbar
-\describe{
-  \item{use}{Boolean whether to plot insert colorbar or not}
-  \item{x}{Left and right-hand limits for legend in percentage of panel}
-  \item{y}{bottom and top limits for legend in percentage of panel}
-}}
 
 \item{plot_legend_fig}{Boolean, whether to plot a separate figure for the heatmap legend or not}
 

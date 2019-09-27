@@ -64,7 +64,9 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi=NULL, RotationMethod="PCA
 
   # PCA
   if( RotationMethod=="PCA" ){
-    Eigen = eigen(L_pj%*%t(L_pj))
+    Cov_tmp = L_pj%*%t(L_pj)
+    Cov_tmp = 0.5*Cov_tmp + 0.5*t(Cov_tmp) # Avoid numerical issues with complex eigen-decomposition due to numerical underflow
+    Eigen = eigen(Cov_tmp)
     Eigen$values_proportion = Eigen$values / sum(Eigen$values)
     Eigen$values_cumulative_proportion = cumsum(Eigen$values) / sum(Eigen$values)
     # Check decomposition

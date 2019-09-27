@@ -4,15 +4,11 @@
 \alias{plot_maps}
 \title{Plot standard maps}
 \usage{
-plot_maps(plot_set = 3, MappingDetails, Report, PlotDF,
-  Sdreport = NULL, Xlim, Ylim, TmbData = NULL, Nknots = Inf,
-  Panel = "Category", MapSizeRatio = c(`Width(in)` = 4, `Height(in)` =
-  4), Res = 200, FileName = paste0(getwd(), "/"), Year_Set = NULL,
-  Years2Include = NULL, Rescale = FALSE, Rotate = 0,
-  Format = "png", zone = NA, Cex = 0.01, add = FALSE,
-  category_names = NULL, textmargin = NULL, pch = NULL,
-  Legend = list(use = FALSE, x = c(10, 30), y = c(10, 30)),
-  mfrow = NULL, plot_legend_fig = TRUE, quiet = FALSE, ...)
+plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
+  TmbData = NULL, projargs = "+proj=longlat", Panel = "Category",
+  Year_Set = NULL, Years2Include = NULL, category_names = NULL,
+  quiet = FALSE, working_dir = paste0(getwd(), "/"), MapSizeRatio,
+  n_cells, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -33,23 +29,11 @@ plot_maps(plot_set = 3, MappingDetails, Report, PlotDF,
   \item{plot_set=14}{Covariate effects on positive catch rates}
 }}
 
-\item{MappingDetails}{tagged list of plot-settings from \code{MapDetails_Fn}}
-
 \item{Report}{tagged list of outputs from TMB model via \code{Obj$report()}}
 
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
-\item{Xlim}{xlimits for each panel}
-
-\item{Ylim}{ylimits for each panel}
-
-\item{Nknots}{Number of knots used for plotting (default is all grid cells in \code{Extrapolation_grid}}
-
 \item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
-
-\item{MapSizeRatio}{Default size for each panel}
-
-\item{FileName}{Directory (absolute path) and base for filenames of plots}
 
 \item{Year_Set}{Year names for labeling panels}
 
@@ -57,14 +41,9 @@ plot_maps(plot_set = 3, MappingDetails, Report, PlotDF,
 
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
-\item{Legend}{tagged list specifying insert colorbar
-\describe{
-  \item{use}{Boolean whether to plot insert colorbar or not}
-  \item{x}{Left and right-hand limits for legend in percentage of panel}
-  \item{y}{bottom and top limits for legend in percentage of panel}
-}}
+\item{MapSizeRatio}{Default size for each panel}
 
-\item{...}{arguments passed to \code{PlotMap_Fn}}
+\item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
 }
 \value{
 Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}

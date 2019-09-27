@@ -5,6 +5,8 @@
 #' @description
 #' \code{plot_data} produces diagnostics plots for the spatial distribution of data and knots
 #'
+#' @inheritParams plot_variable
+#'
 #' @param Extrapolation_List Output from \code{Prepare_Extrapolation_Data_Fn}
 #' @param Spatial_List Output from \code{Spatial_Information_Fn}
 #' @param Data_Geostat data-frame of data (with columns 'E_km', 'N_km', 'Year', 'Lon', 'Lat' at a minimum)
@@ -16,7 +18,7 @@
 plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
   Lat_i=Data_Geostat[,'Lat'], Lon_i=Data_Geostat[,'Lon'], Year_i=Data_Geostat[,'Year'], PlotDir=paste0(getwd(),"/"),
   Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col="red", cex=0.01, pch=19,
-  Year_Set, ...){
+  Year_Set, projargs='+proj=longlat', map_resolution="medium", land_color="grey", ...){
 
   # Check for issues
   if( is.null(Lat_i) | is.null(Lon_i) | is.null(Year_i) ){
@@ -40,18 +42,23 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
     if(length(col)!=length(Year_i)) stop("input `col` has wrong length")
   }
 
+  # CRS for original and new projections
+  CRS_proj = sp::CRS( projargs )
+
+  # Data for mapping
+  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))
+  map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
+
   # Plot data and grid
   png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
     par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
-    plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
-    map( "world", add=TRUE )
+    which_rows = which( Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
+    plot( Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
+    sp::plot( map_data, col=land_color, add=TRUE )
     if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){
-      plot( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
+      plot( Extrapolation_List$Data_Extrap[which_rows,c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
     }
     plot( Spatial_List$loc_x, col="red", pch=20, main="Knots (North-East)")
-    #if( all(c('E_km','N_km')%in%names(Data_Geostat)) ){
-    #  plot( Data_Geostat[,c('E_km','N_km')], col="blue", pch=20, cex=0.1, main="Data (North-East)")
-    #}
   dev.off()
 
   # Plot data by year
@@ -64,7 +71,7 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
     for( t in 1:length(Year_Set) ){
       Which = which( Year_i == Year_Set[t] )
       plot( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], main=Year_Set[t], xlim=range(Lon_i), ylim=range(Lat_i), xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
-      map( "world", add=TRUE, fill=TRUE, col="grey" )
+      sp::plot( map_data, col=land_color, add=TRUE )
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
       mtext( side=c(1,2), text=c("Longitude","Latitude"), outer=TRUE, line=1)

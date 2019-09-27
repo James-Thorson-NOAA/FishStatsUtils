@@ -23,6 +23,9 @@ function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=
          Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE,
          map_style="rescale", ...){
 
+  # Warning
+  warning( "`PlotMap_Fn` is soft-deprecated, please use `plot_variable` instead for many improvements")
+
   # Check for problems
   if( length(Year_Set) != ncol(Mat) ){
     warning( "Year_Set and `ncol(Mat)` don't match: Changing Year_Set'")

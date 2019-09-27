@@ -4,7 +4,7 @@
 #'
 #' @export
 make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extrap=spatial_list$PolygonList$NN_Extrap,
-  fine_scale=spatial_list$fine_scale, Include=(Extrapolation_List[["Area_km2_x"]]>0&Extrapolation_List[["a_el"]][,1]>0) ){
+  fine_scale=spatial_list$fine_scale, Include ){
 
   # Fix defaults
   if( is.null(fine_scale) ) fine_scale = FALSE
@@ -14,6 +14,9 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     }else{
       stop("Must update inputs to `make_map_info` to enable feature `fine_scale=TRUE`")
     }
+  }
+  if( missing(Include) ){
+    Include = Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0
   }
 
   # Initialize
@@ -38,7 +41,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=2,"Width(in)"=2)
     Rotate = 0
     Cex = 0.1
-    Legend = list(use=FALSE,x=c(10,30),y=c(10,30))
+    Legend = list(use=FALSE,x=c(5,10),y=c(5,45))
   }
   if( tolower(Region) == "eastern_bering_sea" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
@@ -59,7 +62,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=2,"Width(in)"=5)
     Rotate = 0
     Cex = 0.2
-    Legend = list(use=FALSE,x=c(10,30),y=c(10,30))
+    Legend = list(use=FALSE,x=c(5,10),y=c(5,45))
   }
   if( tolower(Region) == "gulf_of_alaska" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
@@ -90,7 +93,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=3)
     Rotate = 0
     Cex = 0.1
-    Legend = list(use=FALSE,x=c(10,30),y=c(10,30))
+    Legend = list(use=FALSE,x=c(5,10),y=c(4,45))
   }
   if( tolower(Region) == "gulf_of_st_lawrence" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
@@ -100,7 +103,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=4)
     Rotate = 0
     Cex = 1.0
-    Legend = list(use=FALSE,x=c(10,30),y=c(10,30))
+    Legend = list(use=FALSE,x=c(5,10),y=c(4,45))
   }
   if( tolower(Region) == "new_zealand" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
@@ -110,7 +113,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=2,"Width(in)"=5)
     Rotate = 0     # Degrees counter-clockwise
     Cex = 0.01
-    Legend = list(use=FALSE,x=c(10,30),y=c(10,30))
+    Legend = list(use=FALSE,x=c(5,10),y=c(5,45))
   }
   if( tolower(Region) == "habcam" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include)
@@ -141,7 +144,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Ylim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lat'])
     Rotate = 0
     Cex = 0.1
-    Legend = list(use=FALSE,x=c(10,30),y=c(10,30))
+    Legend = list(use=FALSE,x=c(5,10),y=c(5,45))
   }
 
   #

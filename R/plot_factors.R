@@ -156,17 +156,27 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
       # Plot factors
       if( !is.null(mapdetails_list) ){
-        # Plot factors by year
-        if( Par_name %in% c("Epsilon1","Epsilon2")){
-          FishStatsUtils::plot_maps(plot_set=c(NA,6,NA,NA,7,NA)[i], MappingDetails=mapdetails_list[["MappingDetails"]], Report=Report_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]], Xlim=mapdetails_list[["Xlim"]], Ylim=mapdetails_list[["Ylim"]], FileName=plotdir, Year_Set=Year_Set, Rotate=mapdetails_list[["Rotate"]], category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), mar=c(0,0,2,0), oma=c(1.5,1.5,0,0), pch=20, Cex=mapdetails_list[["Cex"]], cex=1.8, mfrow=Dim_year, cex.main=1.0, Legend=mapdetails_list[["Legend"]], zone=mapdetails_list[["Zone"]], plot_legend_fig=FALSE, land_color=land_color)
+        # Plot Epsilon
+        # Use plot_maps to automatically make one figure per factor
+        if( Par_name %in% c("Epsilon1","Epsilon2") ){
+          plot_maps(plot_set=c(6,6,NA,7,7,NA)[i], Report=Report_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
+            working_dir=plotdir, Year_Set=Year_Set, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100)
         }  #
 
-        # Plot average factors across years
-        if( !Par_name %in% c("Beta1", "Beta2")){
-          ## Doesn't make sense to make maps of beta factors since they aren't spatial
-          Mat_sf = apply(Report_tmp$D_xct, MARGIN=1:2, FUN=mean)
-          FishStatsUtils::PlotMap_Fn( MappingDetails=mapdetails_list[["MappingDetails"]], Mat=Mat_sf, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]], Xlim=mapdetails_list[["Xlim"]], Ylim=mapdetails_list[["Ylim"]], FileName=paste0(plotdir,"Factor_maps--",Par_name), Year_Set=paste0("Factor_",1:ncol(Mat_sf)), Rotate=mapdetails_list[["Rotate"]], zone=mapdetails_list[["Zone"]], mar=c(0,0,2,0), oma=c(2.5,2.5,0,0), pch=20, Cex=mapdetails_list[["Cex"]], mfrow=Dim_factor, Legend=mapdetails_list[["Legend"]], plot_legend_fig=FALSE, land_color=land_color)
+        # Plot Omega
+        # Use plot_variable to plot all factors on single figure
+        if( Par_name %in% c("Omega1", "Omega2")){
+        #  Mat_sf = apply(Report_tmp$D_xct, MARGIN=1:2, FUN=mean)
+        #  plot_maps(plot_set=c(6,6,NA,7,7,NA)[i], Report=Report_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
+        #    working_dir=plotdir, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+        #    legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100)
+        #  #FishStatsUtils::PlotMap_Fn( MappingDetails=mapdetails_list[["MappingDetails"]], Mat=Mat_sf, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]], Xlim=mapdetails_list[["Xlim"]], Ylim=mapdetails_list[["Ylim"]], FileName=paste0(plotdir,"Factor_maps--",Par_name), Year_Set=paste0("Factor_",1:ncol(Mat_sf)), Rotate=mapdetails_list[["Rotate"]], zone=mapdetails_list[["Zone"]], mar=c(0,0,2,0), oma=c(2.5,2.5,0,0), pch=20, Cex=mapdetails_list[["Cex"]], mfrow=Dim_factor, Legend=mapdetails_list[["Legend"]], plot_legend_fig=FALSE, land_color=land_color)
+          plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
+            panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name) )
         }
+
+        ## Doesn't make sense to make maps of beta factors since they aren't spatial
       }
     }else{
       Lprime_SE_list[[i]] = L_SE_list[[i]] = L_SE_list[[i]] = Psi2prime_list[[i]] = Psiprime_list[[i]] = Lprime_list[[i]] = L_list[[i]] = "Element not estimated, and therefore empty"

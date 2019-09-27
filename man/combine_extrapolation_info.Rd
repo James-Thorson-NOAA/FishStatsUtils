@@ -4,7 +4,7 @@
 \alias{combine_extrapolation_info}
 \title{Combines multiple extrapolation grids}
 \usage{
-combine_extrapolation_info(...)
+combine_extrapolation_info(..., create_strata_per_region = FALSE)
 }
 \arguments{
 \item{...}{a sequence of outputs from \code{FishStatsUtils::make_extrapolation_info}}

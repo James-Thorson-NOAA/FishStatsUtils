@@ -5,12 +5,14 @@
 \title{Build extrapolation grid}
 \usage{
 make_extrapolation_info(Region, zone = NA,
-  strata.limits = data.frame(STRATA = "All_areas"), input_grid = NULL,
+  strata.limits = data.frame(STRATA = "All_areas"),
+  create_strata_per_region = FALSE, input_grid = NULL,
   observations_LL = NULL, grid_dim_km = c(2, 2),
   maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
   grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
   strata_to_use = c("SOG", "WCVI", "QCS", "HS", "WCHG"),
-  survey = "Chatham_rise", surveyname = "propInWCGBTS", ...)
+  survey = "Chatham_rise", surveyname = "propInWCGBTS",
+  flip_around_dateline, ...)
 }
 \arguments{
 \item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
@@ -18,6 +20,8 @@ make_extrapolation_info(Region, zone = NA,
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 
 \item{strata.limits}{an input for determining stratification of indices (see example script)}
+
+\item{create_strata_per_region}{Boolean indicating whether to create a single stratum for all regions listed in \code{Region} (the default), or a combined stratum in addition to a stratum for each individual Region}
 
 \item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}}
 
@@ -38,6 +42,8 @@ make_extrapolation_info(Region, zone = NA,
 \item{survey}{survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}}
 
 \item{surveyname}{area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}}
+
+\item{flip_around_dateline}{used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used}
 
 \item{...}{other objects passed for individual regions (see example script)}
 }

@@ -10,8 +10,7 @@
 #' @param n_x the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")
 #' @param Lon_i Longitude for each sample
 #' @param Lat_i Latitude for each sample
-#' @param LON_intensity Longitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lon_i}
-#' @param LAT_intensity Latitude for each location to use during k-means algorithm to decide upon the location of knots; defaults to location for sample \code{Lat_i}
+#' @param knot_method whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}
 #' @param Method a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy
 #' @param fine_scale a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino
 #' @param Extrapolation_List the output from \code{Prepare_Extrapolation_Data_Fn}
@@ -35,9 +34,10 @@
 #'
 
 #' @export
-make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intensity=Lat_i, Extrapolation_List, Method="Mesh",
+make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method="samples", Method="Mesh",
   grid_size_km=50, grid_size_LL=1, fine_scale=FALSE, Network_sz_LL=NULL,
-  iter.max=1000, randomseed=1, nstart=100, DirPath=paste0(getwd(),"/"), Save_Results=FALSE, ... ){
+  iter.max=1000, randomseed=1, nstart=100, DirPath=paste0(getwd(),"/"), Save_Results=FALSE,
+  LON_intensity, LAT_intensity, ... ){
 
   # Deprecated options
   if( Method=="Spherical_mesh" ){
@@ -45,6 +45,19 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   }
   if( Method == "Stream_network" & fine_scale == TRUE ){
     stop("Please use fine_scale=FALSE with stream network spatial model; feature fine_scale=TRUE not yet supported for stream network spatial model.")
+  }
+
+  # Backwards compatible option for different extrapolation grid
+  if( missing(LON_intensity) & missing(LAT_intensity) ){
+    if( knot_method=="samples" ){
+      LON_intensity = Lon_i
+      LAT_intensity = Lat_i
+    }
+    if( knot_method=="grid" ){
+      which_rows = which( Extrapolation_List$Data_Extrap[,'Include']==TRUE & Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
+      LON_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lon']
+      LAT_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lat']
+    }
   }
 
   # Convert to an Eastings-Northings coordinate system
@@ -111,12 +124,22 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
     loc_g = Extrapolation_List$Data_Extrap[ which(Extrapolation_List$Area_km2_x>0), c('E_km','N_km') ]
   }
 
-  # Convert loc_x back to location in lat-long coordinates loc_x_LL
-  # if zone=NA or NTULL, then it automatically detects appropriate zone
-  #tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_x),'X'=loc_x[,'E_km'],'Y'=loc_x[,'N_km'])
-  #attr(tmpUTM,"projection") = "UTM"
-  #attr(tmpUTM,"zone") = Extrapolation_List$zone
-  #loc_x_LL = PBSmapping::convUL(tmpUTM)                                                         #$
+  # Convert loc_x back to location in lat-long coordinates latlon_x
+  tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_x),'X'=loc_x[,'E_km'],'Y'=loc_x[,'N_km'])
+  attr(tmpUTM,"projection") = "UTM"
+  attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
+  latlon_x = PBSmapping::convUL(tmpUTM)                                                         #$
+  latlon_x = cbind( 'Lat'=latlon_x[,"Y"], 'Lon'=latlon_x[,"X"])
+
+  # Convert loc_g back to location in lat-long coordinates latlon_g
+  tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_g),'X'=loc_g[,'E_km'],'Y'=loc_g[,'N_km'])
+  attr(tmpUTM,"projection") = "UTM"
+  attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
+  latlon_g = PBSmapping::convUL(tmpUTM)                                                         #$
+  latlon_g = cbind( 'Lat'=latlon_g[,"Y"], 'Lon'=latlon_g[,"X"])
+
+  # Bundle lat-lon
+  latlon_i = cbind( 'Lat'=Lat_i, 'Lon'=Lon_i )
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
   MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
@@ -171,7 +194,8 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, LON_intensity=Lon_i, LAT_intens
   Return = list( "fine_scale"=fine_scale, "A_is"=A_is, "A_gs"=A_gs, "n_x"=n_x, "n_s"=n_s, "n_g"=nrow(a_gl), "n_i"=nrow(loc_i),
     "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
     "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g),
-    "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap )
+    "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap, "knot_method"=knot_method,
+    "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i )
   class(Return) = "make_spatial_info"
   return( Return )
 }
