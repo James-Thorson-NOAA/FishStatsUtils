@@ -126,6 +126,7 @@ load_example = function( data_set="EBS_pollock" ){
     sampling_data = GOA_pcod_covariate_example$sampling_data
     strata.limits = data.frame('STRATA'="All_areas")
     X_xtp = GOA_pcod_covariate_example$X_xtp
+    covariate_data = GOA_pcod_covariate_example$covariate_data
   }
   if( tolower(data_set) %in% tolower(c("GOA_MICE_example")) ){
     data( goa_mice_example, package="FishStatsUtils" )
@@ -144,6 +145,7 @@ load_example = function( data_set="EBS_pollock" ){
   if( !is.null(X_itp)) Return[["X_itp"]] = X_itp
   if( !is.null(Q_ik)) Return[["Q_ik"]] = Q_ik
   if( !is.null(F_ct)) Return[["F_ct"]] = F_ct
+  if( !is.null(covariate_data)) Return[["covariate_data"]] = covariate_data
 
   # return stuff
   return(Return)

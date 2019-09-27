@@ -213,8 +213,9 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
     if(plot_num==11){
       if( quiet==FALSE ) message(" # Plotting covariates")
       if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
-      if(!("X_xtp" %in% names(TmbData))) stop( "Can only plot covariates for VAST version >= 2.0.0" )
-      Array_xct = aperm( TmbData$X_xtp, perm=c(1,3,2) )
+      #if(!("X_xtp" %in% names(TmbData))) stop( "Can only plot covariates for VAST version >= 2.0.0" )
+      if("X_xtp"%in%names(TmbData)) Array_xct = aperm( TmbData$X_xtp, perm=c(1,3,2) )
+      if("X_gtp"%in%names(TmbData)) Array_xct = aperm( TmbData$X_gtp, perm=c(1,3,2) )
       category_names = 1:dim(Array_xct)[2]
     }
     if(plot_num==12){
