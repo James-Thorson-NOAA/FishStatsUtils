@@ -27,6 +27,8 @@ plot_range_edge(Sdreport, Obj, Year_Set = NULL, Years2Include = NULL,
 
 \item{quantiles}{vector}
 
+\item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
+
 \item{interval_width}{width for confidence intervals}
 
 \item{width}{plot width in inches}

@@ -12,7 +12,7 @@
 #' @param Obj Fitted TMB object from package `VAST`, i.e., output from `fit_model(...)$tmb_list$Obj`
 #' @param working_dir Directory for plots
 #' @param quantiles vector
-#'
+#' @param n_samples number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.
 #'
 
 #' @export
@@ -70,7 +70,7 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
   u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Sdreport$jointPrecision, n.sims=n_samples)
   D_gcyr = array( NA, dim=c(dim(Report$D_gcy),n_samples) )
   for( rI in 1:n_samples ){
-    if( rI%%floor(n_samples/10) == 1 ) message( "Obtaining sample ", rI, " from predictive distribution for density" )
+    if( rI%%max(1,floor(n_samples/10)) == 1 ) message( "Obtaining sample ", rI, " from predictive distribution for density" )
     D_gcyr[,,,rI] = Obj$report( par=u_zr[,rI] )$D_gcy
   }
 
@@ -93,11 +93,15 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
     for( tI in 1:dim(E_zctm)[3] ){
       if(rI==0){
         index_tmp = which.min( (prop_zctm[,cI,tI,mI]-quantiles[zI])^2 )
+        #return( TmbData$Z_gm[order_g[index_tmp],mI] )
         E_zctm[zI,cI,tI,mI] = TmbData$Z_gm[order_g[index_tmp],mI]
+        #return( E_zctm[zI,cI,tI,mI] )
       }
       if(rI>=1){
         index_tmp = which.min( (prop_zctmr[,cI,tI,mI,rI]-quantiles[zI])^2 )
+        #return( TmbData$Z_gm[order_g[index_tmp],mI] )
         E_zctmr[zI,cI,tI,mI,rI] = TmbData$Z_gm[order_g[index_tmp],mI]
+        #return( TmbData$Z_gm[order_g[index_tmp],mI] )
       }
     }}}
   }}
@@ -112,13 +116,11 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
   for( mI in 1:dim(E_zctm)[4] ){
     Index_zct = array(Edge_zctm[,,,mI,'Estimate'],dim(Edge_zctm)[1:3])
     sd_Index_zct = array(Edge_zctm[,,,mI,'Std. Error'],dim(Edge_zctm)[1:3])
-    plot_index( Index_ctl=aperm(Index_zct,c(2,3,1)),
-      sd_Index_ctl=aperm(sd_Index_zct,c(2,3,1)),
+    plot_index( Index_ctl=aperm(Index_zct,c(2,3,1)), sd_Index_ctl=aperm(sd_Index_zct,c(2,3,1)),
       Year_Set=Year_Set, Years2Include=Years2Include, strata_names=quantiles, category_names=category_names,
       DirName=working_dir, PlotName=paste0("RangeEdge_",m_labels[mI],".png"), Yrange=c(NA,NA),
       interval_width=interval_width, width=width, height=height, xlab="Year", ylab=paste0("Quantiles (",m_labels[mI],")") )
   }
-
 
   # Return list of stuff
   Return = list( "Year_Set"=Year_Set, "Edge_zctm"=Edge_zctm )
