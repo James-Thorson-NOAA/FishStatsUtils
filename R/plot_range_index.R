@@ -52,6 +52,8 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
     TmbData[["n_t"]] = nrow(TmbData[["t_yz"]])
   }
 
+
+
   # Default inputs
   if( is.null(Year_Set)) Year_Set = 1:TmbData$n_t
   if( is.null(Years2Include) ) Years2Include = 1:TmbData$n_t

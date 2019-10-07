@@ -79,7 +79,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
       category_names=category_names, n_samples=n_samples, quantiles=c(0.05,0.5,0.95) )
   }else{
     Edge = "Not run"
-    message("\n### Skipping plot of range edge; only possible if `getJointPrecision=TRUE` to plot")
+    message("\n### Skipping plot of range edge; only possible if `getJointPrecision=TRUE` and `n_samples`>0")
   }
 
   # Plot densities

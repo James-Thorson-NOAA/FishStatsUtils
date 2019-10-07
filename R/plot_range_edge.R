@@ -29,6 +29,8 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
   if( !("jointPrecision" %in% names(Sdreport))) stop("jointPrecision not present in Sdreport; please re-run with `getJointPrecision=TRUE`")
   if( any(quantiles<0) | any(quantiles>1) ) stop("Please provide `quantiles` between zero and one")
   if( all(TmbData$Z_gm==0) ) stop("Please re-run with 'Options['Calculate_Range']=TRUE' to calculate range edges")
+  if( n_samples<10 ) stop("`n_samples` must be at least 10 for any chance of meaningful results for `plot_range_edge`")
+  if( n_samples<100 ) warning("Package author recommends `n_samples`>=100 for `plot_range_edge`")
 
   # Which parameters
   if( "ln_Index_tl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
