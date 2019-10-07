@@ -25,7 +25,7 @@ make_covariates = function( formula=~0, covariate_data, Year_i, spatial_list, ex
   if( !is.data.frame(covariate_data) ) stop("Please ensure that `covariate_data` is a data frame")
 
   #
-  sample_data = cbind( "Year"=Year_i, "Lat"=spatial_list$latlon_i[,'Lat'], "Lon"=spatial_list$latlon_i[,'Lon'] )
+  sample_data = data.frame( "Year"=Year_i, "Lat"=spatial_list$latlon_i[,'Lat'], "Lon"=spatial_list$latlon_i[,'Lon'] )
 
   # set of years needed
   Year_Set = min(Year_i):max(Year_i)
@@ -34,30 +34,34 @@ make_covariates = function( formula=~0, covariate_data, Year_i, spatial_list, ex
   latlon_g = spatial_list$latlon_g
 
   # Create data frame of necessary size
-  DF_zp = DF_ip = NULL
-  for( tI in seq_along(Year_Set) ){
-    # Subset to same year
+  DF_zp = NULL
+  DF_ip = cbind( sample_data, covariate_data[,-match(names(sample_data),colnames(covariate_data))] )
+  DF_ip[,-match(c("Year","Lat","Lon"),colnames(covariate_data))] = NA
 
+  # Loop through data and extrapolation-grid
+  for( tI in seq_along(Year_Set) ){
+  #for( tI in 1:14 ){
+
+    # Subset to same year
     tmp_covariate_data = covariate_data[ which(Year_Set[tI]==covariate_data[,'Year'] | is.na(covariate_data[,'Year'])), ]
     if( nrow(tmp_covariate_data)==0 ){
       stop("Year ", Year_Set[tI], " not found in `covariate_data` please specify covariate values for all years" )
     }
     #
-    tmp_sample_data = sample_data[ which(Year_Set[tI]==sample_data[,'Year']), ]
+    Which = which(Year_Set[tI]==sample_data[,'Year'])
     # Do nearest neighbors to define covariates for observations, skipping years without observations
-    if( nrow(tmp_sample_data) > 0 ){
-      NN = RANN::nn2( data=tmp_covariate_data[,c("Lat","Lon")], query=tmp_sample_data[,c("Lat","Lon")], k=1 )
+    if( length(Which) > 0 ){
+      NN = RANN::nn2( data=tmp_covariate_data[,c("Lat","Lon")], query=sample_data[Which,c("Lat","Lon")], k=1 )
       # Add to data-frame
-      newcolumns = tmp_covariate_data[NN$nn.idx[,1], -match(c("Lat","Lon","Year"),colnames(tmp_covariate_data)), drop=FALSE]
-      newrows = cbind(tmp_sample_data, newcolumns)
-      DF_ip = rbind( DF_ip, newrows )
+      newcolumns = tmp_covariate_data[ NN$nn.idx[,1], -match(c("Lat","Lon","Year"),colnames(tmp_covariate_data)), drop=FALSE ]
+      DF_ip[Which, -match(c("Lat","Lon","Year"),colnames(covariate_data))] = newcolumns
     }
 
     # Do nearest neighbors to define covariates for extrapolation grid, including years without observations
     NN = RANN::nn2( data=tmp_covariate_data[,c("Lat","Lon")], query=latlon_g[,c("Lat","Lon")], k=1 )
     # Add rows
-    newcolumns = tmp_covariate_data[NN$nn.idx[,1], -match(c("Lat","Lon","Year"),colnames(tmp_covariate_data)), drop=FALSE]
-    newrows = cbind(latlon_g, "Year"=Year_Set[tI], newcolumns )
+    newcolumns = tmp_covariate_data[ NN$nn.idx[,1], -match(names(sample_data),colnames(tmp_covariate_data)), drop=FALSE ]
+    newrows = cbind("Year"=Year_Set[tI], latlon_g, newcolumns )
     DF_zp = rbind( DF_zp, newrows )
   }
 
