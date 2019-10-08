@@ -35,7 +35,7 @@ make_covariates = function( formula=~0, covariate_data, Year_i, spatial_list, ex
 
   # Create data frame of necessary size
   DF_zp = NULL
-  DF_ip = cbind( sample_data, covariate_data[,-match(names(sample_data),colnames(covariate_data))] )
+  DF_ip = cbind( sample_data, covariate_data[rep(1,nrow(sample_data)),-match(names(sample_data),colnames(covariate_data))] )
   DF_ip[,-match(c("Year","Lat","Lon"),colnames(covariate_data))] = NA
 
   # Loop through data and extrapolation-grid
