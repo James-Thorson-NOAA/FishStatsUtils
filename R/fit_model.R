@@ -114,10 +114,13 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
 
   # Optimize object
   message("\n### Estimating parameters")
-  optimize_args_default1 = extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))]
-  optimize_args_input1 = list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    savedir=NULL, getsd=FALSE, newtonsteps=0, bias.correct=FALSE, quiet=TRUE,
-    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=2)
+  # have user override upper, lower, and loopnum
+  optimize_args_default1 = combine_lists( default=list(lower=tmb_list$Lower, upper=tmb_list$Upper, loopnum=2),
+    input=extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))] )
+  # auto-override user inputs for optimizer-related inputs for first test run
+  optimize_args_input1 = list(obj=tmb_list$Obj, savedir=NULL, newtonsteps=0, bias.correct=FALSE,
+    control=list(eval.max=10000,iter.max=10000,trace=1), quiet=TRUE, getsd=FALSE )
+  # combine
   optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1 )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
 
@@ -135,8 +138,11 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
     savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
     bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
     control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1)
+  # user over-rides all default inputs
   optimize_args_input2 = extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))]
+  # combine
   optimize_args_input2 = combine_lists( input=optimize_args_input2, default=optimize_args_default2 )
+  # start from MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates$par), default=optimize_args_input2 )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 

@@ -9,6 +9,7 @@
 #' @inheritParams fit_model
 #' @inheritParams plot_maps
 #' @inheritParams plot_residuals
+#' @inheritParams plot_range_edge
 #' @param check_residuals Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)
 #' @param ... additional settings to pass to \code{FishStatsUtils::plot_maps}
 #'
@@ -20,7 +21,7 @@
 #' @export
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
-  category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, ... ){
+  category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, n_samples=100, ... ){
 
   # Check for known issues
   if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
@@ -71,14 +72,14 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   }
 
   # Plot range edges
-  if( "jointPrecision" %in% names(fit$parameter_estimates$SD) ){
+  if( "jointPrecision"%in%names(fit$parameter_estimates$SD) & n_samples>0 ){
     message("\n### Making plot of spatial indices")
     Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
       working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot,
-      category_names=category_names, n_samples=100, quantiles=c(0.05,0.5,0.95) )
+      category_names=category_names, n_samples=n_samples, quantiles=c(0.05,0.5,0.95) )
   }else{
     Edge = "Not run"
-    message("\n### Skipping plot of range edge; must re-run with `getJointPrecision=TRUE` to plot")
+    message("\n### Skipping plot of range edge; only possible if `getJointPrecision=TRUE` and `n_samples`>0")
   }
 
   # Plot densities

@@ -8,8 +8,8 @@
 #'
 #' @param Y_gt matrix where values for every column are plotted as a map
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
-#' @param legend_x two numeric values (between 0 and 1) giving left and right-hand location of color legend
-#' @param legend_y two numeric values (between 0 and 1) giving bottom and top location of color legend
+#' @param legend_x two numeric values (generally between 0 and 1, but slightly lower/higher values generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend
+#' @param legend_y two numeric values (see legend_y) giving bottom and top location of color legend
 #' @param map_list output from \code{FishStatsUtils::make_map_info}
 #' @param zlim range for defining bounds of color scale
 #' @param add boolean indicating whether to add plot to an existing panel figure, or to define a new panel figure
@@ -24,8 +24,8 @@ plot_variable <-
 function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution="medium",
          file_name="density", working_dir=paste0(getwd(),"/"), Format="png", Res=200, add=FALSE,
          outermargintext=c("Eastings","Northings"), zlim, col, mar=c(0,0,2,0), oma=c(4,4,0,0),
-         legend_x=c(0,0.05), legend_y=c(0.05,0.45), mfrow, land_color="grey",
-         n_cells, ...){
+         legend_x=c(0,0.05), legend_y=c(0.05,0.45), cex.legend=1, mfrow, land_color="grey",
+         n_cells, xlim, ylim, ...){
 
   ###################
   # Settings and inputs
@@ -64,7 +64,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     col = col(1000)
   }
   if( all(is.numeric(c(legend_x,legend_y))) ){
-    if( any(c(legend_x,legend_y)>1) | any(c(legend_x,legend_y)<0) ){
+    if( any(c(legend_x,legend_y) > 1.2) | any(c(legend_x,legend_y) < -0.2) ){
       stop("Check values for `legend_x` and `legend_y`")
     }
   }
@@ -120,7 +120,9 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     # library(plotKML)
     cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
     Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size )
-    image( Raster_proj, col=col, zlim=zlim )
+    if(missing(xlim)) xlim = Raster_proj@bbox[1,]
+    if(missing(ylim)) ylim = Raster_proj@bbox[2,]
+    image( Raster_proj, col=col, zlim=zlim, xlim=xlim, ylim=ylim )
 
     # Plot maps using rnaturalearth
     sp::plot( map_data, col=land_color, add=TRUE )
@@ -136,7 +138,14 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
     yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]
     yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
-    plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(zlim[1],zlim[2],length=4),1), rect.col=col, cex=1, align=c("lt","rb")[2], gradient="y")
+    if( diff(legend_y) > diff(legend_x) ){
+      align = c("lt","rb")[2]
+      gradient = c("x","y")[1]
+    }else{
+      align = c("lt","rb")[1]
+      gradient = c("x","y")[1]
+    }
+    plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(zlim[1],zlim[2],length=4),1), rect.col=col, cex=cex.legend, align=align, gradient=gradient)
   }
 
   # Margin text
@@ -144,5 +153,5 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   if(add==FALSE) mtext(side=2, outer=TRUE, outermargintext[2], cex=1.75, line=par()$oma[2]/2)
 
   # return stuff as necessary
-  return( invisible(list("Par"=Par, "cell.size"=cell.size, "n_cells"=n_cells)) )
+  return( invisible(list("Par"=Par, "cell.size"=cell.size, "n_cells"=n_cells, "xlim"=xlim, "ylim"=ylim)) )
 }

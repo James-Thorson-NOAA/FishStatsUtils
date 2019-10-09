@@ -148,6 +148,10 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
       Include = extrapolation_list[["Area_km2_x"]]>0 & extrapolation_list[["a_el"]][,1]>0
       DF = cbind( extrapolation_list$Data_Extrap[,c('Lon','Lat')], "x2i"=x2i, "Include"=Include )
 
+      # Fill in labels
+      if( is.null(Year_Set) ) Year_Set = 1:ncol(Q_xy)
+      if( is.null(Years2Include) ) Years2Include = 1:ncol(Q_xy)
+
       # Make plots
       plot_args = plot_variable( Y_gt=ifelse(is.na(Q_xy),mean(zlim),Q_xy), map_list=list("PlotDF"=DF), projargs=projargs, working_dir=working_dir,
         panel_labels=Year_Set[Years2Include], file_name=plot_code, zlim=zlim, col=Col, ... )

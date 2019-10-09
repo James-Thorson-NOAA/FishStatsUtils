@@ -33,7 +33,7 @@ load_example = function( data_set="EBS_pollock" ){
                    "goa_mice_example" = tolower("Gulf_of_Alaska"),
                    tolower("Other") )
 
-  F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
+  covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
     Year = as.numeric(sapply(WCGBTS_Canary_example[,'PROJECT_CYCLE'], FUN=function(Char){strsplit(as.character(Char)," ")[[1]][2]}))
@@ -122,10 +122,11 @@ load_example = function( data_set="EBS_pollock" ){
     strata.limits = data.frame('STRATA'="All_areas")
   }
   if( tolower(data_set) %in% tolower(c("covariate_example","GOA_pcod_covariate_example")) ){
-    data( GOA_pcod_covariate_example, package="FishStatsUtils" )
-    sampling_data = GOA_pcod_covariate_example$sampling_data
+    data( GOA_Pcod_covariate_example, package="FishStatsUtils" )
+    sampling_data = GOA_Pcod_covariate_example$sampling_data
     strata.limits = data.frame('STRATA'="All_areas")
-    X_xtp = GOA_pcod_covariate_example$X_xtp
+    X_xtp = GOA_Pcod_covariate_example$X_xtp
+    covariate_data = GOA_Pcod_covariate_example$covariate_data
   }
   if( tolower(data_set) %in% tolower(c("GOA_MICE_example")) ){
     data( goa_mice_example, package="FishStatsUtils" )
@@ -144,6 +145,7 @@ load_example = function( data_set="EBS_pollock" ){
   if( !is.null(X_itp)) Return[["X_itp"]] = X_itp
   if( !is.null(Q_ik)) Return[["Q_ik"]] = Q_ik
   if( !is.null(F_ct)) Return[["F_ct"]] = F_ct
+  if( !is.null(covariate_data)) Return[["covariate_data"]] = covariate_data
 
   # return stuff
   return(Return)
