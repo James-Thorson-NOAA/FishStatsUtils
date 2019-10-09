@@ -9,7 +9,8 @@ plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
   working_dir = paste0(getwd(), "/"), Format = "png", Res = 200,
   add = FALSE, outermargintext = c("Eastings", "Northings"), zlim, col,
   mar = c(0, 0, 2, 0), oma = c(4, 4, 0, 0), legend_x = c(0, 0.05),
-  legend_y = c(0.05, 0.45), mfrow, land_color = "grey", n_cells, ...)
+  legend_y = c(0.05, 0.45), cex.legend = 1, mfrow,
+  land_color = "grey", n_cells, xlim, ylim, ...)
 }
 \arguments{
 \item{Y_gt}{matrix where values for every column are plotted as a map}
@@ -26,9 +27,9 @@ plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
 
 \item{zlim}{range for defining bounds of color scale}
 
-\item{legend_x}{two numeric values (between 0 and 1) giving left and right-hand location of color legend}
+\item{legend_x}{two numeric values (generally between 0 and 1, but slightly lower/higher values generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend}
 
-\item{legend_y}{two numeric values (between 0 and 1) giving bottom and top location of color legend}
+\item{legend_y}{two numeric values (see legend_y) giving bottom and top location of color legend}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
 
