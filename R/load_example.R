@@ -122,7 +122,7 @@ load_example = function( data_set="EBS_pollock" ){
     strata.limits = data.frame('STRATA'="All_areas")
   }
   if( tolower(data_set) %in% tolower(c("covariate_example","GOA_pcod_covariate_example")) ){
-    data( GOA_Pcod_covariate_example, package="FishStatsUtils" )
+    data( GOA_pcod_covariate_example, package="FishStatsUtils" )
     sampling_data = GOA_Pcod_covariate_example$sampling_data
     strata.limits = data.frame('STRATA'="All_areas")
     X_xtp = GOA_Pcod_covariate_example$X_xtp

@@ -140,7 +140,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
     if( diff(legend_y) > diff(legend_x) ){
       align = c("lt","rb")[2]
-      gradient = c("x","y")[1]
+      gradient = c("x","y")[2]
     }else{
       align = c("lt","rb")[1]
       gradient = c("x","y")[1]
