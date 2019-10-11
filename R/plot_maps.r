@@ -250,26 +250,26 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
-    if(plot_num==15){
-      # Spatial effects for probability of encounter
-      if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 1st linear predictor")
-      if("D_xt"%in%names(Report)) stop()
-      if("D_xct"%in%names(Report)) stop()
-      if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
-      if("D_gcy"%in%names(Report)) Array_xct = Report$Omega1_gc %o% 1
-      if("dhat_ktp" %in% names(Report)) stop()
-      if("dpred_ktp" %in% names(Report)) stop()
-    }
-    if(plot_num==16){
-      # Spatial effects for positive catch rates
-      if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 2nd linear predictor")
-      if("D_xt"%in%names(Report)) stop()
-      if("D_xct"%in%names(Report)) stop()
-      if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
-      if("D_gcy"%in%names(Report)) Array_xct = Report$Omega2_gc %o% 1
-      if("dhat_ktp" %in% names(Report)) stop()
-      if("dpred_ktp" %in% names(Report)) stop()
-    }
+    #if(plot_num==15){
+    #  # Spatial effects for probability of encounter
+    #  if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 1st linear predictor")
+    #  if("D_xt"%in%names(Report)) stop()
+    #  if("D_xct"%in%names(Report)) stop()
+    #  if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
+    #  if("D_gcy"%in%names(Report)) Array_xct = Report$Omega1_gc %o% 1
+    #  if("dhat_ktp" %in% names(Report)) stop()
+    #  if("dpred_ktp" %in% names(Report)) stop()
+    #}
+    #if(plot_num==16){
+    #  # Spatial effects for positive catch rates
+    #  if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 2nd linear predictor")
+    #  if("D_xt"%in%names(Report)) stop()
+    #  if("D_xct"%in%names(Report)) stop()
+    #  if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
+    #  if("D_gcy"%in%names(Report)) Array_xct = Report$Omega2_gc %o% 1
+    #  if("dhat_ktp" %in% names(Report)) stop()
+    #  if("dpred_ktp" %in% names(Report)) stop()
+    #}
     if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
 
     # Plot for each category
@@ -278,7 +278,7 @@ function(plot_set=3, Report, PlotDF, Sdreport=NULL, TmbData=NULL, projargs='+pro
       if(length(dim(Array_xct))==3) Nplot = dim(Array_xct)[2]
       for( cI in 1:Nplot){
         if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
-        if(length(dim(Array_xct))==3) Return = Mat_xt = array(Array_xct[,cI,],dim=dim(Array_xct)[c(1,3)])
+        if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
 
         # Do plot
         #if( is.null(mfrow)) mfrow = c(ceiling(sqrt(length(Years2Include))), ceiling(length(Years2Include)/ceiling(sqrt(length(Years2Include)))))
