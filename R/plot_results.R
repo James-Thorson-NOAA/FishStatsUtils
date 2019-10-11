@@ -85,7 +85,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   # Plot densities
   message("\n### Making plots of spatial predictions")
   plot_maps_args = list(...)
-  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, category_names=category_names,
+  plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, category_names=category_names, TmbData=fit$data_list,
     Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
     working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
