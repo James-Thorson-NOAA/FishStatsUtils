@@ -8,13 +8,8 @@ function( strata.limits=NULL, zone=NA, survey="Chatham_rise", flip_around_dateli
   message("Using strata ", strata.limits)
 
   # Read extrapolation data
-  if( is.null(Data) ){
-    utils::data( chatham_rise_grid, package="FishStatsUtils" )
-    Data_Extrap <- chatham_rise_grid
-  }else{
-    #stop( "Survey doesn't match New Zealand grid options" )
-    Data_Extrap <- Data
-  }
+  utils::data( chatham_rise_grid, package="FishStatsUtils" )
+  Data_Extrap <- chatham_rise_grid
 
   # Survey areas
   #Area_km2_x = 4 * 1.852^2 * ifelse( Data_Extrap[,'EBS_STRATUM']!=0, 1, 0 )
@@ -29,9 +24,9 @@ function( strata.limits=NULL, zone=NA, survey="Chatham_rise", flip_around_dateli
   }
 
   # Convert extrapolation-data to an Eastings-Northings coordinate system
-  if( is.numeric(zone) ){
-    tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
-    colnames(tmpUTM) = c('E_km','N_km')
+  if( is.na(zone) || is.numeric(zone) ){
+    tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)
+    colnames(tmpUTM)[3:4] = c('E_km','N_km')
   }else{
     tmpUTM = Convert_LL_to_EastNorth_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], crs=zone )
   }
