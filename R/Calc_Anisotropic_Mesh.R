@@ -26,7 +26,7 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
     }
   }else{
     loc_z = rbind( loc_x, loc_g, loc_i )
-    outer_hull = INLA::inla.nonconvex.hull(loc_i, convex = -0.05, concave = -0.05)
+    outer_hull = INLA::inla.nonconvex.hull(as.matrix(loc_z), convex = -0.05, concave = -0.05)
     anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, boundary=outer_hull, ...)
   }
 
@@ -53,8 +53,8 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   E0 = V2 - V1                      # E = edge for each triangle
   E1 = V0 - V2
   E2 = V1 - V0
-  
-  # Calculate Areas 
+
+  # Calculate Areas
   crossprod_fn = function(Vec1,Vec2) abs(det( rbind(Vec1,Vec2) ))
   Tri_Area = rep(NA, nrow(E0))
   for(i in 1:length(Tri_Area)) Tri_Area[i] = crossprod_fn( E0[i,],E1[i,] )/2   # T = area of each triangle
