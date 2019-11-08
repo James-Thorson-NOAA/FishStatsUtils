@@ -58,6 +58,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
       LON_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lon']
       LAT_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lat']
     }
+    if( !(knot_method %in% c("samples","grid")) ) stop("`knot_method` must be either `samples` or `grid`")
   }
 
   # Convert to an Eastings-Northings coordinate system
