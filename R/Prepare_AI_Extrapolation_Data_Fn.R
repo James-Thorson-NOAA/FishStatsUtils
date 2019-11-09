@@ -12,7 +12,6 @@ function( strata.limits=NULL, zone=NA, flip_around_dateline=TRUE, ... ){
   Data_Extrap <- aleutian_islands_grid
 
   # Survey areas
-  #Area_km2_x = 4 * 1.852^2 * ifelse( Data_Extrap[,'EBS_STRATUM']!=0, 1, 0 )
   Area_km2_x = Data_Extrap[,'Area_km2']
   
   # Augment with strata for each extrapolation cell
