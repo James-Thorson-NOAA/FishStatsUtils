@@ -26,7 +26,7 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
     }
   }else{
     loc_z = rbind( loc_x, loc_g, loc_i )
-    outer_hull = INLA::inla.nonconvex.hull(loc_i, convex = -0.05, concave = -0.05)
+    outer_hull = INLA::inla.nonconvex.hull( as.matrix(loc_z), convex = -0.05, concave = -0.05)
     anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, boundary=outer_hull, ...)
   }
 
