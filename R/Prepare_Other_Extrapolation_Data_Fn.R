@@ -27,7 +27,15 @@ function( strata.limits, observations_LL, grid_dim_km=c(2,2), maximum_distance_f
     if( any(observations_LL[,'Lat']>0) & any(observations_LL[,'Lat']<0) ) warning( "PBSmapping doesn't work with observations in both Northern and Southern hemisphere" )
 
     # Make grid
-    Data_Extrap = expand.grid( "E_km"=seq(E_lim[1],E_lim[2],by=grid_dim_km[1]), "N_km"=seq(N_lim[1],N_lim[2],by=grid_dim_km[2]), "Area_km2"=prod(grid_dim_km) )
+    E_seq = seq(E_lim[1], E_lim[2], by=grid_dim_km[1])
+    N_seq = seq(N_lim[1], N_lim[2], by=grid_dim_km[2])
+    if( length(E_seq)*length(N_seq) > 1e5 ){
+      warning("Please increase `grid_dim_km` to avoid memory issues caused by creating a large extrapolation-grid")
+    }
+    if( length(E_seq)*length(N_seq) > 1e7 ){
+      stop("Please increase `grid_dim_km` to avoid memory-associated crashes caused by creating a huge extrapolation-grid")
+    }
+    Data_Extrap = expand.grid( "E_km"=E_seq, "N_km"=N_seq, "Area_km2"=prod(grid_dim_km) )
 
     # Add LL
     TmpUTM = rename_columns( Data_Extrap[,c("E_km","N_km")], newname=c("X","Y"))
