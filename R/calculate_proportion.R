@@ -1,5 +1,3 @@
-
-
 #' Calculate the compositional-expansion
 #'
 #' \code{calculate_proportion} takes output from a VAST run and calculates the proportion of biomass in different categories
@@ -15,8 +13,9 @@
 #' }
 #'
 #' @export
-calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL,
-  plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), DirName=paste0(getwd(),"/"), PlotName="Proportion.png", PlotName2="Average.png",
+My_calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NULL, Years2Include=NULL, 
+  strata_names=NULL, category_names=NULL, plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), 
+  DirName=paste0(getwd(),"/"), PlotName="Proportion.png", PlotName2="Average.png",
   interval_width=1, width=6, height=6, xlab="Category", ylab="Proportion", ... ){
 
   # Warnings and errors
@@ -25,6 +24,12 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
   }
   Index_ctl = array(Index$Index_ctl[,,,'Estimate'],dim=dim(Index$Index_ctl)[1:3])
   SE_Index_ctl = array(Index$Index_ctl[,,,'Std. Error'],dim=dim(Index$Index_ctl)[1:3])
+
+  if( !is.null(Expansion_cz) ){
+    Index_ctl = as.array(Index_ctl[Expansion_cz[,1]==1,,,drop=FALSE])
+    SE_Index_ctl = as.array(SE_Index_ctl[Expansion_cz[,1]==1,,,drop=FALSE])
+    category_names = category_names[Expansion_cz[,1]==1]
+  }
 
   # Calculate proportions, and total biomass
   Prop_ctl = Index_ctl / outer(rep(1,dim(Index_ctl)[1]),apply(Index_ctl,MARGIN=2:3,FUN=sum))
