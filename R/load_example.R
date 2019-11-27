@@ -137,6 +137,13 @@ load_example = function( data_set="EBS_pollock" ){
     F_ct = t( F_tc[which(F_tc[,'X'] %in% min(sampling_data[,'Year']):max(sampling_data[,'Year'])),-1] )
     colnames(F_ct) = min(sampling_data[,'Year']):max(sampling_data[,'Year'])
   }
+  if( tolower(data_set) %in% tolower("PESC_example_red_grouper") ){
+    data( PESC_example_red_grouper, package="FishStatsUtils" )
+    sampling_data = example$sampling_data
+    region = example$Region
+    strata.limits = example$strata.limits
+    input_grid = example$input_grid
+  }
   sampling_data = na.omit( sampling_data )
 
   Return = list("sampling_data"=sampling_data, "Region"=region, "strata.limits"=strata.limits)
@@ -146,6 +153,7 @@ load_example = function( data_set="EBS_pollock" ){
   if( !is.null(Q_ik)) Return[["Q_ik"]] = Q_ik
   if( !is.null(F_ct)) Return[["F_ct"]] = F_ct
   if( !is.null(covariate_data)) Return[["covariate_data"]] = covariate_data
+  if( !is.null(input_grid)) Return[["input_grid"]] = input_grid
 
   # return stuff
   return(Return)

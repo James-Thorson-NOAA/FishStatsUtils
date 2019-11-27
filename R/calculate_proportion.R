@@ -15,7 +15,7 @@
 #' }
 #'
 #' @export
-calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL,
+calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL,
   plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), DirName=paste0(getwd(),"/"), PlotName="Proportion.png", PlotName2="Average.png",
   interval_width=1, width=6, height=6, xlab="Category", ylab="Proportion", ... ){
 
@@ -30,6 +30,12 @@ calculate_proportion = function( TmbData, Index, Year_Set=NULL, Years2Include=NU
   Prop_ctl = Index_ctl / outer(rep(1,dim(Index_ctl)[1]),apply(Index_ctl,MARGIN=2:3,FUN=sum))
   Index_tl = apply(Index_ctl,MARGIN=2:3,FUN=sum)
   SE_Index_tl = sqrt(apply(SE_Index_ctl^2,MARGIN=2:3,FUN=sum,na.rm=TRUE))
+
+  if( !is.null(Expansion_cz) ){
+    Index_ctl = as.array(Index_ctl[Expansion_cz[,1]==1,,,drop=FALSE])
+    SE_Index_ctl = as.array(SE_Index_ctl[Expansion_cz[,1]==1,,,drop=FALSE])
+    category_names = category_names[Expansion_cz[,1]==1]
+  }
 
   # Approximate variance for proportions, and effective sample size
   Neff_ctl = var_Prop_ctl = array(NA,dim=dim(Prop_ctl))
