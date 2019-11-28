@@ -6,6 +6,7 @@
 #'
 #' @param Index output from \code{FishStatsUtils::plot_biomass_index}
 #' @inheritParams plot_biomass_index
+#' @inheritParams VAST::make_data
 #' @param ... list of arguments to pass to \code{plot_index}
 #'
 #' @return Tagged list of output

@@ -3,7 +3,7 @@
 #'
 #' \code{load_example} loads a catch and effort data set from multiple surveys worldwide
 #'
-#' Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", "covariate_example", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
+#' Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", "covariate_example", "PESC_example_red_grouper", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
 #'
 #' @param data_set data set to load
 #'
@@ -31,6 +31,7 @@ load_example = function( data_set="EBS_pollock" ){
                    "covariate_example" = tolower("Gulf_of_Alaska"),
                    "goa_pcod_covariate_example" = tolower("Gulf_of_Alaska"),
                    "goa_mice_example" = tolower("Gulf_of_Alaska"),
+                   "PESC_example_red_grouper" = tolower("User"),
                    tolower("Other") )
 
   covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
