@@ -1,6 +1,6 @@
 #' @export
 Prepare_Other_Extrapolation_Data_Fn <-
-function( strata.limits, observations_LL, grid_dim_km=c(2,2), maximum_distance_from_sample=NULL,
+function( strata.limits, observations_LL, projargs=NA, grid_dim_km=c(2,2), maximum_distance_from_sample=NULL,
           zone=NA, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1), flip_around_dateline=FALSE, ... ){
 
   # Local function
@@ -18,13 +18,14 @@ function( strata.limits, observations_LL, grid_dim_km=c(2,2), maximum_distance_f
     if( is.null(maximum_distance_from_sample) ) maximum_distance_from_sample = sqrt((grid_dim_km[1]/2)^2+(grid_dim_km[2]/2)^2)
 
     # Get range
-    observations_UTM = Convert_LL_to_UTM_Fn( Lon=observations_LL[,'Lon'], Lat=observations_LL[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
-    E_lim = mean(range(observations_UTM[,'X'])) + c(-0.6,0.6)*diff(range(observations_UTM[,'X']))
-    N_lim = mean(range(observations_UTM[,'Y'])) + c(-0.6,0.6)*diff(range(observations_UTM[,'Y']))
+    #TmpUTM = Convert_LL_to_UTM_Fn( Lon=observations_LL[,'Lon'], Lat=observations_LL[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
+    TmpUTM = project_coordinates( Lon=observations_LL[,'Lon'], Lat=observations_LL[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
+    E_lim = mean(range(TmpUTM[,'E_km'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'E_km']))
+    N_lim = mean(range(TmpUTM[,'N_km'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'N_km']))
 
     # Detect Northern or Southern hemisphere
-    NorthernTF = all( observations_LL[,'Lat']>0 )
-    if( any(observations_LL[,'Lat']>0) & any(observations_LL[,'Lat']<0) ) warning( "PBSmapping doesn't work with observations in both Northern and Southern hemisphere" )
+    #NorthernTF = all( observations_LL[,'Lat']>0 )
+    #if( any(observations_LL[,'Lat']>0) & any(observations_LL[,'Lat']<0) ) warning( "PBSmapping doesn't work with observations in both Northern and Southern hemisphere" )
 
     # Make grid
     E_seq = seq(E_lim[1], E_lim[2], by=grid_dim_km[1])
@@ -38,17 +39,19 @@ function( strata.limits, observations_LL, grid_dim_km=c(2,2), maximum_distance_f
     Data_Extrap = expand.grid( "E_km"=E_seq, "N_km"=N_seq, "Area_km2"=prod(grid_dim_km) )
 
     # Add LL
-    TmpUTM = rename_columns( Data_Extrap[,c("E_km","N_km")], newname=c("X","Y"))
-    attr(TmpUTM, "projection") = "UTM"
-    attr(TmpUTM, "zone") = attr(observations_UTM,"zone")
-    TmpLL = PBSmapping::convUL(TmpUTM, southern=!NorthernTF )
-    if( flip_around_dateline==TRUE ){
-      TmpLL[,1] = TmpLL[,1] - 180
-    }
+    #TmpUTM = rename_columns( Data_Extrap[,c("E_km","N_km")], newname=c("X","Y"))
+    #attr(TmpUTM, "projection") = "UTM"
+    #attr(TmpUTM, "zone") = attr(TmpUTM,"zone")
+    #TmpLL = PBSmapping::convUL(TmpUTM, southern=!NorthernTF )
+    #if( flip_around_dateline==TRUE ){
+    #  TmpLL[,1] = TmpLL[,1] - 180
+    #}
+    TmpLL = project_coordinates( Lon=Data_Extrap[,"E_km"], Lat=Data_Extrap[,"N_km"], projargs=attr(TmpUTM,"origargs"),
+      origargs=attr(TmpUTM,"projargs"), zone=zone, flip_around_dateline=flip_around_dateline)
     Data_Extrap = cbind( Data_Extrap, rename_columns(TmpLL,newname=c("Lon","Lat")) )
 
     # Restrict to grid locations near samples
-    NN_Extrap = RANN::nn2( query=Data_Extrap[,c("E_km","N_km")], data=observations_UTM[,c("X","Y")], k=1)
+    NN_Extrap = RANN::nn2( query=Data_Extrap[,c("E_km","N_km")], data=TmpUTM[,c("E_km","N_km")], k=1)
     Data_Extrap = cbind( Data_Extrap, "Include"=ifelse(NN_Extrap$nn.dists<maximum_distance_from_sample,1,0))
 
     # Survey areas
@@ -93,6 +96,7 @@ function( strata.limits, observations_LL, grid_dim_km=c(2,2), maximum_distance_f
   }
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(TmpUTM,"zone"), "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(TmpUTM,"zone"), "projargs"=attr(tmpUTM,"projargs"),
+    "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
   return( Return )
 }

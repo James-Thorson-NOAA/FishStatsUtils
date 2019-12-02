@@ -4,7 +4,7 @@
 \alias{make_extrapolation_info}
 \title{Build extrapolation grid}
 \usage{
-make_extrapolation_info(Region, zone = NA,
+make_extrapolation_info(Region, projargs = NA, zone = NA,
   strata.limits = data.frame(STRATA = "All_areas"),
   create_strata_per_region = FALSE, input_grid = NULL,
   observations_LL = NULL, grid_dim_km = c(2, 2),
@@ -16,6 +16,8 @@ make_extrapolation_info(Region, zone = NA,
 }
 \arguments{
 \item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
+
+\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 

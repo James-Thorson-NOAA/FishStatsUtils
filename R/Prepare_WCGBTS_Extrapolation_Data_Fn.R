@@ -1,6 +1,6 @@
 #' @export
 Prepare_WCGBTS_Extrapolation_Data_Fn <-
-function( strata.limits=NULL, surveyname='propInWCGBTS', zone=NA, ... ){
+function( strata.limits=NULL, projargs=NA, surveyname='propInWCGBTS', zone=NA, flip_around_dateline=FALSE, ... ){
   # Infer strata
   if( is.null(strata.limits)){
     strata.limits = data.frame('STRATA'="All_areas")
@@ -24,11 +24,13 @@ function( strata.limits=NULL, surveyname='propInWCGBTS', zone=NA, ... ){
   }
 
   # Convert extrapolation-data to an Eastings-Northings coordinate system
-  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone)                                                         #$
+  #tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
+  tmpUTM = project_coordinates( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)
   Data_Extrap = cbind( Data_Extrap, 'Include'=(Data_Extrap[,'Cowcod']==0 & Data_Extrap[,'Ngdc_m']<(-35)))
-  Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('X','Y')]
+  Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('E_km','N_km')]
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=FALSE, "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "projargs"=attr(tmpUTM,"projargs"),
+    "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
   return( Return )
 }

@@ -34,7 +34,7 @@ load_example = function( data_set="EBS_pollock" ){
                    "PESC_example_red_grouper" = tolower("User"),
                    tolower("Other") )
 
-  covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
+  input_grid = covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
     Year = as.numeric(sapply(WCGBTS_Canary_example[,'PROJECT_CYCLE'], FUN=function(Char){strsplit(as.character(Char)," ")[[1]][2]}))

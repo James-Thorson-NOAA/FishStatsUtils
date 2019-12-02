@@ -1,6 +1,6 @@
 #' @export
 Prepare_GOM_Extrapolation_Data_Fn <-
-function( strata.limits=NULL, zone=NA, ... ){
+function( strata.limits=NULL, projargs=NA, zone=NA, ... ){
 
   # Infer strata
   if( is.null(strata.limits)){
@@ -24,13 +24,15 @@ function( strata.limits=NULL, zone=NA, ... ){
   }
 
   # Convert extrapolation-data to an Eastings-Northings coordinate system
-  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=FALSE)                                                         #$
+  #tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=FALSE)                                                         #$
+  tmpUTM = project_coordinates( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
 
   # Extra junk
   Data_Extrap = cbind( Data_Extrap, 'Include'=1)
-  Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('X','Y')]
+  Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('E_km','N_km')]
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=FALSE, "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "projargs"=attr(tmpUTM,"projargs"),
+    "flip_around_dateline"=FALSE, "Area_km2_x"=Area_km2_x)
   return( Return )
 }

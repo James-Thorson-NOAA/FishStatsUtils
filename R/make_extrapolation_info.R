@@ -5,6 +5,7 @@
 #'
 #' To do area-weighted extrapolation of estimated density for use in calculating abundance indices, it is necessary to have a precise measurement of the footprint for a given survey design. Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted at the location of each grid cell and where each grid cell is associated with a known area within a given survey design. Collaborators have worked with the package author to include the extrapolation-grid for several regions automatically in FishStatsUtils, but for new regions an analyst must either detect the grid automatically using \code{Region="Other"} or input an extrapolation-grid manually using \code{Region="User"}.  The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
 #'
+#' @inheritParams sp::CRS
 #' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"
 #' @param strata.limits an input for determining stratification of indices (see example script)
 #' @param zone UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples
@@ -32,7 +33,7 @@
 #' }
 
 #' @export
-make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
+make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
   create_strata_per_region=FALSE, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
   maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
   region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
@@ -45,63 +46,63 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
     Extrapolation_List = NULL
     if( tolower(Region[rI]) == "california_current" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_WCGBTS_Extrapolation_Data_Fn( strata.limits=strata.limits, surveyname=surveyname, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_WCGBTS_Extrapolation_Data_Fn( strata.limits=strata.limits, surveyname=surveyname, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) %in% c("wcghl","wcghl_domain","west_coast_hook_and_line") ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_WCGHL_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_WCGHL_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }                      #
     if( tolower(Region[rI]) == "british_columbia" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_BC_Coast_Extrapolation_Data_Fn( strata.limits=strata.limits, strata_to_use=strata_to_use, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_BC_Coast_Extrapolation_Data_Fn( strata.limits=strata.limits, strata_to_use=strata_to_use, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "eastern_bering_sea" ){ #
       if(missing(flip_around_dateline)) flip_around_dateline = TRUE
-      Extrapolation_List = Prepare_EBS_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_EBS_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "northern_bering_sea" ){ #
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_NBS_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_NBS_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "bering_sea_slope" ){ #
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_BSslope_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_BSslope_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) %in% c("st_matthews_island","smi") ){ #
       if(missing(flip_around_dateline)) flip_around_dateline = TRUE
-      Extrapolation_List = Prepare_SMI_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_SMI_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "aleutian_islands" ){ #
       if(missing(flip_around_dateline)) flip_around_dateline = TRUE
-      Extrapolation_List = Prepare_AI_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_AI_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "gulf_of_alaska" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_GOA_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_GOA_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "northwest_atlantic" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_NWA_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_NWA_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "south_africa" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_SA_Extrapolation_Data_Fn( strata.limits=strata.limits, region=region, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_SA_Extrapolation_Data_Fn( strata.limits=strata.limits, region=region, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "gulf_of_st_lawrence" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_GSL_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_GSL_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "new_zealand" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_NZ_Extrapolation_Data_Fn( strata.limits=strata.limits, survey=survey, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_NZ_Extrapolation_Data_Fn( strata.limits=strata.limits, survey=survey, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "habcam" ){  #
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_HabCam_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_HabCam_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "gulf_of_mexico" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_GOM_Extrapolation_Data_Fn( strata.limits=strata.limits, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_GOM_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "stream_network" ){
       if( is.null(input_grid)){
@@ -111,7 +112,7 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
         stop("'input_grid' must contain columns named 'Lat', 'Lon', 'Area_km2', and 'child_i'")
       }
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_User_Extrapolation_Data_Fn( strata.limits=strata.limits, input_grid=input_grid, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_User_Extrapolation_Data_Fn( strata.limits=strata.limits, input_grid=input_grid, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "user" ){
       if( is.null(input_grid)){
@@ -121,7 +122,7 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
         stop("'input_grid' must contain columns named 'Lat', 'Lon', and 'Area_km2'")
       }
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_User_Extrapolation_Data_Fn( strata.limits=strata.limits, input_grid=input_grid, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_User_Extrapolation_Data_Fn( strata.limits=strata.limits, input_grid=input_grid, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( is.null(Extrapolation_List) ){
       if( is.null(observations_LL)){
@@ -130,7 +131,7 @@ make_extrapolation_info = function( Region, zone=NA, strata.limits=data.frame('S
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_Other_Extrapolation_Data_Fn( strata.limits=strata.limits, observations_LL=observations_LL,
         grid_dim_km=grid_dim_km, maximum_distance_from_sample=maximum_distance_from_sample,
-        grid_in_UTM=grid_in_UTM, grid_dim_LL=grid_dim_LL, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+        grid_in_UTM=grid_in_UTM, grid_dim_LL=grid_dim_LL, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
 
     # Combine
