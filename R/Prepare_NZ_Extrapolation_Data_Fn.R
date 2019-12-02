@@ -1,6 +1,6 @@
 #' @export
 Prepare_NZ_Extrapolation_Data_Fn <-
-function( strata.limits=NULL, zone=NA, survey="Chatham_rise", flip_around_dateline=FALSE, ... ){
+function( strata.limits=NULL, projargs=NA, zone=NA, survey="Chatham_rise", flip_around_dateline=FALSE, ... ){
   # Infer strata
   if( is.null(strata.limits)){
     strata.limits = data.frame('STRATA'="All_areas")
@@ -24,18 +24,20 @@ function( strata.limits=NULL, zone=NA, survey="Chatham_rise", flip_around_dateli
   }
 
   # Convert extrapolation-data to an Eastings-Northings coordinate system
-  if( is.na(zone) || is.numeric(zone) ){
-    tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)
-    colnames(tmpUTM)[3:4] = c('E_km','N_km')
-  }else{
-    tmpUTM = Convert_LL_to_EastNorth_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], crs=zone )
-  }
+  #if( is.na(zone) || is.numeric(zone) ){
+  #  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)
+  #  colnames(tmpUTM)[3:4] = c('E_km','N_km')
+  #}else{
+  #  tmpUTM = Convert_LL_to_EastNorth_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], crs=zone )
+  #}
+  tmpUTM = project_coordinates( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
 
   # Extra junk
   Data_Extrap = cbind( Data_Extrap, 'Include'=1)
   Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('E_km','N_km')]
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "projargs"=attr(tmpUTM,"projargs"),
+    "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
   return( Return )
 }

@@ -779,3 +779,73 @@ Plot_range_quantiles = function( Data_Extrap, Report, TmbData, a_xl, NN_Extrap, 
   Return = list( "Data_Extrap_Range"=Data_Extrap_Range )
   return( invisible(Return) )
 }
+
+
+#' Convert from Lat-Long to Eastings-Northings using WGS
+#'
+#' \code{Convert_LL_to_EastNorth_Fn} converts from Latitude-Longitude to World Geodetic System Eastings-Northings for a given location
+#'
+#' @param Lat vector of latitudes
+#' @param Lon vector of longitudes
+#' @param crs EPSG reference for coordinate reference system (CRS) defining Eastings-Northings after transformation
+
+#' @return A data frame with the following columns
+#' \describe{
+#'   \item{E_km}{The eastings for each value of Lon (in kilometers)}
+#'   \item{N_km}{The northings for each value of Lat (in kilometers)}
+#' }
+
+Convert_LL_to_EastNorth_Fn <-
+function( Lon, Lat, crs=NA ){
+  # SEE:  https://github.com/nwfsc-assess/geostatistical_delta-GLMM/issues/25#issuecomment-345825230
+
+  # Attach package
+  require(rgdal)
+  on.exit( detach("package:rgdal") )
+
+  # Transform
+  dstart<-data.frame(lon=Lon, lat=Lat) # that's the object
+  coordinates(dstart) <- c("lon", "lat")
+  proj4string(dstart) <- CRS("+init=epsg:4326") # that's the lat long projection
+  CRS.new <- CRS(crs) # that's the eastings and northings projection
+  dstart.t <- spTransform(dstart, CRS.new) # here's where you transform
+
+  # Clean up
+  dstart.t = cbind( "E_km"=dstart.t@coords[,"lon"]/1000, "N_km"=dstart.t@coords[,'lat']/1000 )
+  attr(dstart.t,"zone") = crs
+
+  # Return results
+  return( dstart.t )
+}
+
+
+#' Convert from Lat-Long to UTM
+#'
+#' \code{Convert_LL_to_UTM_Fn} converts from Latitude-Longitude to Universal Transverse Mercator projections for a given location
+#'
+#' @param Lat vector of latitudes
+#' @param Lon vector of longitudes
+#' @param zone UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone
+#' @param flip_around_dateline boolean specifying whether to flip Lat-Lon locations around the dateline, and then retransform back (only useful if Lat-Lon straddle the dateline)
+
+#' @return A data frame with the following columns
+#' \describe{
+#'   \item{X}{The UTM eastings for each value of Lon}
+#'   \item{Y}{The UTM northings measured from the equator for each Lat}
+#' }
+
+Convert_LL_to_UTM_Fn <-
+function( Lon, Lat, zone=NA, flip_around_dateline=FALSE ){
+
+  # Convert
+  # if zone=NA or NULL, then it automatically detects appropriate zone
+  Tmp = cbind('PID'=1,'POS'=1:length(Lon),'X'=Lon,'Y'=Lat)
+  if( flip_around_dateline==TRUE ) Tmp[,'X'] = ifelse( Tmp[,'X']>0, Tmp[,'X']-180, Tmp[,'X']+180)
+  attr(Tmp,"projection") = "LL"
+  attr(Tmp,"zone") = zone
+  tmpUTM = PBSmapping::convUL(Tmp)                                                         #$
+  if( !is.na(zone)) message("convUL: For the UTM conversion, used zone ",zone," as specified")
+
+  # Return results
+  return( tmpUTM )
+}

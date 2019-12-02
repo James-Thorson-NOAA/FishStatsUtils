@@ -77,17 +77,19 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     grid_num = RANN::nn2( data=loc_grid, query=loc_i, k=1)$nn.idx[,1]
   }
   if( Method %in% c("Mesh","Grid","Stream_network") ){
-    if( is.numeric(Extrapolation_List$zone) ){
-      # Locations for samples
-      loc_i = Convert_LL_to_UTM_Fn( Lon=Lon_i, Lat=Lat_i, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
-      loc_i = cbind( 'E_km'=loc_i[,'X'], 'N_km'=loc_i[,'Y'])
-      # Locations for locations for knots
-      loc_intensity = Convert_LL_to_UTM_Fn( Lon=LON_intensity, Lat=LAT_intensity, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
-      loc_intensity = cbind( 'E_km'=loc_intensity[,'X'], 'N_km'=loc_intensity[,'Y'])
-    }else{
-      loc_i = Convert_LL_to_EastNorth_Fn( Lon=Lon_i, Lat=Lat_i, crs=Extrapolation_List$zone )
-      loc_intensity = Convert_LL_to_EastNorth_Fn( Lon=LON_intensity, Lat=LAT_intensity, crs=Extrapolation_List$zone )
-    }
+    #if( is.numeric(Extrapolation_List$zone) ){
+    #  # Locations for samples
+    #  loc_i = Convert_LL_to_UTM_Fn( Lon=Lon_i, Lat=Lat_i, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
+    #  loc_i = cbind( 'E_km'=loc_i[,'X'], 'N_km'=loc_i[,'Y'])
+    #  # Locations for locations for knots
+    #  loc_intensity = Convert_LL_to_UTM_Fn( Lon=LON_intensity, Lat=LAT_intensity, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
+    #  loc_intensity = cbind( 'E_km'=loc_intensity[,'X'], 'N_km'=loc_intensity[,'Y'])
+    #}else{
+    #  loc_i = Convert_LL_to_EastNorth_Fn( Lon=Lon_i, Lat=Lat_i, crs=Extrapolation_List$zone )
+    #  loc_intensity = Convert_LL_to_EastNorth_Fn( Lon=LON_intensity, Lat=LAT_intensity, crs=Extrapolation_List$zone )
+    #}
+    loc_i = project_coordinates( Lon=Lon_i, Lat=Lat_i, projargs=Extrapolation_List$projargs )
+    loc_intensity = project_coordinates( Lon=LON_intensity, Lat=LAT_intensity, projargs=Extrapolation_List$projargs )
     # Bounds for 2D AR1 grid
     Grid_bounds = grid_size_km * apply(Extrapolation_List$Data_Extrap[,c('E_km','N_km')]/grid_size_km, MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
@@ -126,18 +128,21 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   }
 
   # Convert loc_x back to location in lat-long coordinates latlon_x
-  tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_x),'X'=loc_x[,'E_km'],'Y'=loc_x[,'N_km'])
-  attr(tmpUTM,"projection") = "UTM"
-  attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
-  latlon_x = PBSmapping::convUL(tmpUTM)                                                         #$
-  latlon_x = cbind( 'Lat'=latlon_x[,"Y"], 'Lon'=latlon_x[,"X"])
+  origargs = "+proj=longlat +ellps=WGS84"
+  #tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_x),'X'=loc_x[,'E_km'],'Y'=loc_x[,'N_km'])
+  #attr(tmpUTM,"projection") = "UTM"
+  #attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
+  #latlon_x = PBSmapping::convUL(tmpUTM)                                                         #$
+  #latlon_x = cbind( 'Lat'=latlon_x[,"Y"], 'Lon'=latlon_x[,"X"])
+  latlon_x = project_coordinates( Lon=loc_x[,"E_km"], Lat=loc_x[,"N_km"], projargs=origargs, origargs=Extrapolation_List$projargs )[,c("Lat","Lon")]
 
   # Convert loc_g back to location in lat-long coordinates latlon_g
-  tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_g),'X'=loc_g[,'E_km'],'Y'=loc_g[,'N_km'])
-  attr(tmpUTM,"projection") = "UTM"
-  attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
-  latlon_g = PBSmapping::convUL(tmpUTM)                                                         #$
-  latlon_g = cbind( 'Lat'=latlon_g[,"Y"], 'Lon'=latlon_g[,"X"])
+  #tmpUTM = cbind('PID'=1,'POS'=1:nrow(loc_g),'X'=loc_g[,'E_km'],'Y'=loc_g[,'N_km'])
+  #attr(tmpUTM,"projection") = "UTM"
+  #attr(tmpUTM,"zone") = Extrapolation_List$zone - ifelse( Extrapolation_List$flip_around_dateline==TRUE, 30, 0 )
+  #latlon_g = PBSmapping::convUL(tmpUTM)                                                         #$
+  #latlon_g = cbind( 'Lat'=latlon_g[,"Y"], 'Lon'=latlon_g[,"X"])
+  latlon_g = project_coordinates( Lon=loc_g[,"E_km"], Lat=loc_g[,"N_km"], projargs=origargs, origargs=Extrapolation_List$projargs )[,c("Lat","Lon")]
 
   # Bundle lat-lon
   latlon_i = cbind( 'Lat'=Lat_i, 'Lon'=Lon_i )

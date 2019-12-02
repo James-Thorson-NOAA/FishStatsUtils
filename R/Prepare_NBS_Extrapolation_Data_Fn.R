@@ -1,6 +1,6 @@
 #' @export
 Prepare_NBS_Extrapolation_Data_Fn <-
-function( strata.limits=NULL, zone=NA, flip_around_dateline=FALSE, ... ){
+function( strata.limits=NULL, projargs=NA, zone=NA, flip_around_dateline=FALSE, ... ){
   # Infer strata
   if( is.null(strata.limits)){
     strata.limits = data.frame('STRATA'="All_areas")
@@ -23,8 +23,8 @@ function( strata.limits=NULL, zone=NA, flip_around_dateline=FALSE, ... ){
   }
              #
   # Convert extrapolation-data to an Eastings-Northings coordinate system
-  tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
-           #
+  #tmpUTM = Convert_LL_to_UTM_Fn( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
+  tmpUTM = project_coordinates( Lon=Data_Extrap[,'Lon'], Lat=Data_Extrap[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
 
   # Extra junk
   Data_Extrap = cbind( Data_Extrap, 'Include'=1)
