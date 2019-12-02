@@ -4,26 +4,26 @@
 \alias{project_coordinates}
 \title{Convert from Lat-Long to UTM}
 \usage{
-project_coordinates(Lon_i, Lat_i, projargs = NA,
+project_coordinates(X, Y, projargs = NA,
   origargs = "+proj=longlat +ellps=WGS84", zone = NA,
   flip_around_dateline = FALSE, silent = FALSE)
 }
 \arguments{
-\item{zone}{UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone}
+\item{X}{vector of horizontal-coordinates (e.g., longitude by default)}
 
-\item{flip_around_dateline}{boolean specifying whether to flip Lat-Lon locations around the dateline, and then retransform back (only useful if Lat-Lon straddle the dateline)}
+\item{Y}{vector of vertical-coordinates (e.g., latitude by default)}
 
-\item{Lat}{vector of latitudes}
+\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
-\item{Lat}{vector of latitudes}
+\item{zone}{DEPRECATED INPUT; UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone}
 
-\item{Lon}{vector of longitudes}
+\item{flip_around_dateline}{DEPRECATED INPUT; boolean specifying whether to flip Lat-Lon locations around the dateline, and then retransform back (only useful if Lat-Lon straddle the dateline)}
 }
 \value{
 A data frame with the following columns
 \describe{
-  \item{X}{The UTM eastings for each value of Lon}
-  \item{Y}{The UTM northings measured from the equator for each Lat}
+  \item{X}{The horizonal coordinates after projection (e.g., Eastings in UTM kilometers by default)}
+  \item{Y}{The vertical coordinates after projection (e.g., Northings in UTM kilometers by default)}
 }
 }
 \description{
