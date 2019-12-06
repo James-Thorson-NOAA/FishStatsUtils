@@ -455,7 +455,7 @@ function( strata.limits, observations_LL, projargs=NA, grid_dim_km=c(2,2), maxim
 
     # Get range
     #TmpUTM = Convert_LL_to_UTM_Fn( Lon=observations_LL[,'Lon'], Lat=observations_LL[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
-    TmpUTM = project_coordinates( Lon=observations_LL[,'Lon'], Lat=observations_LL[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
+    TmpUTM = project_coordinates( X=observations_LL[,'Lon'], Y=observations_LL[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
     E_lim = mean(range(TmpUTM[,'E_km'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'E_km']))
     N_lim = mean(range(TmpUTM[,'N_km'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'N_km']))
 
