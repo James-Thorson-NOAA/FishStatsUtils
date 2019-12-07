@@ -456,8 +456,8 @@ function( strata.limits, observations_LL, projargs=NA, grid_dim_km=c(2,2), maxim
     # Get range
     #TmpUTM = Convert_LL_to_UTM_Fn( Lon=observations_LL[,'Lon'], Lat=observations_LL[,'Lat'], zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
     TmpUTM = project_coordinates( X=observations_LL[,'Lon'], Y=observations_LL[,'Lat'], projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline)                                                         #$
-    E_lim = mean(range(TmpUTM[,'E_km'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'E_km']))
-    N_lim = mean(range(TmpUTM[,'N_km'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'N_km']))
+    E_lim = mean(range(TmpUTM[,'X'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'X']))
+    N_lim = mean(range(TmpUTM[,'Y'])) + c(-0.6,0.6)*diff(range(TmpUTM[,'Y']))
 
     # Detect Northern or Southern hemisphere
     #NorthernTF = all( observations_LL[,'Lat']>0 )
@@ -486,7 +486,7 @@ function( strata.limits, observations_LL, projargs=NA, grid_dim_km=c(2,2), maxim
     Data_Extrap = cbind( Data_Extrap, rename_columns(TmpLL,newname=c("Lon","Lat")) )
 
     # Restrict to grid locations near samples
-    NN_Extrap = RANN::nn2( query=Data_Extrap[,c("E_km","N_km")], data=TmpUTM[,c("E_km","N_km")], k=1)
+    NN_Extrap = RANN::nn2( query=Data_Extrap[,c("E_km","N_km")], data=TmpUTM[,c("X","Y")], k=1)
     Data_Extrap = cbind( Data_Extrap, "Include"=ifelse(NN_Extrap$nn.dists<maximum_distance_from_sample,1,0))
 
     # Survey areas
@@ -531,7 +531,7 @@ function( strata.limits, observations_LL, projargs=NA, grid_dim_km=c(2,2), maxim
   }
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(TmpUTM,"zone"), "projargs"=attr(tmpUTM,"projargs"),
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(TmpUTM,"zone"), "projargs"=attr(TmpUTM,"projargs"),
     "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
   return( Return )
 }
