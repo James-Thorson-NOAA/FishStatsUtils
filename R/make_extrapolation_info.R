@@ -154,19 +154,35 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
 
 #' Plot extrapolation-grid used for spatial inference
 #'
+#' @inheritParams sp::CRS
+#'
 #' @title Plot extrapolation-grid
 #' @param x Output from \code{\link{make_extrapolation_info}}
 #' @param ... Not used
 #' @return NULL
 #' @method plot make_extrapolation_info
 #' @export
-plot.make_extrapolation_info <- function(x, cex=0.01, ...)
+plot.make_extrapolation_info <- function(x, land_color="grey", map_resolution="medium", ...)
 {
   par( mfrow=c(1,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
+
+  # CRS for original and new projections
+  CRS_orig = sp::CRS( '+proj=longlat' )
+  CRS_proj = sp::CRS( x$projargs )
+
+  # Data for mapping
+  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))
+
+  # Plot #1 -- Latitude
   plot( x$Data_Extrap[which(x$Area_km2_x>0),c('Lon','Lat')], cex=cex, main="Extrapolation (Lat-Lon)", ... )
-  map( "world", add=TRUE )
+  map_data_orig = sp::spTransform(map_data, CRSobj=CRS_orig)
+  sp::plot( map_data_orig, col=land_color, add=TRUE )
+
+  # Plot #2 -- Projection coordinates
   if( !any(is.na(x$Data_Extrap[,c('E_km','N_km')])) ){
     plot( x$Data_Extrap[which(x$Area_km2_x>0),c('E_km','N_km')], cex=cex, main="Extrapolation (North-East)", ... )
+    #map_data_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
+    #sp::plot( map_data_proj, col=land_color, add=TRUE )
   }
 
   invisible(x)
