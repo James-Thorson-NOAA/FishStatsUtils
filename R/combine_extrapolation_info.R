@@ -20,8 +20,14 @@ combine_extrapolation_info = function( ..., create_strata_per_region=FALSE ){
   Zone = sapply( input_list, FUN=function(List){List[["zone"]]} )
   Flip = sapply( input_list, FUN=function(List){List[["flip_around_dateline"]]} )
   Projargs = sapply( input_list, FUN=function(List){List[["projargs"]]} )
-  if( sd(Zone)>0 | sd(Flip)>0 ){
-    stop( "Must use same Zone for UTM conversion for all extrapolation grids" )
+  if( all(!is.na(Projargs)) ){
+    if( length(unique(Projargs)) > 1 ){
+      stop( "Must use same `projargs` for projection of all extrapolation grids" )
+    }
+  }else{
+    if( sd(Zone)>0 | sd(Flip)>0 ){
+      stop( "Must use same Zone for UTM conversion for all extrapolation grids" )
+    }
   }
 
   # Combine stuff

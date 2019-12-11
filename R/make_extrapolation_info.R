@@ -162,7 +162,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
 #' @return NULL
 #' @method plot make_extrapolation_info
 #' @export
-plot.make_extrapolation_info <- function(x, land_color="grey", map_resolution="medium", ...)
+plot.make_extrapolation_info <- function(x, cex=0.01, land_color="grey", map_resolution="medium", ...)
 {
   par( mfrow=c(1,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
 
