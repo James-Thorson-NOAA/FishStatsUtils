@@ -5,6 +5,7 @@
 #' \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 #'
 #' @inheritParams sp::CRS
+#' @inheritParams rnaturalearth::ne_countries
 #'
 #' @param Y_gt matrix where values for every column are plotted as a map
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
@@ -25,7 +26,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
          file_name="density", working_dir=paste0(getwd(),"/"), Format="png", Res=200, add=FALSE,
          outermargintext=c("Eastings","Northings"), zlim, col, mar=c(0,0,2,0), oma=c(4,4,0,0),
          legend_x=c(0,0.05), legend_y=c(0.05,0.45), cex.legend=1, mfrow, land_color="grey",
-         n_cells, xlim, ylim, ...){
+         n_cells, xlim, ylim, country=NULL, ...){
 
   ###################
   # Settings and inputs
@@ -76,7 +77,8 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   CRS_proj = sp::CRS( projargs )
 
   # Data for mapping
-  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))
+  #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))# , continent="america")
+  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ), country=country)
   map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   ###################

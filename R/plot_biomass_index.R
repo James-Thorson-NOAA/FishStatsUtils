@@ -225,8 +225,9 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
     plot_index( Index_ctl=array(Index_ctl[,,,'Estimate'],dim(Index_ctl)[1:3]),
       sd_Index_ctl=array(log_Index_ctl[,,,'Std. Error'],dim(log_Index_ctl)[1:3]),
       Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
-      DirName=DirName, PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"), scale="log",
-      interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Index" )
+      DirName=DirName, PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"),
+      interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Index",
+      scale="log", plot_args=list("log"=ifelse(plot_log==TRUE,"y","")), "Yrange"=c(ifelse(plot_log==TRUE,NA,0),NA) )
   }
 
   # Plot
