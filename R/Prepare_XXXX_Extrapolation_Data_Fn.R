@@ -1,3 +1,4 @@
+
 #' @export
 Prepare_AI_Extrapolation_Data_Fn <-
 function( strata.limits=NULL, projargs=NA, zone=NA, flip_around_dateline=TRUE, ... ){
@@ -340,7 +341,8 @@ function( strata.limits=NULL, projargs=NA, zone=NA, flip_around_dateline=FALSE, 
   Data_Extrap[,c('E_km','N_km')] = tmpUTM[,c('X','Y')]
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=attr(tmpUTM,"zone"), "projargs"=attr(tmpUTM,"projargs"),
+    "flip_around_dateline"=flip_around_dateline, "Area_km2_x"=Area_km2_x)
   return( Return )
 }
 
