@@ -48,7 +48,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   }
   if( !("PlotDF" %in% names(map_list)) ) stop("Check input `map_list`")
   Y_gt = Y_gt[ map_list$PlotDF[which(map_list$PlotDF[,'Include']>0),'x2i'], , drop=FALSE]
-  if(missing(n_cells)) n_cells = nrow(Y_gt)
+  if(missing(n_cells) || is.null(n_cells)) n_cells = nrow(Y_gt)
   if( missing(mfrow) ){
     mfrow = ceiling(sqrt(ncol(Y_gt)))
     mfrow = c( mfrow, ceiling(ncol(Y_gt)/mfrow) )

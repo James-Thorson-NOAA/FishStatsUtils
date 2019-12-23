@@ -21,6 +21,7 @@
 #' @param survey survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}
 #' @param region which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}
 #' @param surveyname area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}
+#' @param max_cells Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.
 #' @param ... other objects passed for individual regions (see example script)
 
 #' @return Tagged list used in other functions
@@ -34,7 +35,7 @@
 
 #' @export
 make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
-  create_strata_per_region=FALSE, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
+  create_strata_per_region=FALSE, max_cells=Inf, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
   maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
   region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
   survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, ... ){
@@ -132,6 +133,33 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
       Extrapolation_List = Prepare_Other_Extrapolation_Data_Fn( strata.limits=strata.limits, observations_LL=observations_LL,
         grid_dim_km=grid_dim_km, maximum_distance_from_sample=maximum_distance_from_sample,
         grid_in_UTM=grid_in_UTM, grid_dim_LL=grid_dim_LL, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+    }
+
+    # Optionally reduce number of extrapolation-grid cells
+    if( max_cells < nrow(Extrapolation_List$Data_Extrap) ){
+      message( "# Reducing extrapolation-grid for Region ",Region," from ",nrow(Extrapolation_List$Data_Extrap)," to ",max_cells )
+      # Run K-means
+      Kmeans = Calc_Kmeans( n_x=max_cells, loc_orig=Extrapolation_List$Data_Extrap[,c("E_km","N_km")], nstart=100,
+        randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=FALSE )
+      # Transform Extrapolation_List
+      aggregate_vector = function( values_x, index_x, max_index, FUN=sum ){
+        tapply( values_x, INDEX=factor(index_x,levels=1:max_index), FUN=FUN )
+      }
+      # a_el
+      a_el = matrix(NA, nrow=max_cells, ncol=ncol(Extrapolation_List$a_el) )
+      for(lI in 1:ncol(Extrapolation_List$a_el)){
+        a_el[,lI] = aggregate_vector( values_x=Extrapolation_List$a_el[,lI], index_x=Kmeans$cluster, max_index=max_cells )
+      }
+      # Area_km2_x
+      Area_km2_x = aggregate_vector( values_x=Extrapolation_List$Area_km2_x, index_x=Kmeans$cluster, max_index=max_cells )
+      # Data_Extrap
+      Include = aggregate_vector( values_x=Extrapolation_List$Data_Extrap[,'Include'], index_x=Kmeans$cluster, max_index=max_cells, FUN=function(vec){any(vec>0)} )
+      Area_in_survey_km2 = aggregate_vector( values_x=Extrapolation_List$Data_Extrap[,'Area_in_survey_km2'], index_x=Kmeans$cluster, max_index=max_cells )
+      lonlat_g = project_coordinates( X=Kmeans$centers[,"E_km"], Y=Kmeans$centers[,"N_km"], projargs="+proj=longlat +ellps=WGS84", origargs=Extrapolation_List$projargs )
+      Data_Extrap = cbind( "Lon"=lonlat_g[,1], "Lat"=lonlat_g[,2], "Area_in_survey_km2"=Area_in_survey_km2, "Include"=Include, Kmeans$centers )
+      # Assemble
+      Extrapolation_List = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=Extrapolation_List$zone, "projargs"=Extrapolation_List$projargs,
+        "flip_around_dateline"=Extrapolation_List$flip_around_dateline, "Area_km2_x"=Area_km2_x )
     }
 
     # Combine
