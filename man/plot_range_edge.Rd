@@ -11,9 +11,9 @@ plot_range_edge(Sdreport, Obj, Year_Set = NULL, Years2Include = NULL,
   ...)
 }
 \arguments{
-\item{Sdreport}{TMB output from `TMB::sdreport(Obj)`}
+\item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
-\item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `fit_model(...)$tmb_list$Obj`}
+\item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
 
 \item{Year_Set}{Year names for labeling panels}
 

@@ -20,6 +20,8 @@ plot_residuals(Lat_i, Lon_i, TmbData, Report, Q,
 
 \item{Q}{Output from \code{QQ_Fn}}
 
+\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
+
 \item{Year_Set}{Year names for labeling panels}
 
 \item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
