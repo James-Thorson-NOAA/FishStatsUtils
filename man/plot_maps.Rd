@@ -8,7 +8,7 @@ plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
   projargs = "+proj=longlat", Panel = "Category", Year_Set = NULL,
   Years2Include = NULL, category_names = NULL, quiet = FALSE,
   working_dir = paste0(getwd(), "/"), MapSizeRatio, n_cells,
-  what = "estimate", n_samples = 100, Report, TmbData, ...)
+  plot_value = "estimate", n_samples = 100, Report, TmbData, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -45,7 +45,7 @@ plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
 
 \item{MapSizeRatio}{Default size for each panel}
 
-\item{what}{either \code{what="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{what=sd}}
+\item{plot_value}{either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 

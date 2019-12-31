@@ -4,7 +4,7 @@
 \alias{make_covariates}
 \title{Format habitat covariate matrix}
 \usage{
-make_covariates(formula = ~0, covariate_data, Year_i, spatial_list,
+make_covariates(formula, covariate_data, Year_i, spatial_list,
   extrapolation_list)
 }
 \arguments{

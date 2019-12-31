@@ -33,9 +33,11 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # plot data
   message("\n### Making plots of data availability and knots")
-  plot_data( Extrapolation_List=fit$extrapolation_list, Spatial_List=fit$spatial_list,
-    Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir,
-    Year_Set=year_labels, ... )
+  plot_data_args = list(...)
+  plot_data_args = combine_lists( input=plot_data_args, default=list(Extrapolation_List=fit$extrapolation_list,
+    Spatial_List=fit$spatial_list, Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'],
+    Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir, Year_Set=year_labels) )
+  Dens_xt = do.call( what=plot_data, args=plot_data_args )
 
   # PLot settings
   if( missing(map_list) ){
@@ -87,7 +89,8 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   plot_maps_args = list(...)
   plot_maps_args = combine_lists( input=plot_maps_args, default=list(plot_set=plot_set, category_names=category_names, TmbData=fit$data_list,
     Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
-    working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100) )
+    working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100,
+    Obj=fit$tmb_list$Obj) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
 
   # Plot quantile-quantile plot

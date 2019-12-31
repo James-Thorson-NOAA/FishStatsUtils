@@ -51,7 +51,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=5)
     Rotate = 0
     Cex = 0.01
-    Legend = list(use=TRUE,x=c(76,86),y=c(48,83))
+    Legend = list(use=TRUE,x=c(81,86),y=c(48,88))
   }
   if( tolower(Region) == "aleutian_islands" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
@@ -83,7 +83,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=3)
     Rotate = 0
     Cex = 0.01
-    Legend = list(use=TRUE,x=c(70,80),y=c(5,35))
+    Legend = list(use=TRUE,x=c(75,80),y=c(5,35))
   }
   if( tolower(Region) == "south_africa" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
@@ -135,7 +135,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=3)
     Rotate = 0     # Degrees counter-clockwise
     Cex = 0.60
-    Legend = list(use=TRUE,x=c(76,86),y=c(48,83))
+    Legend = list(use=TRUE,x=c(81,86),y=c(48,83))
   }
   if( is.null(PlotDF) ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
