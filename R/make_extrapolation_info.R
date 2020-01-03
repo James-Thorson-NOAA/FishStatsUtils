@@ -6,7 +6,9 @@
 #' To do area-weighted extrapolation of estimated density for use in calculating abundance indices, it is necessary to have a precise measurement of the footprint for a given survey design. Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted at the location of each grid cell and where each grid cell is associated with a known area within a given survey design. Collaborators have worked with the package author to include the extrapolation-grid for several regions automatically in FishStatsUtils, but for new regions an analyst must either detect the grid automatically using \code{Region="Other"} or input an extrapolation-grid manually using \code{Region="User"}.  The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
 #'
 #' @inheritParams sp::CRS
-#' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"
+#' @inheritParams Calc_Kmeans
+#'
+#' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "stream_network", "user", or "other"
 #' @param strata.limits an input for determining stratification of indices (see example script)
 #' @param zone UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples
 #' @param flip_around_dateline used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used
@@ -38,7 +40,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
   create_strata_per_region=FALSE, max_cells=Inf, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
   maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
   region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
-  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, ... ){
+  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100, ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
   # However, it requires a different default value for different regions; hence the input format being used.
@@ -135,39 +137,43 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
         grid_in_UTM=grid_in_UTM, grid_dim_LL=grid_dim_LL, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
 
-    # Optionally reduce number of extrapolation-grid cells
-    if( max_cells < nrow(Extrapolation_List$Data_Extrap) ){
-      message( "# Reducing extrapolation-grid for Region ",Region," from ",nrow(Extrapolation_List$Data_Extrap)," to ",max_cells )
-      # Run K-means
-      Kmeans = Calc_Kmeans( n_x=max_cells, loc_orig=Extrapolation_List$Data_Extrap[,c("E_km","N_km")], nstart=100,
-        randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=FALSE )
-      # Transform Extrapolation_List
-      aggregate_vector = function( values_x, index_x, max_index, FUN=sum ){
-        tapply( values_x, INDEX=factor(index_x,levels=1:max_index), FUN=FUN )
-      }
-      # a_el
-      a_el = matrix(NA, nrow=max_cells, ncol=ncol(Extrapolation_List$a_el) )
-      for(lI in 1:ncol(Extrapolation_List$a_el)){
-        a_el[,lI] = aggregate_vector( values_x=Extrapolation_List$a_el[,lI], index_x=Kmeans$cluster, max_index=max_cells )
-      }
-      # Area_km2_x
-      Area_km2_x = aggregate_vector( values_x=Extrapolation_List$Area_km2_x, index_x=Kmeans$cluster, max_index=max_cells )
-      # Data_Extrap
-      Include = aggregate_vector( values_x=Extrapolation_List$Data_Extrap[,'Include'], index_x=Kmeans$cluster, max_index=max_cells, FUN=function(vec){any(vec>0)} )
-      Area_in_survey_km2 = aggregate_vector( values_x=Extrapolation_List$Data_Extrap[,'Area_in_survey_km2'], index_x=Kmeans$cluster, max_index=max_cells )
-      lonlat_g = project_coordinates( X=Kmeans$centers[,"E_km"], Y=Kmeans$centers[,"N_km"], projargs="+proj=longlat +ellps=WGS84", origargs=Extrapolation_List$projargs )
-      Data_Extrap = cbind( "Lon"=lonlat_g[,1], "Lat"=lonlat_g[,2], "Area_in_survey_km2"=Area_in_survey_km2, "Include"=Include, Kmeans$centers )
-      # Assemble
-      Extrapolation_List = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=Extrapolation_List$zone, "projargs"=Extrapolation_List$projargs,
-        "flip_around_dateline"=Extrapolation_List$flip_around_dateline, "Area_km2_x"=Area_km2_x )
-    }
-
     # Combine
     if( rI==1 ){
       Return = Extrapolation_List
     }else{
       Return = combine_extrapolation_info( Return, Extrapolation_List, create_strata_per_region=create_strata_per_region )
     }
+  }
+
+  # Optionally reduce number of extrapolation-grid cells
+  if( max_cells < nrow(Return$Data_Extrap) ){
+    message( "# Reducing extrapolation-grid from ",nrow(Return$Data_Extrap)," to ",max_cells," cells for Region(s): ",paste(Region,collapse=", ") )
+    # Run K-means only on grid-cells with nonzero area
+    loc_orig = Return$Data_Extrap[,c("E_km","N_km")]
+      loc_orig = loc_orig[ which(Return$Area_km2_x>0), ]
+    Kmeans = Calc_Kmeans( n_x=max_cells, loc_orig=loc_orig, nstart=nstart,
+      randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=FALSE )
+    Kmeans[["cluster"]] = RANN::nn2( data=Kmeans[["centers"]], query=Return$Data_Extrap[,c("E_km","N_km")], k=1)$nn.idx[,1]
+    # Transform Extrapolation_List
+    aggregate_vector = function( values_x, index_x, max_index, FUN=sum ){
+      tapply( values_x, INDEX=factor(index_x,levels=1:max_index), FUN=FUN )
+    }
+    # a_el
+    a_el = matrix(NA, nrow=max_cells, ncol=ncol(Return$a_el) )
+    for(lI in 1:ncol(Return$a_el)){
+      a_el[,lI] = aggregate_vector( values_x=Return$a_el[,lI], index_x=Kmeans$cluster, max_index=max_cells )
+    }
+    # Area_km2_x
+    Area_km2_x = aggregate_vector( values_x=Return$Area_km2_x, index_x=Kmeans$cluster, max_index=max_cells )
+    # Data_Extrap
+    Include = aggregate_vector( values_x=Return$Data_Extrap[,'Include'], index_x=Kmeans$cluster, max_index=max_cells, FUN=function(vec){any(vec>0)} )
+    #Area_in_survey_km2 = aggregate_vector( values_x=Return$Data_Extrap[,'Area_in_survey_km2'], index_x=Kmeans$cluster, max_index=max_cells )
+    lonlat_g = project_coordinates( X=Kmeans$centers[,"E_km"], Y=Kmeans$centers[,"N_km"], projargs="+proj=longlat +ellps=WGS84", origargs=Return$projargs )
+    #Data_Extrap = cbind( "Lon"=lonlat_g[,1], "Lat"=lonlat_g[,2], "Area_in_survey_km2"=Area_in_survey_km2, "Include"=Include, Kmeans$centers )
+    Data_Extrap = cbind( "Lon"=lonlat_g[,1], "Lat"=lonlat_g[,2], "Include"=Include, Kmeans$centers )
+    # Assemble
+    Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=Return$zone, "projargs"=Return$projargs,
+      "flip_around_dateline"=Return$flip_around_dateline, "Area_km2_x"=Area_km2_x )
   }
 
   # Add total across regions if requested

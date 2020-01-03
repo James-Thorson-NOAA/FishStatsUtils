@@ -43,21 +43,16 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
   if( "D_xcy" %in% names(Report) ){
     if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_xcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
-    #Report[["D_xct"]] = Report[["D_xcy"]]
   }
   if( "D_gcy" %in% names(Report) ){
     if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_gcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
-    #Report[["D_gct"]] = Report[["D_gcy"]]
   }
 
   # Dimensions for plotting
   Dim = function( num ) c(ceiling(sqrt(num)), ceiling(num/ceiling(sqrt(num))) )
   Dim_year = Dim(length(Year_Set))
   Dim_species = Dim(length(category_names))
-
-  # Extract covariance
-  #Cov_List = Summarize_Covariance( Report=Report, ParHat=ParHat, Data=Data, SD=SD, category_names=category_names, figname=NULL )
 
   # Extract loadings matrices (more numerically stable than extracting covariances, and then re-creating Cholesky)
   Psi2prime_list = Psiprime_list = Lprime_SE_list = Hinv_list = L_SE_list = Lprime_list = L_list = vector("list", length=6)    # Add names at end so that NULL doesn't interfere
@@ -93,8 +88,6 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         Lsd_cf = apply(L_rcf, MARGIN=2:3, FUN=sd)
         L_SE_list[[i]] = Lsd_cf
         rownames(L_SE_list[[i]]) = category_names
-      }else{
-        #L_SE_list[[i]] = NULL    # Must be NULL to pass to later functions
       }
 
       # Get covariance
@@ -107,11 +100,12 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       if(is.null(Psi_sjt)){
         stop(paste("Covariance is empty for parameter", Var_name))
       }
-      tau = NULL
       logkappa = unlist(ParHat[c('logkappa1','logkappa2')])[c(1,1,1,2,2,2)[i]]
-      if(Options_vec[8]==0) tau = 1 / (exp(logkappa) * sqrt(4*pi));
-      if(Options_vec[8]==1) tau = 1 / sqrt(1-exp(logkappa*2));
-      if( is.null(tau)) stop("Check 'Options_vec[8]' for allowable entries")
+      if(Options_vec[8]==0){
+        tau = 1 / (exp(logkappa) * sqrt(4*pi));
+      }else if(Options_vec[8]==1){
+        tau = 1 / sqrt(1-exp(logkappa*2));
+      }else stop("Check 'Options_vec[8]' for allowable entries")
 
       # Rotate stuff
       Var_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_sjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
@@ -123,7 +117,6 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
       # Extract SEs if available
       if( class(SD)=="sdreport" ){
-        #Lprime_SE_list[[i]] = Var_rot$L_pj_SE_rot
         rowindex = grep( paste0("L_",tolower(Par_name),"_z"), rownames(SD$cov.fixed) )
         L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[paste0("L_",tolower(Par_name),"_z")]], sigma=SD$cov.fixed[rowindex,rowindex] )
         Lprime_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
@@ -135,10 +128,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         Lsd_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=sd)
         Lprime_SE_list[[i]] = Lsd_cf
         rownames(Lprime_SE_list[[i]]) = category_names
-      }else{
-        #Lprime_SE_list[[i]] = NULL  # Must be NULL to pass to later functions
       }
-
 
       # Extract projected factors is available
       if( !is.null(Psi_gjt) ){
@@ -156,6 +146,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
       # Plot factors
       if( !is.null(mapdetails_list) ){
+
         # Plot Epsilon
         # Use plot_maps to automatically make one figure per factor
         if( Par_name %in% c("Epsilon1","Epsilon2") ){
@@ -171,7 +162,6 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         #  plot_maps(plot_set=c(6,6,NA,7,7,NA)[i], Report=Report_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
         #    working_dir=plotdir, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
         #    legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100)
-        #  #FishStatsUtils::PlotMap_Fn( MappingDetails=mapdetails_list[["MappingDetails"]], Mat=Mat_sf, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]], Xlim=mapdetails_list[["Xlim"]], Ylim=mapdetails_list[["Ylim"]], FileName=paste0(plotdir,"Factor_maps--",Par_name), Year_Set=paste0("Factor_",1:ncol(Mat_sf)), Rotate=mapdetails_list[["Rotate"]], zone=mapdetails_list[["Zone"]], mar=c(0,0,2,0), oma=c(2.5,2.5,0,0), pch=20, Cex=mapdetails_list[["Cex"]], mfrow=Dim_factor, Legend=mapdetails_list[["Legend"]], plot_legend_fig=FALSE, land_color=land_color)
           plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
             panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name) )
         }

@@ -75,7 +75,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # Plot range edges
   if( "jointPrecision"%in%names(fit$parameter_estimates$SD) & n_samples>0 ){
-    message("\n### Making plot of spatial indices")
+    message("\n### Making plot of range edges")
     Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
       working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot,
       category_names=category_names, n_samples=n_samples, quantiles=c(0.05,0.5,0.95) )
