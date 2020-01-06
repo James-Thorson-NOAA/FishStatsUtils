@@ -240,7 +240,11 @@ print.make_extrapolation_info <- function(x, quiet=FALSE, ...)
   if(quiet==FALSE){
     cat("make_extrapolation_info(.) result\n")
     print( summary(loc_gz) )
-    cat( paste0("\nUTM zone: ",x$zone,"\n") )
+    if(is.na(x$zone)){
+      cat( paste0("\nprojargs: ",x$projargs,"\n") )
+    }else{
+      cat( paste0("\nUTM zone: ",x$zone,"\n") )
+    }
     if( x$flip_around_dateline == TRUE ){
       cat( "Note: Longitude was translated away from dateline (by adding 180, to avoid dateline projection issues in PBSmapping) prior projection using the UTM zone listed above\n" )
     }
