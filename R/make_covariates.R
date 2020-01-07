@@ -37,7 +37,7 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
   # Create data frame of necessary size
   DF_zp = NULL
   DF_ip = cbind( sample_data, covariate_data[rep(1,nrow(sample_data)),covariate_names] )
-  colnames(DF_ip) = c(names(sample_data),covariate_names)
+  colnames(DF_ip) = c( names(sample_data) ,covariate_names )
   DF_ip[,covariate_names] = NA
 
   # Loop through data and extrapolation-grid
@@ -65,7 +65,6 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
     newrows = cbind("Year"=Year_Set[tI], latlon_g, nearest_covariates )
     DF_zp = rbind( DF_zp, newrows )
   }
-  if( any(is.na(DF_ip)) ) stop("Problem with `DF_ip` in `make_covariates(.)")
 
   # Convert to dimensions requested
   DF = rbind( DF_ip, DF_zp )
@@ -74,6 +73,7 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
   # Make X_ip
   X_ip = X[ 1:nrow(DF_ip), , drop=FALSE ]
   X_itp = aperm( X_ip %o% rep(1,length(Year_Set)), perm=c(1,3,2) )
+  if( any(is.na(X_itp)) ) stop("Problem with `X_itp` in `make_covariates(.)")
 
   # Make X_gpt and then permute dimensions
   X_gpt = NULL
@@ -84,6 +84,7 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
     X_gpt = abind::abind( X_gpt, X[ indices, , drop=FALSE ], along=3 )
   }
   X_gtp = aperm( X_gpt, perm=c(1,3,2) )
+  if( any(is.na(X_gtp)) ) stop("Problem with `X_gtp` in `make_covariates(.)")
 
   # warnings
   if( any(apply(X_gtp, MARGIN=2:3, FUN=sd)>10 | apply(X_itp, MARGIN=2:3, FUN=sd)>10) ){
