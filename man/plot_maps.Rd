@@ -4,11 +4,11 @@
 \alias{plot_maps}
 \title{Plot standard maps}
 \usage{
-plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
-  TmbData = NULL, projargs = "+proj=longlat", Panel = "Category",
-  Year_Set = NULL, Years2Include = NULL, category_names = NULL,
-  quiet = FALSE, working_dir = paste0(getwd(), "/"), MapSizeRatio,
-  n_cells, ...)
+plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
+  projargs = "+proj=longlat", Panel = "Category", Year_Set = NULL,
+  Years2Include = NULL, category_names = NULL, quiet = FALSE,
+  working_dir = paste0(getwd(), "/"), MapSizeRatio, n_cells,
+  plot_value = "estimate", n_samples = 100, Report, TmbData, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -18,8 +18,8 @@ plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
   \item{plot_set=3}{Log-predicted density (product of encounter probability and positive catch rates)}
   \item{plot_set=4}{Log-positive catch rates (rescaled)}
   \item{plot_set=5}{Log-predicted density (rescaled)}
-  \item{plot_set=6}{Spatio-temporal variation in encounter probability}
-  \item{plot_set=7}{Spatio-temporal variation in log-positive catch rates}
+  \item{plot_set=6}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model)}
+  \item{plot_set=7}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model)}
   \item{plot_set=8}{Linear predictor for encounter probability}
   \item{plot_set=9}{Linear predictor for positive catch rates}
   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
@@ -29,9 +29,11 @@ plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
   \item{plot_set=14}{Covariate effects on positive catch rates}
 }}
 
-\item{Report}{tagged list of outputs from TMB model via \code{Obj$report()}}
+\item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
 
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
+
+\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
 \item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
 
@@ -42,6 +44,12 @@ plot_maps(plot_set = 3, Report, PlotDF, Sdreport = NULL,
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
 \item{MapSizeRatio}{Default size for each panel}
+
+\item{plot_value}{either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}}
+
+\item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
+
+\item{Report}{tagged list of outputs from TMB model via \code{Obj$report()}}
 
 \item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
 }

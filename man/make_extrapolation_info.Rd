@@ -4,24 +4,28 @@
 \alias{make_extrapolation_info}
 \title{Build extrapolation grid}
 \usage{
-make_extrapolation_info(Region, zone = NA,
+make_extrapolation_info(Region, projargs = NA, zone = NA,
   strata.limits = data.frame(STRATA = "All_areas"),
-  create_strata_per_region = FALSE, input_grid = NULL,
-  observations_LL = NULL, grid_dim_km = c(2, 2),
+  create_strata_per_region = FALSE, max_cells = Inf,
+  input_grid = NULL, observations_LL = NULL, grid_dim_km = c(2, 2),
   maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
   grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
   strata_to_use = c("SOG", "WCVI", "QCS", "HS", "WCHG"),
   survey = "Chatham_rise", surveyname = "propInWCGBTS",
-  flip_around_dateline, ...)
+  flip_around_dateline, nstart = 100, ...)
 }
 \arguments{
-\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "clifornia_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "user", or "other"}
+\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "stream_network", "user", or "other"}
+
+\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 
 \item{strata.limits}{an input for determining stratification of indices (see example script)}
 
 \item{create_strata_per_region}{Boolean indicating whether to create a single stratum for all regions listed in \code{Region} (the default), or a combined stratum in addition to a stratum for each individual Region}
+
+\item{max_cells}{Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.}
 
 \item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}}
 
@@ -44,6 +48,8 @@ make_extrapolation_info(Region, zone = NA,
 \item{surveyname}{area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}}
 
 \item{flip_around_dateline}{used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used}
+
+\item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
 
 \item{...}{other objects passed for individual regions (see example script)}
 }

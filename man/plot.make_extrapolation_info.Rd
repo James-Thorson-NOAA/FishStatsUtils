@@ -4,7 +4,8 @@
 \alias{plot.make_extrapolation_info}
 \title{Plot extrapolation-grid}
 \usage{
-\method{plot}{make_extrapolation_info}(x, cex = 0.01, ...)
+\method{plot}{make_extrapolation_info}(x, cex = 0.01,
+  land_color = "grey", map_resolution = "medium", ...)
 }
 \arguments{
 \item{x}{Output from \code{\link{make_extrapolation_info}}}

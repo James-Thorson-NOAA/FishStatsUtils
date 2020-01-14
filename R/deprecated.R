@@ -779,3 +779,404 @@ Plot_range_quantiles = function( Data_Extrap, Report, TmbData, a_xl, NN_Extrap, 
   Return = list( "Data_Extrap_Range"=Data_Extrap_Range )
   return( invisible(Return) )
 }
+
+
+#' Convert from Lat-Long to Eastings-Northings using WGS
+#'
+#' \code{Convert_LL_to_EastNorth_Fn} converts from Latitude-Longitude to World Geodetic System Eastings-Northings for a given location
+#'
+#' @param Lat vector of latitudes
+#' @param Lon vector of longitudes
+#' @param crs EPSG reference for coordinate reference system (CRS) defining Eastings-Northings after transformation
+
+#' @return A data frame with the following columns
+#' \describe{
+#'   \item{E_km}{The eastings for each value of Lon (in kilometers)}
+#'   \item{N_km}{The northings for each value of Lat (in kilometers)}
+#' }
+
+Convert_LL_to_EastNorth_Fn <-
+function( Lon, Lat, crs=NA ){
+  # SEE:  https://github.com/nwfsc-assess/geostatistical_delta-GLMM/issues/25#issuecomment-345825230
+
+  # Attach package
+  require(rgdal)
+  on.exit( detach("package:rgdal") )
+
+  # Transform
+  dstart<-data.frame(lon=Lon, lat=Lat) # that's the object
+  coordinates(dstart) <- c("lon", "lat")
+  proj4string(dstart) <- CRS("+init=epsg:4326") # that's the lat long projection
+  CRS.new <- CRS(crs) # that's the eastings and northings projection
+  dstart.t <- spTransform(dstart, CRS.new) # here's where you transform
+
+  # Clean up
+  dstart.t = cbind( "E_km"=dstart.t@coords[,"lon"]/1000, "N_km"=dstart.t@coords[,'lat']/1000 )
+  attr(dstart.t,"zone") = crs
+
+  # Return results
+  return( dstart.t )
+}
+
+
+#' Convert from Lat-Long to UTM
+#'
+#' \code{Convert_LL_to_UTM_Fn} converts from Latitude-Longitude to Universal Transverse Mercator projections for a given location
+#'
+#' @param Lat vector of latitudes
+#' @param Lon vector of longitudes
+#' @param zone UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone
+#' @param flip_around_dateline boolean specifying whether to flip Lat-Lon locations around the dateline, and then retransform back (only useful if Lat-Lon straddle the dateline)
+
+#' @return A data frame with the following columns
+#' \describe{
+#'   \item{X}{The UTM eastings for each value of Lon}
+#'   \item{Y}{The UTM northings measured from the equator for each Lat}
+#' }
+
+Convert_LL_to_UTM_Fn <-
+function( Lon, Lat, zone=NA, flip_around_dateline=FALSE ){
+
+  # Convert
+  # if zone=NA or NULL, then it automatically detects appropriate zone
+  Tmp = cbind('PID'=1,'POS'=1:length(Lon),'X'=Lon,'Y'=Lat)
+  if( flip_around_dateline==TRUE ) Tmp[,'X'] = ifelse( Tmp[,'X']>0, Tmp[,'X']-180, Tmp[,'X']+180)
+  attr(Tmp,"projection") = "LL"
+  attr(Tmp,"zone") = zone
+  tmpUTM = PBSmapping::convUL(Tmp)                                                         #$
+  if( !is.na(zone)) message("convUL: For the UTM conversion, used zone ",zone," as specified")
+
+  # Return results
+  return( tmpUTM )
+}
+
+#' @title
+#' Plot maps with areal results
+#'
+#' @description
+#' \code{PlotMap_Fn} is a hidden function to plot a map and fill in regions with colors to represent intensity in an areal-interpretion of model results
+#'
+#' @inheritParams plot_maps
+#' @param plot_legend_fig Boolean, whether to plot a separate figure for the heatmap legend or not
+#' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
+#' @param ... arguments passed to \code{par}
+#'
+#' @details
+#' This function was necessary to build because \code{mapproj::mapproject} as used in \code{maps::map} has difficulties with both rotations (for most projections) and
+#' truncating the cocuntry boundaries within the plotting region (which \code{mapproj::mapproject} appears to do prior to projection,
+#' so that the post-projection is often missing boundaries that are within the plotting rectangle).  I use rectangular projections by default, but Lamberts or Albers conformal
+#' projections would also be useful for many cases.
+
+#' @export
+PlotMap_Fn <-
+function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Xlim, Ylim, FileName=paste0(getwd(),"/"), Year_Set,
+         Rescale=FALSE, Rotate=0, Format="png", Res=200, zone=NA, Cex=0.01, textmargin="", add=FALSE, pch=15,
+         outermargintext=c("Eastings","Northings"), zlim=NULL, Col=NULL,
+         Legend=list("use"=FALSE, "x"=c(10,30), "y"=c(10,30)), mfrow=c(1,1), plot_legend_fig=TRUE, land_color="grey", ignore.na=FALSE,
+         map_style="rescale", ...){
+
+  # Warning
+  warning( "`PlotMap_Fn` is soft-deprecated, please use `plot_variable` instead for many improvements")
+
+  # Check for problems
+  if( length(Year_Set) != ncol(Mat) ){
+    warning( "Year_Set and `ncol(Mat)` don't match: Changing Year_Set'")
+    Year_Set = 1:ncol(Mat)
+  }
+
+  # Transform to grid or other coordinates
+  Mat = Mat[PlotDF[,'x2i'],,drop=FALSE]
+  Which = which( PlotDF[,'Include']>0 )
+  if( Rescale!=FALSE ) Mat = Mat / outer(rep(Rescale,nrow(Mat)), colMeans(Mat[Which,]))
+
+  # Plotting functions
+  f = function(Num, zlim=NULL){
+    if( is.null(zlim)) Return = ((Num)-min(Num,na.rm=TRUE))/max(diff(range(Num,na.rm=TRUE)),0.01)
+    if( !is.null(zlim)) Return = ((Num)-zlim[1])/max(diff(zlim),0.01)
+    return( Return )
+  }
+  if( is.null(Col)) Col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
+  if( is.function(Col)) Col = Col(50)
+
+  # Plot
+  Par = list( mfrow=mfrow, ...)
+  if(Format=="png"){
+    png(file=paste0(FileName, ".png"),
+        width=Par$mfrow[2]*MapSizeRatio['Width(in)'],
+        height=Par$mfrow[1]*MapSizeRatio['Height(in)'], res=Res, units='in')
+  }
+  if(Format=="jpg"){
+    jpeg(file=paste0(FileName, ".jpg"),
+         width=Par$mfrow[2]*MapSizeRatio['Width(in)'],
+         height=Par$mfrow[1]*MapSizeRatio['Height(in)'], res=Res, units='in')
+  }
+  if(Format%in%c("tif","tiff")){
+    tiff(file=paste0(FileName, ".tif"),
+         width=Par$mfrow[2]*MapSizeRatio['Width(in)'],
+         height=Par$mfrow[1]*MapSizeRatio['Height(in)'], res=Res, units='in')
+  }
+    if(add==FALSE) par( Par )          # consider changing to Par=list() input, which overloads defaults a la optim() "control" input
+    for(tI in 1:length(Year_Set)){
+      if( is.null(MappingDetails) ){
+        plot(1, type="n", ylim=Ylim, xlim=Xlim, main="", xlab="", ylab="", mar=par()$mar )#, main=Year_Set[t])
+        points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[ceiling(f(Mat[Which,],zlim=zlim)[,t]*(length(Col)-1))+1], cex=0.01)
+      }else{
+        # If not rotating:  Use simple plot
+        if( Rotate==0 ){
+          Col_Bin = ceiling( f(Mat[Which,,drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
+          if( map_style=="rescale" ){
+            # Make plot size using plot(.)
+            plot( 1, type="n", ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), xaxt="n", yaxt="n", xlab="", ylab="" )
+            points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
+            Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE)
+            map( Map, add=TRUE ) #, col=land_color, fill=TRUE )  # ->  Using land-fill color produces weird plotting artefacts
+          }else{
+            # Make plot size using map(.)
+            map(MappingDetails[[1]], MappingDetails[[2]], ylim=mean(Ylim)+c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+c(-0.5,0.5)*diff(Xlim), plot=TRUE, fill=FALSE, mar=c(0.1,0.1,par("mar")[3],0), myborder=0 )
+            points(x=PlotDF[Which,'Lon'], y=PlotDF[Which,'Lat'], col=Col[Col_Bin], cex=Cex, pch=pch)
+            map(MappingDetails[[1]], MappingDetails[[2]], plot=TRUE, col=land_color, fill=TRUE, add=TRUE )
+          }
+        }
+        # If rotating:  Record all polygons; Rotate them and all points;  Plot rotated polygons;  Plot points
+        if( Rotate!=0 ){
+          # Extract map features
+          boundary_around_limits = 3
+          Map = maps::map(MappingDetails[[1]], MappingDetails[[2]], plot=FALSE, ylim=mean(Ylim)+boundary_around_limits*c(-0.5,0.5)*diff(Ylim), xlim=mean(Xlim)+boundary_around_limits*c(-0.5,0.5)*diff(Xlim), fill=TRUE) # , orientation=c(mean(y.lim),mean(x.lim),15)
+          Tmp1 = na.omit( cbind('PID'=cumsum(is.na(Map$x)), 'POS'=1:length(Map$x), 'X'=Map$x, 'Y'=Map$y, matrix(0,ncol=length(Year_Set),nrow=length(Map$x),dimnames=list(NULL,Year_Set))) )
+          TmpLL = rbind( Tmp1, cbind('PID'=max(Tmp1[,1])+1, 'POS'=1:length(Which)+max(Tmp1[,2]), 'X'=PlotDF[Which,'Lon'], 'Y'=PlotDF[Which,'Lat'], Mat[Which,]) )
+          tmpUTM = TmpLL
+          # Convert map to Eastings-Northings
+          if( is.numeric(zone) ){
+            tmpUTM[,c('X','Y')] = as.matrix(Convert_LL_to_UTM_Fn( Lon=TmpLL[,'X'], Lat=TmpLL[,'Y'], zone=zone, flip_around_dateline=ifelse(MappingDetails[[1]]%in%c("world2","world2Hires"),FALSE,FALSE) )[,c('X','Y')])
+          }else{
+            tmpUTM[,c('X','Y')] = as.matrix(Convert_LL_to_EastNorth_Fn( Lon=TmpLL[,'X'], Lat=TmpLL[,'Y'], crs=zone )[,c('E_km','N_km')])
+          }
+          # Rotate map features and maps simultaneously
+          tmpUTM = data.frame(tmpUTM)
+          sp::coordinates(tmpUTM) = c("X","Y")
+          tmpUTM_rotated <- maptools::elide( tmpUTM, rotate=Rotate)
+          plot( 1, type="n", xlim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x']), ylim=range(tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y']), xaxt="n", yaxt="n" )
+          Col_Bin = ceiling( f(tmpUTM_rotated@data[-c(1:nrow(Tmp1)),-c(1:2),drop=FALSE],zlim=zlim)[,tI]*(length(Col)-1) ) + 1
+          if( ignore.na==FALSE && any(Col_Bin<1 | Col_Bin>length(Col)) ) stop("zlim doesn't span the range of the variable")
+          points(x=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'x'], y=tmpUTM_rotated@coords[-c(1:nrow(Tmp1)),'y'], col=Col[Col_Bin], cex=Cex, pch=pch)
+          # Plot map features
+          lev = levels(as.factor(tmpUTM_rotated@data$PID))
+          for(levI in 1:(length(lev)-1)) {
+            indx = which(tmpUTM$PID == lev[levI])
+            if( var(sign(TmpLL[indx,'Y']))==0 ){
+              polygon(x=tmpUTM_rotated@coords[indx,'x'], y=tmpUTM_rotated@coords[indx,'y'], col=land_color)
+            }else{
+              warning( "Skipping map polygons that straddle equator, because PBSmapping::convUL doesn't work for these cases" )
+            }
+          }
+        }
+      }
+      title( Year_Set[tI], line=0.1, cex.main=ifelse(is.null(Par$cex.main), 1.8, Par$cex.main), cex=ifelse(is.null(Par$cex.main), 1.8, Par$cex.main) )
+      box()
+    }
+    # Include legend
+    if( Legend$use==TRUE ){
+      FishStatsUtils:::smallPlot( FishStatsUtils:::Heatmap_Legend(colvec=Col, heatrange=list(range(Mat[Which,],na.rm=TRUE),zlim)[[ifelse(is.null(zlim),1,2)]], dopar=FALSE), x=Legend$x, y=Legend$y, mar=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.2, font=2 )  #
+    }
+    # Margin text
+    if(add==FALSE) mtext(side=1, outer=TRUE, outermargintext[1], cex=1.75, line=par()$oma[1]/2)
+    if(add==FALSE) mtext(side=2, outer=TRUE, outermargintext[2], cex=1.75, line=par()$oma[2]/2)
+  if(Format %in% c("png","jpg","tif","tiff")) dev.off()
+  # Legend
+  if( plot_legend_fig==TRUE ){
+    if(Format=="png"){
+      png(file=paste0(FileName, "_Legend.png",sep=""),
+          width=1, height=2*MapSizeRatio['Height(in)'], res=Res, units='in')
+    }
+    if(Format=="jpg"){
+      jpeg(file=paste0(FileName, "_Legend.jpg",sep=""),
+           width=1, height=2*MapSizeRatio['Height(in)'], res=Res, units='in')
+    }
+    if(Format%in%c("tif","tiff")){
+      tiff(file=paste0(FileName, "_Legend.tif",sep=""),
+           width=1, height=2*MapSizeRatio['Height(in)'], res=Res, units='in')
+    }
+    if(Format %in% c("png","jpg","tif","tiff")){
+      FishStatsUtils:::Heatmap_Legend( colvec=Col, heatrange=list(range(Mat,na.rm=TRUE),zlim)[[ifelse(is.null(zlim),1,2)]], textmargin=textmargin )
+      dev.off()
+    }
+  }
+  return( invisible(list("Par"=Par)) )
+}
+
+
+#' @export
+plot_lines = function( x, y, ybounds, fn=lines, col_bounds="black", bounds_type="whiskers", border=NA,
+  border_lty="solid", lwd_bounds=1, ... ){
+
+  #warning( "`plot_lines` is soft-deprecated" )
+
+  fn( y=y, x=x, ... )
+  if( bounds_type=="whiskers" ){
+    for(t in 1:length(y)){
+      lines( x=rep(x[t],2), y=ybounds[t,], col=col_bounds, lty=border_lty, lwd=lwd_bounds)
+    }
+  }
+  if( bounds_type=="shading" ){
+    polygon( x=c(x,rev(x)), y=c(ybounds[,1],rev(ybounds[,2])), col=col_bounds, border=border, lty=border_lty)
+  }
+}
+
+#' Inset small plot within figure
+#'
+#' Inset plot with margins, background and border (based on: https://github.com/cran/berryFunctions/blob/master/R/smallPlot.R)
+#'
+#' @return parameters of small plot, invisible.
+smallPlot <- function( expr, x=c(5,70), y=c(50,100), x1,y1,x2,y2, mar=c(12, 14, 3, 3), mgp=c(1.8, 0.8, 0),
+  bg=par("bg"), border=par("fg"), las=1, resetfocus=TRUE, ...){
+
+  # Input check:                               #  y1 | P1       |
+  if(missing(x1)) x1 <- min(x, na.rm=TRUE)     #     |          |
+  if(missing(x2)) x2 <- max(x, na.rm=TRUE)     #  y2 |       P2 |
+  if(missing(y1)) y1 <- max(y, na.rm=TRUE)     #     ------------
+  if(missing(y2)) y2 <- min(y, na.rm=TRUE)     #       x1    x2
+
+  # catch outside plot:
+  if(x1<0)  {x1 <- 0;   warning("x (",x1,") set to 0.")}
+  if(y2<0)  {y2 <- 0;   warning("y (",y2,") set to 0.")}
+  if(x2>100){x2 <- 100; warning("x (",x2,") set to 100.")}
+  if(y1>100){y1 <- 100; warning("y (",y1,") set to 100.")}
+
+  # control for 0:1 input:
+  if(diff(range(x, na.rm=TRUE)) < 1  |  diff(range(y, na.rm=TRUE)) < 1  ){
+    stop("x or y was probably given as coodinates between 0 and 1. They must be between 0 and 100.")
+  }
+
+  # old parameters to be restored at exit:
+  op <- par(no.readonly=TRUE)
+
+  # inset plot: background, border
+  par(plt=c(x1, x2, y2, y1)/100, new=TRUE, mgp=mgp) # plt / fig
+  plot.new() # code line from ade4::add.scatter
+  u <- par("usr")
+  rect(u[1], u[3], u[2], u[4], col=bg, border=border)
+
+  # inset plot: margins
+  par(plt=c(x1+mar[2], x2-mar[4], y2+mar[1], y1-mar[3])/100, new=TRUE, las=las, ...)
+
+  # Actual plot:
+  expr
+
+  # par of small plot:
+  sp <- par(no.readonly=TRUE)
+
+  # par reset
+  if(resetfocus){
+    if( par("mfrow")[1]==1 & par("mfrow")[2]==1  ){
+      par(op) # ruins multiple figure plots, so:
+    }else{
+      par(plt=op$plt, new=op$new, mgp=op$mgp, las=op$las)
+    }
+  }
+  return(invisible(sp))
+}
+
+
+#' Format habitat covariate matrix
+#'
+#' \code{format_covariates} formats an array used by \code{Data_Fn} for habitat (a.k.a. density) covariates
+#'
+#' @param Lat_e, Latitude for covariate sample e
+#' @param Lon_e, Longitude for covariate sample e
+#' @param t_e, Time (e.g., year) for covariate sample e
+#' @param Cov_ep, matrix of covariates
+#' @param Spatial_List, Output from \code{FishStatsUtils::Spatial_Information_Fn}, representing spatial location of knots
+#' @param FUN, function used to aggregate observations associated with each knot-time combination
+#' @param Year_Set, Set of times \code{t_e} used when generating \code{Cov_xtp}
+#' @param na.omit, What to do when some knot-time combination has no observation. Options include \code{"error"} which throw an error, or \code{"time-average"} which fills in the average for other years with observations for each knot
+
+#' @return Tagged list of useful output
+#' \describe{
+#'   \item{Cov_xtp}{3-dimensional array for use in \code{VAST::Data_Fn}}
+#'   \item{var_p}{a matrix summarizing the data-level variance, variance among knots, and lost variance when aggregating from data to knots for each covariate}
+#' }
+
+#' @export
+format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spatial_List, FUN=mean, Year_Set=min(t_e):max(t_e), na.omit="error" ){
+
+  # Knots in UTM: Spatial_List$loc_x
+  # Info for projection:  Extrapolation_List[c('zone','flip_around_dateline')]
+
+  # Backwards compatibility
+  if( is.null(Spatial_List$fine_scale) ) Spatial_List$fine_scale = FALSE
+
+  # Determine grids to use
+  if( Spatial_List$fine_scale==FALSE ){
+    loc_g = Spatial_List$loc_x
+  }else{
+    if(is.null(Spatial_List)) stop("Problem with `Spatial_List`")
+    loc_g = Spatial_List$loc_g
+  }
+
+  #
+  if( is.vector(Cov_ep)) Cov_ep = matrix(Cov_ep,ncol=1)
+
+  # Step 1:  Project Lat_e and Lon_e to same coordinate system as knots
+  if( is.numeric(Extrapolation_List$zone) ){
+    loc_e = Convert_LL_to_UTM_Fn( Lon=Lon_e, Lat=Lat_e, zone=Extrapolation_List$zone, flip_around_dateline=Extrapolation_List$flip_around_dateline )                                                         #$
+    loc_e = cbind( 'E_km'=loc_e[,'X'], 'N_km'=loc_e[,'Y'])
+  }else{
+    loc_e = Convert_LL_to_EastNorth_Fn( Lon=Lon_e, Lat=Lat_e, crs=Extrapolation_List$zone )
+  }
+
+  # Associate each knot with all covariate measurements that are closest to that knot
+  if( na.omit %in% c("error","time-average") ){
+    # Step 2: Determine nearest knot for each LatLon_e
+    NN = RANN::nn2( data=loc_g[,c('E_km','N_km')], query=loc_e[,c('E_km','N_km')], k=1 )$nn.idx[,1]
+
+    # Step 3: Determine average covariate for each knot and year
+    Cov_xtp = NULL
+    for(pI in 1:ncol(Cov_ep)){
+      Cov_xt = tapply( Cov_ep[,pI], INDEX=list(factor(NN,levels=1:nrow(loc_g)), factor(t_e,levels=Year_Set)), FUN=FUN )
+      Cov_xtp = abind::abind( Cov_xtp, Cov_xt, along=3 )
+    }
+
+    # Step 4: QAQC
+    if( any(is.na(Cov_xtp)) ){
+      if( na.omit=="error" ){
+        stop("No covariate value for some combination of knot and year")
+      }
+      if( na.omit=="time-average"){
+        Cov_xtp = ifelse( is.na(Cov_xtp), aperm(apply(Cov_xtp,MARGIN=c(1,3),FUN=mean, na.rm=TRUE)%o%rep(1,length(Year_Set)),c(1,3,2)), Cov_xtp )
+      }
+    }
+
+    # Step 5: Calculate variance lost when aggregating to knots
+    KnotVar_p = apply( Cov_xtp, MARGIN=3, FUN=function(vec){var(as.vector(vec))} )
+    DataVar_p = apply( Cov_ep, MARGIN=2, FUN=var )
+    LostVar_p = 1 - KnotVar_p / DataVar_p
+    var_p = matrix( c(KnotVar_p,DataVar_p,LostVar_p), nrow=3, byrow=TRUE)
+    dimnames(var_p) = list( c("Variance_among_knots","Variance_among_observations","Proportion_of_variance_lost"), colnames(Cov_ep) )
+    for(pI in 1:ncol(Cov_ep)){
+      message( "Projecting to knots lost ", formatC(100*LostVar_p[pI],format="f",digits=1), "% of variance for variable ", ifelse(is.null(colnames(Cov_ep)[pI]),pI,colnames(Cov_ep)[pI]))
+    }
+  }
+
+  # Associate each knot with the X closest measurements in a given year
+  if( is.numeric(na.omit) ){
+    Cov_xtp = array(NA, dim=c(nrow(loc_g),length(Year_Set),ncol(Cov_ep)), dimnames=list(NULL,Year_Set,colnames(Cov_ep)) )
+
+    for(tI in 1:length(Year_Set)){
+      locprime_e = loc_e[which(t_e==Year_Set[tI]),c('E_km','N_km'),drop=FALSE]
+      if( nrow(locprime_e) == 0 ) stop("No measurements for year ", Year_Set[tI] )
+      NN = RANN::nn2( data=locprime_e[,c('E_km','N_km')], query=loc_g[,c('E_km','N_km')], k=na.omit )$nn.idx
+      for(xI in 1:dim(Cov_xtp)[1] ){
+      for(pI in 1:dim(Cov_xtp)[3] ){
+        Cov_xtp[xI,tI,pI] = FUN( Cov_ep[which(t_e==Year_Set[tI]),pI][NN[xI,]] )
+      }}
+    }
+  }
+
+  # Calculate interpolated value
+  Return = list( Cov_xtp=Cov_xtp )
+  if( na.omit %in% c("error","time-average") ){
+    Return[["var_p"]] = var_p
+  }
+  return( Return )
+}
+

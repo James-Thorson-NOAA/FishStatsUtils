@@ -8,11 +8,9 @@
 #' \code{plot_range_edge} plots range edges
 #'
 #' @inheritParams plot_biomass_index
-#' @param Sdreport TMB output from `TMB::sdreport(Obj)`
-#' @param Obj Fitted TMB object from package `VAST`, i.e., output from `fit_model(...)$tmb_list$Obj`
+#' @inheritParams sample_variable
 #' @param working_dir Directory for plots
 #' @param quantiles vector
-#' @param n_samples number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.
 #'
 
 #' @export
@@ -26,7 +24,6 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
-  if( !("jointPrecision" %in% names(Sdreport))) stop("jointPrecision not present in Sdreport; please re-run with `getJointPrecision=TRUE`")
   if( any(quantiles<0) | any(quantiles>1) ) stop("Please provide `quantiles` between zero and one")
   if( all(TmbData$Z_gm==0) ) stop("Please re-run with 'Options['Calculate_Range']=TRUE' to calculate range edges")
   if( n_samples<10 ) stop("`n_samples` must be at least 10 for any chance of meaningful results for `plot_range_edge`")
@@ -57,24 +54,25 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
     m_labels = colnames(TmbData$Z_gm)
   }
 
-  #### Local function
-  # Sample from GMRF using sparse precision
-  rmvnorm_prec <- function(mu, prec, n.sims) {
-    z <- matrix(rnorm(length(mu) * n.sims), ncol=n.sims)
-    L <- Matrix::Cholesky(prec, super=TRUE)
-    z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
-    z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
-    z <- as.matrix(z)
-    mu + z
-  }
-
-  # Sample from densities
-  u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Sdreport$jointPrecision, n.sims=n_samples)
-  D_gcyr = array( NA, dim=c(dim(Report$D_gcy),n_samples) )
-  for( rI in 1:n_samples ){
-    if( rI%%max(1,floor(n_samples/10)) == 1 ) message( "Obtaining sample ", rI, " from predictive distribution for density" )
-    D_gcyr[,,,rI] = Obj$report( par=u_zr[,rI] )$D_gcy
-  }
+  ##### Local function
+  ## Sample from GMRF using sparse precision
+  #rmvnorm_prec <- function(mu, prec, n.sims) {
+  #  z <- matrix(rnorm(length(mu) * n.sims), ncol=n.sims)
+  #  L <- Matrix::Cholesky(prec, super=TRUE)
+  #  z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
+  #  z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
+  #  z <- as.matrix(z)
+  #  mu + z
+  #}
+  #
+  ## Sample from densities
+  #u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Sdreport$jointPrecision, n.sims=n_samples)
+  #D_gcyr = array( NA, dim=c(dim(Report$D_gcy),n_samples) )
+  #for( rI in 1:n_samples ){
+  #  if( rI%%max(1,floor(n_samples/10)) == 1 ) message( "Obtaining sample ", rI, " from predictive distribution for density" )
+  #  D_gcyr[,,,rI] = Obj$report( par=u_zr[,rI] )$D_gcy
+  #}
+  D_gcyr = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name="D_gcy", n_samples=n_samples )
 
   # Calculate quantiles from observed and sampled densities D_gcy
   Z_zm = TmbData$Z_gm

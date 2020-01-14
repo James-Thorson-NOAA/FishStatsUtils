@@ -22,21 +22,23 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
 
   # Warnings and errors
   if( !all(TmbData[['FieldConfig']] %in% c(-2,-1)) ){
-    stop("Derivation only included for independent categories")
+    message("Derivation only included for independent categories")
+    return( invisible("Not run") )
   }
   Index_ctl = array(Index$Index_ctl[,,,'Estimate'],dim=dim(Index$Index_ctl)[1:3])
   SE_Index_ctl = array(Index$Index_ctl[,,,'Std. Error'],dim=dim(Index$Index_ctl)[1:3])
-
-  # Calculate proportions, and total biomass
-  Prop_ctl = Index_ctl / outer(rep(1,dim(Index_ctl)[1]),apply(Index_ctl,MARGIN=2:3,FUN=sum))
-  Index_tl = apply(Index_ctl,MARGIN=2:3,FUN=sum)
-  SE_Index_tl = sqrt(apply(SE_Index_ctl^2,MARGIN=2:3,FUN=sum,na.rm=TRUE))
 
   if( !is.null(Expansion_cz) ){
     Index_ctl = as.array(Index_ctl[Expansion_cz[,1]==1,,,drop=FALSE])
     SE_Index_ctl = as.array(SE_Index_ctl[Expansion_cz[,1]==1,,,drop=FALSE])
     category_names = category_names[Expansion_cz[,1]==1]
   }
+
+  # Calculate proportions, and total biomass
+  Prop_ctl = Index_ctl / outer(rep(1,dim(Index_ctl)[1]),apply(Index_ctl,MARGIN=2:3,FUN=sum))
+  Index_tl = apply(Index_ctl,MARGIN=2:3,FUN=sum)
+  SE_Index_tl = sqrt(apply(SE_Index_ctl^2,MARGIN=2:3,FUN=sum,na.rm=TRUE))
+
 
   # Approximate variance for proportions, and effective sample size
   Neff_ctl = var_Prop_ctl = array(NA,dim=dim(Prop_ctl))

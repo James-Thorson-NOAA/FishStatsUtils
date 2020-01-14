@@ -193,6 +193,8 @@ print.fit_model <- function(x, ...)
 #' @export
 plot.fit_model <- function(x, what="results", ...)
 {
+  if(!is.character(what)) stop("Check `what` in `plot.fit_model`")
+
   ## Plot extrapolation-grid
   if( length(grep(what, "extrapolation_grid")) ){
     cat("\n### Running `plot.make_extrapolation_info`\n")
