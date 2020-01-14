@@ -7,7 +7,7 @@
 plot_factors(Report, ParHat, Data, SD = NULL, Year_Set = NULL,
   category_names = NULL, RotationMethod = "PCA",
   mapdetails_list = NULL, Dim_year = NULL, Dim_species = NULL,
-  plotdir = paste0(getwd(), "/"), land_color = "grey")
+  plotdir = paste0(getwd(), "/"), land_color = "grey", ...)
 }
 \arguments{
 \item{Report}{output report, e.g., from \code{Report <- obj$report()}}
@@ -31,6 +31,8 @@ plot_factors(Report, ParHat, Data, SD = NULL, Year_Set = NULL,
 \item{plotdir}{directory for saving plots}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
+
+\item{...}{additional arguments passed to \code{plot_maps(.)} when plotting spatio-temporal terms Epsilon}
 }
 \description{
 \code{plot_factors} plots factor loadings, average spatial factors, and spatio-temporal factors

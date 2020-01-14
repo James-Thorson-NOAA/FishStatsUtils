@@ -22,7 +22,8 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
 
   # Warnings and errors
   if( !all(TmbData[['FieldConfig']] %in% c(-2,-1)) ){
-    stop("Derivation only included for independent categories")
+    message("Derivation only included for independent categories")
+    return( invisible("Not run") )
   }
   Index_ctl = array(Index$Index_ctl[,,,'Estimate'],dim=dim(Index$Index_ctl)[1:3])
   SE_Index_ctl = array(Index$Index_ctl[,,,'Std. Error'],dim=dim(Index$Index_ctl)[1:3])

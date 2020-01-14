@@ -22,8 +22,8 @@ plot_results(fit, settings = fit$settings, plot_set = 3,
   \item{plot_set=3}{Log-predicted density (product of encounter probability and positive catch rates)}
   \item{plot_set=4}{Log-positive catch rates (rescaled)}
   \item{plot_set=5}{Log-predicted density (rescaled)}
-  \item{plot_set=6}{Spatio-temporal variation in encounter probability}
-  \item{plot_set=7}{Spatio-temporal variation in log-positive catch rates}
+  \item{plot_set=6}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model)}
+  \item{plot_set=7}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model)}
   \item{plot_set=8}{Linear predictor for encounter probability}
   \item{plot_set=9}{Linear predictor for positive catch rates}
   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}

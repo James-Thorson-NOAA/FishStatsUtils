@@ -9,7 +9,7 @@
 #' @return combined list.
 #'
 #' @export
-combine_lists = function( default, input ){
+combine_lists = function( default, input, args_to_use=NULL ){
   output = default
   for( i in seq_along(input) ){
     if( names(input)[i] %in% names(default) ){
@@ -17,6 +17,9 @@ combine_lists = function( default, input ){
     }else{
       output = c( output, input[i] )
     }
+  }
+  if( !is.null(args_to_use) ){
+    output = output[intersect(names(output),args_to_use)]
   }
   return( output )
 }
