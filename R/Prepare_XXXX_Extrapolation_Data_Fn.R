@@ -14,7 +14,7 @@ function( strata.limits=NULL, projargs=NA, zone=NA, flip_around_dateline=TRUE, .
 
   # Survey areas
   Area_km2_x = Data_Extrap[,'Area_km2']
-  
+
   # Augment with strata for each extrapolation cell
   Tmp = cbind("BEST_DEPTH_M"=0, "BEST_LAT_DD"=Data_Extrap[,'Lat'], "propInSurvey"=1)
   a_el = as.data.frame(matrix(NA, nrow=nrow(Data_Extrap), ncol=nrow(strata.limits), dimnames=list(NULL,strata.limits[,'STRATA'])))
@@ -348,7 +348,7 @@ function( strata.limits=NULL, projargs=NA, zone=NA, flip_around_dateline=FALSE, 
 
 #' @export
 Prepare_NWA_Extrapolation_Data_Fn <-
-function( strata.limits=NULL, projargs=NA, zone=NA, flip_around_dateline=FALSE, ... ){
+function( strata.limits=NULL, epu_to_use = c('Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')[1], projargs=NA, zone=NA, flip_around_dateline=FALSE, ... ){
   # Infer strata
   if( is.null(strata.limits)){
     strata.limits = list('All_areas'=1:1e5)
@@ -365,7 +365,8 @@ function( strata.limits=NULL, projargs=NA, zone=NA, flip_around_dateline=FALSE, 
   # Augment with strata for each extrapolation cell
   Tmp = cbind("BEST_DEPTH_M"=0, "BEST_LAT_DD"=Data_Extrap[,'Lat'], "BEST_LON_DD"=Data_Extrap[,'Lon'])
   if( length(strata.limits)==1 && strata.limits[1]=="EPU" ){
-    # Specify strata by 'stratum_number'
+    # Specify epu by 'epu_to_use'
+    Data_Extrap <- Data_Extrap[Data_Extrap$EPU %in% epu_to_use, ]
     a_el = matrix(NA, nrow=nrow(Data_Extrap), ncol=length(unique(northwest_atlantic_grid[,'EPU'])), dimnames=list(NULL,unique(northwest_atlantic_grid[,'EPU'])) )
     for(l in 1:ncol(a_el)){
       a_el[,l] = ifelse( Data_Extrap[,'EPU']==unique(northwest_atlantic_grid[,'EPU'])[l], Area_km2_x, 0 )
