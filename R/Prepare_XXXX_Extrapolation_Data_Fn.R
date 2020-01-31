@@ -355,6 +355,10 @@ function( strata.limits=NULL, epu_to_use = c('All', 'Georges_Bank','Mid_Atlantic
   }
   message("Using strata ", strata.limits)
 
+  if(tolower(epu_to_use) == "all") {
+    epu_to_use <- c('Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')
+  }
+
   # Read extrapolation data
   utils::data( northwest_atlantic_grid, package="FishStatsUtils" )
   Data_Extrap <- northwest_atlantic_grid
