@@ -50,31 +50,33 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
   map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   # Plot data and grid
-  png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
-    par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
-    which_rows = which( Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
-    plot( Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
-    sp::plot( map_data, col=land_color, add=TRUE )
-    if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){
-      plot( Extrapolation_List$Data_Extrap[which_rows,c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
-    }
-    plot( Spatial_List$loc_x, col="red", pch=20, main="Knots (North-East)")
-  dev.off()
+  if( !missing(Extrapolation_List) & !missing(Spatial_List) ){
+    png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
+      par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
+      which_rows = which( Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
+      plot( Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
+      sp::plot( map_data, col=land_color, add=TRUE )
+      if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){
+        plot( Extrapolation_List$Data_Extrap[which_rows,c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
+      }
+      plot( Spatial_List$loc_x, col="red", pch=20, main="Knots (North-East)")
+    dev.off()
+  }
 
   # Plot data by year
   # Use Data_Geostat, instead of TmbData, because I want raw locations, not locations at knots
   if(missing(Year_Set)) Year_Set = min(Year_i):max(Year_i)
     Nrow = ceiling( sqrt(length(Year_Set)) )
     Ncol = ceiling( length(Year_Set)/Nrow )
-  png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
+  if(!is.null(Plot2_name)) png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(Year_Set) ){
       Which = which( Year_i == Year_Set[t] )
-      plot( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], main=Year_Set[t], xlim=range(Lon_i), ylim=range(Lat_i), xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
+      plot( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], main=Year_Set[t], xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
       sp::plot( map_data, col=land_color, add=TRUE )
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
       mtext( side=c(1,2), text=c("Longitude","Latitude"), outer=TRUE, line=1)
     }
-  dev.off()
+  if(!is.null(Plot2_name))dev.off()
 }

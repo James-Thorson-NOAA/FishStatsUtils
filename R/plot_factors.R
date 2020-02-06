@@ -134,8 +134,10 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       # Extract projected factors is available
       if( !is.null(Psi_gjt) ){
         Var2_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_gjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4 )
-        Report_tmp = list("D_xct"=Var2_rot$Psi_rot, "Epsilon1_sct"=Var2_rot$Psi_rot, "Epsilon2_sct"=Var2_rot$Psi_rot)
+        Report2_tmp = list("D_xct"=Var2_rot$Psi_rot, "Epsilon1_sct"=Var2_rot$Psi_rot, "Epsilon2_sct"=Var2_rot$Psi_rot)
         Psi2prime_list[[i]] = Var2_rot$Psi_rot
+      }else{
+        Report2_tmp = NULL
       }
 
       # Plot loadings
@@ -146,12 +148,12 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       dev.off()
 
       # Plot factors
-      if( !is.null(mapdetails_list) ){
+      if( !is.null(mapdetails_list) & !is.null(Report2_tmp) ){
 
         # Plot Epsilon
         # Use plot_maps to automatically make one figure per factor
         if( Par_name %in% c("Epsilon1","Epsilon2") ){
-          plot_maps(plot_set=c(6,6,NA,7,7,NA)[i], Report=Report_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
+          plot_maps(plot_set=c(6,6,NA,7,7,NA)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
             working_dir=plotdir, Year_Set=Year_Set, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
             legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, ...)
         }  #
@@ -163,7 +165,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         #  plot_maps(plot_set=c(6,6,NA,7,7,NA)[i], Report=Report_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
         #    working_dir=plotdir, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
         #    legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100)
-          plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
+          plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
             panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name) )
         }
 

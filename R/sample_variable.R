@@ -32,7 +32,7 @@ sample_variable = function( Sdreport, Obj, variable_name, n_samples=100 ){
     z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
     z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
     z <- as.matrix(z)
-    mu + z
+    return(mu + z)
   }
 
   # Sample from joint distribution

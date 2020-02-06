@@ -3,7 +3,10 @@
 #'
 #' \code{fit_model} fits a spatio-temporal model to data
 #'
-#' This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, build covariates from a formula interface, assemble data, build model, estimate parameters, and check for obvious problems with the estimates.
+#' This function is the user-interface for the functions that determine the extrapolation-grid \code{make_extrapolation_info}, define spatial objects \code{make_spatial_info},
+#' build covariates from a formula interface \code{make_covariates}, assemble data \code{make_data}, build model \code{make_model}, estimate parameters \code{TMBhelper::fit_tmb},
+#' and check for obvious problems with the estimates \code{check_fit}. It passes additional named arguments \code{...} directly to these other functions, and please see reference
+#' documetation (e.g., \code{?make_extrapolation_info}) to see potential arguments to pass.
 #'
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
@@ -100,7 +103,6 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   model_args_input = extra_args[intersect(names(extra_args),formalArgs(make_model))]
   model_args_input = combine_lists( input=model_args_input, default=model_args_default )
   tmb_list = do.call( what=make_model, args=model_args_input )
-  if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
   # Run the model or optionally don't
   if( run_model==FALSE ){
@@ -111,6 +113,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
     class(Return) = "fit_model"
     return(Return)
   }
+  if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
   # Optimize object
   message("\n### Estimating parameters")

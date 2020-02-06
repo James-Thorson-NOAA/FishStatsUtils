@@ -39,7 +39,6 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
   Index_tl = apply(Index_ctl,MARGIN=2:3,FUN=sum)
   SE_Index_tl = sqrt(apply(SE_Index_ctl^2,MARGIN=2:3,FUN=sum,na.rm=TRUE))
 
-
   # Approximate variance for proportions, and effective sample size
   Neff_ctl = var_Prop_ctl = array(NA,dim=dim(Prop_ctl))
   for( cI in 1:dim(var_Prop_ctl)[1]){
