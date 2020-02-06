@@ -31,6 +31,8 @@
 #' @param Year_Set Year names for labeling panels
 #' @param Years2Include integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)
 #' @param category_names character vector specifying names for different categories (only used for R package \code{VAST})
+#' @param projargs a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.
+#' @param country optional list of countries to display, e.g. c("united states of america", "canada"). 
 #' @param ... arguments passed to \code{FishStatsUtils::plot_variable}
 #'
 #' @return Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}

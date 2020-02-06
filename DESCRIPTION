@@ -43,6 +43,6 @@ Remotes:
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 URL: http://github.com/james-thorson/FishStatsUtils
 BugReports: http://github.com/james-thorson/FishStatsUtils/issues
