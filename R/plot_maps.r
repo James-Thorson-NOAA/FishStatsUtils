@@ -41,7 +41,7 @@ plot_maps <-
 function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
          Panel="Category", Year_Set=NULL, Years2Include=NULL, category_names=NULL, quiet=FALSE,
          working_dir=paste0(getwd(),"/"), MapSizeRatio, n_cells, plot_value="estimate", n_samples=100,
-         Report, TmbData, ...){
+         Report, TmbData, zlim=NULL, ...){
 
   # Local functions
   extract_value = function( Sdreport, Report, Obj, variable_name, plot_value="estimate", n_samples ){
@@ -311,7 +311,7 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
 
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), "") )
         plot_args = plot_variable( Y_gt=Mat_xt[,years_to_include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=Year_Set[years_to_include], file_name=file_name, n_cells=n_cells, ... )
+          panel_labels=Year_Set[years_to_include], file_name=file_name, n_cells=n_cells, zlim=zlim, ... )
       }
     }
     # Plot for each year
@@ -325,7 +325,7 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
         # Do plot
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",Year_Set[years_to_include][tI]), "") )
         plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=category_names, file_name=file_name, n_cells=n_cells, ... )
+          panel_labels=category_names, file_name=file_name, n_cells=n_cells, zlim=zlim, ... )
       }
     }
   }

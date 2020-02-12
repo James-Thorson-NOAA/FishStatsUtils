@@ -18,6 +18,8 @@ PlotMap_Fn(MappingDetails, Mat, PlotDF, MapSizeRatio = c(`Width(in)` = 4,
 
 \item{Year_Set}{Year names for labeling panels}
 
+\item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+
 \item{plot_legend_fig}{Boolean, whether to plot a separate figure for the heatmap legend or not}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
