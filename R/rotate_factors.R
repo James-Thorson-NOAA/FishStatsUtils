@@ -5,7 +5,7 @@
 #'
 #' @param Cov_jj Covariance calculated from loadings matrix
 #' @param L_pj Loadings matrix for `p` categories and `j` factors (calculated from \code{Cov_jj} if it is provided)
-#' @param Psi Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)
+#' @param Psi_sjt Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)
 #' @param RotationMethod Method used for rotation, Options: "PCA" (recommended) or "Varimax"
 #' @param testcutoff tolerance for numerical rounding when confirming that rotation doesn't effect results
 
@@ -18,18 +18,18 @@
 #' }
 
 #' @export
-rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi=NULL, RotationMethod="PCA", testcutoff=1e-10,
+rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi_sjt=NULL, RotationMethod="PCA", testcutoff=1e-10,
   quiet=FALSE ){
 
   # If missing time, add a third dimension
-  if( length(dim(Psi))==2 ){
-    Psi = array( Psi, dim=c(dim(Psi),1) )
+  if( length(dim(Psi_sjt))==2 ){
+    Psi_sjt = array( Psi_sjt, dim=c(dim(Psi_sjt),1) )
   }
 
   # Local functions
   approx_equal = function(m1,m2,denominator=mean(m1+m2),d=1e-10) (2*abs(m1-m2)/denominator) < d
   trunc_machineprec = function(n) ifelse(n<1e-10,0,n)
-  Nknots = dim(Psi)[1]
+  Nknots = dim(Psi_sjt)[1]
   Nfactors = ncol(L_pj)
   Nyears = nrow(L_pj)
 
@@ -53,11 +53,11 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi=NULL, RotationMethod="PCA
     Hinv = varimax( L_pj, normalize=FALSE )
     H = solve(Hinv$rotmat)
     L_pj_rot = L_pj %*% Hinv$rotmat
-    if( !is.null(Psi) ){
-      Psi_rot = array(NA, dim=dim(Psi))
+    if( !is.null(Psi_sjt) ){
+      Psi_rot = array(NA, dim=dim(Psi_sjt))
       # My new factors
       for( n in 1:Nknots ){
-        Psi_rot[n,,] = H %*% Psi[n,,]
+        Psi_rot[n,,] = H %*% Psi_sjt[n,,]
       }
     }
   }
@@ -77,17 +77,17 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi=NULL, RotationMethod="PCA
     # My new factors
     H = corpcor::pseudoinverse(L_pj_rot) %*% L_pj
     Hinv = list("rotmat"=solve(H))
-    if( !is.null(Psi) ){
-      Psi_rot = array(NA, dim=dim(Psi))
+    if( !is.null(Psi_sjt) ){
+      Psi_rot = array(NA, dim=dim(Psi_sjt))
       for( n in 1:Nknots ){
-        Psi_rot[n,,] = H %*% Psi[n,,]
+        Psi_rot[n,,] = H %*% Psi_sjt[n,,]
       }
     }
   }
 
   # Flip around
   for( j in 1:dim(L_pj_rot)[2] ){
-    if( !is.null(Psi) ){
+    if( !is.null(Psi_sjt) ){
       Psi_rot[,j,] = Psi_rot[,j,] * sign(sum(L_pj_rot[,j]))
     }
     L_pj_rot[,j] = L_pj_rot[,j] * sign(sum(L_pj_rot[,j]))
@@ -100,11 +100,11 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi=NULL, RotationMethod="PCA
     if( !all(approx_equal(L_pj%*%t(L_pj),L_pj_rot%*%t(L_pj_rot), d=testcutoff)) ) stop("Covariance matrix is changed by rotation")
     # Check linear predictor
       # Should give identical predictions as unrotated
-    if( !is.null(Psi) ){
-      for(i in 1:dim(Psi)[[1]]){
-      for(j in 1:dim(Psi)[[3]]){
-        MaxDiff = max(L_pj%*%Psi[i,,j] - L_pj_rot%*%Psi_rot[i,,j])
-        if( !all(approx_equal(L_pj%*%Psi[i,,j],L_pj_rot%*%Psi_rot[i,,j], d=testcutoff, denominator=1)) ) stop(paste0("Linear predictor is wrong for site ",i," and time ",j," with difference ",MaxDiff))
+    if( !is.null(Psi_sjt) ){
+      for(i in 1:dim(Psi_sjt)[[1]]){
+      for(j in 1:dim(Psi_sjt)[[3]]){
+        MaxDiff = max(L_pj%*%Psi_sjt[i,,j] - L_pj_rot%*%Psi_rot[i,,j])
+        if( !all(approx_equal(L_pj%*%Psi_sjt[i,,j],L_pj_rot%*%Psi_rot[i,,j], d=testcutoff, denominator=1)) ) stop(paste0("Linear predictor is wrong for site ",i," and time ",j," with difference ",MaxDiff))
       }}
     }
     # Check rotation matrix
@@ -118,7 +118,7 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi=NULL, RotationMethod="PCA
   # Return stuff
   Return = list( "L_pj_rot"=L_pj_rot, "Hinv"=Hinv, "L_pj"=L_pj )
   if(RotationMethod=="PCA") Return[["Eigen"]] = Eigen
-  if( !is.null(Psi) ){
+  if( !is.null(Psi_sjt) ){
     Return[["Psi_rot"]] = Psi_rot
   }
   return( Return )

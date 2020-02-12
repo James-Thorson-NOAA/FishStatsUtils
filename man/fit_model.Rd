@@ -56,7 +56,10 @@ Returns a tagged list of internal objects, the TMB object, and slot \code{parame
 \code{fit_model} fits a spatio-temporal model to data
 }
 \details{
-This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, build covariates from a formula interface, assemble data, build model, estimate parameters, and check for obvious problems with the estimates.
+This function is the user-interface for the functions that determine the extrapolation-grid \code{make_extrapolation_info}, define spatial objects \code{make_spatial_info},
+build covariates from a formula interface \code{make_covariates}, assemble data \code{make_data}, build model \code{make_model}, estimate parameters \code{TMBhelper::fit_tmb},
+and check for obvious problems with the estimates \code{check_fit}. It passes additional named arguments \code{...} directly to these other functions, and please see reference
+documetation (e.g., \code{?make_extrapolation_info}) to see potential arguments to pass.
 }
 \examples{
 \dontrun{

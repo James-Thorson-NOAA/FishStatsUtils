@@ -14,7 +14,7 @@
 #' @param legend_x two numeric values (generally between 0 and 1, but slightly lower/higher values generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend
 #' @param legend_y two numeric values (see legend_y) giving bottom and top location of color legend
 #' @param map_list output from \code{FishStatsUtils::make_map_info}
-#' @param zlim range for defining bounds of color scale
+#' @param zlim range for defining bounds of color scale.  If missing, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.
 #' @param add boolean indicating whether to add plot to an existing panel figure, or to define a new panel figure
 #' @param outermargintext vector defining text to plot in outer margins of panel figure
 #' @param panel_labels vector defining titles to use for each panel; defaults to blank
@@ -126,7 +126,9 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size )
     if(missing(xlim)) xlim = Raster_proj@bbox[1,]
     if(missing(ylim)) ylim = Raster_proj@bbox[2,]
-    image( Raster_proj, col=col, zlim=zlim, xlim=xlim, ylim=ylim )
+    Zlim = zlim
+    if(is.na(Zlim[1])) Zlim = range(Y_gt[,tI],na.rm=TRUE)
+    image( Raster_proj, col=col, zlim=Zlim, xlim=xlim, ylim=ylim )
 
     # Plot maps using rnaturalearth
     sp::plot( map_data, col=land_color, add=TRUE )
@@ -134,22 +136,22 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     # Title and box
     title( panel_labels[tI], line=0.1, cex.main=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main), cex=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main) )
     box()
-  }
 
-  # Include legend
-  if( all(is.numeric(c(legend_x,legend_y))) ){
-    xl = (1-legend_x[1])*par('usr')[1] + (legend_x[1])*par('usr')[2]
-    xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
-    yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]
-    yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
-    if( diff(legend_y) > diff(legend_x) ){
-      align = c("lt","rb")[2]
-      gradient = c("x","y")[2]
-    }else{
-      align = c("lt","rb")[1]
-      gradient = c("x","y")[1]
+    # Include legend
+    if( all(is.numeric(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
+      xl = (1-legend_x[1])*par('usr')[1] + (legend_x[1])*par('usr')[2]
+      xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
+      yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]
+      yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
+      if( diff(legend_y) > diff(legend_x) ){
+        align = c("lt","rb")[2]
+        gradient = c("x","y")[2]
+      }else{
+        align = c("lt","rb")[1]
+        gradient = c("x","y")[1]
+      }
+      plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),1), rect.col=col, cex=cex.legend, align=align, gradient=gradient)
     }
-    plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(zlim[1],zlim[2],length=4),1), rect.col=col, cex=cex.legend, align=align, gradient=gradient)
   }
 
   # Margin text

@@ -273,27 +273,33 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
-    #if(plot_num==15){
-    #  # Spatial effects for probability of encounter
-    #  if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 1st linear predictor")
-    #  if("D_xt"%in%names(Report)) stop()
-    #  if("D_xct"%in%names(Report)) stop()
-    #  if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
-    #  if("D_gcy"%in%names(Report)) Array_xct = Report$Omega1_gc %o% 1
-    #  if("dhat_ktp" %in% names(Report)) stop()
-    #  if("dpred_ktp" %in% names(Report)) stop()
-    #}
-    #if(plot_num==16){
-    #  # Spatial effects for positive catch rates
-    #  if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 2nd linear predictor")
-    #  if("D_xt"%in%names(Report)) stop()
-    #  if("D_xct"%in%names(Report)) stop()
-    #  if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
-    #  if("D_gcy"%in%names(Report)) Array_xct = Report$Omega2_gc %o% 1
-    #  if("dhat_ktp" %in% names(Report)) stop()
-    #  if("dpred_ktp" %in% names(Report)) stop()
-    #}
+    if(plot_num==15){
+      # Spatial effects for probability of encounter
+      if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 1st linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
+      if("D_gcy"%in%names(Report)) Array_xct = Report$Omega1_gc %o% 1
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+    }
+    if(plot_num==16){
+      # Spatial effects for positive catch rates
+      if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 2nd linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
+      if("D_gcy"%in%names(Report)) Array_xct = Report$Omega2_gc %o% 1
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+    }
     if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
+    if( any(abs(Array_xct)==Inf) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
+    if( all(Years2Include %in% 1:dim(Array_xct)[3]) ){
+      years_to_include = Years2Include
+    }else{
+      years_to_include = 1:dim(Array_xct)[3]
+    }
 
     # Plot for each category
     if( tolower(Panel)=="category" ){
@@ -304,20 +310,20 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
         if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
 
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), "") )
-        plot_args = plot_variable( Y_gt=Mat_xt[,Years2Include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=Year_Set[Years2Include], file_name=file_name, n_cells=n_cells, ... )
+        plot_args = plot_variable( Y_gt=Mat_xt[,years_to_include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
+          panel_labels=Year_Set[years_to_include], file_name=file_name, n_cells=n_cells, ... )
       }
     }
     # Plot for each year
     if( tolower(Panel)=="year" ){
-      Nplot = length(Years2Include)
+      Nplot = length(years_to_include)
       for( tI in 1:Nplot){
-        if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,Years2Include[tI],drop=TRUE]
-        if(length(dim(Array_xct))==3) Mat_xc = Array_xct[,,Years2Include[tI],drop=TRUE]
+        if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,years_to_include[tI],drop=TRUE]
+        if(length(dim(Array_xct))==3) Mat_xc = Array_xct[,,years_to_include[tI],drop=TRUE]
         Return = Mat_xc = array( as.vector(Mat_xc), dim=c(dim(Array_xct)[1],Ncategories)) # Reformat to make sure it has same format for everything
 
         # Do plot
-        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",Year_Set[Years2Include][tI]), "") )
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",Year_Set[years_to_include][tI]), "") )
         plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
           panel_labels=category_names, file_name=file_name, n_cells=n_cells, ... )
       }
