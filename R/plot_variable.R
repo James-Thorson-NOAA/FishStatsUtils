@@ -80,7 +80,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
 
   # Data for mapping
   #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))# , continent="america")
-  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ), country=country)
+  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
   map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   ###################

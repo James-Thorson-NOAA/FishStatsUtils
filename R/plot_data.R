@@ -18,7 +18,7 @@
 plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
   Lat_i=Data_Geostat[,'Lat'], Lon_i=Data_Geostat[,'Lon'], Year_i=Data_Geostat[,'Year'], PlotDir=paste0(getwd(),"/"),
   Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col="red", cex=0.01, pch=19,
-  Year_Set, projargs='+proj=longlat', map_resolution="medium", land_color="grey", ...){
+  Year_Set, projargs='+proj=longlat', map_resolution="medium", land_color="grey", country=NULL, ...){
 
   # Check for issues
   if( is.null(Lat_i) | is.null(Lon_i) | is.null(Year_i) ){
@@ -46,7 +46,7 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
   CRS_proj = sp::CRS( projargs )
 
   # Data for mapping
-  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))
+  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
   map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   # Plot data and grid
@@ -72,7 +72,8 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(Year_Set) ){
       Which = which( Year_i == Year_Set[t] )
-      plot( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], main=Year_Set[t], xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
+      plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i) )
+      points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], main=Year_Set[t], xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
       sp::plot( map_data, col=land_color, add=TRUE )
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
