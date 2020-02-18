@@ -368,7 +368,7 @@ function( strata.limits=NULL, epu_to_use = c('All', 'Georges_Bank','Mid_Atlantic
   if( length(strata.limits)==1 && strata.limits[1]=="EPU" ){
     # Specify epu by 'epu_to_use'
     Data_Extrap <- Data_Extrap[Data_Extrap$EPU %in% epu_to_use, ]
-    a_el = matrix(NA, nrow=nrow(Data_Extrap), ncol=length(unique(northwest_atlantic_grid[,'EPU'])), dimnames=list(NULL,unique(northwest_atlantic_grid[,'EPU'])) )
+    a_el = matrix(NA, nrow=nrow(Data_Extrap), ncol=length(epu_to_use), dimnames=list(NULL, epu_to_use) )
     Area_km2_x = Data_Extrap[, "Area_in_survey_km2"]
     for(l in 1:ncol(a_el)){
       a_el[,l] = ifelse( Data_Extrap[,'EPU']==unique(northwest_atlantic_grid[,'EPU'])[l], Area_km2_x, 0 )
