@@ -56,8 +56,11 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of abundance index")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
-    Index = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
-      Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
+    plot_biomass_index_args = list(...)
+    plot_biomass_index_args = combine_lists( "input"=plot_biomass_index_args, "default"=list(DirName=working_dir,
+      TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
+      Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names), "args_to_use"=formalArgs(plot_biomass_index) )
+    Index = do.call( what=plot_biomass_index, args=plot_biomass_index_args )
   }else{
     Index = "Not run"
     message("\n### Skipping plot of abundance index; must re-run with standard errors to plot")
@@ -128,7 +131,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # return
   Return = list( "Q"=Q, "Index"=Index, "Proportions"=Proportions, "Range"=Range, "Dens_xt"=Dens_xt, "Edge"=Edge,
-    "map_list"=map_list, "plot_maps_args"=plot_maps_args )
+    "map_list"=map_list, "plot_maps_args"=plot_maps_args, "plot_biomass_index_args"=plot_biomass_index_args )
   return( invisible(Return) )
 }
 
