@@ -407,10 +407,6 @@ function( strata.limits=NULL, projargs=NA, zone=NA, survey="Chatham_rise", flip_
   }
   message("Using strata ", strata.limits)
 
-  if(tolower(epu_to_use) == "all") {
-    epu_to_use <- c('Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')
-  }
-
   # Read extrapolation data
   utils::data( chatham_rise_grid, package="FishStatsUtils" )
   Data_Extrap <- chatham_rise_grid
