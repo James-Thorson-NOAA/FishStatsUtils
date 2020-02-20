@@ -53,10 +53,10 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"), Report=fit$Report, TmbData=fit$data_list )
 
   # Plot index
+  plot_biomass_index_args = list(...)
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of abundance index")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
-    plot_biomass_index_args = list(...)
     plot_biomass_index_args = combine_lists( "input"=plot_biomass_index_args, "default"=list(DirName=working_dir,
       TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
       Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names), "args_to_use"=formalArgs(plot_biomass_index) )

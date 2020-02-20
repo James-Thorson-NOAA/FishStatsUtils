@@ -5,6 +5,7 @@
 #'
 #' @inheritParams plot_overdispersion
 #' @inheritParams summarize_covariance
+#' @inheritParams plot_maps
 #' @param Year_Set plotting-names for time dimension
 #' @param mapdetails_list output from \code{FishStatsUtils::MapDetails_Fn}
 #' @param Dim_year Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)
@@ -15,7 +16,7 @@
 
 #' @export
 plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
-  mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey", ... ){
+  mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey", zlim=NA, ... ){
 
   # Extract Options and Options_vec (depends upon version)
   if( all(c("Options","Options_vec") %in% names(Data)) ){
@@ -109,7 +110,8 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       }
 
       # Get covariance
-      Psi_sjt = ParHat[[Var_name]]
+      if(Var_name%in%names(ParHat)) Psi_sjt = ParHat[[Var_name]]
+      if(Var_name%in%names(Report)) Psi_sjt = Report[[Var_name]]
       Psi_gjt = Report[[Var2_name]]
       ## the betas and EpsilonTimeare transposed compared to others so fix that here
       if( Par_name %in% c("Beta1","Beta2") ){
@@ -184,7 +186,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         if( Par_name %in% c("Epsilon1","Epsilon2") ){
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
             working_dir=plotdir, Year_Set=Year_Set, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
-            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, ...)
+            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim, ...)
         }  #
 
         # Plot Omega
@@ -199,8 +201,8 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         # Plot EpsilonTime
         if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-            working_dir=plotdir, category_names=category_names, Panel="Year",
-            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, ...)
+            working_dir=plotdir, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), Panel="Year",
+            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim, ...)
         }  #
       }
     }else{
