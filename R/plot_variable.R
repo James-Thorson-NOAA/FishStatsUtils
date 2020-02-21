@@ -66,7 +66,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
   if( is.function(col)){
     col = col(1000)
   }
-  if( all(is.numeric(c(legend_x,legend_y))) ){
+  if( !any(is.na(c(legend_x,legend_y))) ){
     if( any(c(legend_x,legend_y) > 1.2) | any(c(legend_x,legend_y) < -0.2) ){
       stop("Check values for `legend_x` and `legend_y`")
     }
@@ -138,7 +138,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     box()
 
     # Include legend
-    if( all(is.numeric(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
+    if( !any(is.na(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
       xl = (1-legend_x[1])*par('usr')[1] + (legend_x[1])*par('usr')[2]
       xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
       yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]

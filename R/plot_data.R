@@ -72,8 +72,8 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(Year_Set) ){
       Which = which( Year_i == Year_Set[t] )
-      plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i) )
-      points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], main=Year_Set[t], xaxt="n", yaxt="n", col=col[Which], pch=pch[Which], ... )
+      plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i), main=Year_Set[t], xaxt="n", yaxt="n" )
+      points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
       sp::plot( map_data, col=land_color, add=TRUE )
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
