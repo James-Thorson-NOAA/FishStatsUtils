@@ -71,10 +71,12 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
   if(!is.null(Plot2_name)) png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(Year_Set) ){
-      Which = which( Year_i == Year_Set[t] )
       plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i), main=Year_Set[t], xaxt="n", yaxt="n" )
-      points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
       sp::plot( map_data, col=land_color, add=TRUE )
+      Which = which( Year_i == Year_Set[t] )
+      if( length(Which)>0 ){
+        points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
+      }
       if( t>(length(Year_Set)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
       mtext( side=c(1,2), text=c("Longitude","Latitude"), outer=TRUE, line=1)

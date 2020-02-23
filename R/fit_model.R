@@ -73,7 +73,8 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
-  extrapolation_args_default = list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone)
+  extrapolation_args_default = list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone,
+    max_cells=settings$max_cells)
   extrapolation_args_input = extra_args[intersect(names(extra_args),formalArgs(make_extrapolation_info))]
   extrapolation_args_input = combine_lists( input=extrapolation_args_input, default=extrapolation_args_default )
   extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )

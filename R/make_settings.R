@@ -25,7 +25,8 @@
 make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
   strata.limits=data.frame('STRATA'="All_areas"), zone=NA, FieldConfig, RhoConfig,
   OverdispersionConfig, ObsModel, bias.correct, Options, use_anisotropy,
-  vars_to_correct, Version, treat_nonencounter_as_zero, n_categories, VamConfig ){
+  vars_to_correct, Version, treat_nonencounter_as_zero, n_categories, VamConfig,
+  max_cells=Inf ){
 
   # Get version
   if(missing(Version)) Version = FishStatsUtils::get_latest_version()
@@ -131,7 +132,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
   # Bundle and export
   settings = list("Version"=Version, "n_x"=n_x, "Region"=Region, "strata.limits"=strata.limits, "zone"=zone, "FieldConfig"=FieldConfig, "RhoConfig"=RhoConfig,
     "VamConfig"=VamConfig, "OverdispersionConfig"=OverdispersionConfig, "ObsModel"=ObsModel, "vars_to_correct"=vars_to_correct,
-    "Options"=Options, "grid_size_km"=grid_size_km,
+    "Options"=Options, "grid_size_km"=grid_size_km, "max_cells"=max_cells,
     "Method"=Method, "use_anisotropy"=use_anisotropy, "fine_scale"=fine_scale, "bias.correct"=bias.correct )
   return(settings)
 }
