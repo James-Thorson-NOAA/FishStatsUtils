@@ -66,6 +66,7 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
   # Plot data by year
   # Use Data_Geostat, instead of TmbData, because I want raw locations, not locations at knots
   if(missing(Year_Set)) Year_Set = min(Year_i):max(Year_i)
+  if( !any(unique(Year_i) %in% Year_Set) ) Year_Set = sort(unique(Year_i))
     Nrow = ceiling( sqrt(length(Year_Set)) )
     Ncol = ceiling( length(Year_Set)/Nrow )
   if(!is.null(Plot2_name)) png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")

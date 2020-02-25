@@ -200,8 +200,13 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
         # Plot EpsilonTime
         if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
+          if( dim(Var_rot$Psi_rot)[2] == length(category_names) ){
+            factor_names = category_names
+          }else{
+            factor_names = paste0("Factor_",1:dim(Var_rot$Psi_rot)[2])
+          }
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-            working_dir=plotdir, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), Panel="Year",
+            working_dir=plotdir, category_names=factor_names, Panel="Year",
             legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim, ...)
         }  #
       }

@@ -21,7 +21,8 @@
 #' @export
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
-  category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, n_samples=100, ... ){
+  category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, n_samples=100,
+  calculate_relative_to_average=FALSE, ... ){
 
   # Check for known issues
   if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
@@ -95,7 +96,8 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
     message("\n### Making plot of range edges")
     Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
       working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot,
-      category_names=category_names, n_samples=n_samples, quantiles=c(0.05,0.5,0.95) )
+      category_names=category_names, n_samples=n_samples, quantiles=c(0.05,0.5,0.95),
+      calculate_relative_to_average=calculate_relative_to_average )
   }else{
     Edge = "Not run"
     message("\n### Skipping plot of range edge; only possible if `getJointPrecision=TRUE`, `Options['Calculate_Range']=TRUE`, and `n_samples`>0")
