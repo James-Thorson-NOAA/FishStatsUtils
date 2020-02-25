@@ -8,7 +8,7 @@ plot_results(fit, settings = fit$settings, plot_set = 3,
   working_dir = paste0(getwd(), "/"), year_labels = fit$year_labels,
   years_to_plot = fit$years_to_plot, use_biascorr = TRUE, map_list,
   category_names, check_residuals = TRUE, projargs = "+proj=longlat",
-  zrange, n_samples = 100, ...)
+  zrange, n_samples = 100, calculate_relative_to_average = FALSE, ...)
 }
 \arguments{
 \item{fit}{Output from \code{fit_model}}
@@ -44,6 +44,8 @@ plot_results(fit, settings = fit$settings, plot_set = 3,
 \item{zrange}{lower and upper bounds for plotted value of Pearson residuals, used to change plotting scale to eliminate influence of outliers on plotting scale}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
+
+\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default), or instead calculate relative to median across all years. The latter reduces standard errors, and is appropriate when checking significance for comparison across years for a single species.  The former (default) is appropriate for checking significance for comparison across species.}
 
 \item{...}{additional settings to pass to \code{FishStatsUtils::plot_maps}}
 }

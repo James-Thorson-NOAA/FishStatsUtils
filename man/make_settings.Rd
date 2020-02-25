@@ -8,7 +8,7 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
   strata.limits = data.frame(STRATA = "All_areas"), zone = NA,
   FieldConfig, RhoConfig, OverdispersionConfig, ObsModel, bias.correct,
   Options, use_anisotropy, vars_to_correct, Version,
-  treat_nonencounter_as_zero, n_categories, VamConfig)
+  treat_nonencounter_as_zero, n_categories, VamConfig, max_cells = Inf)
 }
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
@@ -47,6 +47,8 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
   \item{VamConfig[1]}{indicates the rank of the interaction matrix, indicating the number of community axes that have regulated dynamics}
   \item{VamConfig[2]}{Indicates whether interactions occur before spatio-temporal variation (\code{VamConfig[2]=0}) or after \code{VamConfig[2]=1}}
 }}
+
+\item{max_cells}{Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.}
 }
 \value{
 Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.
