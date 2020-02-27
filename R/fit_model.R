@@ -53,7 +53,7 @@
 fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, covariate_data, formula=~0, Q_ik=NULL, newtonsteps=1,
-  silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
+  silent=TRUE, build_model=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
 
   # Capture extra arguments to function
   extra_args = list(...)
@@ -75,16 +75,14 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   message("\n### Making extrapolation-grid")
   extrapolation_args_default = list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone,
     max_cells=settings$max_cells)
-  extrapolation_args_input = extra_args[intersect(names(extra_args),formalArgs(make_extrapolation_info))]
-  extrapolation_args_input = combine_lists( input=extrapolation_args_input, default=extrapolation_args_default )
+  extrapolation_args_input = combine_lists( input=extra_args, default=extrapolation_args_default, args_to_use=formalArgs(make_extrapolation_info) )
   extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
 
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
   spatial_args_default = list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
     Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale)
-  spatial_args_input = extra_args[intersect(names(extra_args),formalArgs(make_spatial_info))]
-  spatial_args_input = combine_lists( input=spatial_args_input, default=spatial_args_default )
+  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=formalArgs(make_spatial_info) )
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
   # Build data
@@ -94,15 +92,14 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, covariate_data=covariate_data, formula=formula, Q_ik=Q_ik)
-  data_args_input = combine_lists( input=extra_args, default=data_args_default )
+  data_args_input = combine_lists( input=extra_args, default=data_args_default, args_to_use=formalArgs(make_data) )
   data_list = do.call( what=make_data, args=data_args_input )
 
   # Build object
   message("\n### Making TMB object")
   model_args_default = list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
-    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method)
-  model_args_input = extra_args[intersect(names(extra_args),formalArgs(make_model))]
-  model_args_input = combine_lists( input=model_args_input, default=model_args_default )
+    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method, "build_model"=build_model)
+  model_args_input = combine_lists( input=extra_args, default=model_args_default, args_to_use=formalArgs(make_model) )
   tmb_list = do.call( what=make_model, args=model_args_input )
 
   # Run the model or optionally don't
@@ -131,12 +128,12 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   message("\n### Estimating parameters")
   # have user override upper, lower, and loopnum
   optimize_args_default1 = combine_lists( default=list(lower=tmb_list$Lower, upper=tmb_list$Upper, loopnum=2),
-    input=extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))] )
+    input=extra_args, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # auto-override user inputs for optimizer-related inputs for first test run
   optimize_args_input1 = list(obj=tmb_list$Obj, savedir=NULL, newtonsteps=0, bias.correct=FALSE,
     control=list(eval.max=10000,iter.max=10000,trace=1), quiet=TRUE, getsd=FALSE )
   # combine
-  optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1 )
+  optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
@@ -153,11 +150,9 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
     savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
     bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
     control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1)
-  # user over-rides all default inputs
-  optimize_args_input2 = extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))]
-  # combine
-  optimize_args_input2 = combine_lists( input=optimize_args_input2, default=optimize_args_default2 )
-  # start from MLE
+  # combine while over-riding defaults using user inputs
+  optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
+  # over-ride inputs to start from previous MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates$par), default=optimize_args_input2 )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 
