@@ -8,7 +8,8 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
   length(b_i)), v_i = rep(0, length(b_i)),
   working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
   covariate_data, formula = ~0, Q_ik = NULL, newtonsteps = 1,
-  silent = TRUE, run_model = TRUE, test_fit = TRUE, ...)
+  silent = TRUE, build_model = TRUE, run_model = TRUE,
+  test_fit = TRUE, ...)
 }
 \arguments{
 \item{settings}{Output from \code{make_settings}}
@@ -42,6 +43,8 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
 \item{Q_ik}{matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
 
 \item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
+
+\item{build_model}{Boolean indicating whether to build the model, \code{build_model=TRUE}, or simply build the inputs, \code{build_model=FALSE}}
 
 \item{run_model}{Boolean indicating whether to run the model or simply return the inputs and built TMB object}
 

@@ -103,7 +103,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   tmb_list = do.call( what=make_model, args=model_args_input )
 
   # Run the model or optionally don't
-  if( run_model==FALSE ){
+  if( run_model==FALSE | build_model==FALSE ){
     # Build and output
     Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
       "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
