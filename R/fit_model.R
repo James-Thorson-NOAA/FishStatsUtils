@@ -86,13 +86,14 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
   # Build data
+  # Do *not* restrict inputs to formalArgs(make_data) because other potential inputs are still parsed by make_data for backwards compatibility
   message("\n### Making data object") # VAST::
   if(missing(covariate_data)) covariate_data = NULL
   data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, covariate_data=covariate_data, formula=formula, Q_ik=Q_ik)
-  data_args_input = combine_lists( input=extra_args, default=data_args_default, args_to_use=formalArgs(make_data) )
+  data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
   data_list = do.call( what=make_data, args=data_args_input )
 
   # Build object
@@ -105,9 +106,12 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   # Run the model or optionally don't
   if( run_model==FALSE | build_model==FALSE ){
     # Build and output
+    input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
+      "model_args_input"=model_args_input, "spatial_args_input"=spatial_args_input,
+      "data_args_input"=data_args_input )
     Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
       "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
-      "settings"=settings)
+      "settings"=settings, "input_args"=input_args)
     class(Return) = "fit_model"
     return(Return)
   }
@@ -163,7 +167,8 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   # Build and output
   input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
     "model_args_input"=model_args_input, "spatial_args_input"=spatial_args_input,
-    "optimize_args_input1"=optimize_args_input1, "optimize_args_input2"=optimize_args_input2)
+    "optimize_args_input1"=optimize_args_input1, "optimize_args_input2"=optimize_args_input2,
+    "data_args_input"=data_args_input )
   Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
     "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
     "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
