@@ -158,6 +158,10 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
           for( rI in 1:nrow(L_rz) ){
             tmpmat = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=nrow(L_list[[i]]), returntype="loadings_matrix" )
             Lprime_rcf[rI,,] = rotate_factors( L_pj=tmpmat, RotationMethod="PCA", testcutoff=1e-4, quiet=TRUE )$L_pj_rot
+            # Rotate to maximize correlation with original factors, to prevent effect of label switching on SEs
+            for( fI in 1:ncol(Lprime_list[[i]]) ){
+              Lprime_rcf[rI,,fI] = Lprime_rcf[rI,,fI] * sign(cor(Lprime_rcf[rI,,fI],Lprime_list[[i]][,fI]))
+            }
           }
           Lmean_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=mean)
           Lsd_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=sd)
