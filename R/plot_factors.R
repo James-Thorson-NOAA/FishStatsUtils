@@ -71,6 +71,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
     # Variable names
     Par_name = c("Omega1", "Epsilon1", "Beta1", "EpsilonTime1", "Omega2", "Epsilon2", "Beta2", "EpsilonTime2")[i]
+    Lpar_name = c("L_omega1_z", "L_epsilon1_z", "L_beta1_z", "Ltime_epsilon1_z", "L_omega2_z", "L_epsilon2_z", "L_beta2_z", "Ltime_epsilon2_z")[i]
 
     # Backwards compatible loading of variables and names
     if(Par_name == "Omega1"){ Var_name = "Omegainput1_sf"; Var2_name = "Omegainput1_gf"; L_name = "L_omega1_cf" }
@@ -89,7 +90,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       if( "L_beta1_cf" %in% names(Report) ){
         L_list[[i]] = Report[[L_name]]
       }else{
-        L_list[[i]] = calc_cov( L_z=ParHat[[paste0("L_",tolower(Par_name),"_z")]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
+        L_list[[i]] = calc_cov( L_z=ParHat[[Lpar_name]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
       }
       if( !Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
         rownames(L_list[[i]]) = category_names
@@ -97,16 +98,20 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
       # Load SE
       if( class(SD)=="sdreport" ){
-        rowindex = grep( paste0("L_",tolower(Par_name),"_z"), rownames(SD$cov.fixed) )
-        L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[paste0("L_",tolower(Par_name),"_z")]], sigma=SD$cov.fixed[rowindex,rowindex] )
-        L_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
-        for( rI in 1:nrow(L_rz) ){
-          L_rcf[rI,,] = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
+        rowindex = grep( Lpar_name, rownames(SD$cov.fixed) )
+        if( length(rowindex)>0 ){
+          L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[Lpar_name]], sigma=SD$cov.fixed[rowindex,rowindex] )
+          L_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
+          for( rI in 1:nrow(L_rz) ){
+            L_rcf[rI,,] = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=nrow(L_list[[i]]), returntype="loadings_matrix" )
+          }
+          Lmean_cf = apply(L_rcf, MARGIN=2:3, FUN=mean)
+          Lsd_cf = apply(L_rcf, MARGIN=2:3, FUN=sd)
+          L_SE_list[[i]] = Lsd_cf
+          if( nrow(L_SE_list[[i]])==length(category_names) ){
+            rownames(L_SE_list[[i]]) = category_names
+          }
         }
-        Lmean_cf = apply(L_rcf, MARGIN=2:3, FUN=mean)
-        Lsd_cf = apply(L_rcf, MARGIN=2:3, FUN=sd)
-        L_SE_list[[i]] = Lsd_cf
-        rownames(L_SE_list[[i]]) = category_names
       }
 
       # Get covariance
@@ -146,17 +151,21 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
       # Extract SEs if available
       if( class(SD)=="sdreport" ){
-        rowindex = grep( paste0("L_",tolower(Par_name),"_z"), rownames(SD$cov.fixed) )
-        L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[paste0("L_",tolower(Par_name),"_z")]], sigma=SD$cov.fixed[rowindex,rowindex] )
-        Lprime_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
-        for( rI in 1:nrow(L_rz) ){
-          tmpmat = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
-          Lprime_rcf[rI,,] = rotate_factors( L_pj=tmpmat, RotationMethod="PCA", testcutoff=1e-4, quiet=TRUE )$L_pj_rot
+        rowindex = grep( Lpar_name, rownames(SD$cov.fixed) )
+        if( length(rowindex)>0 ){
+          L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[Lpar_name]], sigma=SD$cov.fixed[rowindex,rowindex] )
+          Lprime_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
+          for( rI in 1:nrow(L_rz) ){
+            tmpmat = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=nrow(L_list[[i]]), returntype="loadings_matrix" )
+            Lprime_rcf[rI,,] = rotate_factors( L_pj=tmpmat, RotationMethod="PCA", testcutoff=1e-4, quiet=TRUE )$L_pj_rot
+          }
+          Lmean_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=mean)
+          Lsd_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=sd)
+          Lprime_SE_list[[i]] = Lsd_cf
+          if( nrow(L_SE_list[[i]])==length(category_names) ){
+            rownames(Lprime_SE_list[[i]]) = category_names
+          }
         }
-        Lmean_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=mean)
-        Lsd_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=sd)
-        Lprime_SE_list[[i]] = Lsd_cf
-        rownames(Lprime_SE_list[[i]]) = category_names
       }
 
       # Extract projected factors is available
