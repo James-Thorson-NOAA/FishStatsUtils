@@ -17,7 +17,7 @@
 #' @export
 plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, strata_names=NULL,
   category_names=NULL, working_dir=paste0(getwd(),"/"), quantiles=c(0.05,0.95), n_samples=100,
-  interval_width=1, width=NULL, height=NULL, calculate_relative_to_average=FALSE, ...){
+  interval_width=1, width=NULL, height=NULL, calculate_relative_to_average=FALSE, seed=123456, ...){
 
   # Unpack
   Report = Obj$report()
@@ -56,7 +56,7 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
   }
 
   ##### Local function
-  D_gcyr = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name="D_gcy", n_samples=n_samples )
+  D_gcyr = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name="D_gcy", n_samples=n_samples, seed=seed )
 
   # Calculate quantiles from observed and sampled densities D_gcy
   E_zctm = array(NA, dim=c(length(quantiles),dim(Report$D_gcy)[2:3],ncol(TmbData$Z_gm)) )

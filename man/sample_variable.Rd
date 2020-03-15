@@ -4,7 +4,8 @@
 \alias{sample_variable}
 \title{Sample from predictive distribution of a variable}
 \usage{
-sample_variable(Sdreport, Obj, variable_name, n_samples = 100)
+sample_variable(Sdreport, Obj, variable_name, n_samples = 100,
+  seed = 123456)
 }
 \arguments{
 \item{Sdreport}{TMB output from `\code{TMB::sdreport(Obj)}`}
@@ -14,6 +15,8 @@ sample_variable(Sdreport, Obj, variable_name, n_samples = 100)
 \item{variable_name}{name of variable available in report using \code{Obj$report()}}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
+
+\item{seed}{integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}}
 }
 \description{
 \code{sample_variable} samples from the joint distribution of random effects to approximate the predictive distribution for a variable
