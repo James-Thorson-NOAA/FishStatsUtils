@@ -5,6 +5,7 @@
 #'
 #' @inheritParams plot_overdispersion
 #' @inheritParams summarize_covariance
+#' @inheritParams rotate_factors
 #' @inheritParams plot_maps
 #' @param Year_Set plotting-names for time dimension
 #' @param mapdetails_list output from \code{FishStatsUtils::MapDetails_Fn}
@@ -16,7 +17,8 @@
 
 #' @export
 plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
-  mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey", zlim=NA, ... ){
+  mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey", zlim=NA,
+  testcutoff=1e-4, ... ){
 
   # Extract Options and Options_vec (depends upon version)
   if( all(c("Options","Options_vec") %in% names(Data)) ){
@@ -137,7 +139,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       }else stop("Check 'Options_vec[8]' for allowable entries")
 
       # Rotate stuff
-      Var_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_sjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4, quiet=TRUE )
+      Var_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_sjt/tau, RotationMethod=RotationMethod, testcutoff=testcutoff, quiet=TRUE )
       if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
         Var_rot$Psi_rot = aperm( Var_rot$Psi_rot, c(1,3,2) )
       }
@@ -157,7 +159,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
           Lprime_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
           for( rI in 1:nrow(L_rz) ){
             tmpmat = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=nrow(L_list[[i]]), returntype="loadings_matrix" )
-            Lprime_rcf[rI,,] = rotate_factors( L_pj=tmpmat, RotationMethod="PCA", testcutoff=1e-4, quiet=TRUE )$L_pj_rot
+            Lprime_rcf[rI,,] = rotate_factors( L_pj=tmpmat, RotationMethod="PCA", testcutoff=testcutoff, quiet=TRUE )$L_pj_rot
             # Rotate to maximize correlation with original factors, to prevent effect of label switching on SEs
             for( fI in 1:ncol(Lprime_list[[i]]) ){
               Lprime_rcf[rI,,fI] = Lprime_rcf[rI,,fI] * sign(cor(Lprime_rcf[rI,,fI],Lprime_list[[i]][,fI]))
@@ -174,7 +176,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
       # Extract projected factors is available
       if( !is.null(Psi_gjt) ){
-        Var2_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_gjt/tau, RotationMethod=RotationMethod, testcutoff=1e-4, quiet=TRUE )
+        Var2_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_gjt/tau, RotationMethod=RotationMethod, testcutoff=testcutoff, quiet=TRUE )
         if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
           Var2_rot$Psi_rot = aperm( Var2_rot$Psi_rot, c(1,3,2) )
         }

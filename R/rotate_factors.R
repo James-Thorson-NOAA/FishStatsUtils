@@ -76,7 +76,7 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi_sjt=NULL, RotationMethod=
     rownames(L_pj_rot) = rownames(L_pj)
     # My new factors
     H = corpcor::pseudoinverse(L_pj_rot) %*% L_pj
-    Hinv = list("rotmat"=solve(H))
+    Hinv = list("rotmat"=corpcor::pseudoinverse(H))
     if( !is.null(Psi_sjt) ){
       Psi_rot = array(NA, dim=dim(Psi_sjt))
       for( n in 1:Nknots ){
@@ -97,14 +97,18 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi_sjt=NULL, RotationMethod=
   # Check covariance matrix
     # Should be identical for rotated and unrotated
   if( !is.na(testcutoff) ){
-    if( !all(approx_equal(L_pj%*%t(L_pj),L_pj_rot%*%t(L_pj_rot), d=testcutoff)) ) stop("Covariance matrix is changed by rotation")
+    if( !all(approx_equal(L_pj%*%t(L_pj),L_pj_rot%*%t(L_pj_rot), d=testcutoff)) ){
+      stop("Covariance matrix is changed by rotation")
+    }
     # Check linear predictor
       # Should give identical predictions as unrotated
     if( !is.null(Psi_sjt) ){
       for(i in 1:dim(Psi_sjt)[[1]]){
       for(j in 1:dim(Psi_sjt)[[3]]){
         MaxDiff = max(L_pj%*%Psi_sjt[i,,j] - L_pj_rot%*%Psi_rot[i,,j])
-        if( !all(approx_equal(L_pj%*%Psi_sjt[i,,j],L_pj_rot%*%Psi_rot[i,,j], d=testcutoff, denominator=1)) ) stop(paste0("Linear predictor is wrong for site ",i," and time ",j," with difference ",MaxDiff))
+        if( !all(approx_equal(L_pj%*%Psi_sjt[i,,j],L_pj_rot%*%Psi_rot[i,,j], d=testcutoff, denominator=1)) ){
+          stop(paste0("Linear predictor is wrong for site ",i," and time ",j," with difference ",MaxDiff))
+        }
       }}
     }
     # Check rotation matrix
@@ -112,7 +116,9 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi_sjt=NULL, RotationMethod=
       # Doesn't have det(R) = 1; determinant(Hinv$rotmat)!=1 ||
     Diag = Hinv$rotmat %*% t(Hinv$rotmat)
     diag(Diag) = ifelse( diag(Diag)==0,1,diag(Diag) )
-    if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff)) ) stop("Rotation matrix is not a rotation")
+    if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff)) ){
+      stop("Rotation matrix is not a rotation")
+    }
   }
 
   # Return stuff
