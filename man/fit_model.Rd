@@ -59,10 +59,20 @@ Returns a tagged list of internal objects, the TMB object, and slot \code{parame
 \code{fit_model} fits a spatio-temporal model to data
 }
 \details{
-This function is the user-interface for the functions that determine the extrapolation-grid \code{make_extrapolation_info}, define spatial objects \code{make_spatial_info},
-build covariates from a formula interface \code{make_covariates}, assemble data \code{make_data}, build model \code{make_model}, estimate parameters \code{TMBhelper::fit_tmb},
-and check for obvious problems with the estimates \code{check_fit}. It passes additional named arguments \code{...} directly to these other functions, and please see reference
-documetation (e.g., \code{?make_extrapolation_info}) to see potential arguments to pass.
+This function is the user-interface for the multiple mid-level functions that
+determine the extrapolation-grid \code{make_extrapolation_info(.)},
+define spatial objects \code{make_spatial_info(.)},
+build covariates from a formula interface \code{make_covariates(.)},
+assemble data \code{make_data(.)},
+build model \code{make_model(.)},
+estimate parameters \code{TMBhelper::fit_tmb(.)},
+and check for obvious problems with the estimates \code{check_fit(.)}.
+Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
+
+Specifically, the mid-level functions called by \code{fit_model(.)} look for arguments in the following order of precedence (from highest to lowest precedence):
+(1) First, \code{fit_model(.)} prioritizes using named arguments passed directly to \code{fit_model(.)}. If arguments are passed this way, they are used instead of other options below.
+(2) Second, if an argument is not passed supplied directly to \code{fit_model(.)}, then \code{fit_model(.)} looks for elements of input \code{settings}, as typically created by \code{settings = make_settings(.)}.
+(3) Third, if an argument is not supplied via (1) or (2) above, then each mid-level function uses default values defined in those function arguments, e.g., see \code{args(make_extrapolation_info)} for defaults for function \code{make_extrapolation_info(.)}
 }
 \examples{
 \dontrun{

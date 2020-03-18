@@ -3,10 +3,22 @@
 #'
 #' \code{fit_model} fits a spatio-temporal model to data
 #'
-#' This function is the user-interface for the functions that determine the extrapolation-grid \code{make_extrapolation_info}, define spatial objects \code{make_spatial_info},
-#' build covariates from a formula interface \code{make_covariates}, assemble data \code{make_data}, build model \code{make_model}, estimate parameters \code{TMBhelper::fit_tmb},
-#' and check for obvious problems with the estimates \code{check_fit}. It passes additional named arguments \code{...} directly to these other functions, and please see reference
-#' documetation (e.g., \code{?make_extrapolation_info}) to see potential arguments to pass.
+#' This function is the user-interface for the multiple mid-level functions that
+#' determine the extrapolation-grid \code{make_extrapolation_info(.)},
+#' define spatial objects \code{make_spatial_info(.)},
+#' build covariates from a formula interface \code{make_covariates(.)},
+#' assemble data \code{make_data(.)},
+#' build model \code{make_model(.)},
+#' estimate parameters \code{TMBhelper::fit_tmb(.)},
+#' and check for obvious problems with the estimates \code{check_fit(.)}.
+#' Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
+#'
+#' Specifically, the mid-level functions called by \code{fit_model(.)} look for arguments in the following order of precedence (from highest to lowest precedence):
+#' (1) First, \code{fit_model(.)} prioritizes using named arguments passed directly to \code{fit_model(.)}. If arguments are passed this way, they are used instead of other options below.
+#' (2) Second, if an argument is not passed supplied directly to \code{fit_model(.)}, then \code{fit_model(.)} looks for elements in input \code{settings}, as typically created by \code{settings = make_settings(.)}.
+#' (3) Third, if an argument is not supplied via (1) or (2) above, then each mid-level function uses default values defined in those function arguments, e.g., see \code{args(make_extrapolation_info)} for defaults for function \code{make_extrapolation_info(.)}
+#' Collectively, this order of precedence allows users to specify inputs for a specific project via input method (1), the package author to change defaults through changes in the settings
+#' defined for a given purpose in \code{make_settings(.)} via input method (2), while still defaulting to package defaults via option (3).
 #'
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
@@ -81,7 +93,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
   spatial_args_default = list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
-    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale)
+    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale, knot_method=settings$knot_method)
   spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=formalArgs(make_spatial_info) )
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 

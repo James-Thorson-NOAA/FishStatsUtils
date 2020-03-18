@@ -31,8 +31,9 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
   # Get version
   if(missing(Version)) Version = FishStatsUtils::get_latest_version()
 
-  # Index standardization
+  # Index standardization -- Deprecated
   if( tolower(purpose) == "index" ){
+    warning( "The package author recommends using purpose=`index2` for updated defaults; purpose=`index` is retained for backwards compatibility but not recommended" )
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
     }else{
@@ -46,6 +47,25 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = TRUE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(knot_method)) knot_method = "samples"
+  }
+
+  # Index standardization
+  if( tolower(purpose) == "index2" ){
+    if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
+      if(missing(FieldConfig)) FieldConfig = matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
+    }else{
+      if(missing(FieldConfig)) FieldConfig = c("Omega1"="IID", "Epsilon1"="IID", "Omega2"="IID", "Epsilon2"="IID")
+    }
+    if(missing(RhoConfig)) RhoConfig = c("Beta1"=0, "Beta2"=0, "Epsilon1"=0, "Epsilon2"=0)
+    if(missing(VamConfig)) VamConfig = c("Method"=0, "Rank"=0, "Timing"=0)
+    if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
+    if(missing(ObsModel)) ObsModel = c(2,1)
+    if(missing(bias.correct)) bias.correct = TRUE
+    if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = TRUE
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(knot_method)) knot_method = "grid"
   }
 
   # Condition and density
@@ -63,6 +83,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = FALSE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(knot_method)) knot_method = "samples"
   }
 
   # Spatial model of intermediate complexity for ecosystems (MICE-in-space)
@@ -80,6 +101,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(bias.correct)) bias.correct = TRUE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=FALSE, "Calculate_Fratio"=TRUE, "Estimate_B0"=TRUE )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Bratio_cyl" )
+    if(missing(knot_method)) knot_method = "samples"
   }
 
   # Spatial model for ordinating species
@@ -97,6 +119,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(bias.correct)) bias.correct = FALSE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "Project_factors"=TRUE )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(knot_method)) knot_method = "samples"
   }
 
   # Spatial EOF analysis
@@ -114,6 +137,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(bias.correct)) bias.correct = FALSE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "Project_factors"=TRUE )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(knot_method)) knot_method = "samples"
   }
 
   # Check for bad input
@@ -132,7 +156,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
   # Bundle and export
   settings = list("Version"=Version, "n_x"=n_x, "Region"=Region, "strata.limits"=strata.limits, "zone"=zone, "FieldConfig"=FieldConfig, "RhoConfig"=RhoConfig,
     "VamConfig"=VamConfig, "OverdispersionConfig"=OverdispersionConfig, "ObsModel"=ObsModel, "vars_to_correct"=vars_to_correct,
-    "Options"=Options, "grid_size_km"=grid_size_km, "max_cells"=max_cells,
+    "Options"=Options, "grid_size_km"=grid_size_km, "max_cells"=max_cells, "knot_method"=knot_method,
     "Method"=Method, "use_anisotropy"=use_anisotropy, "fine_scale"=fine_scale, "bias.correct"=bias.correct )
   return(settings)
 }

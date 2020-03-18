@@ -8,7 +8,7 @@ plot_factors(Report, ParHat, Data, SD = NULL, Year_Set = NULL,
   category_names = NULL, RotationMethod = "PCA",
   mapdetails_list = NULL, Dim_year = NULL, Dim_species = NULL,
   plotdir = paste0(getwd(), "/"), land_color = "grey", zlim = NA,
-  ...)
+  testcutoff = 1e-04, ...)
 }
 \arguments{
 \item{Report}{output report, e.g., from \code{Report <- obj$report()}}
@@ -23,6 +23,8 @@ plot_factors(Report, ParHat, Data, SD = NULL, Year_Set = NULL,
 
 \item{category_names}{character-vector listing name for each category}
 
+\item{RotationMethod}{Method used for rotation, Options: "PCA" (recommended) or "Varimax"}
+
 \item{mapdetails_list}{output from \code{FishStatsUtils::MapDetails_Fn}}
 
 \item{Dim_year}{Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)}
@@ -34,6 +36,8 @@ plot_factors(Report, ParHat, Data, SD = NULL, Year_Set = NULL,
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
 
 \item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+
+\item{testcutoff}{tolerance for numerical rounding when confirming that rotation doesn't effect results}
 
 \item{...}{additional arguments passed to \code{plot_maps(.)} when plotting spatio-temporal terms Epsilon}
 }
