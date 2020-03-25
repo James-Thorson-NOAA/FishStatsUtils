@@ -37,13 +37,16 @@
 
 #' @export
 make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
-  create_strata_per_region=FALSE, max_cells=Inf, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
+  create_strata_per_region=FALSE, max_cells=NULL, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
   maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
   region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
   survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100, ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
   # However, it requires a different default value for different regions; hence the input format being used.
+
+  # Backwards compatibility for when settings didn't include max_cells, such that settings$max_cells=NULL
+  if(is.null(max_cells)) max_cells = Inf
 
   for( rI in seq_along(Region) ){
     Extrapolation_List = NULL
