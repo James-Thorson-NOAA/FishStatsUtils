@@ -190,7 +190,14 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       Dim_factor = Dim( as.vector(Data[["FieldConfig"]])[i] )
       png( file=paste0(plotdir,"Factor_loadings--",Par_name,".png"), width=Dim_factor[2]*4, height=Dim_factor[1]*4, units="in", res=200 )
         par( mfrow=Dim_factor, mar=c(0,2,2,0) )
-        for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ) FishStatsUtils::plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI )
+        for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ){
+          if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
+            At = Year_Set
+          }else{
+            At = 1:nrow(Var_rot$L_pj_rot)
+          }
+          plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=At )
+        }
       dev.off()
 
       # Plot factors

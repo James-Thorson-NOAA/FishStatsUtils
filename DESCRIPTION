@@ -29,10 +29,12 @@ Imports:
     MatrixModels,
     rgdal,
     ThorsonUtilities,
+    TMBhelper
     abind,
     corpcor,
     pander,
     rnaturalearth,
+    rnaturalearthdata,
     formatR,
     splancs
 Depends:
@@ -41,6 +43,7 @@ Suggests:
     testthat
 Remotes: 
     james-thorson/utilities
+    kaskr/TMB_contrib_R/TMBhelper
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
