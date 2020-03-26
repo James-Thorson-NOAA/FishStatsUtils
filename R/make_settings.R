@@ -31,6 +31,11 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
   # Get version
   if(missing(Version)) Version = FishStatsUtils::get_latest_version()
 
+  # Check for bad input
+  if( !( tolower(purpose) %in% c("index","index2","condition_and_density","mice","ordination","eof")) ){
+    stop("'purpose' is currently set up only for index-standardization models, correlations between condition and density, MICE-in-space models, ordination, or empirical-orthogonal-function analysis")
+  }
+
   # Index standardization -- Deprecated
   if( tolower(purpose) == "index" ){
     warning( "The package author recommends using purpose=`index2` for updated defaults; purpose=`index` is retained for backwards compatibility but not recommended" )
@@ -144,11 +149,6 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
-  }
-
-  # Check for bad input
-  if( !( tolower(purpose) %in% c("index","condition_and_density","mice","ordination","eof")) ){
-    stop("'purpose' is currently set up only for index-standardization models, correlations between condition and density, MICE-in-space models, ordination, or empirical-orthogonal-function analysis")
   }
 
   # Other defaults
