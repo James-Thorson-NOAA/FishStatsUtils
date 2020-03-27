@@ -18,15 +18,14 @@
 #' }
 
 #' @export
-convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make_plots=FALSE, quiet=TRUE ){
+convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make_plots=FALSE, quiet=TRUE, ... ){
 
-  # Read shapefile
   shapefile = rgdal::readOGR( file_path, verbose=!quiet )
   proj_orig = "+proj=longlat +ellps=WGS84 +no_defs"
   shapefile@proj4string = sp::CRS(proj_orig)
 
   # Infer projargs if missing, and project
-  if(is.null(projargs)){
+  if( is.null(projargs) || is.na(projargs) ){
     utm_zone = floor((mean(sp::bbox(shapefile)[1,]) + 180) / 6) + 1
     projargs = paste0("+proj=utm +zone=",utm_zone," +ellps=WGS84 +datum=WGS84 +units=km +no_defs ")
   }
@@ -45,10 +44,13 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make
   grid_proj@data = sp::over(grid_proj, shapefile_proj)
   grid_proj = subset( grid_proj, !is.na(AreaName) )
 
-  #
+  # Return to original coordinates
   grid_orig = sp::spTransform( grid_proj, CRSobj=sp::CRS(proj_orig) )
   grid_orig = as.data.frame(grid_orig)
-  grid_output = data.frame( Lat=grid_orig[,'Y'], Lon=grid_orig[,'X'], Area_km2=prod(grid_dim_km), grid_orig[,'AreaName'] )
+
+  # Combine
+  extrapolation_grid = data.frame( "Lat"=grid_orig[,'Y'], "Lon"=grid_orig[,'X'], "Area_km2"=prod(grid_dim_km), "Stratum"=grid_orig[,'AreaName'],
+    "Include"=1, "E_km"=grid_proj@coords[,'X'], "N_km"=grid_proj@coords[,'Y'] )
 
   # make plots
   if( make_plots==TRUE ){
@@ -72,6 +74,7 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make
   }
 
   # Return output
-  return( grid_output )
+  Return = list( "extrapolation_grid"=extrapolation_grid, "projargs"=projargs )
+  return( Return )
 }
 
