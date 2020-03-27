@@ -71,8 +71,10 @@ Please see reference documetation for each of those functions (e.g., \code{?make
 
 Specifically, the mid-level functions called by \code{fit_model(.)} look for arguments in the following order of precedence (from highest to lowest precedence):
 (1) First, \code{fit_model(.)} prioritizes using named arguments passed directly to \code{fit_model(.)}. If arguments are passed this way, they are used instead of other options below.
-(2) Second, if an argument is not passed supplied directly to \code{fit_model(.)}, then \code{fit_model(.)} looks for elements of input \code{settings}, as typically created by \code{settings = make_settings(.)}.
+(2) Second, if an argument is not passed supplied directly to \code{fit_model(.)}, then \code{fit_model(.)} looks for elements in input \code{settings}, as typically created by \code{settings = make_settings(.)}.
 (3) Third, if an argument is not supplied via (1) or (2) above, then each mid-level function uses default values defined in those function arguments, e.g., see \code{args(make_extrapolation_info)} for defaults for function \code{make_extrapolation_info(.)}
+Collectively, this order of precedence allows users to specify inputs for a specific project via input method (1), the package author to change defaults through changes in the settings
+defined for a given purpose in \code{make_settings(.)} via input method (2), while still defaulting to package defaults via option (3).
 }
 \examples{
 \dontrun{

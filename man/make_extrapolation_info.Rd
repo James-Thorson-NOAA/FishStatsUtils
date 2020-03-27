@@ -6,7 +6,7 @@
 \usage{
 make_extrapolation_info(Region, projargs = NA, zone = NA,
   strata.limits = data.frame(STRATA = "All_areas"),
-  create_strata_per_region = FALSE, max_cells = Inf,
+  create_strata_per_region = FALSE, max_cells = NULL,
   input_grid = NULL, observations_LL = NULL, grid_dim_km = c(2, 2),
   maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
   grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),

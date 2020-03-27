@@ -29,7 +29,7 @@ Imports:
     MatrixModels,
     rgdal,
     ThorsonUtilities,
-    TMBhelper
+    TMBhelper,
     abind,
     corpcor,
     pander,
