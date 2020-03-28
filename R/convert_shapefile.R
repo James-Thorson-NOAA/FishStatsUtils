@@ -20,16 +20,17 @@
 #' @export
 convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make_plots=FALSE, quiet=TRUE, ... ){
 
-  shapefile = rgdal::readOGR( file_path, verbose=!quiet )
+  shapefile_orig = rgdal::readOGR( file_path, verbose=FALSE )
   proj_orig = "+proj=longlat +ellps=WGS84 +no_defs"
-  shapefile@proj4string = sp::CRS(proj_orig)
+  shapefile_orig@proj4string = sp::CRS(proj_orig)
 
   # Infer projargs if missing, and project
+  utm_zone = floor((mean(sp::bbox(shapefile_orig)[1,]) + 180) / 6) + 1
+  projargs_utm = paste0("+proj=utm +zone=",utm_zone," +ellps=WGS84 +datum=WGS84 +units=km +no_defs ")
   if( is.null(projargs) || is.na(projargs) ){
-    utm_zone = floor((mean(sp::bbox(shapefile)[1,]) + 180) / 6) + 1
-    projargs = paste0("+proj=utm +zone=",utm_zone," +ellps=WGS84 +datum=WGS84 +units=km +no_defs ")
+    projargs = projargs_utm
   }
-  shapefile_proj = sp::spTransform(shapefile, CRSobj=sp::CRS(projargs) )
+  shapefile_proj = sp::spTransform(shapefile_orig, CRSobj=sp::CRS(projargs) )
 
   # Determine bounds for box
   bbox = shapefile_proj@bbox
@@ -65,12 +66,26 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make
     axis(1); axis(2); box()
 
     # plot original shapefile
-    sp::plot( shapefile, main="shapefile in new projection" )
+    sp::plot( shapefile_orig, main="shapefile in new projection" )
     axis(1); axis(2); box()
 
     # plot original shapefile
-    sp::plot( grid_output[,c('Lon','Lat')], main="Grid in original coordinates" )
+    sp::plot( grid_orig[,c('X','Y')], main="Grid in original coordinates" )
     axis(1); axis(2); box()
+  }
+
+  # Compare areas
+  area_shapefile_orig = sum( raster::area(shapefile_orig) ) / 1000^2  # Convert to square-kiometers
+  area_shapefile_proj = sum( raster::area(shapefile_proj) )
+  area_grid_proj = sum( extrapolation_grid[,'Area_km2'] )
+
+  # Messages
+  Area_ratio = area_grid_proj / area_shapefile_orig
+  if( Area_ratio>1.05 | Area_ratio<0.95 | quiet==FALSE ){
+    message( "Area of projected extrapolation-grid is ", formatC(Area_ratio*100,format="f",digits=2), "% of the original shapefile area" )
+    if( Area_ratio>1.05 | Area_ratio<0.95 ){
+      stop( "Please use a different projection to decrease this conversion error; perhaps `projargs=", projargs_utm, "`" )
+    }
   }
 
   # Return output

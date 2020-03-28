@@ -78,4 +78,7 @@ using \code{Region="User"}, or supply a GIS shapefile \code{Region="[directory_p
 The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
 If a user supplies a character-vector with more than one of these, then they are combined to
 assemble a combined extrapolation-grid.
+
+When supplying a shapefile, I recommend using a UTM projection for projargs, which appears to have lower
+projection errors regarding total area than rnaturalearth.
 }
