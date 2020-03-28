@@ -15,7 +15,7 @@ make_extrapolation_info(Region, projargs = NA, zone = NA,
   flip_around_dateline, nstart = 100, ...)
 }
 \arguments{
-\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "stream_network", "user", or "other"}
+\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile}
 
 \item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
@@ -67,5 +67,15 @@ Tagged list used in other functions
 \code{make_extrapolation_data} builds an object used to determine areas to extrapolation densities to when calculating indices
 }
 \details{
-To do area-weighted extrapolation of estimated density for use in calculating abundance indices, it is necessary to have a precise measurement of the footprint for a given survey design. Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted at the location of each grid cell and where each grid cell is associated with a known area within a given survey design. Collaborators have worked with the package author to include the extrapolation-grid for several regions automatically in FishStatsUtils, but for new regions an analyst must either detect the grid automatically using \code{Region="Other"} or input an extrapolation-grid manually using \code{Region="User"}.  The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+To do area-weighted extrapolation of estimated density for use in calculating abundance indices,
+it is necessary to have a precise measurement of the footprint for a given survey design.
+Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted
+at the location of each grid cell and where each grid cell is associated with a known area within a given survey design.
+Collaborators have worked with the package author to include the extrapolation-grid for several
+regions automatically in FishStatsUtils. For new regions an analyst can either (1) detect
+the grid automatically using \code{Region="Other"}, or (2) input an extrapolation-grid manually
+using \code{Region="User"}, or supply a GIS shapefile \code{Region="[directory_path/file_name].shp"}.
+The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+If a user supplies a character-vector with more than one of these, then they are combined to
+assemble a combined extrapolation-grid.
 }

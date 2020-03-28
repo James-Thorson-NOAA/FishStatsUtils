@@ -3,12 +3,22 @@
 #'
 #' \code{make_extrapolation_data} builds an object used to determine areas to extrapolation densities to when calculating indices
 #'
-#' To do area-weighted extrapolation of estimated density for use in calculating abundance indices, it is necessary to have a precise measurement of the footprint for a given survey design. Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted at the location of each grid cell and where each grid cell is associated with a known area within a given survey design. Collaborators have worked with the package author to include the extrapolation-grid for several regions automatically in FishStatsUtils, but for new regions an analyst must either detect the grid automatically using \code{Region="Other"} or input an extrapolation-grid manually using \code{Region="User"}.  The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+#' To do area-weighted extrapolation of estimated density for use in calculating abundance indices,
+#' it is necessary to have a precise measurement of the footprint for a given survey design.
+#' Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted
+#' at the location of each grid cell and where each grid cell is associated with a known area within a given survey design.
+#' Collaborators have worked with the package author to include the extrapolation-grid for several
+#' regions automatically in FishStatsUtils. For new regions an analyst can either (1) detect
+#' the grid automatically using \code{Region="Other"}, or (2) input an extrapolation-grid manually
+#' using \code{Region="User"}, or supply a GIS shapefile \code{Region="[directory_path/file_name].shp"}.
+#' The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+#' If a user supplies a character-vector with more than one of these, then they are combined to
+#' assemble a combined extrapolation-grid.
 #'
 #' @inheritParams sp::CRS
 #' @inheritParams Calc_Kmeans
 #'
-#' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "stream_network", "user", or "other"
+#' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile
 #' @param strata.limits an input for determining stratification of indices (see example script)
 #' @param zone UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples
 #' @param flip_around_dateline used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used
@@ -114,6 +124,11 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
       if( Region[rI]=="SP-ARSA" ) stop("There's some problem with `SP-ARSA` which precludes it's use")
       Conversion = convert_shapefile( file_path=paste0(system.file("region_shapefiles",package="FishStatsUtils"),"/",toupper(Region[rI]),"/Shapefile.shp"),
         projargs=projargs, grid_dim_km=grid_dim_km, ... )
+      Extrapolation_List = list( "a_el"=matrix(Conversion$extrapolation_grid[,'Area_km2'],ncol=1), "Data_Extrap"=Conversion$extrapolation_grid,
+        "zone"=NA, "projargs"=Conversion$projargs, "flip_around_dateline"=FALSE, "Area_km2_x"=Conversion$extrapolation_grid[,'Area_km2'])
+    }
+    if( file.exists(Region[rI]) ){
+      Conversion = convert_shapefile( file_path=Region[rI], projargs=projargs, grid_dim_km=grid_dim_km, ... )
       Extrapolation_List = list( "a_el"=matrix(Conversion$extrapolation_grid[,'Area_km2'],ncol=1), "Data_Extrap"=Conversion$extrapolation_grid,
         "zone"=NA, "projargs"=Conversion$projargs, "flip_around_dateline"=FALSE, "Area_km2_x"=Conversion$extrapolation_grid[,'Area_km2'])
     }

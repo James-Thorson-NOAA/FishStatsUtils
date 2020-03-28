@@ -5,7 +5,7 @@
 \title{Convert shapefile to extrapolation-grid}
 \usage{
 convert_shapefile(file_path, projargs = NULL, grid_dim_km = c(2, 2),
-  make_plots = FALSE, quiet = TRUE)
+  make_plots = FALSE, quiet = TRUE, ...)
 }
 \arguments{
 \item{file_path}{path for shapefile on harddrive}
