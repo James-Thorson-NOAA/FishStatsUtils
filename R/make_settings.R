@@ -30,14 +30,15 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
 
   # Get version
   if(missing(Version)) Version = FishStatsUtils::get_latest_version()
+  purpose_found = FALSE
 
-  # Check for bad input
-  if( !( tolower(purpose) %in% c("index","index2","condition_and_density","mice","ordination","eof")) ){
-    stop("'purpose' is currently set up only for index-standardization models, correlations between condition and density, MICE-in-space models, ordination, or empirical-orthogonal-function analysis")
-  }
+  ###################
+  # Index standardization
+  ###################
 
-  # Index standardization -- Deprecated
+  # Deprecated
   if( tolower(purpose) == "index" ){
+    purpose_found = TRUE
     warning( "The package author recommends using purpose=`index2` for updated defaults; purpose=`index` is retained for backwards compatibility but not recommended" )
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
@@ -56,8 +57,9 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(max_cells)) max_cells = Inf
   }
 
-  # Index standardization
+  # Current
   if( tolower(purpose) == "index2" ){
+    purpose_found = TRUE
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
     }else{
@@ -75,8 +77,11 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
   }
 
+  ###################
   # Condition and density
+  ###################
   if( tolower(purpose) == "condition_and_density" ){
+    purpose_found = TRUE
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( c(2,2,"IID",0,0,"IID"), ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
     }else{
@@ -94,8 +99,11 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(max_cells)) max_cells = Inf
   }
 
+  ###################
   # Spatial model of intermediate complexity for ecosystems (MICE-in-space)
+  ###################
   if( tolower(purpose) %in% c("mice","interactions") ){
+    purpose_found = TRUE
     if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`mice`")
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( c(n_categories,n_categories,"IID",n_categories,n_categories,"IID"), ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
@@ -113,8 +121,11 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(max_cells)) max_cells = Inf
   }
 
+  ###################
   # Spatial model for ordinating species
+  ###################
   if( tolower(purpose) %in% c("ordination") ){
+    purpose_found = TRUE
     if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`ordination`")
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( c(n_categories,n_categories,n_categories,n_categories,n_categories,n_categories), ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
@@ -132,8 +143,15 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(max_cells)) max_cells = Inf
   }
 
+  ###################
   # Spatial EOF analysis
+  ###################
+
   if( tolower(purpose) %in% c("eof") ){
+    purpose_found = TRUE
+    if( convert_version_name(Version) >= convert_version_name("VAST_v9_2_0") ){
+      warning( "The package author recommends using purpose=`eof2` for improved model specification; purpose=`eof` is retained for backwards compatibility but not recommended" )
+    }
     if(missing(n_categories)) stop("Must supply `n_categories` when using purpose==`eof`")
     if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
       if(missing(FieldConfig)) FieldConfig = matrix( c(0,n_categories,"IID", 0,0,"IID"), ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
@@ -149,6 +167,32 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
+  }
+
+  if( tolower(purpose) %in% c("eof2") ){
+    purpose_found = TRUE
+    if( convert_version_name(Version) < convert_version_name("VAST_v9_2_0") ){
+      stop("Cannot use purpose=`eof2` with VAST versions < 9.2.0")
+    }
+    if(missing(FieldConfig)) FieldConfig = matrix( c("IID","Identity","IID",2, 0,0,"IID","Identity"), ncol=2, nrow=4, dimnames=list(c("Omega","Epsilon","Beta","Epsilon_year"),c("Component_1","Component_2")) )
+    if(missing(RhoConfig)) RhoConfig = c("Beta1"=0, "Beta2"=3, "Epsilon1"=0, "Epsilon2"=0)
+    if(missing(VamConfig)) VamConfig = c("Method"=0, "Rank"=0, "Timing"=0)
+    if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
+    if(missing(ObsModel)) ObsModel = c(2,1)
+    if(missing(bias.correct)) bias.correct = FALSE
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "Project_factors"=TRUE )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(knot_method)) knot_method = "grid"
+    if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
+  }
+
+  ###################
+  # Other settings and formatting
+  ###################
+
+  # Check for bad input
+  if( purpose_found==FALSE ){
+    stop("'purpose' is currently set up only for index-standardization models, correlations between condition and density, MICE-in-space models, ordination, or empirical-orthogonal-function analysis")
   }
 
   # Other defaults

@@ -157,7 +157,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     }
     if( is.null(Extrapolation_List) ){
       if( is.null(observations_LL)){
-        stop("Because you're using a new Region[rI], please provide 'observations_LL' input")
+        stop("Because you're using a new Region[rI], please provide 'observations_LL' input with columns named `Lat` and `Lon`")
       }
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_Other_Extrapolation_Data_Fn( strata.limits=strata.limits, observations_LL=observations_LL,

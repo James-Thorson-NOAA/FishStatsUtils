@@ -21,7 +21,7 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
   interval_width=1, width=6, height=6, xlab="Category", ylab="Proportion", ... ){
 
   # Warnings and errors
-  if( !all(TmbData[['FieldConfig']] %in% c(-2,-1)) ){
+  if( !all(TmbData[['FieldConfig']] %in% c(-3,-2,-1)) ){
     message("Derivation only included for independent categories")
     return( invisible("Not run") )
   }
