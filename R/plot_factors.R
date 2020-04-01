@@ -20,6 +20,9 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
   mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey", zlim=NA,
   testcutoff=1e-4, ... ){
 
+  #
+  if(is.null(mapdetails_list)) message( "`plot_factors(.) skipping plots because argument `mapdetails_list` is missing")
+
   # Extract Options and Options_vec (depends upon version)
   if( all(c("Options","Options_vec") %in% names(Data)) ){
     Options_vec = Data$Options_vec
