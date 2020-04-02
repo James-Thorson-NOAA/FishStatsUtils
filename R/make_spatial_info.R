@@ -181,10 +181,19 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     a_gl = matrix(dist_inp, nrow=n_x)
   }
 
+  # Moving
+  if( fine_scale==TRUE | Method=="Stream_network" ){
+    g_e = rep(NA, length(Extrapolation_List[["Area_km2_x"]]))
+    g_e[ which(Extrapolation_List[["Area_km2_x"]]>0) ] = 1:length(which(Extrapolation_List[["Area_km2_x"]]>0))
+  }else{
+    g_e = PolygonList$NN_Extrap$nn.idx[,1]
+    g_e[ which(Extrapolation_List[["Area_km2_x"]]==0) ] = NA
+  }
+
   # Return
   Return = list( "fine_scale"=fine_scale, "A_is"=A_is, "A_gs"=A_gs, "n_x"=n_x, "n_s"=n_s, "n_g"=nrow(a_gl), "n_i"=nrow(loc_i),
     "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
-    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g),
+    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g), "g_e"=g_e,
     "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap, "knot_method"=knot_method,
     "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i )
   class(Return) = "make_spatial_info"
