@@ -20,6 +20,7 @@
 #'
 #' @inheritParams sp::CRS
 #' @inheritParams Calc_Kmeans
+#' @inheritParams convert_shapefile
 #'
 #' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile
 #' @param strata.limits an input for determining stratification of indices (see example script)
@@ -53,7 +54,8 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
   create_strata_per_region=FALSE, max_cells=NULL, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
   maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
   region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
-  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100, ... ){
+  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100,
+  area_tolerance=0.05, ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
   # However, it requires a different default value for different regions; hence the input format being used.
@@ -126,12 +128,12 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     if( toupper(Region[rI]) %in% c("ATL-IBTS-Q1","ATL-IBTS-Q4","BITS","BTS","BTS-VIIA","EVHOE","IE-IGFS","NIGFS","NS_IBTS","PT-IBTS","SP-ARSA","SP-NORTH","SP-PORC") ){
       if( Region[rI]=="SP-ARSA" ) stop("There's some problem with `SP-ARSA` which precludes it's use")
       Conversion = convert_shapefile( file_path=paste0(system.file("region_shapefiles",package="FishStatsUtils"),"/",toupper(Region[rI]),"/Shapefile.shp"),
-        projargs=projargs, grid_dim_km=grid_dim_km, ... )
+        projargs_for_shapefile="+proj=longlat +ellps=WGS84 +no_defs", projargs=projargs, grid_dim_km=grid_dim_km, area_tolerance=area_tolerance, ... )
       Extrapolation_List = list( "a_el"=matrix(Conversion$extrapolation_grid[,'Area_km2'],ncol=1), "Data_Extrap"=Conversion$extrapolation_grid,
         "zone"=NA, "projargs"=Conversion$projargs, "flip_around_dateline"=FALSE, "Area_km2_x"=Conversion$extrapolation_grid[,'Area_km2'])
     }
     if( file.exists(Region[rI]) ){
-      Conversion = convert_shapefile( file_path=Region[rI], projargs=projargs, grid_dim_km=grid_dim_km, ... )
+      Conversion = convert_shapefile( file_path=Region[rI], projargs=projargs, grid_dim_km=grid_dim_km, area_tolerance=area_tolerance, ... )
       Extrapolation_List = list( "a_el"=matrix(Conversion$extrapolation_grid[,'Area_km2'],ncol=1), "Data_Extrap"=Conversion$extrapolation_grid,
         "zone"=NA, "projargs"=Conversion$projargs, "flip_around_dateline"=FALSE, "Area_km2_x"=Conversion$extrapolation_grid[,'Area_km2'])
     }

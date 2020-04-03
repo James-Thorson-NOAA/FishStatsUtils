@@ -9,6 +9,8 @@
 #'
 #' @param file_path path for shapefile on harddrive
 #' @param make_plots Boolean indicating whether to visualize inputs and outputs as maps
+#' @param projargs_for_shapefile projection-arguments (e.g., as parsed by \code{sp::CRS}), that are used when reading shapefile and overriding any projection arguments already saved there;  Default \code{projargs_for_shapefile=NULL} uses the projection arguments available in the shapefile
+#' @param projargs A character string of projection arguments used to project the shapefile prior to construction an extrapolation-grid; the arguments must be entered exactly as in the PROJ.4 documentation; Default \code{projargs=NULL} uses UTM and infers the UTM zone based on the centroid of the shapefile.
 
 #' @return extrapolation-grid
 
@@ -18,11 +20,13 @@
 #' }
 
 #' @export
-convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make_plots=FALSE, quiet=TRUE, ... ){
+convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), projargs_for_shapefile=NULL,
+  make_plots=FALSE, quiet=TRUE, area_tolerance=0.05, ... ){
 
-  shapefile_orig = rgdal::readOGR( file_path, verbose=FALSE )
+  shapefile_orig = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
   proj_orig = "+proj=longlat +ellps=WGS84 +no_defs"
-  shapefile_orig@proj4string = sp::CRS(proj_orig)
+  shapefile_orig = sp::spTransform(shapefile_orig, CRSobj=sp::CRS(proj_orig) )
+  #shapefile_orig@proj4string = sp::CRS(proj_orig)
 
   # Infer projargs if missing, and project
   utm_zone = floor((mean(sp::bbox(shapefile_orig)[1,]) + 180) / 6) + 1
@@ -43,14 +47,14 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make
 
   # Restrict points to those within a polygon
   grid_proj@data = sp::over(grid_proj, shapefile_proj)
-  grid_proj = subset( grid_proj, !is.na(AreaName) )
+  grid_proj = subset( grid_proj, !apply(grid_proj@data,MARGIN=1,FUN=function(vec){all(is.na(vec))}) )
 
   # Return to original coordinates
   grid_orig = sp::spTransform( grid_proj, CRSobj=sp::CRS(proj_orig) )
   grid_orig = as.data.frame(grid_orig)
 
   # Combine
-  extrapolation_grid = data.frame( "Lat"=grid_orig[,'Y'], "Lon"=grid_orig[,'X'], "Area_km2"=prod(grid_dim_km), "Stratum"=grid_orig[,'AreaName'],
+  extrapolation_grid = data.frame( "Lat"=grid_orig[,'Y'], "Lon"=grid_orig[,'X'], "Area_km2"=prod(grid_dim_km), # "Stratum"=grid_orig[,'AreaName'],
     "Include"=1, "E_km"=grid_proj@coords[,'X'], "N_km"=grid_proj@coords[,'Y'] )
 
   # make plots
@@ -81,11 +85,11 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), make
 
   # Messages
   Area_ratio = area_grid_proj / area_shapefile_orig
-  if( Area_ratio>1.05 | Area_ratio<0.95 | quiet==FALSE ){
+  if( quiet==FALSE ){
     message( "Area of projected extrapolation-grid is ", formatC(Area_ratio*100,format="f",digits=2), "% of the original shapefile area" )
-    if( Area_ratio>1.05 | Area_ratio<0.95 ){
-      stop( "Please use a different projection to decrease this conversion error; perhaps `projargs=", projargs_utm, "`" )
-    }
+  }
+  if( Area_ratio>(1+area_tolerance) | Area_ratio<(1-area_tolerance) ){
+    stop( "Please use a different projection to decrease this conversion error; perhaps `projargs=", projargs_utm, "`" )
   }
 
   # Return output
