@@ -138,7 +138,9 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
 
     # Extract elements
     Array_xct = NULL
-    plot_code <- c("encounter_prob", "pos_catch", "ln_density", "", "", "epsilon_1", "epsilon_2", "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates", "total_density", "covariate_effects_1", "covariate_effects_2", "omega_1", "omega_2")[plot_num]
+    plot_code <- c("encounter_prob", "pos_catch", "ln_density", "", "", "epsilon_1", "epsilon_2",
+      "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates", "total_density",
+      "covariate_effects_1", "covariate_effects_2", "omega_1", "omega_2")[plot_num]
 
     # Extract matrix to plot
     if(plot_num==1){
@@ -311,8 +313,9 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
         if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
         if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
 
-        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), "") )
-        plot_args = plot_variable( Y_gt=Mat_xt[,years_to_include,drop=FALSE], map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
+        plot_args = plot_variable( Y_gt=Mat_xt[,years_to_include,drop=FALSE],
+          map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
           panel_labels=Year_Set[years_to_include], file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
       }
     }
@@ -325,8 +328,9 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
         Return = Mat_xc = array( as.vector(Mat_xc), dim=c(dim(Array_xct)[1],Ncategories)) # Reformat to make sure it has same format for everything
 
         # Do plot
-        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",Year_Set[years_to_include][tI]), "") )
-        plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",Year_Set[years_to_include][tI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
+        plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio),
+          projargs=projargs, working_dir=working_dir,
           panel_labels=category_names, file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
       }
     }
