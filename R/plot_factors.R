@@ -13,7 +13,7 @@
 #' @param Dim_species Plotting dimension (row,column) for plot of categories (default: square with sufficient size for number of categories)
 #' @param plotdir directory for saving plots
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
-#' @param ... additional arguments passed to \code{plot_maps(.)} when plotting spatio-temporal terms Epsilon
+#' @param ... additional arguments passed to \code{plot_maps(.)} and/or \code{plot_variable(.)} when plotting factor-values on a map
 
 #' @export
 plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
@@ -217,7 +217,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         # Use plot_variable to plot all factors on single figure
         if( Par_name %in% c("Omega1", "Omega2")){
           plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
-            panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name) )
+            panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name), ... )
         }
 
         ## Doesn't make sense to make maps of beta factors since they aren't spatial
