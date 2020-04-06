@@ -119,6 +119,8 @@ plot_results( settings=settings, fit=fit )
 \seealso{
 \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
 
+\code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities
+
 Other wrapper functions: \code{\link{make_settings}},
   \code{\link{plot_results}}
 }

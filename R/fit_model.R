@@ -49,6 +49,7 @@
 #'
 #' @family wrapper functions
 #' @seealso \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+#' @seealso \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities
 #'
 #' @examples
 #' \dontrun{
@@ -265,9 +266,14 @@ plot.fit_model <- function(x, what="results", ...)
 #' Extract summary of spatial estimates
 #'
 #' @title Extract spatial estimates
-#' @param fit Output from \code{\link{fit_model}}
+#' @param x Output from \code{\link{fit_model}}
 #' @param what Boolean indicating what to summarize; only option is `density`
 #' @param ... Not used
+#'
+#' \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
+#' which lists the estimated density for every Latitude-Longitude-Year-Category combination
+#' for every modelled location in the extrapolation-grid.
+#'
 #' @return NULL
 #' @method summary fit_model
 #' @export

@@ -7,11 +7,15 @@
 \method{summary}{fit_model}(x, what = "density", ...)
 }
 \arguments{
+\item{x}{Output from \code{\link{fit_model}}}
+
 \item{what}{Boolean indicating what to summarize; only option is `density`}
 
-\item{...}{Not used}
+\item{...}{Not used
 
-\item{fit}{Output from \code{\link{fit_model}}}
+\code{what="density"} returns a tagged list containing element \code{Density_dataframe},
+which lists the estimated density for every Latitude-Longitude-Year-Category combination
+for every modelled location in the extrapolation-grid.}
 }
 \description{
 Extract summary of spatial estimates

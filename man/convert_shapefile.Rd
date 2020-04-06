@@ -13,7 +13,7 @@ convert_shapefile(file_path, projargs = NULL, grid_dim_km = c(2, 2),
 
 \item{projargs}{A character string of projection arguments used to project the shapefile prior to construction an extrapolation-grid; the arguments must be entered exactly as in the PROJ.4 documentation; Default \code{projargs=NULL} uses UTM and infers the UTM zone based on the centroid of the shapefile.}
 
-\item{projargs_for_shapefile}{projection-arguments (e.g., as parsed by \code{sp::CRS}), that are used when reading shapefile (and overriding any projection arguments already saved there);  Default \code{projargs_for_shapefile=NULL} uses the projection arguments available in the shapefile}
+\item{projargs_for_shapefile}{projection-arguments (e.g., as parsed by \code{sp::CRS}), that are used when reading shapefile and overriding any projection arguments already saved there;  Default \code{projargs_for_shapefile=NULL} uses the projection arguments available in the shapefile}
 
 \item{make_plots}{Boolean indicating whether to visualize inputs and outputs as maps}
 }

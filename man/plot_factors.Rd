@@ -39,7 +39,7 @@ plot_factors(Report, ParHat, Data, SD = NULL, Year_Set = NULL,
 
 \item{testcutoff}{tolerance for numerical rounding when confirming that rotation doesn't effect results}
 
-\item{...}{additional arguments passed to \code{plot_maps(.)} when plotting spatio-temporal terms Epsilon}
+\item{...}{additional arguments passed to \code{plot_maps(.)} and/or \code{plot_variable(.)} when plotting factor-values on a map}
 }
 \description{
 \code{plot_factors} plots factor loadings, average spatial factors, and spatio-temporal factors

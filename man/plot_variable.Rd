@@ -40,5 +40,5 @@ plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
 \description{
 \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 
-See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user to center eastings on a specified longitude. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
 }

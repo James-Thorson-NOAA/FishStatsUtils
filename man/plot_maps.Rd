@@ -9,7 +9,7 @@ plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
   Years2Include = NULL, category_names = NULL, quiet = FALSE,
   working_dir = paste0(getwd(), "/"), MapSizeRatio, n_cells,
   plot_value = "estimate", n_samples = 100, Report, TmbData,
-  zlim = NULL, ...)
+  zlim = NULL, country = NULL, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -53,6 +53,8 @@ plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
 \item{Report}{tagged list of outputs from TMB model via \code{Obj$report()}}
 
 \item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+
+\item{country}{a character vector of country names.}
 
 \item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
 }
