@@ -34,6 +34,7 @@
 #' @param grid_dim_LL same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region="other"}
 #' @param grid_in_UTM Boolean stating whether to automatically generate an extrapolation grid based on sampling locations in km within the UTM projection of within Lat-Lon coordinates; only used if \code{Region="other"}
 #' @param strata_to_use strata to include by default for the BC coast extrapolation grid; only used if \code{Region="british_columbia"}
+#' @param epu_to_use EPU to include for the Northwest Atlantic (NWA) extrapolation grid, default is "All"; only used if \code{Region="northwest_atlantic"}
 #' @param survey survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}
 #' @param region which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}
 #' @param surveyname area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}
@@ -54,6 +55,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
   create_strata_per_region=FALSE, max_cells=NULL, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
   maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
   region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
+  epu_to_use=c('All','Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')[1],
   survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100,
   area_tolerance=0.05, ... ){
 
@@ -103,7 +105,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     }
     if( tolower(Region[rI]) == "northwest_atlantic" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_NWA_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_NWA_Extrapolation_Data_Fn( strata.limits=strata.limits, epu_to_use=epu_to_use, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "south_africa" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
