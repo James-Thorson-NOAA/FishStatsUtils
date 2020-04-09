@@ -13,7 +13,7 @@ plot_results(fit, settings = fit$settings, plot_set = 3,
 \arguments{
 \item{fit}{Output from \code{fit_model}}
 
-\item{settings}{Output from \code{make_settings}}
+\item{settings}{Output from \code{\link{make_settings}}}
 
 \item{plot_set}{integer-vector defining plots to create
 \describe{

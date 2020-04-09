@@ -4,19 +4,24 @@
 #' \code{fit_model} fits a spatio-temporal model to data
 #'
 #' This function is the user-interface for the multiple mid-level functions that
-#' determine the extrapolation-grid \code{\link{make_extrapolation_info}},
-#' define spatial objects \code{\link{make_spatial_info}},
-#' build covariates from a formula interface \code{\link{make_covariates}},
-#' assemble data \code{\link{make_data}},
-#' build model \code{\link{make_model}},
-#' estimate parameters \code{\link[TMBhelper]{fit_tmb}},
-#' and check for obvious problems with the estimates \code{\link{check_fit}}.
+#' perform separate components of a spatio-temporal analysis:
+#' \itemize{
+#' \item determine the extrapolation-grid \code{\link{make_extrapolation_info}},
+#' \item define spatial objects \code{\link{make_spatial_info}},
+#' \item build covariates from a formula interface \code{\link{make_covariates}},
+#' \item assemble data \code{\link{make_data}},
+#' \item build model \code{\link{make_model}},
+#' \item estimate parameters \code{\link[TMBhelper]{fit_tmb}}, and
+#' \item check for obvious problems with the estimates \code{\link{check_fit}}.
+#' }
 #' Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
 #'
 #' Specifically, the mid-level functions called by \code{fit_model(.)} look for arguments in the following order of precedence (from highest to lowest precedence):
-#' (1) First, \code{fit_model(.)} prioritizes using named arguments passed directly to \code{fit_model(.)}. If arguments are passed this way, they are used instead of other options below.
-#' (2) Second, if an argument is not passed supplied directly to \code{fit_model(.)}, then \code{fit_model(.)} looks for elements in input \code{settings}, as typically created by \code{\link{make_settings}}.
-#' (3) Third, if an argument is not supplied via (1) or (2) above, then each mid-level function uses default values defined in those function arguments, e.g., see \code{args(make_extrapolation_info)} for defaults for function \code{make_extrapolation_info(.)}
+#' \enumerate{
+#' \item \code{fit_model(.)} prioritizes using named arguments passed directly to \code{fit_model(.)}. If arguments are passed this way, they are used instead of other options below.
+#' \item If an argument is not passed supplied directly to \code{fit_model(.)}, then \code{fit_model(.)} looks for elements in input \code{settings}, as typically created by \code{\link{make_settings}}.
+#' \item If an argument is not supplied via (1) or (2) above, then each mid-level function uses default values defined in those function arguments, e.g., see \code{args(make_extrapolation_info)} for defaults for function \code{make_extrapolation_info(.)}
+#' }
 #' Collectively, this order of precedence allows users to specify inputs for a specific project via input method (1), the package author to change defaults through changes in the settings
 #' defined for a given purpose in \code{make_settings(.)} via input method (2), while still defaulting to package defaults via option (3).
 #'
@@ -31,7 +36,7 @@
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
 #' @inheritParams TMBhelper::fit_tmb
-#' @param settings Output from \code{make_settings}
+#' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
 #' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}
@@ -77,6 +82,8 @@
 #' }
 #'
 #' @export
+#' @md
+# Using https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html for guidance on markdown-enabled documentation
 fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, covariate_data, formula=~0, Q_ik=NULL, newtonsteps=1,
