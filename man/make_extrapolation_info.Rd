@@ -11,8 +11,10 @@ make_extrapolation_info(Region, projargs = NA, zone = NA,
   maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
   grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
   strata_to_use = c("SOG", "WCVI", "QCS", "HS", "WCHG"),
-  survey = "Chatham_rise", surveyname = "propInWCGBTS",
-  flip_around_dateline, nstart = 100, area_tolerance = 0.05, ...)
+  epu_to_use = c("All", "Georges_Bank", "Mid_Atlantic_Bight",
+  "Scotian_Shelf", "Gulf_of_Maine", "Other")[1], survey = "Chatham_rise",
+  surveyname = "propInWCGBTS", flip_around_dateline, nstart = 100,
+  area_tolerance = 0.05, ...)
 }
 \arguments{
 \item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile}
@@ -42,6 +44,8 @@ make_extrapolation_info(Region, projargs = NA, zone = NA,
 \item{region}{which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}}
 
 \item{strata_to_use}{strata to include by default for the BC coast extrapolation grid; only used if \code{Region="british_columbia"}}
+
+\item{epu_to_use}{EPU to include for the Northwest Atlantic (NWA) extrapolation grid, default is "All"; only used if \code{Region="northwest_atlantic"}}
 
 \item{survey}{survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}}
 
