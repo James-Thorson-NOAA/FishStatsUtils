@@ -4,7 +4,7 @@
 \alias{rotate_factors}
 \title{Rotate results}
 \usage{
-rotate_factors(Cov_jj = NULL, L_pj = NULL, Psi = NULL,
+rotate_factors(Cov_jj = NULL, L_pj = NULL, Psi_sjt = NULL,
   RotationMethod = "PCA", testcutoff = 1e-10, quiet = FALSE)
 }
 \arguments{
@@ -12,7 +12,7 @@ rotate_factors(Cov_jj = NULL, L_pj = NULL, Psi = NULL,
 
 \item{L_pj}{Loadings matrix for `p` categories and `j` factors (calculated from \code{Cov_jj} if it is provided)}
 
-\item{Psi}{Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)}
+\item{Psi_sjt}{Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)}
 
 \item{RotationMethod}{Method used for rotation, Options: "PCA" (recommended) or "Varimax"}
 

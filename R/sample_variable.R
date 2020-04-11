@@ -11,10 +11,11 @@
 #' @param Obj Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`
 #' @param variable_name name of variable available in report using \code{Obj$report()}
 #' @param n_samples number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.
+#' @param seed integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}
 #'
 
 #' @export
-sample_variable = function( Sdreport, Obj, variable_name, n_samples=100 ){
+sample_variable = function( Sdreport, Obj, variable_name, n_samples=100, seed=123456 ){
 
   # Informative error messages
   if( !("jointPrecision" %in% names(Sdreport)) ){
@@ -26,17 +27,18 @@ sample_variable = function( Sdreport, Obj, variable_name, n_samples=100 ){
 
   #### Local function
   # Sample from GMRF using sparse precision
-  rmvnorm_prec <- function(mu, prec, n.sims) {
+  rmvnorm_prec <- function(mu, prec, n.sims, seed) {
+    set.seed(seed)
     z <- matrix(rnorm(length(mu) * n.sims), ncol=n.sims)
     L <- Matrix::Cholesky(prec, super=TRUE)
     z <- Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
     z <- Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
     z <- as.matrix(z)
-    mu + z
+    return(mu + z)
   }
 
   # Sample from joint distribution
-  u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Sdreport$jointPrecision, n.sims=n_samples)
+  u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Sdreport$jointPrecision, n.sims=n_samples, seed=seed)
 
   # Extract variable for each sample
   message( "# Obtaining samples from predictive distribution for variable ", variable_name )

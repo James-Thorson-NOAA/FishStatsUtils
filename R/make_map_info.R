@@ -148,16 +148,17 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
   }
 
   #
-  if( fine_scale==TRUE | spatial_list$Method=="Stream_network" ){
-    PlotDF[,'x2i'] = NA
-    PlotDF[ which(Extrapolation_List[["Area_km2_x"]]>0),'x2i'] = 1:length(which(Extrapolation_List[["Area_km2_x"]]>0))
-  }else{
-    PlotDF[,'x2i'] = NN_Extrap$nn.idx[,1]
-  }
-  # Exceptions
-  if( tolower(Region) == "eastern_bering_sea" ){
-    PlotDF = PlotDF[which(PlotDF[,'Lon']<0),]
-  }
+  #if( fine_scale==TRUE | spatial_list$Method=="Stream_network" ){
+  #  PlotDF[,'x2i'] = NA
+  #  PlotDF[ which(Extrapolation_List[["Area_km2_x"]]>0),'x2i'] = 1:length(which(Extrapolation_List[["Area_km2_x"]]>0))
+  #}else{
+  #  PlotDF[,'x2i'] = NN_Extrap$nn.idx[,1]
+  #}
+  ## Exceptions
+  #if( tolower(Region) == "eastern_bering_sea" ){
+  #  PlotDF = PlotDF[which(PlotDF[,'Lon']<0),]
+  #}
+  PlotDF[,'x2i'] = spatial_list$g_e
 
   # Plotting zone has to match zone used for Extrapolation_List, for COG estimates (in UTM via Z_xm) to match map UTM
   if( is.numeric(Extrapolation_List$zone) ){

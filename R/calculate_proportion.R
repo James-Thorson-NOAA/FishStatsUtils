@@ -21,7 +21,7 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
   interval_width=1, width=6, height=6, xlab="Category", ylab="Proportion", ... ){
 
   # Warnings and errors
-  if( !all(TmbData[['FieldConfig']] %in% c(-2,-1)) ){
+  if( !all(TmbData[['FieldConfig']] %in% c(-3,-2,-1)) ){
     message("Derivation only included for independent categories")
     return( invisible("Not run") )
   }
@@ -38,7 +38,6 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
   Prop_ctl = Index_ctl / outer(rep(1,dim(Index_ctl)[1]),apply(Index_ctl,MARGIN=2:3,FUN=sum))
   Index_tl = apply(Index_ctl,MARGIN=2:3,FUN=sum)
   SE_Index_tl = sqrt(apply(SE_Index_ctl^2,MARGIN=2:3,FUN=sum,na.rm=TRUE))
-
 
   # Approximate variance for proportions, and effective sample size
   Neff_ctl = var_Prop_ctl = array(NA,dim=dim(Prop_ctl))

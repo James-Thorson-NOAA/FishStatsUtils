@@ -3,23 +3,38 @@
 #'
 #' \code{make_extrapolation_data} builds an object used to determine areas to extrapolation densities to when calculating indices
 #'
-#' To do area-weighted extrapolation of estimated density for use in calculating abundance indices, it is necessary to have a precise measurement of the footprint for a given survey design. Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted at the location of each grid cell and where each grid cell is associated with a known area within a given survey design. Collaborators have worked with the package author to include the extrapolation-grid for several regions automatically in FishStatsUtils, but for new regions an analyst must either detect the grid automatically using \code{Region="Other"} or input an extrapolation-grid manually using \code{Region="User"}.  The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+#' To do area-weighted extrapolation of estimated density for use in calculating abundance indices,
+#' it is necessary to have a precise measurement of the footprint for a given survey design.
+#' Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted
+#' at the location of each grid cell and where each grid cell is associated with a known area within a given survey design.
+#' Collaborators have worked with the package author to include the extrapolation-grid for several
+#' regions automatically in FishStatsUtils. For new regions an analyst can either (1) detect
+#' the grid automatically using \code{Region="Other"}, or (2) input an extrapolation-grid manually
+#' using \code{Region="User"}, or supply a GIS shapefile \code{Region="[directory_path/file_name].shp"}.
+#' The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+#' If a user supplies a character-vector with more than one of these, then they are combined to
+#' assemble a combined extrapolation-grid.
+#'
+#' When supplying a shapefile, I recommend using a UTM projection for projargs, which appears to have lower
+#' projection errors regarding total area than rnaturalearth.
 #'
 #' @inheritParams sp::CRS
 #' @inheritParams Calc_Kmeans
+#' @inheritParams convert_shapefile
 #'
-#' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "stream_network", "user", or "other"
+#' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile
 #' @param strata.limits an input for determining stratification of indices (see example script)
 #' @param zone UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples
 #' @param flip_around_dateline used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used
 #' @param create_strata_per_region Boolean indicating whether to create a single stratum for all regions listed in \code{Region} (the default), or a combined stratum in addition to a stratum for each individual Region
-#' @param observations_LL a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="user"}
-#' @param input_grid a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}
+#' @param observations_LL a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="other"}
+#' @param input_grid a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="user"}
 #' @param grid_dim_km numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region="other"}
 #' @param maximum_distance_from_sample maximum distance that an extrapolation grid cell can be from the nearest sample and still be included in area-weighted extrapolation of density; only used if \code{Region="other"}
 #' @param grid_dim_LL same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region="other"}
 #' @param grid_in_UTM Boolean stating whether to automatically generate an extrapolation grid based on sampling locations in km within the UTM projection of within Lat-Lon coordinates; only used if \code{Region="other"}
 #' @param strata_to_use strata to include by default for the BC coast extrapolation grid; only used if \code{Region="british_columbia"}
+#' @param epu_to_use EPU to include for the Northwest Atlantic (NWA) extrapolation grid, default is "All"; only used if \code{Region="northwest_atlantic"}
 #' @param survey survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}
 #' @param region which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}
 #' @param surveyname area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}
@@ -37,13 +52,18 @@
 
 #' @export
 make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
-  create_strata_per_region=FALSE, max_cells=Inf, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
+  create_strata_per_region=FALSE, max_cells=NULL, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
   maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
   region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
-  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100, ... ){
+  epu_to_use=c('All','Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')[1],
+  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100,
+  area_tolerance=0.05, ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
   # However, it requires a different default value for different regions; hence the input format being used.
+
+  # Backwards compatibility for when settings didn't include max_cells, such that settings$max_cells=NULL
+  if(is.null(max_cells)) max_cells = Inf
 
   for( rI in seq_along(Region) ){
     Extrapolation_List = NULL
@@ -85,7 +105,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     }
     if( tolower(Region[rI]) == "northwest_atlantic" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
-      Extrapolation_List = Prepare_NWA_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+      Extrapolation_List = Prepare_NWA_Extrapolation_Data_Fn( strata.limits=strata.limits, epu_to_use=epu_to_use, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
     if( tolower(Region[rI]) == "south_africa" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
@@ -106,6 +126,18 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     if( tolower(Region[rI]) == "gulf_of_mexico" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_GOM_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+    }
+    if( toupper(Region[rI]) %in% c("ATL-IBTS-Q1","ATL-IBTS-Q4","BITS","BTS","BTS-VIIA","EVHOE","IE-IGFS","NIGFS","NS_IBTS","PT-IBTS","SP-ARSA","SP-NORTH","SP-PORC") ){
+      if( Region[rI]=="SP-ARSA" ) stop("There's some problem with `SP-ARSA` which precludes it's use")
+      Conversion = convert_shapefile( file_path=paste0(system.file("region_shapefiles",package="FishStatsUtils"),"/",toupper(Region[rI]),"/Shapefile.shp"),
+        projargs_for_shapefile="+proj=longlat +ellps=WGS84 +no_defs", projargs=projargs, grid_dim_km=grid_dim_km, area_tolerance=area_tolerance, ... )
+      Extrapolation_List = list( "a_el"=matrix(Conversion$extrapolation_grid[,'Area_km2'],ncol=1), "Data_Extrap"=Conversion$extrapolation_grid,
+        "zone"=NA, "projargs"=Conversion$projargs, "flip_around_dateline"=FALSE, "Area_km2_x"=Conversion$extrapolation_grid[,'Area_km2'])
+    }
+    if( file.exists(Region[rI]) ){
+      Conversion = convert_shapefile( file_path=Region[rI], projargs=projargs, grid_dim_km=grid_dim_km, area_tolerance=area_tolerance, ... )
+      Extrapolation_List = list( "a_el"=matrix(Conversion$extrapolation_grid[,'Area_km2'],ncol=1), "Data_Extrap"=Conversion$extrapolation_grid,
+        "zone"=NA, "projargs"=Conversion$projargs, "flip_around_dateline"=FALSE, "Area_km2_x"=Conversion$extrapolation_grid[,'Area_km2'])
     }
     if( tolower(Region[rI]) == "stream_network" ){
       if( is.null(input_grid)){
@@ -129,7 +161,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     }
     if( is.null(Extrapolation_List) ){
       if( is.null(observations_LL)){
-        stop("Because you're using a new Region[rI], please provide 'observations_LL' input")
+        stop("Because you're using a new Region[rI], please provide 'observations_LL' input with columns named `Lat` and `Lon`")
       }
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_Other_Extrapolation_Data_Fn( strata.limits=strata.limits, observations_LL=observations_LL,

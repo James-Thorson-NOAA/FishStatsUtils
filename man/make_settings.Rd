@@ -8,12 +8,13 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
   strata.limits = data.frame(STRATA = "All_areas"), zone = NA,
   FieldConfig, RhoConfig, OverdispersionConfig, ObsModel, bias.correct,
   Options, use_anisotropy, vars_to_correct, Version,
-  treat_nonencounter_as_zero, n_categories, VamConfig)
+  treat_nonencounter_as_zero, n_categories, VamConfig, max_cells,
+  knot_method)
 }
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
 
-\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "stream_network", "user", or "other"}
+\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile}
 
 \item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}, \code{purpose="condition_and_density"}, \code{purpose="MICE"}, or \code{purpose="ordination"}.}
 
@@ -47,6 +48,10 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
   \item{VamConfig[1]}{indicates the rank of the interaction matrix, indicating the number of community axes that have regulated dynamics}
   \item{VamConfig[2]}{Indicates whether interactions occur before spatio-temporal variation (\code{VamConfig[2]=0}) or after \code{VamConfig[2]=1}}
 }}
+
+\item{max_cells}{Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.}
+
+\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
 }
 \value{
 Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.

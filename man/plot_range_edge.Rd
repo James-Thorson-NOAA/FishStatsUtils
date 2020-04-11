@@ -8,7 +8,7 @@ plot_range_edge(Sdreport, Obj, Year_Set = NULL, Years2Include = NULL,
   strata_names = NULL, category_names = NULL,
   working_dir = paste0(getwd(), "/"), quantiles = c(0.05, 0.95),
   n_samples = 100, interval_width = 1, width = NULL, height = NULL,
-  ...)
+  calculate_relative_to_average = FALSE, seed = 123456, ...)
 }
 \arguments{
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
@@ -34,6 +34,10 @@ plot_range_edge(Sdreport, Obj, Year_Set = NULL, Years2Include = NULL,
 \item{width}{plot width in inches}
 
 \item{height}{plot height in inches}
+
+\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default), or instead calculate relative to median across all years. The latter reduces standard errors, and is appropriate when checking significance for comparison across years for a single species.  The former (default) is appropriate for checking significance for comparison across species.}
+
+\item{seed}{integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}}
 
 \item{...}{Other inputs to `par()`}
 }

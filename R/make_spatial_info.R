@@ -10,7 +10,7 @@
 #' @param n_x the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")
 #' @param Lon_i Longitude for each sample
 #' @param Lat_i Latitude for each sample
-#' @param knot_method whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}
+#' @param knot_method whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}
 #' @param Method a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy
 #' @param fine_scale a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino
 #' @param Extrapolation_List the output from \code{Prepare_Extrapolation_Data_Fn}
@@ -34,7 +34,7 @@
 #'
 
 #' @export
-make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method="samples", Method="Mesh",
+make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method=NULL, Method="Mesh",
   grid_size_km=50, grid_size_LL=1, fine_scale=FALSE, Network_sz_LL=NULL,
   iter.max=1000, randomseed=1, nstart=100, DirPath=paste0(getwd(),"/"), Save_Results=FALSE,
   LON_intensity, LAT_intensity, ... ){
@@ -46,6 +46,9 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   if( Method == "Stream_network" & fine_scale == TRUE ){
     stop("Please use fine_scale=FALSE with stream network spatial model; feature fine_scale=TRUE not yet supported for stream network spatial model.")
   }
+
+  # Backwards compatibility for when settings didn't include knot_method, such that settings$knot_method=NULL
+  if(is.null(knot_method)) knot_method = "samples"
 
   # Backwards compatible option for different extrapolation grid
   if( missing(LON_intensity) & missing(LAT_intensity) ){
@@ -178,10 +181,19 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     a_gl = matrix(dist_inp, nrow=n_x)
   }
 
+  # Moving
+  if( fine_scale==TRUE | Method=="Stream_network" ){
+    g_e = rep(NA, length(Extrapolation_List[["Area_km2_x"]]))
+    g_e[ which(Extrapolation_List[["Area_km2_x"]]>0) ] = 1:length(which(Extrapolation_List[["Area_km2_x"]]>0))
+  }else{
+    g_e = PolygonList$NN_Extrap$nn.idx[,1]
+    g_e[ which(Extrapolation_List[["Area_km2_x"]]==0) ] = NA
+  }
+
   # Return
   Return = list( "fine_scale"=fine_scale, "A_is"=A_is, "A_gs"=A_gs, "n_x"=n_x, "n_s"=n_s, "n_g"=nrow(a_gl), "n_i"=nrow(loc_i),
     "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
-    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g),
+    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g), "g_e"=g_e,
     "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap, "knot_method"=knot_method,
     "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i )
   class(Return) = "make_spatial_info"

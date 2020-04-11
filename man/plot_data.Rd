@@ -10,7 +10,7 @@ plot_data(Extrapolation_List, Spatial_List, Data_Geostat = NULL,
   Plot1_name = "Data_and_knots.png", Plot2_name = "Data_by_year.png",
   col = "red", cex = 0.01, pch = 19, Year_Set,
   projargs = "+proj=longlat", map_resolution = "medium",
-  land_color = "grey", ...)
+  land_color = "grey", country = NULL, ...)
 }
 \arguments{
 \item{Extrapolation_List}{Output from \code{Prepare_Extrapolation_Data_Fn}}
@@ -24,6 +24,8 @@ plot_data(Extrapolation_List, Spatial_List, Data_Geostat = NULL,
 \item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
+
+\item{country}{a character vector of country names.}
 
 \item{...}{addition inputs to \code{plot}}
 }

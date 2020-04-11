@@ -5,7 +5,7 @@
 \title{Build objects related to spatial information}
 \usage{
 make_spatial_info(n_x, Lon_i, Lat_i, Extrapolation_List,
-  knot_method = "samples", Method = "Mesh", grid_size_km = 50,
+  knot_method = NULL, Method = "Mesh", grid_size_km = 50,
   grid_size_LL = 1, fine_scale = FALSE, Network_sz_LL = NULL,
   iter.max = 1000, randomseed = 1, nstart = 100,
   DirPath = paste0(getwd(), "/"), Save_Results = FALSE, LON_intensity,
@@ -20,7 +20,7 @@ make_spatial_info(n_x, Lon_i, Lat_i, Extrapolation_List,
 
 \item{Extrapolation_List}{the output from \code{Prepare_Extrapolation_Data_Fn}}
 
-\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}}
+\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
 
 \item{Method}{a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy}
 

@@ -66,6 +66,10 @@ plot_maps(
 
 \item{Report}{tagged list of outputs from TMB model via \code{Obj$report()}}
 
+\item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+
+\item{country}{a character vector of country names.}
+
 \item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
 
 \item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}

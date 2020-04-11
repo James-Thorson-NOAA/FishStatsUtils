@@ -3,7 +3,32 @@
 #'
 #' \code{fit_model} fits a spatio-temporal model to data
 #'
-#' This function is the user-interface for the functions that determine the extrapolation-grid, define spatial objects, build covariates from a formula interface, assemble data, build model, estimate parameters, and check for obvious problems with the estimates.
+#' This function is the user-interface for the multiple mid-level functions that
+#' perform separate components of a spatio-temporal analysis:
+#' \itemize{
+#' \item determine the extrapolation-grid \code{\link{make_extrapolation_info}},
+#' \item define spatial objects \code{\link{make_spatial_info}},
+#' \item build covariates from a formula interface \code{\link{make_covariates}},
+#' \item assemble data \code{\link{make_data}},
+#' \item build model \code{\link{make_model}},
+#' \item estimate parameters \code{\link[TMBhelper]{fit_tmb}}, and
+#' \item check for obvious problems with the estimates \code{\link{check_fit}}.
+#' }
+#' Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
+#'
+#' Specifically, the mid-level functions called by \code{fit_model(.)} look for arguments in the following order of precedence (from highest to lowest precedence):
+#' \enumerate{
+#' \item \code{fit_model(.)} prioritizes using named arguments passed directly to \code{fit_model(.)}. If arguments are passed this way, they are used instead of other options below.
+#' \item If an argument is not passed supplied directly to \code{fit_model(.)}, then \code{fit_model(.)} looks for elements in input \code{settings}, as typically created by \code{\link{make_settings}}.
+#' \item If an argument is not supplied via (1) or (2) above, then each mid-level function uses default values defined in those function arguments, e.g., see \code{args(make_extrapolation_info)} for defaults for function \code{make_extrapolation_info(.)}
+#' }
+#' Collectively, this order of precedence allows users to specify inputs for a specific project via input method (1), the package author to change defaults through changes in the settings
+#' defined for a given purpose in \code{make_settings(.)} via input method (2), while still defaulting to package defaults via option (3).
+#'
+#' Variables are indexed internally for locations \code{g}, categories \code{c}, and times \code{y}.
+#' Location index \code{g} represents Longitude-Latitude \code{fit$extrapolation_list$Data_Extrap[which(fit$spatial_list$g_e==g),c('Lon','Lat')]};
+#' Time index \code{y} represents time \code{fit$year_labels}; and
+#' Category \code{g} corresponds to values in \code{fit$data_list$g_i}.
 #'
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
@@ -11,15 +36,25 @@
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
 #' @inheritParams TMBhelper::fit_tmb
-#' @param settings Output from \code{make_settings}
+#' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
-#' @param ... additional arguments to pass to \code{FishStatsUtils::make_extrapolation_info}, \code{FishStatsUtils::make_spatial_info}, \code{VAST::make_data}, \code{VAST::make_model}, or \code{TMBhelper::fit_tmb}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{VAST::make_data}
+#' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}
 #'
-#' @return Returns a tagged list of internal objects, the TMB object, and slot \code{parameter_estimates} containing the MLE estimates
+#' @return Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
+#' \describe{
+#'   \item{parameter_estimates}{Output from \code{\link[TMBhelper]{fit_tmb}}; see that documentation for definition of contents}
+#'   \item{extrapolation_list}{Output from \code{\link{make_extrapolation_info}}; see that documentation for definition of contents}
+#'   \item{spatial_list}{Output from \code{\link{make_spatial_info}}; see that documentation for definition of contents}
+#'   \item{data_list}{Output from \code{\link[VAST]{make_data}}; see that documentation for definition of contents}
+#'   \item{tmb_list}{Output from \code{\link[VAST]{make_model}}; see that documentation for definition of contents}
+#'   \item{ParHat}{Tagged list of maximum likelihood estimatesion of fixed effects and empirical Bayes estimates of random effects, following format of initial values generated by \code{\link[VAST]{make_parameters}}; see that documentation for definition of contents}
+#'   \item{Report}{Tagged list of VAST outputs. For example, estimated density for grid \code{g}, category \code{c}, and time \code{y} is available as \code{fit$Report$D_gcy[g,c,y]}; see Details section for description of indexing}
+#' }
 #'
 #' @family wrapper functions
 #' @seealso \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+#' @seealso \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities
 #'
 #' @examples
 #' \dontrun{
@@ -47,10 +82,12 @@
 #' }
 #'
 #' @export
+#' @md
+# Using https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html for guidance on markdown-enabled documentation
 fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, covariate_data, formula=~0, Q_ik=NULL, newtonsteps=1,
-  silent=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
+  silent=TRUE, build_model=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
 
   # Capture extra arguments to function
   extra_args = list(...)
@@ -70,58 +107,73 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
-  extrapolation_args_default = list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone)
-  extrapolation_args_input = extra_args[intersect(names(extra_args),formalArgs(make_extrapolation_info))]
-  extrapolation_args_input = combine_lists( input=extrapolation_args_input, default=extrapolation_args_default )
+  extrapolation_args_default = list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone,
+    max_cells=settings$max_cells)
+  extrapolation_args_input = combine_lists( input=extra_args, default=extrapolation_args_default, args_to_use=formalArgs(make_extrapolation_info) )
   extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
 
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
   spatial_args_default = list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
-    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale)
-  spatial_args_input = extra_args[intersect(names(extra_args),formalArgs(make_spatial_info))]
-  spatial_args_input = combine_lists( input=spatial_args_input, default=spatial_args_default )
+    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale, knot_method=settings$knot_method)
+  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=formalArgs(make_spatial_info) )
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
   # Build data
+  # Do *not* restrict inputs to formalArgs(make_data) because other potential inputs are still parsed by make_data for backwards compatibility
   message("\n### Making data object") # VAST::
   if(missing(covariate_data)) covariate_data = NULL
   data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, covariate_data=covariate_data, formula=formula, Q_ik=Q_ik)
-  data_args_input = combine_lists( input=extra_args, default=data_args_default )
+  data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
   data_list = do.call( what=make_data, args=data_args_input )
 
   # Build object
   message("\n### Making TMB object")
   model_args_default = list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
-    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method)
-  model_args_input = extra_args[intersect(names(extra_args),formalArgs(make_model))]
-  model_args_input = combine_lists( input=model_args_input, default=model_args_default )
+    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method, "build_model"=build_model)
+  model_args_input = combine_lists( input=extra_args, default=model_args_default, args_to_use=formalArgs(make_model) )
   tmb_list = do.call( what=make_model, args=model_args_input )
-  if(silent==TRUE) tmb_list$Obj$env$beSilent()
 
   # Run the model or optionally don't
-  if( run_model==FALSE ){
+  if( run_model==FALSE | build_model==FALSE ){
     # Build and output
+    input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
+      "model_args_input"=model_args_input, "spatial_args_input"=spatial_args_input,
+      "data_args_input"=data_args_input )
     Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
       "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
-      "settings"=settings)
+      "settings"=settings, "input_args"=input_args)
     class(Return) = "fit_model"
     return(Return)
+  }
+  if(silent==TRUE) tmb_list$Obj$env$beSilent()
+
+  # Check for obvious problems with model
+  if( test_fit==TRUE ){
+    message("\n### Testing model at initial values")
+    LogLike0 = tmb_list$Obj$fn( tmb_list$Obj$par )
+    Gradient0 = tmb_list$Obj$gr( tmb_list$Obj$par )
+    if( any( Gradient0==0 ) ){
+      message("\n")
+      stop("Please check model structure; some parameter has a gradient of zero at starting values\n", call.=FALSE)
+    }else{
+      message("Looks good: All fixed effects have a nonzero gradient")
+    }
   }
 
   # Optimize object
   message("\n### Estimating parameters")
   # have user override upper, lower, and loopnum
   optimize_args_default1 = combine_lists( default=list(lower=tmb_list$Lower, upper=tmb_list$Upper, loopnum=2),
-    input=extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))] )
+    input=extra_args, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # auto-override user inputs for optimizer-related inputs for first test run
   optimize_args_input1 = list(obj=tmb_list$Obj, savedir=NULL, newtonsteps=0, bias.correct=FALSE,
     control=list(eval.max=10000,iter.max=10000,trace=1), quiet=TRUE, getsd=FALSE )
   # combine
-  optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1 )
+  optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
@@ -129,7 +181,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
     problem_found = VAST::check_fit( parameter_estimates )
     if( problem_found==TRUE ){
       message("\n")
-      stop("Please change model structure to avoid problems with parameter estimates and then re-try\n", call.=FALSE)
+      stop("Please change model structure to avoid problems with parameter estimates and then re-try; see details in `?check_fit`\n", call.=FALSE)
     }
   }
 
@@ -138,11 +190,9 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
     savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
     bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
     control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1)
-  # user over-rides all default inputs
-  optimize_args_input2 = extra_args[intersect(names(extra_args),formalArgs(TMBhelper::fit_tmb))]
-  # combine
-  optimize_args_input2 = combine_lists( input=optimize_args_input2, default=optimize_args_default2 )
-  # start from MLE
+  # combine while over-riding defaults using user inputs
+  optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
+  # over-ride inputs to start from previous MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates$par), default=optimize_args_input2 )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 
@@ -153,7 +203,8 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   # Build and output
   input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
     "model_args_input"=model_args_input, "spatial_args_input"=spatial_args_input,
-    "optimize_args_input1"=optimize_args_input1, "optimize_args_input2"=optimize_args_input2)
+    "optimize_args_input1"=optimize_args_input1, "optimize_args_input2"=optimize_args_input2,
+    "data_args_input"=data_args_input )
   Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
     "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
     "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
@@ -222,9 +273,14 @@ plot.fit_model <- function(x, what="results", ...)
 #' Extract summary of spatial estimates
 #'
 #' @title Extract spatial estimates
-#' @param fit Output from \code{\link{fit_model}}
+#' @param x Output from \code{\link{fit_model}}
 #' @param what Boolean indicating what to summarize; only option is `density`
 #' @param ... Not used
+#'
+#' \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
+#' which lists the estimated density for every Latitude-Longitude-Year-Category combination
+#' for every modelled location in the extrapolation-grid.
+#'
 #' @return NULL
 #' @method summary fit_model
 #' @export

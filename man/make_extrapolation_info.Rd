@@ -6,16 +6,18 @@
 \usage{
 make_extrapolation_info(Region, projargs = NA, zone = NA,
   strata.limits = data.frame(STRATA = "All_areas"),
-  create_strata_per_region = FALSE, max_cells = Inf,
+  create_strata_per_region = FALSE, max_cells = NULL,
   input_grid = NULL, observations_LL = NULL, grid_dim_km = c(2, 2),
   maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
   grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
   strata_to_use = c("SOG", "WCVI", "QCS", "HS", "WCHG"),
-  survey = "Chatham_rise", surveyname = "propInWCGBTS",
-  flip_around_dateline, nstart = 100, ...)
+  epu_to_use = c("All", "Georges_Bank", "Mid_Atlantic_Bight",
+  "Scotian_Shelf", "Gulf_of_Maine", "Other")[1], survey = "Chatham_rise",
+  surveyname = "propInWCGBTS", flip_around_dateline, nstart = 100,
+  area_tolerance = 0.05, ...)
 }
 \arguments{
-\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "stream_network", "user", or "other"}
+\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile}
 
 \item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
@@ -27,9 +29,9 @@ make_extrapolation_info(Region, projargs = NA, zone = NA,
 
 \item{max_cells}{Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.}
 
-\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="other"}}
+\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="user"}}
 
-\item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="user"}}
+\item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="other"}}
 
 \item{grid_dim_km}{numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region="other"}}
 
@@ -42,6 +44,8 @@ make_extrapolation_info(Region, projargs = NA, zone = NA,
 \item{region}{which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}}
 
 \item{strata_to_use}{strata to include by default for the BC coast extrapolation grid; only used if \code{Region="british_columbia"}}
+
+\item{epu_to_use}{EPU to include for the Northwest Atlantic (NWA) extrapolation grid, default is "All"; only used if \code{Region="northwest_atlantic"}}
 
 \item{survey}{survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}}
 
@@ -67,5 +71,18 @@ Tagged list used in other functions
 \code{make_extrapolation_data} builds an object used to determine areas to extrapolation densities to when calculating indices
 }
 \details{
-To do area-weighted extrapolation of estimated density for use in calculating abundance indices, it is necessary to have a precise measurement of the footprint for a given survey design. Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted at the location of each grid cell and where each grid cell is associated with a known area within a given survey design. Collaborators have worked with the package author to include the extrapolation-grid for several regions automatically in FishStatsUtils, but for new regions an analyst must either detect the grid automatically using \code{Region="Other"} or input an extrapolation-grid manually using \code{Region="User"}.  The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+To do area-weighted extrapolation of estimated density for use in calculating abundance indices,
+it is necessary to have a precise measurement of the footprint for a given survey design.
+Using VAST, analysts do this by including an "extrapolation grid" where densities are predicted
+at the location of each grid cell and where each grid cell is associated with a known area within a given survey design.
+Collaborators have worked with the package author to include the extrapolation-grid for several
+regions automatically in FishStatsUtils. For new regions an analyst can either (1) detect
+the grid automatically using \code{Region="Other"}, or (2) input an extrapolation-grid manually
+using \code{Region="User"}, or supply a GIS shapefile \code{Region="[directory_path/file_name].shp"}.
+The extrapolation is also used to determine where to drawn pixels when plotting predictions of density.
+If a user supplies a character-vector with more than one of these, then they are combined to
+assemble a combined extrapolation-grid.
+
+When supplying a shapefile, I recommend using a UTM projection for projargs, which appears to have lower
+projection errors regarding total area than rnaturalearth.
 }

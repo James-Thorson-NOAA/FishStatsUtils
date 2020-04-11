@@ -7,10 +7,10 @@
 plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
   map_resolution = "medium", file_name = "density",
   working_dir = paste0(getwd(), "/"), Format = "png", Res = 200,
-  add = FALSE, outermargintext = c("Eastings", "Northings"), zlim, col,
-  mar = c(0, 0, 2, 0), oma = c(4, 4, 0, 0), legend_x = c(0, 0.05),
-  legend_y = c(0.05, 0.45), cex.legend = 1, mfrow,
-  land_color = "grey", n_cells, xlim, ylim, country = NULL, ...)
+  add = FALSE, outermargintext = c("Eastings", "Northings"),
+  zlim = NULL, col, mar = c(0, 0, 2, 0), oma = c(4, 4, 0, 0),
+  legend_x = c(0, 0.05), legend_y = c(0.05, 0.45), cex.legend = 1,
+  mfrow, land_color = "grey", n_cells, xlim, ylim, country = NULL, ...)
 }
 \arguments{
 \item{Y_gt}{matrix where values for every column are plotted as a map}
@@ -25,7 +25,7 @@ plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
 
 \item{outermargintext}{vector defining text to plot in outer margins of panel figure}
 
-\item{zlim}{range for defining bounds of color scale}
+\item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
 \item{legend_x}{two numeric values (generally between 0 and 1, but slightly lower/higher values generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend}
 
@@ -40,5 +40,5 @@ plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
 \description{
 \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 
-See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user to center eastings on a specified longitude. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
 }
