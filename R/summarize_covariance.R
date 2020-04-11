@@ -101,7 +101,7 @@ summarize_covariance = function( Report, Data, ParHat, SD=NULL, category_order=1
       par(mfrow=Dim, mar=c(0,1,1,0), mgp=mgp, tck=tck, oma=oma)
       for(i in 1:6 ){      #
         if( i %in% which(plotTF>0) ){
-          Cov_cc = VAST:::calc_cov( L_z=ParHat[c('L_omega1_z','L_epsilon1_z','L_beta1_z','L_omega2_z','L_epsilon2_z','L_beta2_z')][[i]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c )
+          Cov_cc = calc_cov( L_z=ParHat[c('L_omega1_z','L_epsilon1_z','L_beta1_z','L_omega2_z','L_epsilon2_z','L_beta2_z')][[i]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c )
           plot_cov( Cov=convert(Cov_cc)[category_order,category_order], names=list(category_names[category_order],NA)[[ifelse(i==1|i==3|Dim[2]==1,1,2)]], names2=list(1:nrow(Cov_cc),NA)[[ifelse(i==1|i==2,1,2)]], digits=1, font=2 )
           #if(i==1 | Dim[1]==1) mtext(side=3, text="Spatial", line=1.5, font=2)
           #if(i==2 | Dim[1]==1) mtext(side=3, text="Spatio-temporal", line=1.5, font=2)
