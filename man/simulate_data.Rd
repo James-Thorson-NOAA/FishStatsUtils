@@ -11,7 +11,7 @@ simulate_data(fit, type = 1, random_seed = NULL)
 
 \item{type}{integer stating what type of simulation to use.  \code{type=1} simulates new data conditional upon estimated fixed and random effects.  \code{type=2} simulates new random effects conditional upon fixed effects, and new data conditional upon both.  \code{type=3} simulates new fixed and random effects from the joint precision matrix, and new data conditional upon these values.}
 
-\item{random_seed}{integer passed to \code{\link[base]{set.seed}} whenever \code{type=3}, where the default value \code{random_seed=NULL} resets the random-number seed. Argument no effect when \code{type!=3} because TMB has no interface for setting the random-number seed in C++}
+\item{random_seed}{integer passed to \code{\link[base]{set.seed}}, where the default value \code{random_seed=NULL} resets the random-number seed.}
 }
 \value{
 Report object containing new data and population variables including

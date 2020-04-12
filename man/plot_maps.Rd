@@ -4,26 +4,12 @@
 \alias{plot_maps}
 \title{Plot standard maps}
 \usage{
-plot_maps(
-  plot_set = 3,
-  Obj = NULL,
-  PlotDF,
-  Sdreport = NULL,
-  projargs = "+proj=longlat",
-  Panel = "Category",
-  Year_Set = NULL,
-  Years2Include = NULL,
-  category_names = NULL,
-  quiet = FALSE,
-  working_dir = paste0(getwd(), "/"),
-  MapSizeRatio,
-  n_cells,
-  plot_value = "estimate",
-  n_samples = 100,
-  Report,
-  TmbData,
-  ...
-)
+plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
+  projargs = "+proj=longlat", Panel = "Category", Year_Set = NULL,
+  Years2Include = NULL, category_names = NULL, quiet = FALSE,
+  working_dir = paste0(getwd(), "/"), MapSizeRatio, n_cells,
+  plot_value = "estimate", n_samples = 100, Report, TmbData,
+  zlim = NULL, country = NULL, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -68,11 +54,9 @@ plot_maps(
 
 \item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
-\item{country}{a character vector of country names.}
+\item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
 
 \item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
-
-\item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
 }
 \value{
 Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}

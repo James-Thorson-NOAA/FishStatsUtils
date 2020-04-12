@@ -39,7 +39,7 @@ plot_results(fit, settings = fit$settings, plot_set = 3,
 
 \item{check_residuals}{Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)}
 
-\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
+\item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
 
 \item{zrange}{lower and upper bounds for plotted value of Pearson residuals, used to change plotting scale to eliminate influence of outliers on plotting scale}
 

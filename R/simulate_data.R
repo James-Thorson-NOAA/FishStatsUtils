@@ -7,7 +7,7 @@
 #'
 #' @param fit output form \code{fit_model(.)}
 #' @param type integer stating what type of simulation to use.  \code{type=1} simulates new data conditional upon estimated fixed and random effects.  \code{type=2} simulates new random effects conditional upon fixed effects, and new data conditional upon both.  \code{type=3} simulates new fixed and random effects from the joint precision matrix, and new data conditional upon these values.
-#' @param random_seed integer passed to \code{\link[base]{set.seed}} whenever \code{type=3}, where the default value \code{random_seed=NULL} resets the random-number seed. Argument no effect when \code{type!=3} because TMB has no interface for setting the random-number seed in C++
+#' @param random_seed integer passed to \code{\link[base]{set.seed}}, where the default value \code{random_seed=NULL} resets the random-number seed.
 #'
 
 #' @return Report object containing new data and population variables including
@@ -33,19 +33,18 @@ simulate_data = function( fit, type=1, random_seed=NULL ){
 
   # Extract stuff
   Obj = fit$tmb_list$Obj
-  if( !is.null(random_seed) & type!=3 ){
-    stop("Specifying argument `random_seed` in `simulate_data(.) only works when `type=3`")
-  }
 
   # Simulate conditional upon fixed and random effect estimates
   if( type==1 ){
     Obj$env$data$Options_list$Options['simulate_random_effects'] = FALSE
+    set.seed(random_seed)
     Return = Obj$simulate( complete=TRUE )
   }
 
   # Simulate new random effects and data
   if( type==2 ){
     Obj$env$data$Options_list$Options['simulate_random_effects'] = TRUE
+    set.seed(random_seed)
     Return = Obj$simulate( complete=TRUE )
   }
 
