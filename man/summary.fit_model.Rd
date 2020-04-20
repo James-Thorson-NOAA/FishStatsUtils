@@ -2,21 +2,30 @@
 % Please edit documentation in R/fit_model.R
 \name{summary.fit_model}
 \alias{summary.fit_model}
-\title{Extract spatial estimates}
+\title{Extract summary of spatial estimates}
 \usage{
-\method{summary}{fit_model}(x, what = "density", ...)
+\method{summary}{fit_model}(x, what = "density", n_samples = 250, ...)
 }
 \arguments{
 \item{x}{Output from \code{\link{fit_model}}}
 
 \item{what}{Boolean indicating what to summarize; only option is `density`}
 
-\item{...}{Not used
+\item{n_samples}{Number of samples used when \code{what="residuals"}}
 
-\code{what="density"} returns a tagged list containing element \code{Density_dataframe},
-which lists the estimated density for every Latitude-Longitude-Year-Category combination
-for every modelled location in the extrapolation-grid.}
+\item{...}{Not used}
 }
 \description{
-Extract summary of spatial estimates
+\code{summary.fit_model} extracts spatial estimates
+}
+\details{
+Faciliates common queries for model output including:
+\itemize{
+\item \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
+which lists the estimated density for every Latitude-Longitude-Year-Category combination
+for every modelled location in the extrapolation-grid.
+\item \code{what="residuals"} calls package \code{\link[DHARMa]{DHARMa}} to calculate simulation-based model residuals.
+The function then returns output from function \code{\link[DHARMa]{createDHARMa}} using simulation replicates from the predictive distribution
+conditional on estimated fixed and random effects, and also generates a generic plot for these simulation residuals.
+}
 }

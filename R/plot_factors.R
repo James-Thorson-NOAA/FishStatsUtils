@@ -195,7 +195,8 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         par( mfrow=Dim_factor, mar=c(2,2,1,0), oma=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.02 )
         for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ){
           if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
-            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=Year_Set, LabelPosition="Side" )
+            if(any(is.na(as.numeric(Year_Set)))) stop("Check `At` in `plot_factors(.)`")
+            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=as.numeric(Year_Set), LabelPosition="Side" )
           }else{
             plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=1:nrow(Var_rot$L_pj_rot) )
           }

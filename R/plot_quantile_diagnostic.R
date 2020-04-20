@@ -117,9 +117,9 @@ plot_quantile_diagnostic <- function(TmbData,
       }
 
       # Make plot while calculating posterior predictives
-      if(!is.null(FileName_PP) & !is.null(save_dir)) jpeg(save_PP, width=10, height=3, res=200, units="in")
-      par(mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
-      plot(TmbData$b_i[Which], ylab="", xlab="", log="y", main="", col="blue")
+      #if(!is.null(FileName_PP) & !is.null(save_dir)) jpeg(save_PP, width=10, height=3, res=200, units="in")
+      #par(mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      #plot(TmbData$b_i[Which], ylab="", xlab="", log="y", main="", col="blue")
 
       # Add results to plot: Loop through observations
       for(ObsI in 1:length(Which)){
@@ -143,19 +143,19 @@ plot_quantile_diagnostic <- function(TmbData,
       if(!is.null(FileName_Phist) & !is.null(save_dir)) dev.off()
 
       # Aggregate predictive distribution
-      if(!is.null(FileName_QQ) & !is.null(save_dir)) jpeg(save_QQ, width=4, height=4, res=200, units="in")
-      par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
-      hist( log(y), main="Aggregate predictive dist.", xlab="log(Obs)", ylab="Density")
-      if(!is.null(FileName_QQ) & !is.null(save_dir)) dev.off()
+      #if(!is.null(FileName_QQ) & !is.null(save_dir)) jpeg(save_QQ, width=4, height=4, res=200, units="in")
+      #par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      #hist( log(y), main="Aggregate predictive dist.", xlab="log(Obs)", ylab="Density")
+      #if(!is.null(FileName_QQ) & !is.null(save_dir)) dev.off()
 
       # Quantile histogram
-      if(!is.null(FileName_Qhist) & !is.null(save_dir)) jpeg(save_Qhist, width=4, height=4, res=200, units="in")
-      par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
-      hist(na.omit(Q), main="Quantile_histogram", xlab="Quantile", ylab="Number")
-      if(!is.null(FileName_Qhist) & !is.null(save_dir)) dev.off()
+      #if(!is.null(FileName_Qhist) & !is.null(save_dir)) jpeg(save_Qhist, width=4, height=4, res=200, units="in")
+      #par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      #hist(na.omit(Q), main="Quantile_histogram", xlab="Quantile", ylab="Number")
+      #if(!is.null(FileName_Qhist) & !is.null(save_dir)) dev.off()
 
       # Return stuff
-      Return[[i_e]] = list("type"=ObsModel_ez[i_e,], "Q"=Q, "var_y"=var_y, "pred_y"=pred_y )
+      Return[[i_e]] = list("type"=ObsModel_ez[i_e,], "Q"=Q, "var_y"=var_y, "pred_y"=pred_y, "y"=y )
     }
     
     if(length(Return)==1) Return <- Return[[1]] # single species model

@@ -272,19 +272,27 @@ plot.fit_model <- function(x, what="results", ...)
 
 #' Extract summary of spatial estimates
 #'
-#' @title Extract spatial estimates
-#' @param x Output from \code{\link{fit_model}}
-#' @param what Boolean indicating what to summarize; only option is `density`
-#' @param ... Not used
+#' \code{summary.fit_model} extracts spatial estimates
 #'
-#' \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
+#' Faciliates common queries for model output including:
+#' \itemize{
+#' \item \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
 #' which lists the estimated density for every Latitude-Longitude-Year-Category combination
 #' for every modelled location in the extrapolation-grid.
+#' \item \code{what="residuals"} calls package \code{\link[DHARMa]{DHARMa}} to calculate simulation-based model residuals.
+#' The function then returns output from function \code{\link[DHARMa]{createDHARMa}} using simulation replicates from the predictive distribution
+#' conditional on estimated fixed and random effects, and also generates a generic plot for these simulation residuals.
+#' }
+#'
+#' @param x Output from \code{\link{fit_model}}
+#' @param what Boolean indicating what to summarize; only option is `density`
+#' @param n_samples Number of samples used when \code{what="residuals"}
+#' @param ... Not used
 #'
 #' @return NULL
 #' @method summary fit_model
 #' @export
-summary.fit_model <- function(x, what="density", ...)
+summary.fit_model <- function(x, what="density", n_samples=250, ...)
 {
   ans = NULL
 
@@ -311,6 +319,31 @@ summary.fit_model <- function(x, what="density", ...)
     }else{
       stop( "`summary.fit_model` not implemented for the version of `VAST` being used" )
     }
+  }
+
+  # Residuals
+  if( tolower(what) == "residuals" ){
+    b_iz = matrix(NA, nrow=length(x$data_list$b_i), ncol=n_samples)
+
+    message( "Sampling from the distribution of data conditional on estimated fixed and random effects" )
+    Obj = x$tmb_list$Obj
+    Obj$env$data$n_g = 0
+    for( zI in 1:n_samples ){
+      if( zI%%max(1,floor(n_samples/10)) == 0 ){
+        message( "  Finished sample ", zI, " of ",n_samples )
+      }
+      b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=1 )$b_i
+    }
+
+    # Test DHARMa
+    dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz,
+      observedResponse=x$data_list$b_i,
+      integer=TRUE)
+
+    # do plot
+    plot(dharmaRes, ...)
+    ans = dharmaRes
+    message( "Invisibly returning output from `DHARMa::createDHARMa`, e.g., to apply `plot.DHARMa` to this output")
   }
 
   if( tolower(what) %in% c("parhat","estimates") ){
