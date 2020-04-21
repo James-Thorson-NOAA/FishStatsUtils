@@ -24,6 +24,8 @@
 #'   \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
 #'   \item{plot_set=13}{Covariate effects on encounter probability}
 #'   \item{plot_set=14}{Covariate effects on positive catch rates}
+#'   \item{plot_set=15}{Spatial variation for 1st linear predictor (Omega1)}
+#'   \item{plot_set=16}{Spatial variation for 2nd linear predictor (Omega2)}
 #' }
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
