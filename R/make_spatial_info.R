@@ -79,7 +79,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     loc_grid = loc_grid[Which,]
     grid_num = RANN::nn2( data=loc_grid, query=loc_i, k=1)$nn.idx[,1]
   }
-  if( Method %in% c("Mesh","Grid","Stream_network") ){
+  if( Method %in% c("Mesh","Grid","Stream_network","Barrier") ){
     loc_i = project_coordinates( X=Lon_i, Y=Lat_i, projargs=Extrapolation_List$projargs )
     loc_intensity = project_coordinates( X=LON_intensity, Y=LAT_intensity, projargs=Extrapolation_List$projargs )
     colnames(loc_i) = colnames(loc_intensity) = c("E_km", "N_km")
@@ -102,7 +102,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     knot_i = grid_num
     loc_x = loc_grid
   }
-  if( Method %in% c("Mesh","Spherical_mesh") ){
+  if( Method %in% c("Mesh","Spherical_mesh","Barrier") ){
     knot_i = NN_i
     loc_x = Kmeans[["centers"]]
   }
@@ -134,7 +134,8 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
   MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
-  n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x), "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x) )
+  n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x),
+    "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x), "barrier"=MeshList$anisotropic_spde$n.spde,  )
 
   # Make matrices for 2D AR1 process
   Dist_grid = dist(loc_grid, diag=TRUE, upper=TRUE)
@@ -142,7 +143,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   M1 = as( ifelse(as.matrix(Dist_grid)==grid_size_km, 1, 0), "dgTMatrix" )
   M2 = as( ifelse(as.matrix(Dist_grid)==sqrt(2)*grid_size_km, 1, 0), "dgTMatrix" )
   if( Method=="Spherical_mesh" ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_LL)
-  if( Method %in% c("Mesh","Grid","Stream_network") ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_km)
+  if( Method %in% c("Mesh","Grid","Stream_network","Barrier") ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_km)
 
   # Make projection matrices
   if( fine_scale==FALSE ){

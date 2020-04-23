@@ -32,7 +32,8 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
 
   anisotropic_spde = INLA::inla.spde2.matern(anisotropic_mesh, alpha=2)
 
-  # Exploring how to add projection matrix from knots to extrapolation-grid cells
+  # Exploring how to add projection-matrix A from knots to extrapolation-grid cells
+  # Creating projection-matrix A is now done in `make_data`
   if( FALSE ){
     loc_g = as.matrix( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0),c("E_km","N_km")] )
     outer_hull = INLA::inla.nonconvex.hull(loc_i, convex = -0.05, concave = -0.05)
@@ -54,6 +55,35 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   E1 = V0 - V2
   E2 = V1 - V0
   
+  # Pre-processing for barriers
+  # Barriers don't affect projection matrix A
+  # Obtain polygon for water
+  map_data = rnaturalearth::ne_countries( scale=switch("medium", "low"=110, "medium"=50, "high"=10, 50) )
+
+  # Calculate centroid of each triangle in mesh and convert to SpatialPoints
+  n_triangles = length(anisotropic_mesh$graph$tv[,1])
+  posTri = matrix(NA, nrow=n_triangles, ncol=2)
+  for(tri_index in 1:n_triangles){
+    temp = anisotropic_mesh$loc[ anisotropic_mesh$graph$tv[tri_index,], ]
+    posTri[tri_index,] = colMeans(temp)[c(1,2)]
+  }
+  posTri = sp::SpatialPoints(posTri, proj4string=sp::CRS(Extrapolation_List$projargs) )
+  posTri = sp::spTransform(posTri, CRSobj=map_data@proj4string )
+
+  # Calculate set of triangles barrier.triangles with centroid over land
+  anisotropic_mesh_triangles_over_land = unlist(sp::over(map_data, posTri, returnList=TRUE))
+  #plot( x=posTri@coords[,1], y=posTri@coords[,2], col=ifelse(1:n_triangles%in%triangles_over_land,"black","red") )
+
+  # Create object
+  barrier_finite_elements = INLA:::inla.barrier.fem(mesh=anisotropic_mesh,
+    barrier.triangles=anisotropic_mesh_triangles_over_land)
+  barrier_list = list(C0 = barrier_finite_elements$C[[1]],
+    C1 = barrier_finite_elements$C[[2]],
+    D0 = barrier_finite_elements$D[[1]],
+    D1 = barrier_finite_elements$D[[2]],
+    I = barrier_finite_elements$I )
+  # sp::plot( INLA::inla.barrier.polygon(anisotropic_mesh, triangles_over_land) )
+
   # Calculate Areas 
   crossprod_fn = function(Vec1,Vec2) abs(det( rbind(Vec1,Vec2) ))
   Tri_Area = rep(NA, nrow(E0))
@@ -64,7 +94,7 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   ################
 
   # Mesh and SPDE for different inputs
-  if(Method %in% c("Mesh","Grid","Stream_network")){
+  if(Method %in% c("Mesh","Grid","Stream_network","Barrier")){
     loc_isotropic_mesh = loc_x
     isotropic_mesh = anisotropic_mesh
   }
@@ -79,6 +109,9 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   ####################
   #if( isotropic_mesh$n != anisotropic_mesh$n ) stop("Check `Calc_Anisotropic_Mesh` for problem")
 
-  Return = list("loc_x"=loc_x, "loc_isotropic_mesh"=loc_isotropic_mesh, "isotropic_mesh"=isotropic_mesh, "isotropic_spde"=isotropic_spde, "anisotropic_mesh"=anisotropic_mesh, "anisotropic_spde"=anisotropic_spde, "Tri_Area"=Tri_Area, "TV"=TV, "E0"=E0, "E1"=E1, "E2"=E2 )
+  Return = list("loc_x"=loc_x, "loc_isotropic_mesh"=loc_isotropic_mesh, "isotropic_mesh"=isotropic_mesh,
+    "isotropic_spde"=isotropic_spde, "anisotropic_mesh"=anisotropic_mesh, "anisotropic_spde"=anisotropic_spde,
+    "Tri_Area"=Tri_Area, "TV"=TV, "E0"=E0, "E1"=E1, "E2"=E2,
+    "anisotropic_mesh_triangles_over_land"=anisotropic_mesh_triangles_over_land, "barrier_list"=barrier_list )
   return(Return)
 }
