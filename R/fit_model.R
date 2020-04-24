@@ -39,7 +39,9 @@
 #' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
-#' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}
+#' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
+#' where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
+#' passes named arguments to \code{\link[INLA]{inla.mesh.create}}.
 #'
 #' @return Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
 #' \describe{
@@ -116,7 +118,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   message("\n### Making spatial information")
   spatial_args_default = list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
     Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale, knot_method=settings$knot_method)
-  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=formalArgs(make_spatial_info) )
+  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
   # Build data

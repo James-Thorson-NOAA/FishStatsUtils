@@ -31,6 +31,16 @@ simulate_data = function( fit, type=1, random_seed=NULL ){
     return(mu + z)
   }
 
+  # Check for loaded VAST
+  # Modified from TMB:::getUserDLL
+  dlls <- getLoadedDLLs()
+  isTMBdll <- function(dll) !is(try(getNativeSymbolInfo("MakeADFunObject",dll), TRUE), "try-error")
+  TMBdll <- sapply(dlls, isTMBdll)
+  if( sum(TMBdll)!=1 ){
+    stop("VAST is not linked as a DLL, so `simulate_data` will not work.
+    Please re-run model (potentially from informative starting values to save time) to use `simulate_data`")
+  }
+
   # Extract stuff
   Obj = fit$tmb_list$Obj
 

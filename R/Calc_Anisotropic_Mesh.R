@@ -6,14 +6,13 @@
 #' @param loc_x location (eastings and northings in kilometers, UTM) for each sample or knot
 #' @param Method spatial method determines ("Mesh" and "Grid" give
 #' @param anisotropic_mesh OPTIONAL, anisotropic mesh (if missing, its recalculated from loc_x)
-#' @param refine OPTIONAL, specify whether to add additional points (beyond loc_x and minimal boundary knots)
 #' @param ... Arguments passed to \code{INLA::inla.mesh.create}
 
 #' @return Tagged list containing distance metrics
 
 #' @export
 Calc_Anisotropic_Mesh <-
-function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL, refine=FALSE, fine_scale=FALSE, ...){
+function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL, fine_scale=FALSE, ...){
 
   #######################
   # Create the anisotropic SPDE mesh using 2D coordinates
@@ -22,12 +21,12 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   # 2D coordinates SPDE
   if( fine_scale==FALSE ){
     if( is.null(anisotropic_mesh)){
-      anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, ...)
+      anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, ...)
     }
   }else{
     loc_z = rbind( loc_x, loc_g, loc_i )
     outer_hull = INLA::inla.nonconvex.hull( as.matrix(loc_z), convex = -0.05, concave = -0.05)
-    anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, refine=refine, boundary=outer_hull, ...)
+    anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, ...)
   }
 
   anisotropic_spde = INLA::inla.spde2.matern(anisotropic_mesh, alpha=2)
@@ -37,7 +36,7 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   if( FALSE ){
     loc_g = as.matrix( Extrapolation_List$Data_Extrap[which(Extrapolation_List$Data_Extrap[,'Area_in_survey_km2']>0),c("E_km","N_km")] )
     outer_hull = INLA::inla.nonconvex.hull(loc_i, convex = -0.05, concave = -0.05)
-    if( is.null(anisotropic_mesh)) anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, refine=refine, ...)
+    if( is.null(anisotropic_mesh)) anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, ...)
     plot(anisotropic_mesh)
     A = INLA::inla.spde.make.A( anisotropic_mesh, loc_i )
     Check = apply( A, MARGIN=1, FUN=function(vec){sum(vec>0)})
@@ -100,7 +99,7 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   }
   if(Method %in% c("Spherical_mesh")){
     loc_isotropic_mesh = INLA::inla.mesh.map(loc_x, projection="longlat", inverse=TRUE) # Project from lat/long to mesh coordinates
-    isotropic_mesh = INLA::inla.mesh.create( loc_isotropic_mesh, plot.delay=NULL, refine=refine, ...)
+    isotropic_mesh = INLA::inla.mesh.create( loc_isotropic_mesh, plot.delay=NULL, ...)
   }
   isotropic_spde = INLA::inla.spde2.matern(isotropic_mesh, alpha=2)
 
