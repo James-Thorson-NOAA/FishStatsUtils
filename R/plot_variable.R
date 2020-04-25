@@ -18,6 +18,7 @@
 #' @param add boolean indicating whether to add plot to an existing panel figure, or to define a new panel figure
 #' @param outermargintext vector defining text to plot in outer margins of panel figure
 #' @param panel_labels vector defining titles to use for each panel; defaults to blank
+#' @param contour_nlevels number of levels used when adding contour lines, passed to \code{\link[graphics]{contour}} as argument \code{nlevels}
 #'
 #' @param ... arguments passed to \code{par}
 #'
@@ -28,7 +29,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
          file_name="density", working_dir=paste0(getwd(),"/"), Format="png", Res=200, add=FALSE,
          outermargintext=c("Eastings","Northings"), zlim=NULL, col, mar=c(0,0,2,0), oma=c(4,4,0,0),
          legend_x=c(0,0.05), legend_y=c(0.05,0.45), cex.legend=1, mfrow, land_color="grey",
-         n_cells, xlim, ylim, country=NULL, ...){
+         n_cells, xlim, ylim, country=NULL, contour_nlevels=0, ...){
 
   ###################
   # Settings and inputs
@@ -123,7 +124,7 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     # Interpolate to raster
     # library(plotKML)
     cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
-    Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size )
+    Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=mean )
     if(missing(xlim)) xlim = Raster_proj@bbox[1,]
     if(missing(ylim)) ylim = Raster_proj@bbox[2,]
     Zlim = zlim
@@ -136,6 +137,11 @@ function( Y_gt, map_list, panel_labels, projargs='+proj=longlat', map_resolution
     # Title and box
     title( panel_labels[tI], line=0.1, cex.main=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main), cex=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main) )
     box()
+
+    # Add contour lines
+    if( contour_nlevels > 0 ){
+      contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
+    }
 
     # Include legend
     if( !any(is.na(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
