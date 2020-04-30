@@ -294,7 +294,7 @@ plot.fit_model <- function(x, what="results", ...)
 #' @return NULL
 #' @method summary fit_model
 #' @export
-summary.fit_model <- function(x, what="density", n_samples=250, ...)
+summary.fit_model <- function(x, what="density", n_samples=250, working_dir=NULL, ...)
 {
   ans = NULL
 
@@ -343,7 +343,15 @@ summary.fit_model <- function(x, what="density", n_samples=250, ...)
       integer=TRUE)
 
     # do plot
-    plot(dharmaRes, ...)
+    if( is.null(working_dir) ){
+      plot(dharmaRes, ...)
+    }else if(!is.na(working_dir) ){
+      png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
+        plot(dharmaRes, ...)
+      dev.off()
+    }
+
+    # Return stuff
     ans = dharmaRes
     message( "Invisibly returning output from `DHARMa::createDHARMa`, e.g., to apply `plot.DHARMa` to this output")
   }

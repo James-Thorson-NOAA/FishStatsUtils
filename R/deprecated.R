@@ -1481,3 +1481,335 @@ function(Sim_Settings, Extrapolation_List, Data_Geostat=NULL, MakePlot=FALSE, Da
   if( exists("b1_i")) Return = c(Return, list("b1_i"=b1_i, "b2_i"=b2_i))
   return( Return )
 }
+
+#' Diagnostic QQ function
+#'
+#' @param TmbData TMB Model input data list
+#' @param Report TMB Model output data list
+#' @param save_dir Directory to save plots, if NULL is specified then do not save plot
+#' @param FileName_PP If NULL is specified then do not save this type of plot
+#' @param FileName_Phist If NULL is specified then do not save this type of plot
+#' @param FileName_QQ If NULL is specified then do not save this type of plot
+#' @param FileName_Qhist If NULL is specified then do not save this type of plot
+#' @examples Q <- QQ_Fn(TmbData = TmbData, Report = Report)
+#' @return A list containing results for each specified categories
+#' @export
+plot_quantile_diagnostic <- function(TmbData,
+                  Report,
+                  DateFile=paste0(getwd(),"/"),
+                  save_dir=paste0(DateFile,"/QQ_Fn/"),
+                  FileName_PP="Posterior_Predictive",
+                  FileName_Phist="Posterior_Predictive-Histogram",
+                  FileName_QQ="Q-Q_plot",
+                  FileName_Qhist="Q-Q_hist"){
+
+    # Retrieve data based on model type
+    if("n_e" %in% names(TmbData)){
+        # VAST Versions 3.0.0, 4.0.0: names n_e, e_i and ObsModel_ez are added to support for error distns
+        n_e <- TmbData$n_e
+        e_i <- TmbData$e_i
+        ObsModel_ez <- TmbData$ObsModel_ez
+        sigmaM <- Report$SigmaM
+    }else if("n_c" %in% names(TmbData)){
+        # VAST Version < 3.0.0: names n_c, c_i and ObsModel are used to group by categories
+        n_e <- TmbData$n_c
+        e_i <- TmbData$c_i
+        ObsModel_ez <- rep(1, n_e) %o% TmbData$ObsModel
+        sigmaM <- Report$SigmaM
+        if(is.vector(sigmaM))
+            # VAST Versions 1.0.0 and 1.1.0
+            sigmaM <- rep(1, n_e) %o% Report$SigmaM
+    }else{
+        # SpatialDeltaGLMM
+        n_e <- 1
+        e_i <- rep(0,TmbData$n_i)
+        ObsModel_ez <- matrix(TmbData$ObsModel, nrow = 1)
+        sigmaM <- matrix(Report$SigmaM, nrow = 1)
+    }
+    # else if("n_p" %in% names(TmbData)){
+    #     # MIST: not supported, as MIST uses different definitions for ObsModel
+    #     return(list(message="The function does not support MIST yet."))
+    # }
+
+    # Check data
+    if(nlevels(as.factor(e_i))!=n_e) stop("Error in e_i: nlevels does not agree with n_e")
+    if(nrow(as.matrix(ObsModel_ez))!=n_e) stop("Error in ObsModel_ez: nrow does not agree with n_e")
+    if(nrow(as.matrix(sigmaM))!=n_e) stop("Error in sigmaM: nrow does not agree with n_e")
+
+    # Check save_dir
+    dir.create(save_dir, recursive=TRUE, showWarnings = FALSE)
+    if(!dir.exists(save_dir)) stop(paste0("Wrong directory, cannot save plots: ", save_dir))
+
+    # Return list
+    Return <- vector("list", length = n_e)
+
+    # utility function
+    pow = function(a,b) a^b
+
+    # Loop through each group (plot functions remain unchanged from previous version)
+    for(i_e in 1:n_e){
+
+      # Generate plot names
+      if(!is.null(save_dir)){
+        if(!is.null(FileName_PP)) save_PP=paste0(save_dir,"/",FileName_PP,"-",i_e,".jpg")
+        if(!is.null(FileName_Phist)) save_Phist=paste0(save_dir,"/",FileName_Phist, "-",i_e,".jpg")
+        if(!is.null(FileName_QQ)) save_QQ=paste0(save_dir,"/",FileName_QQ,"-",i_e,".jpg")
+        if(!is.null(FileName_Qhist)) save_Qhist=paste0(save_dir,"/",FileName_Qhist,"-",i_e,".jpg")
+      }
+
+      # Find where b_i > 0 within category i_e
+      Which = which(TmbData$b_i > 0 & e_i == (i_e-1))
+      Q = rep(NA, length(Which)) # vector to track quantiles for each observation
+      y = array(NA, dim=c(length(Which),1000)) # matrix to store samples
+      pred_y = var_y = rep(NA, length(Which) ) # vector to track quantiles for each observation
+
+      # Calculate pred_y
+      # I can't use R2_i anymore because interpretation changed around March 9, 2017 (due to area-swept change in Poisson-process and Tweedie functions)
+      # However, I CAN use P2_i, which has a stable definition over time (as a linear predictor)
+      if( length(ObsModel_ez[i_e,])>=2 && ObsModel_ez[i_e,2]==2 ){
+        Return[[i_e]] = list("type"=ObsModel_ez[i_e,], message="QQ not set up for Tweedie distribution")
+        next
+      }
+      if( !(ObsModel_ez[i_e,1] %in% c(1,2)) ){
+        Return[[i_e]] = list("type"=ObsModel_ez[i_e,], message="QQ not working except for when using a Gamma or Lognormal distribution")
+        next
+      }
+      if( length(ObsModel_ez[i_e,])==1 || ObsModel_ez[i_e,2]%in%c(0,3) ){
+        for(ObsI in 1:length(Which)){
+          pred_y[ObsI] = TmbData$a_i[Which[ObsI]] * exp(Report$P2_i[Which[ObsI]])
+        }
+      }
+      if( length(ObsModel_ez[i_e,])>=2 && ObsModel_ez[i_e,2]%in%c(1,4) ){
+        for(ObsI in 1:length(Which)){
+          if(sigmaM[e_i[Which[ObsI]]+1,3]!=1) stop("`QQ_Fn` will not work with Poisson-link delta model across all VAST versions given values for turned-off parameters")
+          R1_i = 1 - exp( -1 * sigmaM[e_i[Which[ObsI]]+1,3] * TmbData$a_i[Which[ObsI]] * exp(Report$P1_i[Which[ObsI]]) )
+          pred_y[ObsI] = TmbData$a_i[Which[ObsI]] * exp(Report$P1_i[Which[ObsI]]) / R1_i * exp(Report$P2_i[Which[ObsI]]);
+        }
+      }
+
+      # Simulate quantiles for different distributions: Loop through observations
+      for(ObsI in 1:length(Which)){
+        if(ObsModel_ez[i_e,1]==1){
+          y[ObsI,] = rlnorm(n=ncol(y), meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])   # Plotting in log-space
+          Q[ObsI] = plnorm(q=TmbData$b_i[Which[ObsI]], meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])
+        }
+        if(ObsModel_ez[i_e,1]==2){
+          b = pow(sigmaM[i_e, 1],2) * pred_y[ObsI];
+          y[ObsI,] = rgamma(n=ncol(y), shape=1/pow(sigmaM[i_e,1],2), scale=b)
+          Q[ObsI] = pgamma(q=TmbData$b_i[Which[ObsI]], shape=1/pow(sigmaM[i_e,1],2), scale=b)
+        }
+      }
+
+      # Make plot while calculating posterior predictives
+      #if(!is.null(FileName_PP) & !is.null(save_dir)) jpeg(save_PP, width=10, height=3, res=200, units="in")
+      #par(mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      #plot(TmbData$b_i[Which], ylab="", xlab="", log="y", main="", col="blue")
+
+      # Add results to plot: Loop through observations
+      for(ObsI in 1:length(Which)){
+        var_y[ObsI] = var( y[ObsI,] )
+        Quantiles = quantile(y[ObsI,],prob=c(0.025,0.25,0.75,0.975))
+        lines(x=c(ObsI,ObsI), y=Quantiles[2:3], lwd=2)
+        lines(x=c(ObsI,ObsI), y=Quantiles[c(1,4)], lwd=1,lty="dotted")
+        if(TmbData$b_i[Which[ObsI]]>max(Quantiles) | TmbData$b_i[Which[ObsI]]<min(Quantiles)){
+          points(x=ObsI,y=TmbData$b_i[Which[ObsI]],pch=4,col="red",cex=2)
+        }
+      }
+      if(!is.null(FileName_PP) & !is.null(save_dir)) dev.off()
+
+      # Q-Q plot
+      if(!is.null(FileName_Phist) & !is.null(save_dir)) jpeg(save_Phist, width=4, height=4, res=200, units="in")
+      par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      Qtemp = na.omit(Q)
+      Order = order(Qtemp)
+      plot(x=seq(0,1,length=length(Order)), y=Qtemp[Order], main="Q-Q plot", xlab="Uniform", ylab="Empirical", type="l", lwd=3)
+      abline(a=0,b=1)
+      if(!is.null(FileName_Phist) & !is.null(save_dir)) dev.off()
+
+      # Aggregate predictive distribution
+      #if(!is.null(FileName_QQ) & !is.null(save_dir)) jpeg(save_QQ, width=4, height=4, res=200, units="in")
+      #par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      #hist( log(y), main="Aggregate predictive dist.", xlab="log(Obs)", ylab="Density")
+      #if(!is.null(FileName_QQ) & !is.null(save_dir)) dev.off()
+
+      # Quantile histogram
+      #if(!is.null(FileName_Qhist) & !is.null(save_dir)) jpeg(save_Qhist, width=4, height=4, res=200, units="in")
+      #par(mfrow=c(1,1), mar=c(2,2,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
+      #hist(na.omit(Q), main="Quantile_histogram", xlab="Quantile", ylab="Number")
+      #if(!is.null(FileName_Qhist) & !is.null(save_dir)) dev.off()
+
+      # Return stuff
+      Return[[i_e]] = list("type"=ObsModel_ez[i_e,], "Q"=Q, "var_y"=var_y, "pred_y"=pred_y, "y"=y )
+    }
+
+    if(length(Return)==1) Return <- Return[[1]] # single species model
+    return( Return )
+}
+
+#' @title
+#' Plot Pearson residuals on map
+#'
+#' @description
+#' \code{plot_residuals} shows average Pearson residual for every knot for encounter probability and positive catch rate components
+#'
+#' @inheritParams plot_maps
+#'
+#' @param Lat_i Latitude for every observation \code{i}
+#' @param Lon_i Longitude for every observation \code{i}
+#' @param Q Output from \code{QQ_Fn}
+#' @param savdir directory to use when saving results
+#' @param TmbData a tagged list of data inputs generated by \code{make_data}
+#' @param zrange lower and upper bounds for plotted value of Pearson residuals, used to change plotting scale to eliminate influence of outliers on plotting scale
+#' @param ... arguments passed to \code{FisshStatsUtils::plot_variable}
+#'
+#' @return A tagged list of Pearson residuals
+#' \describe{
+#'   \item{Q1_xt}{Matrix of average residuals for encounter/non-encounter component by site \code{x} and year \code{t}}
+#'   \item{Q2_xt}{Matrix of average residuals for positive-catch-rate component by site \code{x} and year \code{t}}
+#' }
+
+#' @export
+plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=longlat',
+         working_dir=paste0(getwd(),"/"), spatial_list, extrapolation_list,
+         Year_Set=NULL, Years2Include=NULL, zrange, ... ){
+
+  ##################
+  # Presence-absence
+  # http://data.princeton.edu/wws509/notes/c3s8.html
+  ##################
+
+  # Add t_iz if missing (e.g., from earlier version of VAST, or SpatialDeltaGLMM)
+  if( !("t_iz" %in% names(TmbData)) ){
+    TmbData$t_iz = matrix( TmbData$t_i, ncol=1 )
+  }
+
+  # Add in t_yz if missing (e.g., from earlier version of VAST, or SpatialDeltaGLMM)
+  if( !("t_yz" %in% names(TmbData)) ){
+    TmbData$t_yz = matrix(1:TmbData$n_t - 1, ncol=1)
+  }
+
+  # Extract binomial stuff for encounter-nonencounter data
+  exp_rate_xy = obs_rate_xy = total_num_xy = exp_num_xy = obs_num_xy = matrix(NA, nrow=spatial_list$n_x, ncol=nrow(TmbData$t_yz) )
+  for( yI in 1:nrow(TmbData$t_yz) ){
+    which_i_in_y = ( TmbData$t_iz == outer(rep(1,TmbData$n_i),TmbData$t_yz[yI,]) )
+    which_i_in_y = which( apply(which_i_in_y,MARGIN=1,FUN=all) )
+    if( length(which_i_in_y)>0 ){
+      exp_rate_xy[,yI] = tapply( Report$R1_i[which_i_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
+      obs_rate_xy[,yI] = tapply( TmbData$b_i[which_i_in_y]>0, INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
+      total_num_xy[,yI] = tapply( TmbData$b_i[which_i_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=length )
+    }else{
+      total_num_xy[,yI] = 0
+    }
+    exp_num_xy = exp_rate_xy * total_num_xy
+    obs_num_xy = obs_rate_xy * total_num_xy
+  }
+
+  # Method #1 -- Binomial cumulative function
+  #Q1_xt = pbinom( obs_num_xt, size=total_num_xt, prob=exp_rate_xt )
+
+  # Method #2 -- Pearson residuals
+  Q1_xy = (obs_num_xy - exp_num_xy) / sqrt(  exp_num_xy*(total_num_xy-exp_num_xy)/total_num_xy )
+
+  # Method #3 -- Deviance residuals
+  #Q1_xt = 2*(obs_num_xt*log(obs_num_xt/exp_num_xt) + (total_num_xt-obs_num_xt)*log((total_num_xt-obs_num_xt)/(total_num_xt-exp_num_xt)))
+  #Q1_xt = ifelse( obs_num_xt==0, 2*((total_num_xt-obs_num_xt)*log((total_num_xt-obs_num_xt)/(total_num_xt-exp_num_xt))), Q1_xt)
+  #Q1_xt = ifelse( (total_num_xt-obs_num_xt)==0, 2*(obs_num_xt*log(obs_num_xt/exp_num_xt)), Q1_xt)
+
+  ##################
+  # Positive catch rates
+  ##################
+
+  # Extract quantile for positive catch rates
+  #Q_i = Q[["Q"]]
+  which_pos = which(TmbData$b_i>0)
+  bvar_ipos = bpred_ipos = NULL
+  # Univariate Q interface
+  if( all(c("var_y","pred_y") %in% names(Q)) ){
+    bvar_ipos = Q[["var_y"]]   # Change name to avoid naming-convention of y with reporting-interval
+    bpred_ipos = Q[["pred_y"]]  # Change name to avoid naming-convention of y with reporting-interval
+  }
+  # Multivariate Q interface
+  if( all(c("var_y","pred_y") %in% names(Q[[1]])) ){
+    bvar_ipos = bpred_ipos = rep(NA, length=length(which_pos))
+    for(i_e in 1:length(Q)){
+      which_pos_and_e = which(TmbData$e_i[which_pos]==(i_e-1))
+      bvar_ipos[which_pos_and_e] = Q[[i_e]][["var_y"]]
+      bpred_ipos[which_pos_and_e] = Q[[i_e]][["pred_y"]]
+    }
+  }
+  if( is.null(bvar_ipos) & is.null(bpred_ipos) ){
+    stop("Something is wrong with `Q` input")
+  }
+
+  ### Method #1 -- chi-squared transformation of cumulative function
+  # Convert to Chi-squared distribution
+  #Chisq_x = tapply( Q_i, INDEX=spatial_list$knot_i[which(TmbData$b_i>0)], FUN=function(vec){sum(-2*log(vec))} )
+  # Calculate d.f. for Chi-squared distribution
+  #DF_x = 2*tapply( Q_i, INDEX=spatial_list$knot_i[which(TmbData$b_i>0)], FUN=length )
+  # Convert back to uniform distribution
+  #P_x = pchisq( q=Chisq_x, df=DF_x )
+
+  ### Method #2 -- average quantile
+  #Q2_x = tapply( Q_i, INDEX=spatial_list$knot_i[which(TmbData$b_i>0)], FUN=mean )
+  #Q2_xt = tapply( Q_i, INDEX=list(spatial_list$knot_i[which(TmbData$b_i>0)],TmbData$t_i[which(TmbData$b_i>0)]), FUN=mean )
+
+  ### Method #3 -- Pearson residuals
+  sum_obs_xy = sum_exp_xy = var_exp_xy = matrix(NA, nrow=spatial_list$n_x, ncol=nrow(TmbData$t_yz) )
+  for( yI in 1:nrow(TmbData$t_yz) ){
+    which_i_in_y = ( TmbData$t_iz == outer(rep(1,TmbData$n_i),TmbData$t_yz[yI,]) )
+    which_i_in_y = which( apply(which_i_in_y,MARGIN=1,FUN=all) )
+    which_i_in_y_and_pos = intersect( which_i_in_y, which_pos )
+    which_ipos_in_y = ( TmbData$t_iz[which_pos,] == outer(rep(1,length(which_pos)),TmbData$t_yz[yI,]) )
+    which_ipos_in_y = which( apply(which_ipos_in_y,MARGIN=1,FUN=all) )
+    if( length(which_i_in_y_and_pos)>0 ){
+      sum_obs_xy[,yI] = tapply( TmbData$b_i[which_i_in_y_and_pos], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
+      sum_exp_xy[,yI] = tapply( bpred_ipos[which_ipos_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
+      var_exp_xy[,yI] = tapply( bvar_ipos[which_ipos_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
+    }
+  }
+  Q2_xy = (sum_obs_xy - sum_exp_xy) / sqrt(var_exp_xy)
+
+  #################
+  # Plots
+  #################
+
+  if( !is.null(working_dir) ){
+    for( zI in 1:2 ){
+      Q_xy = list( Q1_xy, Q2_xy )[[zI]]
+      if( !missing(zrange) ){
+        Q_xy = ifelse( Q_xy<zrange[1], zrange[1], Q_xy )
+        Q_xy = ifelse( Q_xy>zrange[2], zrange[2], Q_xy )
+        zlim = zrange
+      }else{
+        zlim = c(-1,1) * ceiling(max(abs(Q_xy),na.rm=TRUE))
+      }
+      #Q_xt = ifelse( abs(Q_xt)>3, 3*sign(Q_xt), Q_xt )
+
+      # Plot settings
+      Col = colorRampPalette(colors=c("blue","white","red"))
+      textmargin = "Pearson residual"
+      plot_code = c("pearson_residuals_1", "pearson_residuals_2")[zI]
+
+      # Spatial information
+      # Aggregate residual-values to knots regardless of value for fine_scale
+      x2i = spatial_list$NN_Extrap$nn.idx[,1]
+      Include = extrapolation_list[["Area_km2_x"]]>0 & extrapolation_list[["a_el"]][,1]>0
+      DF = cbind( extrapolation_list$Data_Extrap[,c('Lon','Lat')], "x2i"=x2i, "Include"=Include )
+
+      # Fill in labels
+      if( is.null(Year_Set) ) Year_Set = 1:ncol(Q_xy)
+      if( is.null(Years2Include) ) Years2Include = 1:ncol(Q_xy)
+
+      # Make plots
+      plot_args = plot_variable( Y_gt=ifelse(is.na(Q_xy),mean(zlim),Q_xy), map_list=list("PlotDF"=DF), projargs=projargs, working_dir=working_dir,
+        panel_labels=Year_Set[Years2Include], file_name=plot_code, zlim=zlim, col=Col, ... )
+    }
+  }
+
+  #################
+  # Returns
+  #################
+
+  Return = list( "Q1_xy"=Q1_xy, "Q2_xy"=Q2_xy  )  # , "obs_num_xy"=obs_num_xy, "exp_num_xy"=exp_num_xy, "total_num_xy"=total_num_xy
+  return( invisible(Return) )
+}
