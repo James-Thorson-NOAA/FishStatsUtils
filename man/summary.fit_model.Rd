@@ -10,28 +10,32 @@
 \arguments{
 \item{x}{Output from \code{\link{fit_model}}}
 
-\item{what}{Boolean indicating what to summarize; only option is `density`}
+\item{what}{String indicating what to summarize; options are `density` or `residuals`}
 
 \item{n_samples}{Number of samples used when \code{what="residuals"}}
 
-\item{...}{Not used}
+\item{...}{additional arguments passed to \code{\link[DHARMa]{plotResiduals}}}
 }
 \description{
-\code{summary.fit_model} extracts spatial estimates
+\code{summary.fit_model} extracts commonly used quantities derived from a fitted VAST model
 }
 \details{
-Faciliates common queries for model output including:
+\code{summary.fit_model} faciliates common queries for model output including:
 \itemize{
 \item \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
 which lists the estimated density for every Latitude-Longitude-Year-Category combination
 for every modelled location in the extrapolation-grid.
-\item \code{what="residuals"} calls package \code{\link[DHARMa]{DHARMa}} to create a diagnostic object for simulation-based quantile residuals.
-It specifically simulates replicated data sets from the predictive distribution of data
-conditional on estimated fixed and random effects. When detecting that data follow a continuous or delta distribution,
-it then calculates probability-integral-transform (PIT) residuals from the observed and simulated values,
-and replaces the automatically calculated residuals in the DHARMa object with these these PIT residuals.
-Finally, it uses DHARMa to then plot those PIT residuals. Please note that the original DHARMa calculations
-are not correct when using a delta-model (due to additional jittered values added by DHARMa), hence
-the need to call this function to correctly calculate PIT residuals for a delta-model.
+\item \code{what="residuals"} returns a DHARMa object containing PIT residuals;
+See details section for more information.
 }
+
+For calculating residuals, the function calls package \code{\link[DHARMa]{DHARMa}}
+to create a diagnostic object for simulation-based quantile residuals.
+It specifically simulates replicated data sets from the predictive distribution of data
+conditional on estimated fixed and random effects. It then
+calculates probability-integral-transform (PIT) residuals from the observed and simulated values.
+It then replaces the automatically calculated residuals in the DHARMa object with these these PIT residuals,
+so that DHARMa can be used to plot those PIT residuals. PIT residuals are used because the original DHARMa calculations
+are not correct when using a delta-model (due to additional jittered values added by DHARMa when detecting multiple 0-valued observations), hence
+the need to call this function to correctly calculate PIT residuals for a delta-model.
 }
