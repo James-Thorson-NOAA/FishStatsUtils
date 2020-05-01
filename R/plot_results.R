@@ -6,11 +6,13 @@
 #' This function takes a fitted VAST model and generates a standard set of diagnostic and visualization plots.
 #' It does this by calling a series of mid-level plotting functions; see list of functions in Value section of documentation.
 #'
-#' @param fit Output from \code{fit_model}
 #' @inheritParams fit_model
 #' @inheritParams plot_maps
 #' @inheritParams plot_residuals
 #' @inheritParams plot_range_edge
+#' @inheritParams simulate_data
+#'
+#' @param fit Output from \code{fit_model}
 #' @param check_residuals Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)
 #' @param ... additional settings to pass to \code{FishStatsUtils::plot_maps}
 #'
@@ -32,7 +34,7 @@
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
   year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
   category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, n_samples=100,
-  calculate_relative_to_average=FALSE, ... ){
+  calculate_relative_to_average=FALSE, type=1, ... ){
 
   # Check for known issues
   if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
@@ -139,11 +141,11 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
     # Plotting quantile residuals
     message("\n### Making quantile residuals using conditional simulation and package DHARMa")
-    dharmaRes = summary( fit, what="residuals", working_dir=working_dir )
+    dharmaRes = summary( fit, what="residuals", working_dir=working_dir, type=type, ... )
 
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")
-    plot_quantile_residuals( dharmaRes=dharmaRes, fit=fit, working_dir=working_dir )
+    plot_quantile_residuals( dharmaRes=dharmaRes, fit=fit, working_dir=working_dir, ... )
   }else{
     #Q = "Not run"
     #message("\n### Skipping Q-Q plot")

@@ -5,7 +5,7 @@
 \title{Extract summary of spatial estimates}
 \usage{
 \method{summary}{fit_model}(x, what = "density", n_samples = 250,
-  working_dir = NULL, ...)
+  working_dir = NULL, type = 1, ...)
 }
 \arguments{
 \item{x}{Output from \code{\link{fit_model}}}
@@ -14,7 +14,9 @@
 
 \item{n_samples}{Number of samples used when \code{what="residuals"}}
 
-\item{...}{additional arguments passed to \code{\link[DHARMa]{plotResiduals}}}
+\item{type}{integer stating what type of simulation to use. See details for description.}
+
+\item{...}{additional arguments passed to \code{\link[DHARMa]{plotResiduals}} when \code{what="residuals"}}
 }
 \description{
 \code{summary.fit_model} extracts commonly used quantities derived from a fitted VAST model

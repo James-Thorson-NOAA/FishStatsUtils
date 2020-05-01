@@ -295,6 +295,8 @@ plot.fit_model <- function(x, what="results", ...)
 #' are not correct when using a delta-model (due to additional jittered values added by DHARMa when detecting multiple 0-valued observations), hence
 #' the need to call this function to correctly calculate PIT residuals for a delta-model.
 #'
+#' @inheritParams simulate_data
+#'
 #' @param x Output from \code{\link{fit_model}}
 #' @param what String indicating what to summarize; options are `density` or `residuals`
 #' @param n_samples Number of samples used when \code{what="residuals"}
@@ -303,7 +305,8 @@ plot.fit_model <- function(x, what="results", ...)
 #' @return NULL
 #' @method summary fit_model
 #' @export
-summary.fit_model <- function(x, what="density", n_samples=250, working_dir=NULL, ...)
+summary.fit_model <- function(x, what="density", n_samples=250,
+  working_dir=NULL, type=1, ...)
 {
   ans = NULL
 
@@ -334,16 +337,22 @@ summary.fit_model <- function(x, what="density", n_samples=250, working_dir=NULL
 
   # Residuals
   if( tolower(what) == "residuals" ){
-    b_iz = matrix(NA, nrow=length(x$data_list$b_i), ncol=n_samples)
-
-    message( "Sampling from the distribution of data conditional on estimated fixed and random effects" )
+    # extract objects
     Obj = x$tmb_list$Obj
     Obj$env$data$n_g = 0
+
+    # check for issues
+    if( !(type %in% c(1,4)) ){
+      warning("`type` only makes sense for 1 (measurement error) or 4 (unconditional) simulations")
+    }
+
+    b_iz = matrix(NA, nrow=length(x$data_list$b_i), ncol=n_samples)
+    message( "Sampling from the distribution of data conditional on estimated fixed and random effects" )
     for( zI in 1:n_samples ){
       if( zI%%max(1,floor(n_samples/10)) == 0 ){
         message( "  Finished sample ", zI, " of ",n_samples )
       }
-      b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=1 )$b_i
+      b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type )$b_i
     }
 
     # Run DHARMa

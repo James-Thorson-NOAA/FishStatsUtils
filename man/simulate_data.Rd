@@ -9,7 +9,7 @@ simulate_data(fit, type = 1, random_seed = NULL)
 \arguments{
 \item{fit}{output form \code{fit_model(.)}}
 
-\item{type}{integer stating what type of simulation to use.  \code{type=1} simulates new data conditional upon estimated fixed and random effects.  \code{type=2} simulates new random effects conditional upon fixed effects, and new data conditional upon both.  \code{type=3} simulates new fixed and random effects from the joint precision matrix, and new data conditional upon these values.}
+\item{type}{integer stating what type of simulation to use. See details for description.}
 
 \item{random_seed}{integer passed to \code{\link[base]{set.seed}}, where the default value \code{random_seed=NULL} resets the random-number seed.}
 }
@@ -23,4 +23,14 @@ Report object containing new data and population variables including
 }
 \description{
 \code{simulate_data} conducts a parametric bootstrap to simulate new data and potentially simulate new population dynamics and associated variables
+
+Simulate new data given various potential procedures to propagate uncertainty about parameters.
+\itemize{
+\item \code{type=1} is a "measurement error" or "conditional" simulator that simulates new data conditional upon estimated fixed and random effects.
+\item \code{type=2} is an "unconditional" simulator that simulates new random effects conditional upon fixed effects
+(but not otherwise conditioning upon original data), and new data conditional upon both.
+\item \code{type=3} simulates new fixed and random effects from the joint precision matrix (i.e., conditioning upon the original data), and new data conditional upon these values.
+\item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
+and new data conditional upon these values.
+}
 }
