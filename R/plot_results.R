@@ -55,10 +55,6 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
     map_list = make_map_info( "Region"=settings$Region, "spatial_list"=fit$spatial_list, "Extrapolation_List"=fit$extrapolation_list )
   }
 
-  # Plot diagnostic for encounter probability
-  message("\n### Making plot of encounter probability")
-  Enc_prob = plot_encounter_diagnostic( Report=fit$Report, Data_Geostat=cbind("Catch_KG"=fit$data_frame[,'b_i']), DirName=working_dir)
-
   # Plot anisotropy
   message("\n### Making plot of anisotropy")
   plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"), Report=fit$Report, TmbData=fit$data_list )
@@ -126,6 +122,10 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # Plot quantile-quantile plot
   if( check_residuals == TRUE ){
+    # Plot diagnostic for encounter probability
+    #message("\n### Making plot of encounter probability")
+    #Enc_prob = plot_encounter_diagnostic( Report=fit$Report, Data_Geostat=cbind("Catch_KG"=fit$data_frame[,'b_i']), DirName=working_dir)
+    #
     #message("\n### Making Q-Q plot")
     #Q = plot_quantile_diagnostic( TmbData=fit$data_list, Report=fit$Report, FileName_PP="Posterior_Predictive",
     #  FileName_Phist="Posterior_Predictive-Histogram", FileName_QQ="Q-Q_plot", FileName_Qhist="Q-Q_hist", save_dir=working_dir )
@@ -153,7 +153,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   }
 
   # return
-  Return = list( "dharmaRes"=dharmaRes, "Enc_prob"=Enc_prob, "Index"=Index, "Proportions"=Proportions, "Range"=Range, "Dens_xt"=Dens_xt, "Edge"=Edge,
+  Return = list( "dharmaRes"=dharmaRes, "Index"=Index, "Proportions"=Proportions, "Range"=Range, "Dens_xt"=Dens_xt, "Edge"=Edge,
     "map_list"=map_list, "plot_maps_args"=plot_maps_args, "plot_biomass_index_args"=plot_biomass_index_args )
   return( invisible(Return) )
 }

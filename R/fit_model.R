@@ -281,9 +281,14 @@ plot.fit_model <- function(x, what="results", ...)
 #' \item \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
 #' which lists the estimated density for every Latitude-Longitude-Year-Category combination
 #' for every modelled location in the extrapolation-grid.
-#' \item \code{what="residuals"} calls package \code{\link[DHARMa]{DHARMa}} to calculate simulation-based model residuals.
-#' The function then returns output from function \code{\link[DHARMa]{createDHARMa}} using simulation replicates from the predictive distribution
-#' conditional on estimated fixed and random effects, and also generates a generic plot for these simulation residuals.
+#' \item \code{what="residuals"} calls package \code{\link[DHARMa]{DHARMa}} to create a diagnostic object for simulation-based quantile residuals.
+#' It specifically simulates replicated data sets from the predictive distribution of data
+#' conditional on estimated fixed and random effects. When detecting that data follow a continuous or delta distribution,
+#' it then calculates probability-integral-transform (PIT) residuals from the observed and simulated values,
+#' and replaces the automatically calculated residuals in the DHARMa object with these these PIT residuals.
+#' Finally, it uses DHARMa to then plot those PIT residuals. Please note that the original DHARMa calculations
+#' are not correct when using a delta-model (due to additional jittered values added by DHARMa), hence
+#' the need to call this function to correctly calculate PIT residuals for a delta-model.
 #' }
 #'
 #' @param x Output from \code{\link{fit_model}}
@@ -337,10 +342,28 @@ summary.fit_model <- function(x, what="density", n_samples=250, working_dir=NULL
       b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=1 )$b_i
     }
 
-    # Test DHARMa
+    # Run DHARMa
     dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz,
       observedResponse=x$data_list$b_i,
       integer=TRUE)
+
+    # Check difference from nearest integer
+    diff_i = apply( cbind(fit$data_list$b_i%%1,-fit$data_list$b_i%%1), MARGIN=1, FUN=min )
+
+    # Substitute PIT residuals if using a delta-model
+    if( mean(diff_i) > (10*.Machine$double.eps) ){
+      message( "Detecting delta-model, therefore substituting Probability Integral Transform (PIT) residuals for original DHARMa calculations")
+
+      # Calculating probability-integral-transform residuals for zeros
+      prop_zero_i = apply(b_iz, MARGIN=1, FUN=function(vec){mean(vec==0)})
+      PIT_i = runif(min=0, max=prop_zero_i, n=length(prop_zero_i) )
+
+      # Calculating probability-integral-transform residuals for non-zeros
+      prop_less_than_i = apply( b_iz<outer(fit$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
+
+      # Correct DHARMa values
+      dharmaRes$scaledResiduals = ifelse( fit$data_list$b_i>0, prop_less_than_i, PIT_i )
+    }
 
     # do plot
     if( is.null(working_dir) ){

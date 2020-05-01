@@ -25,8 +25,13 @@ Faciliates common queries for model output including:
 \item \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
 which lists the estimated density for every Latitude-Longitude-Year-Category combination
 for every modelled location in the extrapolation-grid.
-\item \code{what="residuals"} calls package \code{\link[DHARMa]{DHARMa}} to calculate simulation-based model residuals.
-The function then returns output from function \code{\link[DHARMa]{createDHARMa}} using simulation replicates from the predictive distribution
-conditional on estimated fixed and random effects, and also generates a generic plot for these simulation residuals.
+\item \code{what="residuals"} calls package \code{\link[DHARMa]{DHARMa}} to create a diagnostic object for simulation-based quantile residuals.
+It specifically simulates replicated data sets from the predictive distribution of data
+conditional on estimated fixed and random effects. When detecting that data follow a continuous or delta distribution,
+it then calculates probability-integral-transform (PIT) residuals from the observed and simulated values,
+and replaces the automatically calculated residuals in the DHARMa object with these these PIT residuals.
+Finally, it uses DHARMa to then plot those PIT residuals. Please note that the original DHARMa calculations
+are not correct when using a delta-model (due to additional jittered values added by DHARMa), hence
+the need to call this function to correctly calculate PIT residuals for a delta-model.
 }
 }
