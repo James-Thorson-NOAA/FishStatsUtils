@@ -145,13 +145,15 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")
-    plot_quantile_residuals( dharmaRes=dharmaRes, fit=fit, working_dir=working_dir, ... )
+    plot_quantile_residuals( dharmaRes=dharmaRes, fit=fit, working_dir=working_dir,
+      Year_Set=year_labels, Years2Include=years_to_plot, ... )
   }else{
     #Q = "Not run"
     #message("\n### Skipping Q-Q plot")
     #message("\n### Skipping plot of Pearson residuals")
     message("\n### Skipping quantile residuals using conditional simulation and package DHARMa")
     message("\n### Skipping plot of quantile residuals ")
+    dharmaRes = NULL
   }
 
   # return

@@ -10,7 +10,12 @@
 #' @param ... arguments passed to \code{FisshStatsUtils::plot_variable}
 #'
 #' @export
-plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residuals_on_map", ... ){
+plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residuals_on_map",
+  Year_Set=NULL, Years2Include=NULL, ... ){
+
+  # labels
+  if( is.null(Year_Set) ) Year_Set = 1:fit$data_list$n_t
+  if( is.null(Years2Include) ) Years2Include = 1:fit$data_list$n_t
 
   # Calculate DHARMa residuals
   if(missing(dharmaRes)){
@@ -32,8 +37,11 @@ plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residual
   PlotDF = cbind( "Lat"=fit$data_frame[,'Lat_i'], "Lon"=fit$data_frame[,'Lon_i'], "x2i"=1:fit$data_list$n_i, "Include"=TRUE)
   Y_gt = matrix(NA, nrow=nrow(fit$data_frame), ncol=fit$data_list$n_t )
   Y_gt[ cbind(1:fit$data_list$n_i,fit$data_list$t_i+1) ] = dharmaRes$scaledResiduals
+  Y_gt = Y_gt[,Years2Include,drop=FALSE]
   col_function = colorRampPalette(colors=c("darkblue","lightblue","white","pink","red"))
-  plot_variable( Y_gt=Y_gt, map_list=list(PlotDF=PlotDF), file_name=file_name, fun=aggregate_pvales, col=col_function, ... )
+  plot_variable( Y_gt=Y_gt, map_list=list(PlotDF=PlotDF), file_name=file_name,
+    fun=aggregate_pvales, col=col_function,
+    panel_labels=Year_Set[Years2Include], ... )
 
   return( NULL )
 }

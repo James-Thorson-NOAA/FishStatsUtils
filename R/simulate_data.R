@@ -86,6 +86,7 @@ simulate_data = function( fit, type=1, random_seed=NULL ){
 
   # Simulate from predictive distribution of random effects and NOT fixed effects, and then new data
   if( type==4 ){
+    set.seed( random_seed )
     warning( "Type-4 residuals are still under development, please use with care and note that they may change at any point.")
     newpar = Obj$env$last.par.best
     #Hess = Obj$env$spHess( par=Obj$env$last.par.best, random=TRUE )
