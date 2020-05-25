@@ -93,7 +93,8 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(ObsModel)) ObsModel = c(1,4)
     if(missing(bias.correct)) bias.correct = TRUE
     if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = FALSE
-    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE,
+      "treat_nonencounter_as_zero"=treat_nonencounter_as_zero, "Project_factors"=TRUE )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
@@ -115,7 +116,8 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
     if(missing(ObsModel)) ObsModel = c(1,1)
     if(missing(bias.correct)) bias.correct = TRUE
-    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=FALSE, "Calculate_Fratio"=TRUE, "Estimate_B0"=TRUE )
+    if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=FALSE,
+      "Calculate_Fratio"=TRUE, "Estimate_B0"=TRUE )
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Bratio_cyl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf

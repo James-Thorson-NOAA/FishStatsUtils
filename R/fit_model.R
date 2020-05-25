@@ -86,7 +86,7 @@
 #' @export
 #' @md
 # Using https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html for guidance on markdown-enabled documentation
-fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(b_i)),
+fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, covariate_data, formula=~0, Q_ik=NULL, newtonsteps=1,
   silent=TRUE, build_model=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
@@ -97,10 +97,10 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   extra_args = c( extra_args, extra_args$extrapolation_args, extra_args$spatial_args, extra_args$optimize_args, extra_args$model_args )
 
   # Assemble inputs
-  data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_iz, "c_iz"=c_iz )
+  data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
   # Decide which years to plot
-  year_labels = seq( min(t_iz), max(t_iz) )
-  years_to_plot = which( year_labels %in% t_iz )
+  year_labels = seq( min(t_i), max(t_i) )
+  years_to_plot = which( year_labels %in% t_i )
 
   # Save record
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
@@ -127,7 +127,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   if(missing(covariate_data)) covariate_data = NULL
   data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
-    "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
+    "s_i"=spatial_list$knot_i-1, "t_i"=t_i, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, covariate_data=covariate_data, formula=formula, Q_ik=Q_ik)
   data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
   data_list = do.call( what=make_data, args=data_args_input )
@@ -354,11 +354,14 @@ summary.fit_model <- function(x, what="density", n_samples=250,
       }
       b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type )$b_i
     }
+    if( any(is.na(b_iz)) ){
+      stop("Check simulated residuals for NA values")
+    }
 
     # Run DHARMa
-    dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz,
+    dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz, # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
       observedResponse=x$data_list$b_i,
-      integer=TRUE)
+      integer=FALSE)
 
     # Calculate probability-integral-transform (PIT) residuals
     message( "Substituting probability-integral-transform (PIT) residuals for DHARMa-calculated residuals" )

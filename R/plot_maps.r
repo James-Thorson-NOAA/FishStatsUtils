@@ -47,16 +47,16 @@ plot_maps <-
 function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
          Panel="Category", Year_Set=NULL, Years2Include=NULL, category_names=NULL, quiet=FALSE,
          working_dir=paste0(getwd(),"/"), MapSizeRatio, n_cells, plot_value="estimate", n_samples=100,
-         Report, TmbData, zlim=NULL, country=NULL, ...){
+         Report, TmbData, zlim=NULL, country=NULL, sample_fixed=TRUE, ...){
 
   # Local functions
-  extract_value = function( Sdreport, Report, Obj, variable_name, plot_value="estimate", n_samples ){
+  extract_value = function( Sdreport, Report, Obj, variable_name, plot_value="estimate", n_samples, sample_fixed=TRUE ){
     if( missing(Report) ){
       Report = Obj$report()
     }
     if( is.function(plot_value) ){
       if(missing(Obj)) stop("Must provide `Obj` for `extract_value(.)` in `plot_maps(.)` when specifying a function for argument `plot_value`")
-      Var_r = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name=variable_name, n_samples=n_samples )
+      Var_r = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name=variable_name, n_samples=n_samples, sample_fixed=sample_fixed )
       Return = apply( Var_r, MARGIN=1:(length(dim(Var_r))-1), FUN=plot_value )
       if( any(dim(Return)!=dim(Report[[variable_name]])) ){
         stop("Check `extract_value(.)` in `plot_maps(.)`")
@@ -65,6 +65,7 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       Return = Report[[variable_name]]
     }else stop("Check input `plot_value` in `plot_maps(.)`")
     return( Return )
+    # apply( Var_r, MARGIN=c(2,4), FUN=function(mat){sum(abs(mat)==Inf)})
   }
 
   # Extract stuff
@@ -101,12 +102,20 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
     Nyears = dim(Report$D_xcy)[3]
   }
   if( "D_gcy" %in% names(Report)){
-    # VAST Version >= 8.0.0
+    # VAST Version 8.0.0 through 9.3.0
     if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_gcy)[3]
     if( is.null(Years2Include) ) Years2Include = 1:dim(Report$D_gcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
     Ncategories = dim(Report$D_gcy)[2]
     Nyears = dim(Report$D_gcy)[3]
+  }
+  if( "D_gct" %in% names(Report)){
+    # VAST Version >= 6.4.0
+    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_gct)[3]
+    if( is.null(Years2Include) ) Years2Include = 1:dim(Report$D_gct)[3]
+    if( is.null(category_names) ) category_names = 1:dim(Report$D_gct)[2]
+    Ncategories = dim(Report$D_gct)[2]
+    Nyears = dim(Report$D_gct)[3]
   }
   if("dhat_ktp" %in% names(Report)){
     # MIST Version <= 14
@@ -150,32 +159,35 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
     if(plot_num==1){
       # Presence/absence ("Pres")
       if( quiet==FALSE ) message(" # plot_num 1: Plotting presence/absense maps")
-      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R1_xt")
-      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R1_xct")
-      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R1_xcy")
-      if("D_gcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R1_gcy")
+      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R1_xt")
+      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R1_xct")
+      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R1_xcy")
+      if("D_gcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R1_gcy")
+      if("D_gct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R1_gct")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("Not implemented for SpatialVAM")
       message( "`plot_num=1` doesn't work well when using ObsModel[2]==1, because average area-swept doesn't generally match area of extrapolation-grid cells" )
     }
     if(plot_num==2){
       # Positive values ("Pos")
       if( quiet==FALSE ) message(" # plot_num 2: Plotting positive catch rate maps")
-      if("D_xt"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R2_xt") )
-      if("D_xct"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R2_xct") )
-      if("D_xcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R2_xcy") )
-      if("D_gcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="R2_gcy") )
+      if("D_xt"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R2_xt") )
+      if("D_xct"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R2_xct") )
+      if("D_xcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R2_xcy") )
+      if("D_gcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R2_gcy") )
+      if("D_gct"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="R2_gct") )
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
       message( "`plot_num=2` doesn't work well when using ObsModel[2]==1, because average area-swept doesn't generally match area of extrapolation-grid cells" )
     }
     if(plot_num==3){
       # Density ("Dens")
       if( quiet==FALSE ) message(" # plot_num 3: Plotting density maps (in log-space)")
-      if("D_xt"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="D_xt") )
-      if("D_xct"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="D_xct") )
-      if("D_xcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="D_xcy") )
-      if("D_gcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="D_gcy") )
-      if("dhat_ktp" %in% names(Report)) Array_xct = aperm(extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="dhat_ktp")[,,cI],c(1,3,2))
-      if("dpred_ktp" %in% names(Report)) Array_xct = aperm(extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="dpred_ktp")[,,cI],c(1,3,2))
+      if("D_xt"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="D_xt") )
+      if("D_xct"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="D_xct") )
+      if("D_xcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="D_xcy") )
+      if("D_gcy"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="D_gcy") )
+      if("D_gct"%in%names(Report)) Array_xct = log( extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="D_gct") )
+      if("dhat_ktp" %in% names(Report)) Array_xct = aperm(extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="dhat_ktp")[,,cI],c(1,3,2))
+      if("dpred_ktp" %in% names(Report)) Array_xct = aperm(extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="dpred_ktp")[,,cI],c(1,3,2))
     }
     if(plot_num==4){
       # Positive values rescaled ("Pos_Rescaled")
@@ -188,37 +200,37 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
     if(plot_num==6){
       # Epsilon for presence/absence ("Eps_Pres")
       if( quiet==FALSE ) message(" # plot_num 6: Plotting spatio-temporal effects (Epsilon) in 1st linear predictor")
-      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon1_st")
-      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon1_sct")
-      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon1_sct")
-      if("D_gcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon1_gct")
+      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon1_st")
+      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon1_sct")
+      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon1_sct")
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon1_gct")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==7){
       # Epsilon for positive values ("Eps_Pos")
       if( quiet==FALSE ) message(" # plot_num 7: Plotting spatio-temporal effects (Epsilon) in 2nd linear predictor")
-      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon2_st")
-      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon2_sct")
-      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon2_sct")
-      if("D_gcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="Epsilon2_gct")
+      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon2_st")
+      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon2_sct")
+      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon2_sct")
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Epsilon2_gct")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==8){
       # Linear predictor for probability of encounter
       if( quiet==FALSE ) message(" # plot_num 8: Plotting 1st predictor after action of link function")
-      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="P1_xt")
-      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="P1_xct")
-      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="P1_xcy")
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
+      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="P1_xt")
+      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="P1_xct")
+      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="P1_xcy")
+      if(any(c("D_gcy","D_gct")%in%names(Report))) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==9){
       # Linear predictor for positive catch rates
       if( quiet==FALSE ) message(" # plot_num 9: Plotting 2nd predictor after action of link function")
-      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="P2_xt")
-      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="P2_xct")
-      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, n_samples=n_samples, variable_name="P2_xcy")
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
+      if("D_xt"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="P2_xt")
+      if("D_xct"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="P2_xct")
+      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Obj=Obj, Report=Report, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="P2_xcy")
+      if(any(c("D_gcy","D_gct")%in%names(Report))) stop("`plot_maps` not implemented for requested plot_num")
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report)))  stop("Not implemented for SpatialVAM")
     }
     if(plot_num==10){
@@ -240,7 +252,7 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       if(any(c("dhat_ktp","dpred_ktp")%in%names(Report))) stop("'plot_num=10' not implemented for 'SpatialVAM'")
       # Convert to CV
       Array_xct = sqrt( exp(Array_xct^2) - 1 )
-      if("D_gcy"%in%names(Report)) stop("`plot_maps` not implemented for requested plot_num")
+      if(any(c("D_gcy","D_gct")%in%names(Report))) stop("`plot_maps` not implemented for requested plot_num")
     }
     if(plot_num==11){
       if( quiet==FALSE ) message(" # plot_num 11: Plotting covariates")
@@ -257,6 +269,7 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       if("D_xct"%in%names(Report)) Array_xct = log(apply(Report$D_xct, FUN=sum, MARGIN=c(1,3)))
       if("D_xcy"%in%names(Report)) Array_xct = log(apply(Report$D_xcy, FUN=sum, MARGIN=c(1,3)))
       if("D_gcy"%in%names(Report)) Array_xct = log(apply(Report$D_gcy, FUN=sum, MARGIN=c(1,3)))
+      if("D_gct"%in%names(Report)) Array_xct = log(apply(Report$D_gct, FUN=sum, MARGIN=c(1,3)))
       logsum = function(vec){ max(vec) + log(sum(exp(vec-max(vec)))) }
       if("dhat_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dhat_ktp,c(1,3,2)), FUN=logsum, MARGIN=c(1,3))
       if("dpred_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dpred_ktp,c(1,3,2)), FUN=logsum, MARGIN=c(1,3))
@@ -266,8 +279,8 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       if( quiet==FALSE ) message(" # plot_num 13: Plotting covariate effects for 1st linear predictor")
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
-      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, n_samples=n_samples, variable_name="eta1_xct")
-      if("D_gcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, n_samples=n_samples, variable_name="eta1_gct")
+      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="eta1_xct")
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="eta1_gct")
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
@@ -276,8 +289,8 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       if( quiet==FALSE ) message(" # plot_num 14: Plotting covariate effects for 2nd linear predictor")
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
-      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, n_samples=n_samples, variable_name="eta2_xct")
-      if("D_gcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, n_samples=n_samples, variable_name="eta2_gct")
+      if("D_xcy"%in%names(Report)) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="eta2_xct")
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="eta2_gct")
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
@@ -287,7 +300,7 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
-      if("D_gcy"%in%names(Report)) Array_xct = Report$Omega1_gc %o% 1
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = Report$Omega1_gc %o% 1
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
@@ -297,7 +310,7 @@ function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
-      if("D_gcy"%in%names(Report)) Array_xct = Report$Omega2_gc %o% 1
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = Report$Omega2_gc %o% 1
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
