@@ -5,7 +5,8 @@
 \title{Plot quantile residuals on map}
 \usage{
 plot_quantile_residuals(dharmaRes, fit,
-  file_name = "quantile_residuals_on_map", ...)
+  file_name = "quantile_residuals_on_map", Year_Set = NULL,
+  Years2Include = NULL, ...)
 }
 \arguments{
 \item{...}{arguments passed to \code{FisshStatsUtils::plot_variable}}

@@ -13,5 +13,28 @@ load_example(data_set = "EBS_pollock")
 \code{load_example} loads a catch and effort data set from multiple surveys worldwide
 }
 \details{
-Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", "covariate_example", "PESC_example_red_grouper", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
+Current options for \code{data_set} include:
+\itemize{
+\item "Chatham_rise_hake",
+\item "Iceland_cod",
+\item "WCGBTS_canary",
+\item "GSL_american_plaice",
+\item "BC_pacific_cod",
+\item "EBS_pollock",
+\item "GOA_Pcod",
+\item "GOA_pollock",
+\item "GB_spring_haddock",
+\item "GB_fall_haddock",
+\item "SAWC_jacopever",
+\item "Aleutian_islands_POP",
+\item "GOA_arrowtooth_condition_and_density",
+\item "condition_and_density",
+\item "multimodal_red_snapper",
+\item "lingcod_comp_expansion",
+\item "covariate_example",
+\item "PESC_example_red_grouper", and
+\item "ordination".
+}
+These examples are used to highlight different functionality for spatio-temporal analysis,
+as well as during integrated testing to check whether updates are backwards compatible for these examples.
 }

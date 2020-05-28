@@ -9,7 +9,7 @@ plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
   Years2Include = NULL, category_names = NULL, quiet = FALSE,
   working_dir = paste0(getwd(), "/"), MapSizeRatio, n_cells,
   plot_value = "estimate", n_samples = 100, Report, TmbData,
-  zlim = NULL, country = NULL, ...)
+  zlim = NULL, country = NULL, sample_fixed = TRUE, ...)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
@@ -57,6 +57,8 @@ plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
 \item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
 \item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
+
+\item{sample_fixed}{whether to sample fixed and random effects, \code{sample_fixed=TRUE} as by default, or just sample random effects, \code{sample_fixed=FALSE}}
 
 \item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
 }

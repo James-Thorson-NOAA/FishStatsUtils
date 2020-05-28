@@ -30,7 +30,7 @@
 plot_biomass_index <-
 function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(getwd(),"/"), PlotName="Index", interval_width=1,
   strata_names=NULL, category_names=NULL, use_biascorr=TRUE, plot_legend=TRUE, total_area_km2=NULL, plot_log=FALSE,
-  width=NULL, height=NULL, create_covariance_table=FALSE, ... ){
+  width=NULL, height=NULL, create_covariance_table=FALSE, Yrange=c(ifelse(plot_log==TRUE,NA,0),NA), ... ){
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
@@ -227,7 +227,7 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
       Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
       DirName=DirName, PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"),
       interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Index",
-      scale="log", plot_args=list("log"=ifelse(plot_log==TRUE,"y","")), "Yrange"=c(ifelse(plot_log==TRUE,NA,0),NA) )
+      scale="log", plot_args=list("log"=ifelse(plot_log==TRUE,"y","")), "Yrange"=Yrange )
   }
 
   # Plot

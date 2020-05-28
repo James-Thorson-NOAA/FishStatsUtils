@@ -4,7 +4,7 @@
 \alias{fit_model}
 \title{Fit VAST to data}
 \usage{
-fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
+fit_model(settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz = rep(0,
   length(b_i)), v_i = rep(0, length(b_i)),
   working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
   covariate_data, formula = ~0, Q_ik = NULL, newtonsteps = 1,
@@ -17,8 +17,6 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
 \item{Lat_i}{Latitude for each sample}
 
 \item{Lon_i}{Longitude for each sample}
-
-\item{t_iz}{Matrix where each row species the time for each observation i (if t_iz is a vector, it is coerced to a matrix with one column; if it is a matrix with two or more columns, it specifies multiple times for each observation, e.g., both year and season)}
 
 \item{b_i}{Sampled biomass for each observation i}
 
