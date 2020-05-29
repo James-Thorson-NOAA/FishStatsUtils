@@ -241,7 +241,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
   }
 
   # Return stuff invisibly
-  names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(L_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "Epsilon1Time1", "Omega2", "Epsilon2", "Beta2", "Epsilon1Time2")
+  names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(L_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "EpsilonTime1", "Omega2", "Epsilon2", "Beta2", "EpsilonTime2")
   Return = list("Loadings"=L_list, "Rotated_loadings"=Lprime_list, "Rotated_factors"=Psiprime_list, "Rotated_projected_factors"=Psi2prime_list, "Rotation_matrices"=Hinv_list)
   if( class(SD)=="sdreport" ){
     Return[["Loadings_SE"]] = L_SE_list
