@@ -73,14 +73,19 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   anisotropic_mesh_triangles_over_land = unlist(sp::over(map_data, posTri, returnList=TRUE))
   #plot( x=posTri@coords[,1], y=posTri@coords[,2], col=ifelse(1:n_triangles%in%triangles_over_land,"black","red") )
 
-  # Create object
-  barrier_finite_elements = INLA:::inla.barrier.fem(mesh=anisotropic_mesh,
-    barrier.triangles=anisotropic_mesh_triangles_over_land)
-  barrier_list = list(C0 = barrier_finite_elements$C[[1]],
-    C1 = barrier_finite_elements$C[[2]],
-    D0 = barrier_finite_elements$D[[1]],
-    D1 = barrier_finite_elements$D[[2]],
-    I = barrier_finite_elements$I )
+  # Create Barrier object if requested
+    # Don't do this unless necessary, because it sometimes throws an error
+  if( Method == "Barrier" ){
+    barrier_finite_elements = INLA:::inla.barrier.fem(mesh=anisotropic_mesh,
+      barrier.triangles=anisotropic_mesh_triangles_over_land)
+    barrier_list = list(C0 = barrier_finite_elements$C[[1]],
+      C1 = barrier_finite_elements$C[[2]],
+      D0 = barrier_finite_elements$D[[1]],
+      D1 = barrier_finite_elements$D[[2]],
+      I = barrier_finite_elements$I )
+  }else{
+    barrier_list = NULL
+  }
   # sp::plot( INLA::inla.barrier.polygon(anisotropic_mesh, triangles_over_land) )
 
   # Calculate Areas 
