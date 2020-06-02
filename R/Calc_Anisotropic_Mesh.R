@@ -75,10 +75,12 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   }else{
     anisotropic_mesh_triangles_over_land = vector()
   }
+  #
   #plot( x=posTri@coords[,1], y=posTri@coords[,2], col=ifelse(1:n_triangles%in%triangles_over_land,"black","red") )
 
   # Create Barrier object if requested
     # Don't do this unless necessary, because it sometimes throws an error
+  #Diagnose issues:  assign("anisotropic_mesh", anisotropic_mesh, envir = .GlobalEnv)
   barrier_finite_elements = INLA:::inla.barrier.fem(mesh=anisotropic_mesh,
     barrier.triangles=anisotropic_mesh_triangles_over_land)
   barrier_list = list(C0 = barrier_finite_elements$C[[1]],
