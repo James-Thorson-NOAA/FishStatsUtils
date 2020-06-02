@@ -365,11 +365,11 @@ summary.fit_model <- function(x, what="density", n_samples=250,
 
     # Calculate probability-integral-transform (PIT) residuals
     message( "Substituting probability-integral-transform (PIT) residuals for DHARMa-calculated residuals" )
-    prop_lessthan_i = apply( b_iz<outer(fit$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
-    prop_lessthanorequalto_i = apply( b_iz<=outer(fit$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
-    # c( "Proportion_PIT_randomized"=mean(abs(prop_lessthan_i-prop_lessthanorequalto_i)>0.00001), "Proportion_zero"=mean(fit$data_list$b_i==0) )
+    prop_lessthan_i = apply( b_iz<outer(x$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
+    prop_lessthanorequalto_i = apply( b_iz<=outer(x$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
+    # c( "Proportion_PIT_randomized"=mean(abs(prop_lessthan_i-prop_lessthanorequalto_i)>0.00001), "Proportion_zero"=mean(x$data_list$b_i==0) )
     PIT_i = runif(min=prop_lessthan_i, max=prop_lessthanorequalto_i, n=length(prop_lessthan_i) )
-    # cbind( "Difference"=dharmaRes$scaledResiduals - PIT_i, "PIT"=PIT_i, "Original"=dharmaRes$scaledResiduals, "b_i"=fit$data_list$b_i )
+    # cbind( "Difference"=dharmaRes$scaledResiduals - PIT_i, "PIT"=PIT_i, "Original"=dharmaRes$scaledResiduals, "b_i"=x$data_list$b_i )
     dharmaRes$scaledResiduals = PIT_i
 
     # do plot
