@@ -140,7 +140,11 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   latlon_i = cbind( 'Lat'=Lat_i, 'Lon'=Lon_i )
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
-  MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+  if(Method != "Stream_network"){
+    MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+  } else { 
+    MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+  }
   n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x),
     "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x), "barrier"=MeshList$anisotropic_spde$n.spde,  )
 
