@@ -134,10 +134,10 @@ latlon_to_SpatialPolygons = function( lat, lon, alpha=1 ){
   return(SpatialPolygons)
 }
 
-setwd("C:/Users/James.Thorson/Desktop/Work files/AFSC/2020-06 -- Question from Ellen")
-temp2 = read.csv("EBS_stations.csv") # Feb 2020 northern Bering Sea 6 jellyfish species
-lat = temp2$lat
-lon = temp2$long
-
-SpatialPolygons = latlon_to_SpatialPolygons( lat=lat, lon=lon, alpha=3 )
-sp::plot(SpatialPolygons)
+#setwd("C:/Users/James.Thorson/Desktop/Work files/AFSC/2020-06 -- Question from Ellen")
+#temp2 = read.csv("EBS_stations.csv") # Feb 2020 northern Bering Sea 6 jellyfish species
+#lat = temp2$lat
+#lon = temp2$long
+#
+#SpatialPolygons = latlon_to_SpatialPolygons( lat=lat, lon=lon, alpha=3 )
+#sp::plot(SpatialPolygons)
