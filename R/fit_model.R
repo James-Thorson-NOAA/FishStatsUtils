@@ -185,6 +185,13 @@ fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b
       message("\n")
       stop("Please change model structure to avoid problems with parameter estimates and then re-try; see details in `?check_fit`\n", call.=FALSE)
     }
+    #Report = tmb_list$Obj$report()
+    #ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+    #Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
+    #  "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
+    #  "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
+    #  "input_args"=input_args )
+    #return( invisible(Return) )
   }
 
   # Restart estimates after checking parameters

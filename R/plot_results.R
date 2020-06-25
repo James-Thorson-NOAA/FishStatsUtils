@@ -42,6 +42,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
+  message("\n### Creating plots in directory ", working_dir )
 
   # plot data
   message("\n### Making plots of data availability and knots")
