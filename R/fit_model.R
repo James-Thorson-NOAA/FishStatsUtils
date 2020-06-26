@@ -39,7 +39,9 @@
 #' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
-#' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}
+#' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
+#' where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
+#' passes named arguments to \code{\link[INLA]{inla.mesh.create}}.
 #'
 #' @return Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
 #' \describe{
@@ -84,7 +86,7 @@
 #' @export
 #' @md
 # Using https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html for guidance on markdown-enabled documentation
-fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(b_i)),
+fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
   Xconfig_zcp=NULL, covariate_data, formula=~0, Q_ik=NULL, newtonsteps=1,
   silent=TRUE, build_model=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
@@ -95,10 +97,10 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   extra_args = c( extra_args, extra_args$extrapolation_args, extra_args$spatial_args, extra_args$optimize_args, extra_args$model_args )
 
   # Assemble inputs
-  data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_iz, "c_iz"=c_iz )
+  data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
   # Decide which years to plot
-  year_labels = seq( min(t_iz), max(t_iz) )
-  years_to_plot = which( year_labels %in% t_iz )
+  year_labels = seq( min(t_i), max(t_i) )
+  years_to_plot = which( year_labels %in% t_i )
 
   # Save record
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
@@ -116,7 +118,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   message("\n### Making spatial information")
   spatial_args_default = list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
     Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale, knot_method=settings$knot_method)
-  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=formalArgs(make_spatial_info) )
+  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
   # Build data
@@ -125,7 +127,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
   if(missing(covariate_data)) covariate_data = NULL
   data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
-    "s_i"=spatial_list$knot_i-1, "t_iz"=t_iz, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
+    "s_i"=spatial_list$knot_i-1, "t_i"=t_i, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
     Xconfig_zcp=Xconfig_zcp, covariate_data=covariate_data, formula=formula, Q_ik=Q_ik)
   data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
   data_list = do.call( what=make_data, args=data_args_input )
@@ -183,6 +185,13 @@ fit_model = function( settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz=rep(0,length(
       message("\n")
       stop("Please change model structure to avoid problems with parameter estimates and then re-try; see details in `?check_fit`\n", call.=FALSE)
     }
+    #Report = tmb_list$Obj$report()
+    #ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+    #Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
+    #  "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
+    #  "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
+    #  "input_args"=input_args )
+    #return( invisible(Return) )
   }
 
   # Restart estimates after checking parameters
@@ -272,19 +281,39 @@ plot.fit_model <- function(x, what="results", ...)
 
 #' Extract summary of spatial estimates
 #'
-#' @title Extract spatial estimates
-#' @param x Output from \code{\link{fit_model}}
-#' @param what Boolean indicating what to summarize; only option is `density`
-#' @param ... Not used
+#' \code{summary.fit_model} extracts commonly used quantities derived from a fitted VAST model
 #'
-#' \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
+#' \code{summary.fit_model} faciliates common queries for model output including:
+#' \itemize{
+#' \item \code{what="density"} returns a tagged list containing element \code{Density_dataframe},
 #' which lists the estimated density for every Latitude-Longitude-Year-Category combination
 #' for every modelled location in the extrapolation-grid.
+#' \item \code{what="residuals"} returns a DHARMa object containing PIT residuals;
+#' See details section for more information.
+#' }
+#'
+#' For calculating residuals, the function calls package \code{\link[DHARMa]{DHARMa}}
+#' to create a diagnostic object for simulation-based quantile residuals.
+#' It specifically simulates replicated data sets from the predictive distribution of data
+#' conditional on estimated fixed and random effects. It then
+#' calculates probability-integral-transform (PIT) residuals from the observed and simulated values.
+#' It then replaces the automatically calculated residuals in the DHARMa object with these these PIT residuals,
+#' so that DHARMa can be used to plot those PIT residuals. PIT residuals are used because the original DHARMa calculations
+#' are not correct when using a delta-model (due to additional jittered values added by DHARMa when detecting multiple 0-valued observations), hence
+#' the need to call this function to correctly calculate PIT residuals for a delta-model.
+#'
+#' @inheritParams simulate_data
+#'
+#' @param x Output from \code{\link{fit_model}}
+#' @param what String indicating what to summarize; options are `density` or `residuals`
+#' @param n_samples Number of samples used when \code{what="residuals"}
+#' @param ... additional arguments passed to \code{\link[DHARMa]{plotResiduals}} when \code{what="residuals"}
 #'
 #' @return NULL
 #' @method summary fit_model
 #' @export
-summary.fit_model <- function(x, what="density", ...)
+summary.fit_model <- function(x, what="density", n_samples=250,
+  working_dir=NULL, type=1, ...)
 {
   ans = NULL
 
@@ -311,6 +340,57 @@ summary.fit_model <- function(x, what="density", ...)
     }else{
       stop( "`summary.fit_model` not implemented for the version of `VAST` being used" )
     }
+  }
+
+  # Residuals
+  if( tolower(what) == "residuals" ){
+    # extract objects
+    Obj = x$tmb_list$Obj
+    Obj$env$data$n_g = 0
+
+    # check for issues
+    if( !(type %in% c(1,4)) ){
+      warning("`type` only makes sense for 1 (measurement error) or 4 (unconditional) simulations")
+    }
+
+    b_iz = matrix(NA, nrow=length(x$data_list$b_i), ncol=n_samples)
+    message( "Sampling from the distribution of data conditional on estimated fixed and random effects" )
+    for( zI in 1:n_samples ){
+      if( zI%%max(1,floor(n_samples/10)) == 0 ){
+        message( "  Finished sample ", zI, " of ",n_samples )
+      }
+      b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type )$b_i
+    }
+    if( any(is.na(b_iz)) ){
+      stop("Check simulated residuals for NA values")
+    }
+
+    # Run DHARMa
+    dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz, # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
+      observedResponse=x$data_list$b_i,
+      integer=FALSE)
+
+    # Calculate probability-integral-transform (PIT) residuals
+    message( "Substituting probability-integral-transform (PIT) residuals for DHARMa-calculated residuals" )
+    prop_lessthan_i = apply( b_iz<outer(x$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
+    prop_lessthanorequalto_i = apply( b_iz<=outer(x$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
+    # c( "Proportion_PIT_randomized"=mean(abs(prop_lessthan_i-prop_lessthanorequalto_i)>0.00001), "Proportion_zero"=mean(x$data_list$b_i==0) )
+    PIT_i = runif(min=prop_lessthan_i, max=prop_lessthanorequalto_i, n=length(prop_lessthan_i) )
+    # cbind( "Difference"=dharmaRes$scaledResiduals - PIT_i, "PIT"=PIT_i, "Original"=dharmaRes$scaledResiduals, "b_i"=x$data_list$b_i )
+    dharmaRes$scaledResiduals = PIT_i
+
+    # do plot
+    if( is.null(working_dir) ){
+      plot(dharmaRes, ...)
+    }else if(!is.na(working_dir) ){
+      png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
+        plot(dharmaRes, ...)
+      dev.off()
+    }
+
+    # Return stuff
+    ans = dharmaRes
+    message( "Invisibly returning output from `DHARMa::createDHARMa`, e.g., to apply `plot.DHARMa` to this output")
   }
 
   if( tolower(what) %in% c("parhat","estimates") ){

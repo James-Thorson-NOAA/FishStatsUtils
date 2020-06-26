@@ -12,10 +12,12 @@
 #' @param variable_name name of variable available in report using \code{Obj$report()}
 #' @param n_samples number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.
 #' @param seed integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}
+#' @param sample_fixed whether to sample fixed and random effects, \code{sample_fixed=TRUE} as by default, or just sample random effects, \code{sample_fixed=FALSE}
 #'
 
 #' @export
-sample_variable = function( Sdreport, Obj, variable_name, n_samples=100, seed=123456 ){
+sample_variable = function( Sdreport, Obj, variable_name, n_samples=100,
+  sample_fixed=TRUE, seed=123456 ){
 
   # Informative error messages
   if( !("jointPrecision" %in% names(Sdreport)) ){
@@ -38,7 +40,15 @@ sample_variable = function( Sdreport, Obj, variable_name, n_samples=100, seed=12
   }
 
   # Sample from joint distribution
-  u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Sdreport$jointPrecision, n.sims=n_samples, seed=seed)
+  if( sample_fixed==TRUE ){
+    u_zr = rmvnorm_prec( mu=Obj$env$last.par.best, prec=Sdreport$jointPrecision, n.sims=n_samples, seed=seed)
+    # apply( u_zr, MARGIN=2, FUN=function(vec){sum(abs(vec)==Inf)})
+    # u_zr[-Obj$env$random,1]
+  }else{
+    u_zr = Obj$env$last.par.best %o% rep(1, n_samples)
+    MC = Obj$env$MC( keep=TRUE, n=n_samples, antithetic=FALSE )
+    u_zr[Obj$env$random,] = attr(MC, "samples")
+  }
 
   # Extract variable for each sample
   message( "# Obtaining samples from predictive distribution for variable ", variable_name )

@@ -3,7 +3,14 @@
 #'
 #' \code{make_spatial_info} builds a tagged list with all the spatial information needed for \code{Data_Fn}
 #'
-#' \code{fine_scale=TRUE} is a new feature starting in V8.0.0 which triggers two major changes: (1) projecting Gaussian Markov random fields from knots to sampling and extrapolation-grid locations using bilinear interpolation (i.e., piecewise linear smoothing), and (2) including density covariates individually for extrapolation-grid and sampling locations. \code{fine_scale=FALSE} is designed to be backwards compatible with earlier versions, although V8.0.0 may also require changes to input naming conventions for covariates to specify the same model and attain the same fit.
+#' \code{fine_scale=TRUE} is a new feature starting in V8.0.0 which triggers two major changes:
+#' \enumerate{
+#' \item projecting Gaussian Markov random fields from knots to sampling and extrapolation-grid locations using bilinear interpolation (i.e., piecewise linear smoothing), and
+#' \item including density covariates individually for extrapolation-grid and sampling locations.
+#' }
+#'
+#' \code{fine_scale=FALSE} is designed to be backwards compatible with earlier versions,
+#' although V8.0.0 may also require changes to input naming conventions for covariates to specify the same model and attain the same fit.
 #'
 #' \code{LON_intensity} and \code{LAT_intensity} allow users to specify locations that are used by the k-means algorithm to determine the location of knots, where e.g. users can either hard-code the desired knot locations via these inputs (using \code{n_x} greater than this number of locations), or use the extrapolation-grid to ensure that knots are located proportional to that grid.
 #'
@@ -17,7 +24,7 @@
 #' @param grid_size_km the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}
 #' @param grid_size_LL the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}
 #' @param Network_sz_LL data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"
-#' @param ... additional arguments passed to \code{INLA::inla.mesh.create}
+#' @param ... additional arguments passed to \code{\link[INLA]{inla.mesh.create}}
 #' @inheritParams Calc_Kmeans
 
 #' @return Tagged list containing objects for running a VAST model
@@ -79,7 +86,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     loc_grid = loc_grid[Which,]
     grid_num = RANN::nn2( data=loc_grid, query=loc_i, k=1)$nn.idx[,1]
   }
-  if( Method %in% c("Mesh","Grid","Stream_network") ){
+  if( Method %in% c("Mesh","Grid","Stream_network","Barrier") ){
     loc_i = project_coordinates( X=Lon_i, Y=Lat_i, projargs=Extrapolation_List$projargs )
     loc_intensity = project_coordinates( X=LON_intensity, Y=LAT_intensity, projargs=Extrapolation_List$projargs )
     colnames(loc_i) = colnames(loc_intensity) = c("E_km", "N_km")
@@ -102,7 +109,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     knot_i = grid_num
     loc_x = loc_grid
   }
-  if( Method %in% c("Mesh","Spherical_mesh") ){
+  if( Method %in% c("Mesh","Spherical_mesh","Barrier") ){
     knot_i = NN_i
     loc_x = Kmeans[["centers"]]
   }
@@ -133,8 +140,14 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   latlon_i = cbind( 'Lat'=Lat_i, 'Lon'=Lon_i )
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
-  MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
-  n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x), "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x) )
+  # Diagnose issues:  assign("Kmeans", Kmeans, envir = .GlobalEnv)
+  if(Method != "Stream_network"){
+    MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+  }else{
+    MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+  }
+  n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x),
+    "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x), "barrier"=MeshList$anisotropic_spde$n.spde,  )
 
   # Make matrices for 2D AR1 process
   Dist_grid = dist(loc_grid, diag=TRUE, upper=TRUE)
@@ -142,7 +155,7 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   M1 = as( ifelse(as.matrix(Dist_grid)==grid_size_km, 1, 0), "dgTMatrix" )
   M2 = as( ifelse(as.matrix(Dist_grid)==sqrt(2)*grid_size_km, 1, 0), "dgTMatrix" )
   if( Method=="Spherical_mesh" ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_LL)
-  if( Method %in% c("Mesh","Grid","Stream_network") ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_km)
+  if( Method %in% c("Mesh","Grid","Stream_network","Barrier") ) GridList = list("M0"=M0, "M1"=M1, "M2"=M2, "grid_size_km"=grid_size_km)
 
   # Make projection matrices
   if( fine_scale==FALSE ){

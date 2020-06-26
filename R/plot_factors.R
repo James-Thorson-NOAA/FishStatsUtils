@@ -195,7 +195,8 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         par( mfrow=Dim_factor, mar=c(2,2,1,0), oma=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.02 )
         for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ){
           if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
-            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=Year_Set, LabelPosition="Side" )
+            if(any(is.na(as.numeric(Year_Set)))) stop("Check `At` in `plot_factors(.)`")
+            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=as.numeric(Year_Set), LabelPosition="Side" )
           }else{
             plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=1:nrow(Var_rot$L_pj_rot) )
           }
@@ -240,7 +241,7 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
   }
 
   # Return stuff invisibly
-  names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(L_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "Epsilon1Time1", "Omega2", "Epsilon2", "Beta2", "Epsilon1Time2")
+  names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(L_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "EpsilonTime1", "Omega2", "Epsilon2", "Beta2", "EpsilonTime2")
   Return = list("Loadings"=L_list, "Rotated_loadings"=Lprime_list, "Rotated_factors"=Psiprime_list, "Rotated_projected_factors"=Psi2prime_list, "Rotation_matrices"=Hinv_list)
   if( class(SD)=="sdreport" ){
     Return[["Loadings_SE"]] = L_SE_list

@@ -3,7 +3,30 @@
 #'
 #' \code{load_example} loads a catch and effort data set from multiple surveys worldwide
 #'
-#' Current options for \code{data_set} include "Chatham_rise_hake", "Iceland_cod", "WCGBTS_canary", "GSL_american_plaice", "BC_pacific_cod", "EBS_pollock", "GOA_Pcod", "GOA_pollock", "GB_spring_haddock", "GB_fall_haddock", "SAWC_jacopever", "Aleutian_islands_POP", "condition_and_density", "multimodal_red_snapper", "lingcod_comp_expansion", "covariate_example", "PESC_example_red_grouper", and "ordination".  These examples are used to highlight different functionality for spatio-temporal packages, as well as during automated testing of backwards compatibility.
+#' Current options for \code{data_set} include:
+#' \itemize{
+#' \item "Chatham_rise_hake",
+#' \item "Iceland_cod",
+#' \item "WCGBTS_canary",
+#' \item "GSL_american_plaice",
+#' \item "BC_pacific_cod",
+#' \item "EBS_pollock",
+#' \item "GOA_Pcod",
+#' \item "GOA_pollock",
+#' \item "GB_spring_haddock",
+#' \item "GB_fall_haddock",
+#' \item "SAWC_jacopever",
+#' \item "Aleutian_islands_POP",
+#' \item "GOA_arrowtooth_condition_and_density",
+#' \item "condition_and_density",
+#' \item "multimodal_red_snapper",
+#' \item "lingcod_comp_expansion",
+#' \item "covariate_example",
+#' \item "PESC_example_red_grouper", and
+#' \item "ordination".
+#' }
+#' These examples are used to highlight different functionality for spatio-temporal analysis,
+#' as well as during integrated testing to check whether updates are backwards compatible for these examples.
 #'
 #' @param data_set data set to load
 #'
@@ -24,6 +47,7 @@ load_example = function( data_set="EBS_pollock" ){
                    "sawc_jacopever" = tolower("South_Africa"),
                    "aleutian_islands_pop" = tolower("Aleutian_Islands"),
                    "condition_and_density" = tolower("Eastern_Bering_Sea"),
+                   "goa_arrowtooth_condition_and_density" = tolower("Gulf_of_Alaska"),
                    "multimodal_red_snapper" = tolower("Gulf_of_Mexico"),
                    "lingcod_comp_expansion" = tolower("California_current"),
                    "ordination" = tolower("Eastern_Bering_Sea"),
@@ -104,7 +128,12 @@ load_example = function( data_set="EBS_pollock" ){
   }
   if( tolower(data_set) %in% tolower("condition_and_density") ){
     data( condition_and_density_example, package="FishStatsUtils" )
-    sampling_data = data.frame( "Category"=condition_and_density_example[,'Category'], "Response_variable"=condition_and_density_example[,'Response_variable'], "Year"=condition_and_density_example[,'Year'], "Vessel"=1, "AreaSwept_km2"=condition_and_density_example[,'AreaSwept'], "Lat"=condition_and_density_example[,'Lat'], "Lon"=condition_and_density_example[,'Lon'], 'logLength_lncm'=condition_and_density_example[,'logLength_lncm'] )
+    sampling_data = condition_and_density_example
+    strata.limits = data.frame('STRATA'="All_areas")
+  }
+  if( tolower(data_set) %in% tolower("GOA_arrowtooth_condition_and_density") ){
+    data( GOA_arrowtooth_condition_and_density, package="FishStatsUtils" )
+    sampling_data = GOA_arrowtooth_condition_and_density
     strata.limits = data.frame('STRATA'="All_areas")
   }
   if( tolower(data_set) %in% tolower("multimodal_red_snapper") ){
@@ -145,7 +174,7 @@ load_example = function( data_set="EBS_pollock" ){
     strata.limits = example$strata.limits
     input_grid = example$input_grid
   }
-  sampling_data = na.omit( sampling_data )
+  #sampling_data = na.omit( sampling_data )
 
   Return = list("sampling_data"=sampling_data, "Region"=region, "strata.limits"=strata.limits)
   if( !is.null(X_xtp)) Return[["X_xtp"]] = X_xtp

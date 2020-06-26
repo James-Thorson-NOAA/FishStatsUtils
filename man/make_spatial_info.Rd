@@ -42,7 +42,7 @@ make_spatial_info(n_x, Lon_i, Lat_i, Extrapolation_List,
 
 \item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
 
-\item{...}{additional arguments passed to \code{INLA::inla.mesh.create}}
+\item{...}{additional arguments passed to \code{\link[INLA]{inla.mesh.create}}}
 }
 \value{
 Tagged list containing objects for running a VAST model
@@ -61,7 +61,14 @@ Tagged list containing objects for running a VAST model
 \code{make_spatial_info} builds a tagged list with all the spatial information needed for \code{Data_Fn}
 }
 \details{
-\code{fine_scale=TRUE} is a new feature starting in V8.0.0 which triggers two major changes: (1) projecting Gaussian Markov random fields from knots to sampling and extrapolation-grid locations using bilinear interpolation (i.e., piecewise linear smoothing), and (2) including density covariates individually for extrapolation-grid and sampling locations. \code{fine_scale=FALSE} is designed to be backwards compatible with earlier versions, although V8.0.0 may also require changes to input naming conventions for covariates to specify the same model and attain the same fit.
+\code{fine_scale=TRUE} is a new feature starting in V8.0.0 which triggers two major changes:
+\enumerate{
+\item projecting Gaussian Markov random fields from knots to sampling and extrapolation-grid locations using bilinear interpolation (i.e., piecewise linear smoothing), and
+\item including density covariates individually for extrapolation-grid and sampling locations.
+}
+
+\code{fine_scale=FALSE} is designed to be backwards compatible with earlier versions,
+although V8.0.0 may also require changes to input naming conventions for covariates to specify the same model and attain the same fit.
 
 \code{LON_intensity} and \code{LAT_intensity} allow users to specify locations that are used by the k-means algorithm to determine the location of knots, where e.g. users can either hard-code the desired knot locations via these inputs (using \code{n_x} greater than this number of locations), or use the extrapolation-grid to ensure that knots are located proportional to that grid.
 }

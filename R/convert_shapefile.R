@@ -24,6 +24,9 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), proj
   make_plots=FALSE, quiet=TRUE, area_tolerance=0.05, ... ){
 
   shapefile_orig = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
+  if( !(shapefile_orig@class %in% c("SpatialPolygonsDataFrame","SpatialPolygons")) ){
+    warning( "object at `file_path` doesn't appear to be a shapefile")
+  }
   proj_orig = "+proj=longlat +ellps=WGS84 +no_defs"
   shapefile_orig = sp::spTransform(shapefile_orig, CRSobj=sp::CRS(proj_orig) )
   #shapefile_orig@proj4string = sp::CRS(proj_orig)
@@ -35,6 +38,12 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), proj
     projargs = projargs_utm
   }
   shapefile_proj = sp::spTransform(shapefile_orig, CRSobj=sp::CRS(projargs) )
+
+  # Check for total area
+  Total_area = sum(raster::area(shapefile_proj))
+  if( Total_area < 100 ){
+    warning("Total area for polygons in shapefile is ", Total_area, " km^2 and this might indicate an issue with identifying or specifying the projection" )
+  }
 
   # Determine bounds for box
   bbox = shapefile_proj@bbox

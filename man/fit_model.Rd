@@ -4,7 +4,7 @@
 \alias{fit_model}
 \title{Fit VAST to data}
 \usage{
-fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
+fit_model(settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz = rep(0,
   length(b_i)), v_i = rep(0, length(b_i)),
   working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
   covariate_data, formula = ~0, Q_ik = NULL, newtonsteps = 1,
@@ -17,8 +17,6 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
 \item{Lat_i}{Latitude for each sample}
 
 \item{Lon_i}{Longitude for each sample}
-
-\item{t_iz}{Matrix where each row species the time for each observation i (if t_iz is a vector, it is coerced to a matrix with one column; if it is a matrix with two or more columns, it specifies multiple times for each observation, e.g., both year and season)}
 
 \item{b_i}{Sampled biomass for each observation i}
 
@@ -50,7 +48,9 @@ fit_model(settings, Lat_i, Lon_i, t_iz, b_i, a_i, c_iz = rep(0,
 
 \item{test_fit}{Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
 
-\item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}}, where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}}
+\item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
+where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
+passes named arguments to \code{\link[INLA]{inla.mesh.create}}.}
 }
 \value{
 Object of class \code{fit_model}, containing formatted inputs and outputs from VAST

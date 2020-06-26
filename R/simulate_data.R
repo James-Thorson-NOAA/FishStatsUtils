@@ -5,9 +5,19 @@
 #' @description
 #' \code{simulate_data} conducts a parametric bootstrap to simulate new data and potentially simulate new population dynamics and associated variables
 #'
+#' Simulate new data given various potential procedures to propagate uncertainty about parameters.
+#' \itemize{
+#' \item \code{type=1} is a "measurement error" or "conditional" simulator that simulates new data conditional upon estimated fixed and random effects.
+#' \item \code{type=2} is an "unconditional" simulator that simulates new random effects conditional upon fixed effects
+#' (but not otherwise conditioning upon original data), and new data conditional upon both.
+#' \item \code{type=3} simulates new fixed and random effects from the joint precision matrix (i.e., conditioning upon the original data), and new data conditional upon these values.
+#' \item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
+#' and new data conditional upon these values.
+#' }
+#'
 #' @param fit output form \code{fit_model(.)}
-#' @param type integer stating what type of simulation to use.  \code{type=1} simulates new data conditional upon estimated fixed and random effects.  \code{type=2} simulates new random effects conditional upon fixed effects, and new data conditional upon both.  \code{type=3} simulates new fixed and random effects from the joint precision matrix, and new data conditional upon these values.
-#' @param random_seed integer passed to \code{\link[base]{set.seed}} whenever \code{type=3}, where the default value \code{random_seed=NULL} resets the random-number seed. Argument no effect when \code{type!=3} because TMB has no interface for setting the random-number seed in C++
+#' @param type integer stating what type of simulation to use. See details for description.
+#' @param random_seed integer passed to \code{\link[base]{set.seed}}, where the default value \code{random_seed=NULL} resets the random-number seed.
 #'
 
 #' @return Report object containing new data and population variables including
@@ -31,25 +41,35 @@ simulate_data = function( fit, type=1, random_seed=NULL ){
     return(mu + z)
   }
 
+  # Check for loaded VAST
+  # Modified from TMB:::getUserDLL
+  dlls <- getLoadedDLLs()
+  isTMBdll <- function(dll) !is(try(getNativeSymbolInfo("MakeADFunObject",dll), TRUE), "try-error")
+  TMBdll <- sapply(dlls, isTMBdll)
+  if( sum(TMBdll)!=1 ){
+    stop("VAST is not linked as a DLL, so `simulate_data` will not work.
+    Please re-run model (potentially from informative starting values to save time) to use `simulate_data`")
+  }
+
   # Extract stuff
   Obj = fit$tmb_list$Obj
-  if( !is.null(random_seed) & type!=3 ){
-    stop("Specifying argument `random_seed` in `simulate_data(.) only works when `type=3`")
-  }
 
   # Simulate conditional upon fixed and random effect estimates
   if( type==1 ){
     Obj$env$data$Options_list$Options['simulate_random_effects'] = FALSE
+    set.seed(random_seed)
     Return = Obj$simulate( complete=TRUE )
   }
 
   # Simulate new random effects and data
   if( type==2 ){
     Obj$env$data$Options_list$Options['simulate_random_effects'] = TRUE
+    set.seed(random_seed)
     Return = Obj$simulate( complete=TRUE )
   }
 
-  # Simulate from predictive distribution, and then new data
+  # Simulate from predictive distribution of fixed AND random effects, and then new data
+  # Could instead explore fit$tmb_list$Obj$env$MC(.) for sampling-importance-resampling approach
   if( type==3 ){
     # Informative error messages
     if( !("jointPrecision" %in% names(fit$parameter_estimates$SD)) ){
@@ -58,6 +78,22 @@ simulate_data = function( fit, type=1, random_seed=NULL ){
 
     # Sample from joint distribution
     newpar = rmvnorm_prec( mu=Obj$env$last.par.best, prec=fit$parameter_estimates$SD$jointPrecision, n.sims=1, random_seed=random_seed )[,1]
+
+    # Simulate
+    Obj$env$data$Options_list$Options['simulate_random_effects'] = FALSE
+    Return = Obj$simulate( par=newpar, complete=TRUE )
+  }
+
+  # Simulate from predictive distribution of random effects and NOT fixed effects, and then new data
+  if( type==4 ){
+    set.seed( random_seed )
+    warning( "Type-4 residuals are still under development, please use with care and note that they may change at any point.")
+    newpar = Obj$env$last.par.best
+    #Hess = Obj$env$spHess( par=Obj$env$last.par.best, random=TRUE )
+    #newrandom = rmvnorm_prec( mu=rep(0,nrow(Hess)), prec=Hess, n.sims=1, random_seed=random_seed )[,1]
+    #newpar[Obj$env$random] = newrandom
+    MC = Obj$env$MC( keep=TRUE, n=1, antithetic=FALSE )
+    newpar[Obj$env$random] = attr(MC, "samples")
 
     # Simulate
     Obj$env$data$Options_list$Options['simulate_random_effects'] = FALSE

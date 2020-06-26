@@ -5,7 +5,7 @@
 \title{Make mesh for distances among points}
 \usage{
 Calc_Anisotropic_Mesh(loc_x, loc_g, loc_i, Method, Extrapolation_List,
-  anisotropic_mesh = NULL, refine = FALSE, fine_scale = FALSE, ...)
+  anisotropic_mesh = NULL, fine_scale = FALSE, ...)
 }
 \arguments{
 \item{loc_x}{location (eastings and northings in kilometers, UTM) for each sample or knot}
@@ -13,8 +13,6 @@ Calc_Anisotropic_Mesh(loc_x, loc_g, loc_i, Method, Extrapolation_List,
 \item{Method}{spatial method determines ("Mesh" and "Grid" give}
 
 \item{anisotropic_mesh}{OPTIONAL, anisotropic mesh (if missing, its recalculated from loc_x)}
-
-\item{refine}{OPTIONAL, specify whether to add additional points (beyond loc_x and minimal boundary knots)}
 
 \item{...}{Arguments passed to \code{INLA::inla.mesh.create}}
 }
