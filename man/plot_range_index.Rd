@@ -4,14 +4,23 @@
 \alias{plot_range_index}
 \title{Plot shifts in distribution and area occupied}
 \usage{
-plot_range_index(Sdreport, Report, TmbData, Year_Set = NULL,
-  Years2Include = NULL, strata_names = NULL,
-  PlotDir = paste0(getwd(), "/"), FileName_COG = paste0(PlotDir,
-  "/center_of_gravity.png"), FileName_Area = paste0(PlotDir,
-  "/Area.png"), FileName_EffArea = paste0(PlotDir,
-  "/Effective_Area.png"), Znames = rep("", ncol(TmbData$Z_xm)),
-  use_biascorr = TRUE, category_names = NULL, interval_width = 1,
-  ...)
+plot_range_index(
+  Sdreport,
+  Report,
+  TmbData,
+  Year_Set = NULL,
+  Years2Include = NULL,
+  strata_names = NULL,
+  PlotDir = paste0(getwd(), "/"),
+  FileName_COG = paste0(PlotDir, "/center_of_gravity.png"),
+  FileName_Area = paste0(PlotDir, "/Area.png"),
+  FileName_EffArea = paste0(PlotDir, "/Effective_Area.png"),
+  Znames = rep("", ncol(TmbData$Z_xm)),
+  use_biascorr = TRUE,
+  category_names = NULL,
+  interval_width = 1,
+  ...
+)
 }
 \arguments{
 \item{Sdreport}{TMB output from `TMB::sdreport(Obj)`}

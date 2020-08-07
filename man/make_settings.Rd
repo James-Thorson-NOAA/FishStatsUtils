@@ -4,12 +4,28 @@
 \alias{make_settings}
 \title{Make list of settings}
 \usage{
-make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
-  strata.limits = data.frame(STRATA = "All_areas"), zone = NA,
-  FieldConfig, RhoConfig, OverdispersionConfig, ObsModel, bias.correct,
-  Options, use_anisotropy, vars_to_correct, Version,
-  treat_nonencounter_as_zero, n_categories, VamConfig, max_cells,
-  knot_method)
+make_settings(
+  n_x,
+  Region,
+  purpose = "index",
+  fine_scale = TRUE,
+  strata.limits = data.frame(STRATA = "All_areas"),
+  zone = NA,
+  FieldConfig,
+  RhoConfig,
+  OverdispersionConfig,
+  ObsModel,
+  bias.correct,
+  Options,
+  use_anisotropy,
+  vars_to_correct,
+  Version,
+  treat_nonencounter_as_zero,
+  n_categories,
+  VamConfig,
+  max_cells,
+  knot_method
+)
 }
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
@@ -24,7 +40,10 @@ make_settings(n_x, Region, purpose = "index", fine_scale = TRUE,
 
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 
-\item{FieldConfig}{a vector of format c("Omega1"=0, "Epsilon1"=10, "Omega2"="AR1", "Epsilon2"=10), where Omega refers to spatial variation, Epsilon refers to spatio-temporal variation, Omega1 refers to variation in encounter probability, and Omega2 refers to variation in positive catch rates, where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance}
+\item{FieldConfig}{a vector of format c("Omega1"=0, "Epsilon1"=10, "Omega2"="AR1", "Epsilon2"=10), where Omega refers to spatial variation,
+Epsilon refers to spatio-temporal variation, Omega1 refers to variation in encounter probability, and
+Omega2 refers to variation in positive catch rates, where 0 is off, "AR1" is an AR1 process,
+and >0 is the number of elements in a factor-analysis covariance}
 
 \item{RhoConfig}{vector of form c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0) specifying whether either intercepts (Beta1 and Beta2) or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals (0: each year as fixed effect; 1: each year as random following IID distribution; 2: each year as random following a random walk; 3: constant among years as fixed effect; 4: each year as random following AR1 process);  If missing, assumed to be zero for each element}
 
@@ -63,9 +82,10 @@ Tagged list containing default settings for a given purpose, use \code{names} on
 This function assembles a default set of user-decisions for a specified modelling purpose. The default settings are guessed based on generic guidance, and should be carefully reviewed for real-world purposes. If the user supplies values for individual settings e.g. \code{FieldConfig}, then these values override the defaults that are provided by interpreting \code{purpose}
 }
 \seealso{
-\code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+\code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 
-Other wrapper functions: \code{\link{fit_model}},
-  \code{\link{plot_results}}
+Other wrapper functions: 
+\code{\link{fit_model}()},
+\code{\link{plot_results}()}
 }
 \concept{wrapper functions}

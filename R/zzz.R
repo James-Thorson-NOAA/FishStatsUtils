@@ -1,6 +1,6 @@
 
-#.onLoad <- function(libname, pkgname) {
-#}
+# .onLoad <- function(libname, pkgname) {
+# }
 
 .onAttach <- function(libname, pkgname) {
   if( getOption("repos")["CRAN"] == "@CRAN@" ){
@@ -45,5 +45,28 @@ Rotate_Fn = function( ... ){
   .Deprecated( new="FishStatsUtils::rotate_factors" )
   FishStatsUtils::rotate_factors( ... )
 }
+
+#' Copy of FishStatsUtils::make_mesh
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::make_mesh} to see list of arguments and usage
+#' @export
+Calc_Anisotropic_Mesh = function( ... ){
+  .Deprecated( new="FishStatsUtils::make_mesh" )
+  FishStatsUtils::make_mesh( ... )
+}
+
+#' Copy of FishStatsUtils::make_kmeans
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::make_kmeans} to see list of arguments and usage
+#' @export
+Calc_Kmeans = function( ... ){
+  .Deprecated( new="FishStatsUtils::make_kmeans" )
+  FishStatsUtils::make_kmeans( ... )
+}
+
 
 

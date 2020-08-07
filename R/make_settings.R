@@ -19,7 +19,7 @@
 #' @return Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.
 #'
 #' @family wrapper functions
-#' @seealso \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+#' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 #'
 #' @export
 make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,

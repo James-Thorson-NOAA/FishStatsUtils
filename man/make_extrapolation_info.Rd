@@ -4,17 +4,31 @@
 \alias{make_extrapolation_info}
 \title{Build extrapolation grid}
 \usage{
-make_extrapolation_info(Region, projargs = NA, zone = NA,
+make_extrapolation_info(
+  Region,
+  projargs = NA,
+  zone = NA,
   strata.limits = data.frame(STRATA = "All_areas"),
-  create_strata_per_region = FALSE, max_cells = NULL,
-  input_grid = NULL, observations_LL = NULL, grid_dim_km = c(2, 2),
-  maximum_distance_from_sample = NULL, grid_in_UTM = TRUE,
-  grid_dim_LL = c(0.1, 0.1), region = c("south_coast", "west_coast"),
+  create_strata_per_region = FALSE,
+  max_cells = NULL,
+  input_grid = NULL,
+  observations_LL = NULL,
+  grid_dim_km = c(2, 2),
+  maximum_distance_from_sample = NULL,
+  grid_in_UTM = TRUE,
+  grid_dim_LL = c(0.1, 0.1),
+  region = c("south_coast", "west_coast"),
   strata_to_use = c("SOG", "WCVI", "QCS", "HS", "WCHG"),
-  epu_to_use = c("All", "Georges_Bank", "Mid_Atlantic_Bight",
-  "Scotian_Shelf", "Gulf_of_Maine", "Other")[1], survey = "Chatham_rise",
-  surveyname = "propInWCGBTS", flip_around_dateline, nstart = 100,
-  area_tolerance = 0.05, ...)
+  epu_to_use = c("All", "Georges_Bank", "Mid_Atlantic_Bight", "Scotian_Shelf",
+    "Gulf_of_Maine", "Other")[1],
+  survey = "Chatham_rise",
+  surveyname = "propInWCGBTS",
+  flip_around_dateline,
+  nstart = 100,
+  area_tolerance = 0.05,
+  backwards_compatible_kmeans = FALSE,
+  ...
+)
 }
 \arguments{
 \item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile}
@@ -54,6 +68,10 @@ make_extrapolation_info(Region, projargs = NA, zone = NA,
 \item{flip_around_dateline}{used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used}
 
 \item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
+
+\item{backwards_compatible_kmeans}{a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
+where \code{backwards_compatible_kmeans==TRUE} modifies the default algorithm to maintain backwards compatibility, and
+where \code{backwards_compatible_kmeans==FALSE} breaks backwards compatibility between R versions prior to and after R 3.6.0.}
 
 \item{...}{other objects passed for individual regions (see example script)}
 }

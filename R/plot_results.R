@@ -28,7 +28,7 @@
 #' }
 #'
 #' @family wrapper functions
-#' @seealso \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+#' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 #'
 #' @export
 plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),

@@ -4,10 +4,21 @@
 \alias{plot_residuals}
 \title{Plot Pearson residuals on map}
 \usage{
-plot_residuals(Lat_i, Lon_i, TmbData, Report, Q,
-  projargs = "+proj=longlat", working_dir = paste0(getwd(), "/"),
-  spatial_list, extrapolation_list, Year_Set = NULL,
-  Years2Include = NULL, zrange, ...)
+plot_residuals(
+  Lat_i,
+  Lon_i,
+  TmbData,
+  Report,
+  Q,
+  projargs = "+proj=longlat",
+  working_dir = paste0(getwd(), "/"),
+  spatial_list,
+  extrapolation_list,
+  Year_Set = NULL,
+  Years2Include = NULL,
+  zrange,
+  ...
+)
 }
 \arguments{
 \item{Lat_i}{Latitude for every observation \code{i}}

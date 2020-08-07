@@ -4,11 +4,23 @@
 \alias{plot_factors}
 \title{Plot factor-decomposition of covariance}
 \usage{
-plot_factors(Report, ParHat, Data, SD = NULL, Year_Set = NULL,
-  category_names = NULL, RotationMethod = "PCA",
-  mapdetails_list = NULL, Dim_year = NULL, Dim_species = NULL,
-  plotdir = paste0(getwd(), "/"), land_color = "grey", zlim = NA,
-  testcutoff = 1e-04, ...)
+plot_factors(
+  Report,
+  ParHat,
+  Data,
+  SD = NULL,
+  Year_Set = NULL,
+  category_names = NULL,
+  RotationMethod = "PCA",
+  mapdetails_list = NULL,
+  Dim_year = NULL,
+  Dim_species = NULL,
+  plotdir = paste0(getwd(), "/"),
+  land_color = "grey",
+  zlim = NA,
+  testcutoff = 1e-04,
+  ...
+)
 }
 \arguments{
 \item{Report}{output report, e.g., from \code{Report <- obj$report()}}

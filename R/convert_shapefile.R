@@ -5,7 +5,7 @@
 #' \code{convert_shapefile} reads in a shapefile and creates an extrapolation with a chosen resolution
 #'
 #' @inheritParams sp::CRS
-#' @inheritParams make_extraploation_info
+#' @inheritParams make_extrapolation_info
 #'
 #' @param file_path path for shapefile on harddrive
 #' @param make_plots Boolean indicating whether to visualize inputs and outputs as maps

@@ -4,11 +4,19 @@
 \alias{Rerun_Fn}
 \title{Explore counter-factual scenario}
 \usage{
-Rerun_Fn(parhat0, turnoff_pars, loc_x,
+Rerun_Fn(
+  parhat0,
+  turnoff_pars,
+  loc_x,
   cov_to_turnoff = 1:dim(parhat0[["gamma2_ctp"]])[3],
-  calculate_COG = TRUE, figname = NULL, Map = "generate",
-  MapDetails_List = NULL, year_set = 1:ncol(parhat0[["beta1_ct"]]),
-  c_set = 1:nrow(parhat0[["beta1_ct"]]), ...)
+  calculate_COG = TRUE,
+  figname = NULL,
+  Map = "generate",
+  MapDetails_List = NULL,
+  year_set = 1:ncol(parhat0[["beta1_ct"]]),
+  c_set = 1:nrow(parhat0[["beta1_ct"]]),
+  ...
+)
 }
 \arguments{
 \item{parhat0}{parameter values to use by default (presumably maximum-likelihood estimates)}

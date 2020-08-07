@@ -4,11 +4,23 @@
 \alias{plot_range_edge}
 \title{Plot shifts in range edges}
 \usage{
-plot_range_edge(Sdreport, Obj, Year_Set = NULL, Years2Include = NULL,
-  strata_names = NULL, category_names = NULL,
-  working_dir = paste0(getwd(), "/"), quantiles = c(0.05, 0.95),
-  n_samples = 100, interval_width = 1, width = NULL, height = NULL,
-  calculate_relative_to_average = FALSE, seed = 123456, ...)
+plot_range_edge(
+  Sdreport,
+  Obj,
+  Year_Set = NULL,
+  Years2Include = NULL,
+  strata_names = NULL,
+  category_names = NULL,
+  working_dir = paste0(getwd(), "/"),
+  quantiles = c(0.05, 0.95),
+  n_samples = 100,
+  interval_width = 1,
+  width = NULL,
+  height = NULL,
+  calculate_relative_to_average = FALSE,
+  seed = 123456,
+  ...
+)
 }
 \arguments{
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}

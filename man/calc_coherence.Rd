@@ -4,8 +4,12 @@
 \alias{calc_coherence}
 \title{Calculate stability metrics}
 \usage{
-calc_coherence(Report, Data, covhat = NULL, yearbounds_zz = matrix(c(1,
-  Data$n_t), nrow = 1))
+calc_coherence(
+  Report,
+  Data,
+  covhat = NULL,
+  yearbounds_zz = matrix(c(1, Data$n_t), nrow = 1)
+)
 }
 \arguments{
 \item{Report}{output report, e.g., from \code{Report <- obj$report()}}

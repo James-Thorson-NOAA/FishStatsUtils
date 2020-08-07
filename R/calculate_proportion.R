@@ -4,9 +4,9 @@
 #'
 #' \code{calculate_proportion} takes output from a VAST run and calculates the proportion of biomass in different categories
 #'
-#' @param Index output from \code{FishStatsUtils::plot_biomass_index}
 #' @inheritParams plot_biomass_index
 #' @inheritParams VAST::make_data
+#' @param Index output from \code{FishStatsUtils::plot_biomass_index}
 #' @param ... list of arguments to pass to \code{plot_index}
 #'
 #' @return Tagged list of output

@@ -4,8 +4,14 @@
 \alias{sample_variable}
 \title{Sample from predictive distribution of a variable}
 \usage{
-sample_variable(Sdreport, Obj, variable_name, n_samples = 100,
-  sample_fixed = TRUE, seed = 123456)
+sample_variable(
+  Sdreport,
+  Obj,
+  variable_name,
+  n_samples = 100,
+  sample_fixed = TRUE,
+  seed = 123456
+)
 }
 \arguments{
 \item{Sdreport}{TMB output from `\code{TMB::sdreport(Obj)}`}

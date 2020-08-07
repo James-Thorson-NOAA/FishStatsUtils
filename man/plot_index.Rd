@@ -4,15 +4,34 @@
 \alias{plot_index}
 \title{Plot an index}
 \usage{
-plot_index(Index_ctl, sd_Index_ctl = array(0, dim(Index_ctl)),
-  Year_Set = NULL, Years2Include = NULL, strata_names = NULL,
-  category_names = NULL, scale = "uniform", plot_legend = NULL,
-  DirName = paste0(getwd(), "/"), PlotName = "Index.png",
-  interval_width = 1, width = NULL, height = NULL, xlab = "Year",
-  ylab = "Index", bounds_type = "whiskers", col = NULL,
-  col_bounds = NULL, Yrange = c(0, NA), type = "b",
-  plot_lines_args = list(), plot_args = list(),
-  SampleSize_ctz = NULL, Y2range = c(0, NA), y2lab = "", ...)
+plot_index(
+  Index_ctl,
+  sd_Index_ctl = array(0, dim(Index_ctl)),
+  Year_Set = NULL,
+  Years2Include = NULL,
+  strata_names = NULL,
+  category_names = NULL,
+  scale = "uniform",
+  plot_legend = NULL,
+  DirName = paste0(getwd(), "/"),
+  PlotName = "Index.png",
+  interval_width = 1,
+  width = NULL,
+  height = NULL,
+  xlab = "Year",
+  ylab = "Index",
+  bounds_type = "whiskers",
+  col = NULL,
+  col_bounds = NULL,
+  Yrange = c(0, NA),
+  type = "b",
+  plot_lines_args = list(),
+  plot_args = list(),
+  SampleSize_ctz = NULL,
+  Y2range = c(0, NA),
+  y2lab = "",
+  ...
+)
 }
 \arguments{
 \item{Index_ctl}{A matrix or array of time-series estimates for multiple categories \code{c}, years \code{t}, and strata \code{l}}

@@ -4,12 +4,33 @@
 \alias{fit_model}
 \title{Fit VAST to data}
 \usage{
-fit_model(settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz = rep(0,
-  length(b_i)), v_i = rep(0, length(b_i)),
-  working_dir = paste0(getwd(), "/"), Xconfig_zcp = NULL,
-  covariate_data, formula = ~0, Q_ik = NULL, newtonsteps = 1,
-  silent = TRUE, build_model = TRUE, run_model = TRUE,
-  test_fit = TRUE, ...)
+fit_model(
+  settings,
+  Lat_i,
+  Lon_i,
+  t_i,
+  b_i,
+  a_i,
+  c_iz = rep(0, length(b_i)),
+  v_i = rep(0, length(b_i)),
+  working_dir = paste0(getwd(), "/"),
+  X1config_cp = NULL,
+  X2config_cp = NULL,
+  covariate_data,
+  X1_formula = ~0,
+  X2_formula = ~0,
+  Q1config_k = NULL,
+  Q2config_k = NULL,
+  catchability_data,
+  Q1_formula = ~0,
+  Q2_formula = ~0,
+  newtonsteps = 1,
+  silent = TRUE,
+  build_model = TRUE,
+  run_model = TRUE,
+  test_fit = TRUE,
+  ...
+)
 }
 \arguments{
 \item{settings}{Output from \code{\link{make_settings}}}
@@ -18,27 +39,47 @@ fit_model(settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz = rep(0,
 
 \item{Lon_i}{Longitude for each sample}
 
-\item{b_i}{Sampled biomass for each observation i}
+\item{t_i}{Time for each observation i}
 
-\item{a_i}{Sampled area for each observation i}
+\item{b_i}{Sampled value (biomass, counts, etc.) for each observation i}
+
+\item{a_i}{Sampled area for each observation i;  use \code{a_i=1} for observations without a natural area measurement, while
+noting that resulting densities no longer have interpretable units in that case)}
 
 \item{c_iz}{Category (e.g., species, length-bin) for each observation i}
 
-\item{v_i}{sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i (by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
+\item{v_i}{sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
+(by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
 
-\item{Xconfig_zcp}{OPTIONAL, 3D array of settings for each dynamic density covariate, where the first dimension corresponds to 1st or 2nd linear predictors, second dimension corresponds to model category, and third dimension corresponds to each density covariate
+\item{X1config_cp}{matrix of settings for each density covariate for the 1st lienar predictor,
+       where the row corresponds to model category, and column corresponds to each density covariate
 \describe{
-  \item{Xconfig_zcp[z,c,p]=0}{\code{X_itp[,,p]} has no effect on linear predictor z for category c}
-  \item{Xconfig_zcp[z,c,p]=1}{\code{X_itp[,,p]} has a linear effect on linear predictor z for category c}
-  \item{Xconfig_zcp[z,c,p]=2}{\code{X_itp[,,p]} has a spatially varying, zero-centered linear effect on linear predictor z for category c}
-  \item{Xconfig_zcp[z,c,p]=3}{\code{X_itp[,,p]} has a spatially varying linear effect on linear predictor z for category c}
+  \item{X1config_cp[c,p]=0}{\code{X_ip[,p]} has no effect on the 1st linear predictor for category c}
+  \item{X1config_cp[c,p]=1}{\code{X_ip[,p]} has a linear effect on 1st linear predictor for category c}
+  \item{X1config_cp[c,p]=2}{\code{X_ip[,p]} has a spatially varying, zero-centered linear effect on 1st linear predictor for category c}
+  \item{X1config_cp[c,p]=3}{\code{X_ip[,p]} has a spatially varying linear effect on 1st linear predictor for category c}
+  \item{X1config_cp[c,p]=-1}{\code{X1config_cp[c,p]=-1} is the same as \code{X1config_cp[c,p]=2}, but without including the log-likelihood term; this is useful in special cases when carefully mirroring spatially varying coefficients, e.g., to use cohort effects in a age-structured spatio-temporal model}
 }}
+
+\item{X2config_cp}{Same as argument \code{X1config_cp} but for 2nd linear predictor}
 
 \item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)}
 
-\item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}}
+\item{X1_formula}{right-sided formula affecting the 1st linear predictor for density, e.g.,
+\code{X1_formula=~BOT_DEPTH+BOT_DEPTH^2} for a quadratic effect of variable \code{BOT_DEPTH}}
 
-\item{Q_ik}{matrix of catchability covariates (e.g., measured variables affecting catch rates but not caused by variation in species density) for each observation i}
+\item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for density}
+
+\item{Q1config_k}{Same as argument \code{X1config_cp} but affecting affecting the 1st linear predictor for catchability,
+and note that it is a vector (instead of matrix) given the more flexible form for catchability covariates}
+
+\item{Q2config_k}{Same as argument \code{Q1config_cp} but affecting affecting the 2nd linear predictor for catchability}
+
+\item{catchability_data}{data-frame of covariates for use when specifying \code{Q1_formula} and \code{Q2_formula}}
+
+\item{Q1_formula}{same as \code{X1_formula} but affecting the 1st linear predictor for catchability (a.k.a. detectability)}
+
+\item{Q2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for catchability (a.k.a. detectability)}
 
 \item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
 
@@ -107,14 +148,20 @@ library(VAST)
 example = load_example( data_set="EBS_pollock" )
 
 # Make settings
-settings = make_settings( n_x=50, Region=example$Region, purpose="index",
-  strata.limits=example$strata.limits )
+settings = make_settings( n_x=50,
+         Region=example$Region,
+         purpose="index",
+         strata.limits=example$strata.limits )
 
 # Run model
-fit = fit_model( "settings"=settings, "Lat_i"=example$sampling_data[,'Lat'],
-  "Lon_i"=example$sampling_data[,'Lon'], "t_i"=example$sampling_data[,'Year'],
-  "c_i"=rep(0,nrow(example$sampling_data)), "b_i"=example$sampling_data[,'Catch_KG'],
-  "a_i"=example$sampling_data[,'AreaSwept_km2'], "v_i"=example$sampling_data[,'Vessel'] )
+fit = fit_model( "settings"=settings,
+    "Lat_i"=example$sampling_data[,'Lat'],
+    "Lon_i"=example$sampling_data[,'Lon'],
+    "t_i"=example$sampling_data[,'Year'],
+    "c_i"=rep(0,nrow(example$sampling_data)),
+    "b_i"=example$sampling_data[,'Catch_KG'],
+    "a_i"=example$sampling_data[,'AreaSwept_km2'],
+    "v_i"=example$sampling_data[,'Vessel'] )
 
 # Plot results
 plot_results( settings=settings, fit=fit )
@@ -122,11 +169,12 @@ plot_results( settings=settings, fit=fit )
 
 }
 \seealso{
-\code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+\code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 
 \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities
 
-Other wrapper functions: \code{\link{make_settings}},
-  \code{\link{plot_results}}
+Other wrapper functions: 
+\code{\link{make_settings}()},
+\code{\link{plot_results}()}
 }
 \concept{wrapper functions}

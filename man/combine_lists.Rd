@@ -4,8 +4,7 @@
 \alias{combine_lists}
 \title{Combine lists}
 \usage{
-combine_lists(default, input, args_to_use = NULL,
-  use_partial_matching = FALSE)
+combine_lists(default, input, args_to_use = NULL, use_partial_matching = FALSE)
 }
 \arguments{
 \item{default}{default values for combined list}

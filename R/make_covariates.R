@@ -46,9 +46,10 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
 
   # Create data frame of necessary size
   DF_zp = NULL
-  DF_ip = cbind( sample_data, covariate_data[rep(1,nrow(sample_data)),covariate_names] )
+  #DF_ip = cbind( sample_data, covariate_data[rep(1,nrow(sample_data)),covariate_names] )
+  DF_ip = data.frame( sample_data, covariate_data[rep(1,nrow(sample_data)),covariate_names] )
   colnames(DF_ip) = c( names(sample_data) ,covariate_names )
-  DF_ip[,covariate_names] = NA
+  #DF_ip[,covariate_names] = NA
 
   # Loop through data and extrapolation-grid
   for( tI in seq_along(Year_Set) ){
@@ -78,7 +79,17 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
 
   # Convert to dimensions requested
   DF = rbind( DF_ip, DF_zp )
-  X = model.matrix( update.formula(formula, ~.+0), data=DF )[,,drop=FALSE]
+
+  # Make model.matrix
+    # To ensure identifiability given betas (intercepts), add intercept to formula
+    # and then remove that term from model.matrix. This will not fix identifiability
+    # issues arising when both conditions are met:
+    # factor(Year) has an interaction with another factor, and
+    # betas vary among years (are not constant)
+  Model_matrix = model.matrix( update.formula(formula, ~.+1), data=DF )
+  Columns_to_keep = which( attr(Model_matrix,"assign") != 0 )
+  coefficient_names = attr(Model_matrix,"dimnames")[[2]][Columns_to_keep]
+  X = Model_matrix[,Columns_to_keep,drop=FALSE]
 
   # Make X_ip
   X_ip = X[ 1:nrow(DF_ip), , drop=FALSE ]
@@ -102,7 +113,8 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
   }
 
   # return stuff
-  Return = list( "X_gtp"=X_gtp, "X_itp"=X_itp, "covariate_names"=covariate_names )
+  Return = list( "X_gtp"=X_gtp, "X_itp"=X_itp, "covariate_names"=covariate_names,
+    "coefficient_names"=coefficient_names )
   return( Return )
 }
 

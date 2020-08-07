@@ -4,9 +4,17 @@
 \alias{format_covariates}
 \title{Format habitat covariate matrix}
 \usage{
-format_covariates(Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List,
-  Spatial_List, FUN = mean, Year_Set = min(t_e):max(t_e),
-  na.omit = "error")
+format_covariates(
+  Lat_e,
+  Lon_e,
+  t_e,
+  Cov_ep,
+  Extrapolation_List,
+  Spatial_List,
+  FUN = mean,
+  Year_Set = min(t_e):max(t_e),
+  na.omit = "error"
+)
 }
 \arguments{
 \item{Lat_e, }{Latitude for covariate sample e}

@@ -4,8 +4,12 @@
 \alias{Calc_Polygon_Areas_and_Polygons_Fn}
 \title{Calculate areas and covariates for a given triangulated mesh}
 \usage{
-Calc_Polygon_Areas_and_Polygons_Fn(loc_x, Data_Extrap,
-  Covariates = "none", a_el = NULL)
+Calc_Polygon_Areas_and_Polygons_Fn(
+  loc_x,
+  Data_Extrap,
+  Covariates = "none",
+  a_el = NULL
+)
 }
 \arguments{
 \item{loc_x}{location (eastings and northings in kilometers, UTM) for each sample or knot}

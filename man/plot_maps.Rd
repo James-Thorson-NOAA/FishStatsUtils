@@ -4,12 +4,29 @@
 \alias{plot_maps}
 \title{Plot standard maps}
 \usage{
-plot_maps(plot_set = 3, Obj = NULL, PlotDF, Sdreport = NULL,
-  projargs = "+proj=longlat", Panel = "Category", Year_Set = NULL,
-  Years2Include = NULL, category_names = NULL, quiet = FALSE,
-  working_dir = paste0(getwd(), "/"), MapSizeRatio, n_cells,
-  plot_value = "estimate", n_samples = 100, Report, TmbData,
-  zlim = NULL, country = NULL, sample_fixed = TRUE, ...)
+plot_maps(
+  plot_set = 3,
+  Obj = NULL,
+  PlotDF,
+  Sdreport = NULL,
+  projargs = "+proj=longlat",
+  Panel = "Category",
+  Year_Set = NULL,
+  Years2Include = NULL,
+  category_names = NULL,
+  quiet = FALSE,
+  working_dir = paste0(getwd(), "/"),
+  MapSizeRatio,
+  n_cells,
+  plot_value = "estimate",
+  n_samples = 100,
+  Report,
+  TmbData,
+  zlim = NULL,
+  country = NULL,
+  sample_fixed = TRUE,
+  ...
+)
 }
 \arguments{
 \item{plot_set}{integer-vector defining plots to create

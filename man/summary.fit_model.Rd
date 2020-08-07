@@ -4,8 +4,14 @@
 \alias{summary.fit_model}
 \title{Extract summary of spatial estimates}
 \usage{
-\method{summary}{fit_model}(x, what = "density", n_samples = 250,
-  working_dir = NULL, type = 1, ...)
+\method{summary}{fit_model}(
+  x,
+  what = "density",
+  n_samples = 250,
+  working_dir = NULL,
+  type = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{Output from \code{\link{fit_model}}}

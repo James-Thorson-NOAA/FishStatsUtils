@@ -4,9 +4,14 @@
 \alias{Geostat_Sim}
 \title{Simulate data}
 \usage{
-Geostat_Sim(Sim_Settings, Extrapolation_List, Data_Geostat = NULL,
-  MakePlot = FALSE, DateFile = paste0(getwd(), "/"),
-  standardize_fields = FALSE)
+Geostat_Sim(
+  Sim_Settings,
+  Extrapolation_List,
+  Data_Geostat = NULL,
+  MakePlot = FALSE,
+  DateFile = paste0(getwd(), "/"),
+  standardize_fields = FALSE
+)
 }
 \arguments{
 \item{Sim_Settings}{an optional tagged list for specifying input parameters (see function code to determine settings)}
