@@ -1022,6 +1022,7 @@ function( colvec, heatrange, textmargin=NULL, labeltransform="uniform", dopar=TR
 plot_lines = function( x, y, ybounds, fn=lines, col_bounds="black", bounds_type="whiskers", border=NA,
   border_lty="solid", lwd_bounds=1, ... ){
 
+  # Function still used in plot_index
   #warning( "`plot_lines` is soft-deprecated" )
 
   fn( y=y, x=x, ... )

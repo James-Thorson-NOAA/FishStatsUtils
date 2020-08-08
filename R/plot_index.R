@@ -6,7 +6,7 @@
 #' @param Index_ctl A matrix or array of time-series estimates for multiple categories \code{c}, years \code{t}, and strata \code{l}
 #' @param sd_Index_ctl A matrix or array of variances for each estimate
 #' @inheritParams plot_biomass_index
-#' @inheritParams plot_lines
+
 #' @param Yrange lower and upper bound for left-hand y-axis, corresponding to input \code{Index_ctl} (use \code{Yrange[1]=NA} and/or \code{Yrange[2]=NA} for using the lower and upper bound of estimate intervals)
 #' @param Y2range lower and upper bound for right-hand y-axis, corresponding to input \code{SampleSize_ctz} (see Yrange for more info)
 #' @param SampleSize_ctz optional array of sample sizes for each category and year to be plotted on each panel
