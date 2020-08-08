@@ -45,17 +45,26 @@ Epsilon refers to spatio-temporal variation, Omega1 refers to variation in encou
 Omega2 refers to variation in positive catch rates, where 0 is off, "AR1" is an AR1 process,
 and >0 is the number of elements in a factor-analysis covariance}
 
-\item{RhoConfig}{vector of form c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0) specifying whether either intercepts (Beta1 and Beta2) or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals (0: each year as fixed effect; 1: each year as random following IID distribution; 2: each year as random following a random walk; 3: constant among years as fixed effect; 4: each year as random following AR1 process);  If missing, assumed to be zero for each element}
+\item{RhoConfig}{vector of form c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0) specifying whether either intercepts (Beta1 and Beta2)
+or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals (0: each year as fixed effect;
+1: each year as random following IID distribution; 2: each year as random following a random walk;
+3: constant among years as fixed effect; 4: each year as random following AR1 process);  If missing, assumed to be zero for each element}
 
-\item{OverdispersionConfig}{a vector of format c("eta1"=0, "eta2"="AR1") governing any correlated overdispersion among categories for each level of v_i, where eta1 is for encounter probability, and eta2 is for positive catch rates, where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance (by default, c("eta1"=0, "eta2"=0) and this turns off overdispersion)}
+\item{OverdispersionConfig}{a vector of format c("eta1"=0, "eta2"="AR1") governing any correlated overdispersion
+among categories for each level of v_i, where eta1 is for encounter probability, and eta2 is for positive catch rates,
+where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance (by default,
+c("eta1"=0, "eta2"=0) and this turns off overdispersion)}
 
-\item{Options}{a vector of form c('SD_site_logdensity'=FALSE,'Calculate_Range'=FALSE,'Calculate_effective_area'=FALSE,'Calculate_Cov_SE'=FALSE,'Calculate_Synchrony'=FALSE,'Calculate_proportion'=FALSE), where Calculate_Range=1 turns on calculation of center of gravity, and Calculate_effective_area=1 turns on calculation of effective area occupied}
+\item{Options}{a vector of form c('SD_site_logdensity'=FALSE,'Calculate_Range'=FALSE,'Calculate_effective_area'=FALSE,
+'Calculate_Cov_SE'=FALSE,'Calculate_Synchrony'=FALSE,'Calculate_proportion'=FALSE), where \code{Calculate_Range=1}
+turns on calculation of center of gravity, and Calculate_effective_area=1 turns on calculation of effective area occupied}
 
 \item{use_anisotropy}{Boolean indicating whether to estimate two additional parameters representing geometric anisotropy}
 
 \item{vars_to_correct}{a character-vector listing which parameters to include for bias-correction, as passed to \code{TMBhelper::Optimize}}
 
-\item{Version}{a version number;  If missing, defaults to latest version using \code{FishStatsUtils::get_latest_version(package="VAST")}}
+\item{Version}{Which CPP version to use.  If missing, defaults to latest version using \code{FishStatsUtils::get_latest_version(package="VAST")}.
+Can be used to specify using an older CPP, to maintain backwards compatibility.}
 
 \item{treat_nonencounter_as_zero}{Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates}
 
