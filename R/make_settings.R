@@ -52,7 +52,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(bias.correct)) bias.correct = TRUE
     if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = TRUE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
-    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
   }
@@ -72,7 +72,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(bias.correct)) bias.correct = TRUE
     if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = TRUE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
-    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "grid"
     if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
   }
@@ -95,7 +95,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = FALSE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE,
       "treat_nonencounter_as_zero"=treat_nonencounter_as_zero, "Project_factors"=TRUE )
-    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
   }
@@ -118,7 +118,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(bias.correct)) bias.correct = TRUE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=FALSE,
       "Calculate_Fratio"=TRUE, "Estimate_B0"=TRUE )
-    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Bratio_cyl" )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Bratio_cyl", "Index_ctl", "Bratio_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
   }
@@ -140,7 +140,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(ObsModel)) ObsModel = c(1,1)
     if(missing(bias.correct)) bias.correct = FALSE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "Project_factors"=TRUE )
-    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
   }
@@ -166,7 +166,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(ObsModel)) ObsModel = c(1,1)
     if(missing(bias.correct)) bias.correct = FALSE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "Project_factors"=TRUE )
-    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
   }
@@ -183,7 +183,7 @@ make_settings = function( n_x, Region, purpose="index", fine_scale=TRUE,
     if(missing(ObsModel)) ObsModel = c(2,1)
     if(missing(bias.correct)) bias.correct = FALSE
     if(missing(Options)) Options =  c("SD_site_logdensity"=FALSE, "Calculate_Range"=FALSE, "Calculate_effective_area"=FALSE, "Calculate_Cov_SE"=TRUE, "Project_factors"=TRUE )
-    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl" )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "grid"
     if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
   }
