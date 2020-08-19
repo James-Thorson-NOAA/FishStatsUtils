@@ -360,8 +360,8 @@ summary.fit_model <- function(x, what="density", n_samples=250,
     # Change n_g
     # Must change back explicitly because TMB appears to pass env as a pointer, so changes in copy affect original x outside of function!
     n_g_orig = Obj$env$data$n_g
-    Tmp = function(n_g){Obj$env$data$n_g = n_g}
-    on.exit( Tmp(n_g_orig) )
+    revert_settings = function(n_g){Obj$env$data$n_g = n_g}
+    on.exit( revert_settings(n_g_orig) )
     Obj$env$data$n_g = 0
 
     # check for issues
