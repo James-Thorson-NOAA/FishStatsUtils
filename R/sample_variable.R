@@ -14,7 +14,17 @@
 #' @param seed integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}
 #' @param sample_fixed whether to sample fixed and random effects, \code{sample_fixed=TRUE} as by default, or just sample random effects, \code{sample_fixed=FALSE}
 #'
-
+#' @examples
+#' \dontrun{
+#' # Run model using selected inputs, but also with getJointPrecision=TRUE
+#' fit = fit_model( ...,
+#'     getJointPrecision=TRUE )
+#'
+#' # Run sample_variable
+#' sample = sample_variable( Sdreport=fit$parameter_estimates$SD,
+#'     Obj=fit$tmb_list$Obj, variable_name="D_gct" )
+#' }
+#'
 #' @export
 sample_variable = function( Sdreport, Obj, variable_name, n_samples=100,
   sample_fixed=TRUE, seed=123456 ){
@@ -24,7 +34,7 @@ sample_variable = function( Sdreport, Obj, variable_name, n_samples=100,
     stop("jointPrecision not present in Sdreport; please re-run with `getJointPrecision=TRUE`")
   }
   if( !(variable_name %in% names(Obj$report())) ){
-    stop( variable_name, " not found in report(.); please choose check your requested variable name" )
+    stop( variable_name, " not found in report(.); please choose check your requested variable name from available list: ", paste(names(Obj$report()),collapse=", ") )
   }
 
   #### Local function

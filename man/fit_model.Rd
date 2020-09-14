@@ -139,7 +139,6 @@ Category \code{g} corresponds to values in \code{fit$data_list$g_i}.
 \examples{
 \dontrun{
 # Load packages
-library(TMB)
 library(VAST)
 
 # load data set

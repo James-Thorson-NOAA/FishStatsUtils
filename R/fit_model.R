@@ -61,7 +61,6 @@
 #' @examples
 #' \dontrun{
 #' # Load packages
-#' library(TMB)
 #' library(VAST)
 #'
 #' # load data set

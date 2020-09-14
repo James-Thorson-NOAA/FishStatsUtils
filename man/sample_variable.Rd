@@ -31,3 +31,15 @@ sample_variable(
 
 Exploratory testing suggests that calling \code{Obj$report(newvalues)} within a function like \code{sample_variable(.)} doesn't affect the results of subsequent calls of \code{Obj$report()} so this function does not appear to change anything in the global environment
 }
+\examples{
+\dontrun{
+# Run model using selected inputs, but also with getJointPrecision=TRUE
+fit = fit_model( ...,
+    getJointPrecision=TRUE )
+
+# Run sample_variable
+sample = sample_variable( Sdreport=fit$parameter_estimates$SD,
+    Obj=fit$tmb_list$Obj, variable_name="D_gct" )
+}
+
+}
