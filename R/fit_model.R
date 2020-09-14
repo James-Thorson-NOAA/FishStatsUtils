@@ -110,6 +110,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b
   years_to_plot = which( year_labels %in% t_i )
 
   # Save record
+  message("\n### Writing output from `fit_model` in directory: ", working_dir)
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
   #save( settings, file=file.path(working_dir,"Record.RData"))
   capture.output( settings, file=file.path(working_dir,"settings.txt"))
