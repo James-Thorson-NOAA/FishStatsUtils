@@ -40,10 +40,7 @@ make_settings(
 
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 
-\item{FieldConfig}{a vector of format c("Omega1"=0, "Epsilon1"=10, "Omega2"="AR1", "Epsilon2"=10), where Omega refers to spatial variation,
-Epsilon refers to spatio-temporal variation, Omega1 refers to variation in encounter probability, and
-Omega2 refers to variation in positive catch rates, where 0 is off, "AR1" is an AR1 process,
-and >0 is the number of elements in a factor-analysis covariance}
+\item{FieldConfig}{See Details section of \code{\link[VAST]{make_data}} for details}
 
 \item{RhoConfig}{vector of form c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0) specifying whether either intercepts (Beta1 and Beta2)
 or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals (0: each year as fixed effect;

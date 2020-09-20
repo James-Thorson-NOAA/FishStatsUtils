@@ -23,14 +23,17 @@
 
 \item{what}{Which output from \code{fit$Report} should be extracted; default is predicted density}
 
-\item{t_i}{Time for each observation i}
+\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
 
-\item{a_i}{Sampled area for each observation i;  use \code{a_i=1} for observations without a natural area measurement, while
+\item{a_i}{Numeric vector containing values greater than zero, providing sampled area for each
+observation i;  use \code{a_i=1} for observations without a natural area measurement, while
 noting that resulting densities no longer have interpretable units in that case)}
 
-\item{c_iz}{Category (e.g., species, length-bin) for each observation i}
+\item{c_iz}{Vector of integers ranging from 0 to the number of variables minus 1, providing the
+category (e.g., species, length-bin) for each observation i}
 
-\item{v_i}{sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
+\item{v_i}{Vector of integers ranging from 0 to the number of vessels minus 1,
+providing sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
 (by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
 
 \item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)}
