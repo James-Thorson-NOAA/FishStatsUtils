@@ -4,8 +4,14 @@
 \alias{rotate_factors}
 \title{Rotate results}
 \usage{
-rotate_factors(Cov_jj = NULL, L_pj = NULL, Psi_sjt = NULL,
-  RotationMethod = "PCA", testcutoff = 1e-10, quiet = FALSE)
+rotate_factors(
+  Cov_jj = NULL,
+  L_pj = NULL,
+  Psi_sjt = NULL,
+  RotationMethod = "PCA",
+  testcutoff = 1e-10,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{Cov_jj}{Covariance calculated from loadings matrix}

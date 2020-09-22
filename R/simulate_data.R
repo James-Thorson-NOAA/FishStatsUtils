@@ -53,9 +53,15 @@ simulate_data = function( fit, type=1, random_seed=NULL ){
 
   # Extract stuff
   Obj = fit$tmb_list$Obj
+  simulate_random_effects_orig = Obj$env$data$Options_list$Options['simulate_random_effects']
+
+  # Revert settings when done
+  revert_settings = function(simulate_random_effects){Obj$env$data$Options_list$Options['simulate_random_effects'] = simulate_random_effects}
+  on.exit( revert_settings(simulate_random_effects_orig) )
 
   # Simulate conditional upon fixed and random effect estimates
   if( type==1 ){
+    # Change and revert settings
     Obj$env$data$Options_list$Options['simulate_random_effects'] = FALSE
     set.seed(random_seed)
     Return = Obj$simulate( complete=TRUE )

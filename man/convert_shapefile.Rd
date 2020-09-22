@@ -4,18 +4,29 @@
 \alias{convert_shapefile}
 \title{Convert shapefile to extrapolation-grid}
 \usage{
-convert_shapefile(file_path, projargs = NULL, grid_dim_km = c(2, 2),
-  projargs_for_shapefile = NULL, make_plots = FALSE, quiet = TRUE,
-  area_tolerance = 0.05, ...)
+convert_shapefile(
+  file_path,
+  projargs = NULL,
+  grid_dim_km = c(2, 2),
+  projargs_for_shapefile = NULL,
+  make_plots = FALSE,
+  quiet = TRUE,
+  area_tolerance = 0.05,
+  ...
+)
 }
 \arguments{
 \item{file_path}{path for shapefile on harddrive}
 
 \item{projargs}{A character string of projection arguments used to project the shapefile prior to construction an extrapolation-grid; the arguments must be entered exactly as in the PROJ.4 documentation; Default \code{projargs=NULL} uses UTM and infers the UTM zone based on the centroid of the shapefile.}
 
+\item{grid_dim_km}{numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region="other"}}
+
 \item{projargs_for_shapefile}{projection-arguments (e.g., as parsed by \code{sp::CRS}), that are used when reading shapefile and overriding any projection arguments already saved there;  Default \code{projargs_for_shapefile=NULL} uses the projection arguments available in the shapefile}
 
 \item{make_plots}{Boolean indicating whether to visualize inputs and outputs as maps}
+
+\item{...}{other objects passed for individual regions (see example script)}
 }
 \value{
 extrapolation-grid

@@ -14,6 +14,9 @@
 #'
 #' \code{LON_intensity} and \code{LAT_intensity} allow users to specify locations that are used by the k-means algorithm to determine the location of knots, where e.g. users can either hard-code the desired knot locations via these inputs (using \code{n_x} greater than this number of locations), or use the extrapolation-grid to ensure that knots are located proportional to that grid.
 #'
+#' @inheritParams make_kmeans
+#' @inheritParams make_mesh
+#'
 #' @param n_x the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")
 #' @param Lon_i Longitude for each sample
 #' @param Lat_i Latitude for each sample
@@ -25,7 +28,6 @@
 #' @param grid_size_LL the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}
 #' @param Network_sz_LL data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"
 #' @param ... additional arguments passed to \code{\link[INLA]{inla.mesh.create}}
-#' @inheritParams Calc_Kmeans
 
 #' @return Tagged list containing objects for running a VAST model
 #' \describe{
@@ -33,7 +35,7 @@
 #'   \item{GridList}{A tagged list with inputs related to the 2D AR1 grid}
 #'   \item{a_xl}{A data frame with areas for each knot and each strattum}
 #'   \item{loc_UTM}{A data frame with the converted UTM coordinates for each sample}
-#'   \item{Kmeans}{Output from \code{Calc_Kmeans} with knots for a triangulated mesh}
+#'   \item{Kmeans}{Output from \code{make_kmeans} with knots for a triangulated mesh}
 #'   \item{knot_i}{The knot associated with each sample}
 #'   \item{Method}{The Method input (for archival purposes)}
 #'   \item{loc_x}{The UTM location for each knot}
@@ -42,9 +44,9 @@
 
 #' @export
 make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method=NULL, Method="Mesh",
-  grid_size_km=50, grid_size_LL=1, fine_scale=FALSE, Network_sz_LL=NULL,
+  anisotropic_mesh=NULL, Kmeans=NULL, grid_size_km=50, grid_size_LL=1, fine_scale=FALSE, Network_sz_LL=NULL,
   iter.max=1000, randomseed=1, nstart=100, DirPath=paste0(getwd(),"/"), Save_Results=FALSE,
-  LON_intensity, LAT_intensity, ... ){
+  LON_intensity, LAT_intensity, backwards_compatible_kmeans=FALSE, ... ){
 
   # Deprecated options
   if( Method=="Spherical_mesh" ){
@@ -78,7 +80,8 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     Grid_bounds = (grid_size_km/110) * apply(loc_e/(grid_size_km/110), MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
-    Kmeans = Calc_Kmeans(n_x=n_x, loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, ... )
+    if(is.null(Kmeans)) Kmeans = make_kmeans(n_x=n_x, loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed,
+      backwards_compatible_kmeans=backwards_compatible_kmeans, ... )
 
     # Calculate grid for 2D AR1 process
     loc_grid = expand.grid( 'Lon'=seq(Grid_bounds[1,1],Grid_bounds[2,1],by=grid_size_LL), 'Lat'=seq(Grid_bounds[1,2],Grid_bounds[2,2],by=grid_size_LL) )
@@ -94,7 +97,8 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
     Grid_bounds = grid_size_km * apply(Extrapolation_List$Data_Extrap[,c('E_km','N_km')]/grid_size_km, MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
-    Kmeans = Calc_Kmeans(n_x=n_x, loc_orig=loc_intensity[,c("E_km", "N_km")], randomseed=randomseed, nstart=nstart, DirPath=DirPath, Save_Results=Save_Results )
+    if(is.null(Kmeans)) Kmeans = make_kmeans(n_x=n_x, loc_orig=loc_intensity[,c("E_km", "N_km")], randomseed=randomseed, nstart=nstart,
+      DirPath=DirPath, Save_Results=Save_Results, backwards_compatible_kmeans=backwards_compatible_kmeans )
     NN_i = RANN::nn2( data=Kmeans[["centers"]], query=loc_i, k=1)$nn.idx[,1]
 
     # Calculate grid for 2D AR1 process
@@ -128,7 +132,8 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   }
 
   # Convert loc_x back to location in lat-long coordinates latlon_x
-  origargs = "+proj=longlat +ellps=WGS84"
+  #origargs = "+proj=longlat +ellps=WGS84"
+  origargs = "+proj=longlat +datum=WGS84"
   latlon_x = project_coordinates( X=loc_x[,"E_km"], Y=loc_x[,"N_km"], projargs=origargs, origargs=Extrapolation_List$projargs )[,c("Y","X")]
   colnames(latlon_x) = c("Lat", "Lon")
 
@@ -142,9 +147,11 @@ make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
   # Diagnose issues:  assign("Kmeans", Kmeans, envir = .GlobalEnv)
   if(Method != "Stream_network"){
-    MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+    MeshList = make_mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
+      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
   }else{
-    MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+    MeshList = make_mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
+      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
   }
   n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x),
     "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x), "barrier"=MeshList$anisotropic_spde$n.spde,  )

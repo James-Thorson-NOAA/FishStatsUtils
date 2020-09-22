@@ -4,14 +4,35 @@
 \alias{plot_variable}
 \title{Plot results on a multi-panel figure of maps}
 \usage{
-plot_variable(Y_gt, map_list, panel_labels, projargs = "+proj=longlat",
-  map_resolution = "medium", file_name = "density",
-  working_dir = paste0(getwd(), "/"), Format = "png", Res = 200,
-  add = FALSE, outermargintext = c("Eastings", "Northings"),
-  zlim = NULL, col, mar = c(0, 0, 2, 0), oma = c(4, 4, 0, 0),
-  legend_x = c(0, 0.05), legend_y = c(0.05, 0.45), cex.legend = 1,
-  mfrow, land_color = "grey", n_cells, xlim, ylim, country = NULL,
-  contour_nlevels = 0, fun = mean, ...)
+plot_variable(
+  Y_gt,
+  map_list,
+  panel_labels,
+  projargs = "+proj=longlat",
+  map_resolution = "medium",
+  file_name = "density",
+  working_dir = paste0(getwd(), "/"),
+  Format = "png",
+  Res = 200,
+  add = FALSE,
+  outermargintext = c("Eastings", "Northings"),
+  zlim = NULL,
+  col,
+  mar = c(0, 0, 2, 0),
+  oma = c(4, 4, 0, 0),
+  legend_x = c(0, 0.05),
+  legend_y = c(0.05, 0.45),
+  cex.legend = 1,
+  mfrow,
+  land_color = "grey",
+  n_cells,
+  xlim,
+  ylim,
+  country = NULL,
+  contour_nlevels = 0,
+  fun = mean,
+  ...
+)
 }
 \arguments{
 \item{Y_gt}{matrix where values for every column are plotted as a map}

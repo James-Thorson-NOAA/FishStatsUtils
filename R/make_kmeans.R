@@ -1,7 +1,7 @@
 
 #' Calculate location for knots approximating spatial variation
 #'
-#' \code{Calc_Kmeans} determines the location for a set of knots for approximating spatial variation
+#' \code{make_kmeans} determines the location for a set of knots for approximating spatial variation
 #'
 #' @param n_x the number of knots to select
 #' @param loc_orig a matrix with two columns where each row gives the 2-dimensional coordinates to be approximated
@@ -10,6 +10,9 @@
 #' @param iter.max the number of iterations used per k-means algorithm (default=1000)
 #' @param DirPath a directory where the algorithm looks for a previously-saved output (default is working directory)
 #' @param Save_Results a boolean stating whether to save the output (Default=TRUE)
+#' @param backwards_compatible_kmeans a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
+#'        where \code{backwards_compatible_kmeans==TRUE} modifies the default algorithm to maintain backwards compatibility, and
+#'        where \code{backwards_compatible_kmeans==FALSE} breaks backwards compatibility between R versions prior to and after R 3.6.0.
 
 #' @return Tagged list containing outputs
 #' \describe{
@@ -18,8 +21,9 @@
 #' }
 
 #' @export
-Calc_Kmeans <-
-function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=TRUE ){
+make_kmeans <-
+function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"),
+  Save_Results=TRUE, backwards_compatible_kmeans=FALSE ){
 
   # get old seed
   oldseed = ceiling(runif(1,min=1,max=1e6))
@@ -28,6 +32,17 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
   old.options <- options()
   options( "warn" = -1 )
   on.exit( options(old.options) )
+
+  # Backwards compatibility
+  if( backwards_compatible_kmeans==TRUE ){
+    if( identical(formalArgs(RNGkind), c("kind","normal.kind","sample.kind")) ){
+      RNGkind_orig = RNGkind()
+      on.exit( RNGkind(kind=RNGkind_orig[1], normal.kind=RNGkind_orig[2], sample.kind=RNGkind_orig[3]), add=TRUE )
+      RNGkind( sample.kind="Rounding" )
+    }else if( !identical(formalArgs(RNGkind), c("kind","normal.kind")) ){
+      stop("Assumptions about `RNGkind` are not met within `make_kmeans`; please report problem to package developers")
+    }
+  }
 
   # Calculate knots for SPDE mesh
   if( length(unique(paste(loc_orig[,1],loc_orig[,2],sep="_")))<=n_x ){

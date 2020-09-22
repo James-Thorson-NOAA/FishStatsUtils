@@ -3,7 +3,6 @@
 \docType{package}
 \name{FishStatsUtils}
 \alias{FishStatsUtils}
-\alias{FishStatsUtils-package}
 \title{FishStatsUtils}
 \description{
 FishStatsUtils provides utilities (shared code and data) for spatio-temporal models (VAST, SpatialDeltaGLMM, ...)

@@ -4,9 +4,14 @@
 \alias{make_map_info}
 \title{Get information for adequate mapping for regions}
 \usage{
-make_map_info(Region, Extrapolation_List, spatial_list = NULL,
+make_map_info(
+  Region,
+  Extrapolation_List,
+  spatial_list = NULL,
   NN_Extrap = spatial_list$PolygonList$NN_Extrap,
-  fine_scale = spatial_list$fine_scale, Include)
+  fine_scale = spatial_list$fine_scale,
+  Include
+)
 }
 \description{
 Function provides information to be used when plotting results

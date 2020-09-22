@@ -4,8 +4,15 @@
 \alias{plot_cov}
 \title{Plot covariance matrix}
 \usage{
-plot_cov(Cov, zlim = NULL, names = 1:nrow(Cov), names2 = names,
-  ncolors = 21, digits = 2, ...)
+plot_cov(
+  Cov,
+  zlim = NULL,
+  names = 1:nrow(Cov),
+  names2 = names,
+  ncolors = 21,
+  digits = 2,
+  ...
+)
 }
 \arguments{
 \item{Cov}{matrix (covariance or correlation) used for plotting}

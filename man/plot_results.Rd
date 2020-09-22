@@ -4,12 +4,24 @@
 \alias{plot_results}
 \title{Plot results}
 \usage{
-plot_results(fit, settings = fit$settings, plot_set = 3,
-  working_dir = paste0(getwd(), "/"), year_labels = fit$year_labels,
-  years_to_plot = fit$years_to_plot, use_biascorr = TRUE, map_list,
-  category_names, check_residuals = TRUE, projargs = "+proj=longlat",
-  zrange, n_samples = 100, calculate_relative_to_average = FALSE,
-  type = 1, ...)
+plot_results(
+  fit,
+  settings = fit$settings,
+  plot_set = 3,
+  working_dir = paste0(getwd(), "/"),
+  year_labels = fit$year_labels,
+  years_to_plot = fit$years_to_plot,
+  use_biascorr = TRUE,
+  map_list,
+  category_names,
+  check_residuals = TRUE,
+  projargs = "+proj=longlat",
+  zrange,
+  n_samples = 100,
+  calculate_relative_to_average = FALSE,
+  type = 1,
+  ...
+)
 }
 \arguments{
 \item{fit}{Output from \code{fit_model}}
@@ -74,9 +86,10 @@ This function takes a fitted VAST model and generates a standard set of diagnost
 It does this by calling a series of mid-level plotting functions; see list of functions in Value section of documentation.
 }
 \seealso{
-\code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+\code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 
-Other wrapper functions: \code{\link{fit_model}},
-  \code{\link{make_settings}}
+Other wrapper functions: 
+\code{\link{fit_model}()},
+\code{\link{make_settings}()}
 }
 \concept{wrapper functions}

@@ -4,8 +4,13 @@
 \alias{make_covariates}
 \title{Format habitat covariate matrix}
 \usage{
-make_covariates(formula, covariate_data, Year_i, spatial_list,
-  extrapolation_list)
+make_covariates(
+  formula,
+  covariate_data,
+  Year_i,
+  spatial_list,
+  extrapolation_list
+)
 }
 \arguments{
 \item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}}

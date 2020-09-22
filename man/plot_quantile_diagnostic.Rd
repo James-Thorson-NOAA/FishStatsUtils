@@ -4,11 +4,16 @@
 \alias{plot_quantile_diagnostic}
 \title{Diagnostic QQ function}
 \usage{
-plot_quantile_diagnostic(TmbData, Report, DateFile = paste0(getwd(),
-  "/"), save_dir = paste0(DateFile, "/QQ_Fn/"),
+plot_quantile_diagnostic(
+  TmbData,
+  Report,
+  DateFile = paste0(getwd(), "/"),
+  save_dir = paste0(DateFile, "/QQ_Fn/"),
   FileName_PP = "Posterior_Predictive",
   FileName_Phist = "Posterior_Predictive-Histogram",
-  FileName_QQ = "Q-Q_plot", FileName_Qhist = "Q-Q_hist")
+  FileName_QQ = "Q-Q_plot",
+  FileName_Qhist = "Q-Q_hist"
+)
 }
 \arguments{
 \item{TmbData}{TMB Model input data list}

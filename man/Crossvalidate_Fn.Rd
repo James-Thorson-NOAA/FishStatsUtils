@@ -4,8 +4,16 @@
 \alias{Crossvalidate_Fn}
 \title{K-fold crossvalidation}
 \usage{
-Crossvalidate_Fn(record_dir, parhat, original_data, group_i = NULL,
-  kfold = 10, newtonsteps = 1, skip_finished = FALSE, ...)
+Crossvalidate_Fn(
+  record_dir,
+  parhat,
+  original_data,
+  group_i = NULL,
+  kfold = 10,
+  newtonsteps = 1,
+  skip_finished = FALSE,
+  ...
+)
 }
 \arguments{
 \item{record_dir, }{a directory with writing privilege where the runs are stored}
@@ -23,8 +31,6 @@ Crossvalidate_Fn(record_dir, parhat, original_data, group_i = NULL,
 \item{skip_finished}{boolean specifying whether to rerun (skip_finished==FALSE) or skip (skip_finished==TRUE) previously completed runs (Default=FALSE)}
 
 \item{...}{Additional arguments to pass to \code{VAST::Build_TMB_Fn}}
-
-\item{skip_finished}{boolean specifying whether to rerun (skip_finished==FALSE) or skip (skip_finished==TRUE) previously completed runs (Default=FALSE)}
 }
 \value{
 Results a matrix with total predictive negative log-likelihood for each crossvalidation partition, and number of crossvalidation samples for that partition

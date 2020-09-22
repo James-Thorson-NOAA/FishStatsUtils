@@ -4,9 +4,15 @@
 \alias{project_coordinates}
 \title{Convert from Lat-Long to UTM}
 \usage{
-project_coordinates(X, Y, projargs = NA,
-  origargs = "+proj=longlat +ellps=WGS84", zone = NA,
-  flip_around_dateline = FALSE, silent = FALSE)
+project_coordinates(
+  X,
+  Y,
+  projargs = NA,
+  origargs = "+proj=longlat +datum=WGS84",
+  zone = NA,
+  flip_around_dateline = FALSE,
+  silent = FALSE
+)
 }
 \arguments{
 \item{X}{vector of horizontal-coordinates (e.g., longitude by default)}

@@ -4,8 +4,12 @@
 \alias{calc_coherence}
 \title{Calculate stability metrics}
 \usage{
-calc_coherence(Report, Data, covhat = NULL, yearbounds_zz = matrix(c(1,
-  Data$n_t), nrow = 1))
+calc_coherence(
+  Report,
+  Data,
+  covhat = NULL,
+  yearbounds_zz = matrix(c(1, Data$n_t), nrow = 1)
+)
 }
 \arguments{
 \item{Report}{output report, e.g., from \code{Report <- obj$report()}}
@@ -14,7 +18,8 @@ calc_coherence(Report, Data, covhat = NULL, yearbounds_zz = matrix(c(1,
 
 \item{covhat}{estimated covariance used for calculating coherence}
 
-\item{yearbounds_zz}{matrix with two columns, giving first and last years for defining one or more periods (rows) used to calculate changes in synchrony over time (only used if \code{Options['Calculate_Synchrony']=1})}
+\item{yearbounds_zz}{matrix with two columns, giving first and last years for defining one or more periods (rows) used to
+calculate changes in synchrony over time (only used if \code{Options['Calculate_Synchrony']=1})}
 }
 \value{
 Tagged list containing measures of synchrony

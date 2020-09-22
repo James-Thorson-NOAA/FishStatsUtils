@@ -4,8 +4,14 @@
 \alias{sample_variable}
 \title{Sample from predictive distribution of a variable}
 \usage{
-sample_variable(Sdreport, Obj, variable_name, n_samples = 100,
-  sample_fixed = TRUE, seed = 123456)
+sample_variable(
+  Sdreport,
+  Obj,
+  variable_name,
+  n_samples = 100,
+  sample_fixed = TRUE,
+  seed = 123456
+)
 }
 \arguments{
 \item{Sdreport}{TMB output from `\code{TMB::sdreport(Obj)}`}
@@ -24,4 +30,16 @@ sample_variable(Sdreport, Obj, variable_name, n_samples = 100,
 \code{sample_variable} samples from the joint distribution of random effects to approximate the predictive distribution for a variable
 
 Exploratory testing suggests that calling \code{Obj$report(newvalues)} within a function like \code{sample_variable(.)} doesn't affect the results of subsequent calls of \code{Obj$report()} so this function does not appear to change anything in the global environment
+}
+\examples{
+\dontrun{
+# Run model using selected inputs, but also with getJointPrecision=TRUE
+fit = fit_model( ...,
+    getJointPrecision=TRUE )
+
+# Run sample_variable
+sample = sample_variable( Sdreport=fit$parameter_estimates$SD,
+    Obj=fit$tmb_list$Obj, variable_name="D_gct" )
+}
+
 }

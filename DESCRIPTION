@@ -1,8 +1,8 @@
 Package: FishStatsUtils
 Type: Package
 Title: Utilities (shared code and data) for FishStats spatio-temporal modeling toolbox
-Version: 2.7.0
-Date: 2020-04-23
+Version: 2.8.0
+Date: 2020-09-22
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -53,6 +53,7 @@ Remotes:
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
-RoxygenNote: 7.0.2
+Encoding: UTF-8
+RoxygenNote: 7.1.1
 URL: http://github.com/james-thorson/FishStatsUtils
 BugReports: http://github.com/james-thorson/FishStatsUtils/issues

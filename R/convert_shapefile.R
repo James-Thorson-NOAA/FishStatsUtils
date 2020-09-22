@@ -5,7 +5,7 @@
 #' \code{convert_shapefile} reads in a shapefile and creates an extrapolation with a chosen resolution
 #'
 #' @inheritParams sp::CRS
-#' @inheritParams make_extraploation_info
+#' @inheritParams make_extrapolation_info
 #'
 #' @param file_path path for shapefile on harddrive
 #' @param make_plots Boolean indicating whether to visualize inputs and outputs as maps
@@ -24,6 +24,7 @@ convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), proj
   make_plots=FALSE, quiet=TRUE, area_tolerance=0.05, ... ){
 
   shapefile_orig = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
+  # raster::shapefile(.) has simplified read-write interface for future reference
   if( !(shapefile_orig@class %in% c("SpatialPolygonsDataFrame","SpatialPolygons")) ){
     warning( "object at `file_path` doesn't appear to be a shapefile")
   }

@@ -55,13 +55,12 @@
 #' }
 #'
 #' @family wrapper functions
-#' @seealso \code{?VAST} for general documentation, \code{?make_settings} for generic settings, \code{?fit_model} for model fitting, and \code{?plot_results} for generic plots
+#' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 #' @seealso \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities
 #'
 #' @examples
 #' \dontrun{
 #' # Load packages
-#' library(TMB)
 #' library(VAST)
 #'
 #' # load data set
@@ -70,14 +69,20 @@
 #' example = load_example( data_set="EBS_pollock" )
 #'
 #' # Make settings
-#' settings = make_settings( n_x=50, Region=example$Region, purpose="index",
-#'   strata.limits=example$strata.limits )
+#' settings = make_settings( n_x=50,
+#'          Region=example$Region,
+#'          purpose="index",
+#'          strata.limits=example$strata.limits )
 #'
 #' # Run model
-#' fit = fit_model( "settings"=settings, "Lat_i"=example$sampling_data[,'Lat'],
-#'   "Lon_i"=example$sampling_data[,'Lon'], "t_i"=example$sampling_data[,'Year'],
-#'   "c_i"=rep(0,nrow(example$sampling_data)), "b_i"=example$sampling_data[,'Catch_KG'],
-#'   "a_i"=example$sampling_data[,'AreaSwept_km2'], "v_i"=example$sampling_data[,'Vessel'] )
+#' fit = fit_model( "settings"=settings,
+#'     "Lat_i"=example$sampling_data[,'Lat'],
+#'     "Lon_i"=example$sampling_data[,'Lon'],
+#'     "t_i"=example$sampling_data[,'Year'],
+#'     "c_i"=rep(0,nrow(example$sampling_data)),
+#'     "b_i"=example$sampling_data[,'Catch_KG'],
+#'     "a_i"=example$sampling_data[,'AreaSwept_km2'],
+#'     "v_i"=example$sampling_data[,'Vessel'] )
 #'
 #' # Plot results
 #' plot_results( settings=settings, fit=fit )
@@ -88,8 +93,9 @@
 # Using https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html for guidance on markdown-enabled documentation
 fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b_i)),
   v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
-  Xconfig_zcp=NULL, covariate_data, formula=~0, Q_ik=NULL, newtonsteps=1,
-  silent=TRUE, build_model=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
+  X1config_cp=NULL, X2config_cp=NULL, covariate_data, X1_formula=~0, X2_formula=~0,
+  Q1config_k=NULL, Q2config_k=NULL, catchability_data, Q1_formula=~0, Q2_formula=~0,
+  newtonsteps=1, silent=TRUE, build_model=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
 
   # Capture extra arguments to function
   extra_args = list(...)
@@ -103,6 +109,7 @@ fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b
   years_to_plot = which( year_labels %in% t_i )
 
   # Save record
+  message("\n### Writing output from `fit_model` in directory: ", working_dir)
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)
   #save( settings, file=file.path(working_dir,"Record.RData"))
   capture.output( settings, file=file.path(working_dir,"settings.txt"))
@@ -125,12 +132,15 @@ fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b
   # Do *not* restrict inputs to formalArgs(make_data) because other potential inputs are still parsed by make_data for backwards compatibility
   message("\n### Making data object") # VAST::
   if(missing(covariate_data)) covariate_data = NULL
+  if(missing(catchability_data)) catchability_data = NULL
   data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_i"=t_i, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
-    Xconfig_zcp=Xconfig_zcp, covariate_data=covariate_data, formula=formula, Q_ik=Q_ik)
+    "X1config_cp"=X1config_cp, "X2config_cp"=X2config_cp, "covariate_data"=covariate_data, "X1_formula"=X1_formula, "X2_formula"=X2_formula,
+    "Q1config_k"=Q1config_k, "Q2config_k"=Q2config_k, "catchability_data"=catchability_data, "Q1_formula"=Q1_formula, "Q2_formula"=Q2_formula )
   data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
   data_list = do.call( what=make_data, args=data_args_input )
+  #return(data_list) }
 
   # Build object
   message("\n### Making TMB object")
@@ -216,8 +226,9 @@ fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b
     "data_args_input"=data_args_input )
   Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
     "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
-    "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
-    "input_args"=input_args )
+    "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings, "input_args"=input_args,
+    "X1config_cp"=X1config_cp, "X2config_cp"=X2config_cp, "covariate_data"=covariate_data, "X1_formula"=X1_formula, "X2_formula"=X2_formula,
+    "Q1config_k"=Q1config_k, "Q2config_k"=Q1config_k, "catchability_data"=catchability_data, "Q1_formula"=Q1_formula, "Q2_formula"=Q2_formula)
   class(Return) = "fit_model"
   return( Return )
 }
@@ -249,7 +260,6 @@ print.fit_model <- function(x, ...)
 #' @param ... Arguments passed to \code{\link{plot_results}}
 #' @return NULL
 #' @method plot fit_model
-#' @export plot
 #' @export
 plot.fit_model <- function(x, what="results", ...)
 {
@@ -346,6 +356,12 @@ summary.fit_model <- function(x, what="density", n_samples=250,
   if( tolower(what) == "residuals" ){
     # extract objects
     Obj = x$tmb_list$Obj
+
+    # Change n_g
+    # Must change back explicitly because TMB appears to pass env as a pointer, so changes in copy affect original x outside of function!
+    n_g_orig = Obj$env$data$n_g
+    revert_settings = function(n_g){Obj$env$data$n_g = n_g}
+    on.exit( revert_settings(n_g_orig) )
     Obj$env$data$n_g = 0
 
     # check for issues
@@ -408,4 +424,95 @@ summary.fit_model <- function(x, what="density", n_samples=250,
 }
 
 
+#' Predict density for new samples (\emph{Beta version; may change without notice})
+#'
+#' \code{predict.fit_model} calculates predictions given new data
+#'
+#' When the user does not supply \code{covariate_data}, predictions are based upon covariate values
+#' interpolated from covariates supplied when fitting the model.  When the user does supply \code{covariate_data},
+#' predictions are created when interpolating based on those new supplied values.
+#'
+#' @inheritParams make_covariates
+#' @inheritParams VAST::make_data
+#' @param x Output from \code{\link{fit_model}}
+#' @param what Which output from \code{fit$Report} should be extracted; default is predicted density
+#'
+#' @return NULL
+#' @method predict fit_model
+#' @export
+predict.fit_model <- function(x, what="D_i", Lat_i, Lon_i, t_i, a_i, c_iz=rep(0,length(t_i)),
+  v_i=rep(0,length(t_i)), covariate_data=NULL, catchability_data=NULL,
+  working_dir=paste0(getwd(),"/"))
+{
+  warning("`predict.fit_model(.)` is still in development")
+
+  # Process inputs
+  PredTF_i = c( x$data_list$PredTF_i, rep(1,length(t_i)) )
+  b_i = c( x$data_frame[,"b_i"], rep(1,length(t_i)) )
+  c_iz = rbind( matrix(x$data_frame[,grep("c_iz",names(x$data_frame))]), matrix(c_iz) )
+  Lat_i = c( x$data_frame[,"Lat_i"], Lat_i )
+  Lon_i = c( x$data_frame[,"Lon_i"], Lon_i )
+  a_i = c( x$data_frame[,"a_i"], a_i )
+  v_i = c( x$data_frame[,"v_i"], v_i )
+  t_i = c( x$data_frame[,"t_i"], t_i )
+  catchability_data = rbind( x$catchability_data, catchability_data )
+  assign("b_i", b_i, envir=.GlobalEnv)
+
+  # Populate covariate_data
+  # Default: use original covariate values
+  # When user provides new values, deal with missing years in covariate_data so that it doesn't throw an unnecessary error
+  if( is.null(covariate_data) ){
+    message("Using `covariate_data` supplied during original fit to interpolate covariate values for predictions")
+    covariate_data = x$covariate_data
+  }else{
+    if( !(all(t_i %in% covariate_data[,'Year']) | any(is.na(covariate_data[,'Year']))) ){
+      stop("Some `t_i` values are supplied without covariates")
+    }else{
+      message("Covariates not provided for all modeled years, so filling in zeros for covariates in other years")
+      zeros_data = covariate_data[match(covariate_data[,'Year'],unique(covariate_data[,'Year'])),]
+      zeros_data[,setdiff(names(zeros_data),c('Lat','Lon','Year'))] = 0
+      zeros_data[,c('Lat','Lon')] = Inf
+      covariate_data = rbind( covariate_data, zeros_data)
+    }
+  }
+
+  # Build information regarding spatial location and correlation
+  message("\n### Re-making spatial information")
+  spatial_args_new = list("anisotropic_mesh"=x$spatial_list$MeshList$anisotropic_mesh, "Kmeans"=x$spatial_list$Kmeans,
+    "Lon_i"=Lon_i, "Lat_i"=Lat_i )
+  spatial_args_input = combine_lists( input=spatial_args_new, default=x$input_args$spatial_args_input )
+  spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
+
+  # Build data
+  # Do *not* restrict inputs to formalArgs(make_data) because other potential inputs are still parsed by make_data for backwards compatibility
+  message("\n### Re-making data object")
+  data_args_new = list( "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i, "PredTF_i"=PredTF_i,
+    "t_i"=t_i, "spatial_list"=spatial_list,
+    "covariate_data"=covariate_data, "catchability_data"=catchability_data )
+  data_args_input = combine_lists( input=data_args_new, default=x$input_args$data_args_input )  # Do *not* use args_to_use
+  data_list = do.call( what=make_data, args=data_args_input )
+  data_list$n_g = 0
+
+  # Build object
+  message("\n### Re-making TMB object")
+  model_args_default = list("TmbData"=data_list, "RunDir"=working_dir, "Version"=x$settings$Version,
+    "RhoConfig"=x$settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method)
+  model_args_input = combine_lists( input=list("Parameters"=x$ParHat),
+    default=model_args_default, args_to_use=formalArgs(make_model) )
+  tmb_list = do.call( what=make_model, args=model_args_input )
+
+  # Extract output
+  Report = tmb_list$Obj$report()
+  Y_i = Report[[what]][(1+nrow(x$data_frame)):length(Report$D_i)]
+
+  # sanity check
+  if( all.equal(covariate_data,x$covariate_data) & Report$jnll!=x$Report$jnll){
+    message("Problem detected in `predict.fit_model`; returning outputs for diagnostic purposes")
+    Return = list("Report"=Report, "data_list"=data_list)
+    return(Return)
+  }
+
+  # return prediction
+  return(Y_i)
+}
 

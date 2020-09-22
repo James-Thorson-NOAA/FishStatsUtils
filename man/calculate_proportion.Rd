@@ -4,19 +4,38 @@
 \alias{calculate_proportion}
 \title{Calculate the compositional-expansion}
 \usage{
-calculate_proportion(TmbData, Index, Expansion_cz = NULL,
-  Year_Set = NULL, Years2Include = NULL, strata_names = NULL,
-  category_names = NULL, plot_legend = ifelse(TmbData$n_l > 1, TRUE,
-  FALSE), DirName = paste0(getwd(), "/"), PlotName = "Proportion.png",
-  PlotName2 = "Average.png", interval_width = 1, width = 6,
-  height = 6, xlab = "Category", ylab = "Proportion", ...)
+calculate_proportion(
+  TmbData,
+  Index,
+  Expansion_cz = NULL,
+  Year_Set = NULL,
+  Years2Include = NULL,
+  strata_names = NULL,
+  category_names = NULL,
+  plot_legend = ifelse(TmbData$n_l > 1, TRUE, FALSE),
+  DirName = paste0(getwd(), "/"),
+  PlotName = "Proportion.png",
+  PlotName2 = "Average.png",
+  interval_width = 1,
+  width = 6,
+  height = 6,
+  xlab = "Category",
+  ylab = "Proportion",
+  ...
+)
 }
 \arguments{
 \item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
 
 \item{Index}{output from \code{FishStatsUtils::plot_biomass_index}}
 
-\item{Expansion_cz}{matrix specifying how densities are expanded when calculating annual indices, with a row for each category \code{c} and two columns.  The first column specifies whether to calculate annual index for category \code{c} as the weighted-sum across density estimates, where density is weighted by area ("area-weighted expansion", \code{Expansion[c,1]=0}, the default), where density is weighted by the expanded value for another category ("abundance weighted expansion" \code{Expansion[c1,1]=1}), or the index is calculated as the weighted average of density weighted by the expanded value for another category ("abundance weighted-average expansion" \code{Expansion[c1,1]=2}).  The 2nd column is only used when \code{Expansion[c1,1]=1} or \code{Expansion[c1,1]=2} , and specifies the category to use for abundance-weighted expansion, where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
+\item{Expansion_cz}{matrix specifying how densities are expanded when calculating annual indices, with a row for each category \code{c} and two columns.
+The first column specifies whether to calculate annual index for category \code{c} as the weighted-sum across density estimates,
+where density is weighted by area ("area-weighted expansion", \code{Expansion[c,1]=0}, the default),
+where density is weighted by the expanded value for another category ("abundance weighted expansion" \code{Expansion[c1,1]=1}),
+or the index is calculated as the weighted average of density weighted by the expanded value for another category
+("abundance weighted-average expansion" \code{Expansion[c1,1]=2}).  The 2nd column is only used when \code{Expansion[c1,1]=1} or \code{Expansion[c1,1]=2},
+and specifies the category to use for abundance-weighted expansion, where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
 
 \item{Year_Set}{Year names for labeling panels}
 

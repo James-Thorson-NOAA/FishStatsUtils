@@ -4,12 +4,29 @@
 \alias{make_spatial_info}
 \title{Build objects related to spatial information}
 \usage{
-make_spatial_info(n_x, Lon_i, Lat_i, Extrapolation_List,
-  knot_method = NULL, Method = "Mesh", grid_size_km = 50,
-  grid_size_LL = 1, fine_scale = FALSE, Network_sz_LL = NULL,
-  iter.max = 1000, randomseed = 1, nstart = 100,
-  DirPath = paste0(getwd(), "/"), Save_Results = FALSE, LON_intensity,
-  LAT_intensity, ...)
+make_spatial_info(
+  n_x,
+  Lon_i,
+  Lat_i,
+  Extrapolation_List,
+  knot_method = NULL,
+  Method = "Mesh",
+  anisotropic_mesh = NULL,
+  Kmeans = NULL,
+  grid_size_km = 50,
+  grid_size_LL = 1,
+  fine_scale = FALSE,
+  Network_sz_LL = NULL,
+  iter.max = 1000,
+  randomseed = 1,
+  nstart = 100,
+  DirPath = paste0(getwd(), "/"),
+  Save_Results = FALSE,
+  LON_intensity,
+  LAT_intensity,
+  backwards_compatible_kmeans = FALSE,
+  ...
+)
 }
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
@@ -23,6 +40,8 @@ make_spatial_info(n_x, Lon_i, Lat_i, Extrapolation_List,
 \item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
 
 \item{Method}{a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy}
+
+\item{anisotropic_mesh}{OPTIONAL, anisotropic mesh (if missing, its recalculated from loc_x)}
 
 \item{grid_size_km}{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}}
 
@@ -42,6 +61,10 @@ make_spatial_info(n_x, Lon_i, Lat_i, Extrapolation_List,
 
 \item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
 
+\item{backwards_compatible_kmeans}{a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
+where \code{backwards_compatible_kmeans==TRUE} modifies the default algorithm to maintain backwards compatibility, and
+where \code{backwards_compatible_kmeans==FALSE} breaks backwards compatibility between R versions prior to and after R 3.6.0.}
+
 \item{...}{additional arguments passed to \code{\link[INLA]{inla.mesh.create}}}
 }
 \value{
@@ -51,7 +74,7 @@ Tagged list containing objects for running a VAST model
   \item{GridList}{A tagged list with inputs related to the 2D AR1 grid}
   \item{a_xl}{A data frame with areas for each knot and each strattum}
   \item{loc_UTM}{A data frame with the converted UTM coordinates for each sample}
-  \item{Kmeans}{Output from \code{Calc_Kmeans} with knots for a triangulated mesh}
+  \item{Kmeans}{Output from \code{make_kmeans} with knots for a triangulated mesh}
   \item{knot_i}{The knot associated with each sample}
   \item{Method}{The Method input (for archival purposes)}
   \item{loc_x}{The UTM location for each knot}

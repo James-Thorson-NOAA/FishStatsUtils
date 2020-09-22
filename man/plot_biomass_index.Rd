@@ -4,12 +4,26 @@
 \alias{plot_biomass_index}
 \title{Plot index of abundance}
 \usage{
-plot_biomass_index(TmbData, Sdreport, Year_Set = NULL,
-  Years2Include = NULL, DirName = paste0(getwd(), "/"),
-  PlotName = "Index", interval_width = 1, strata_names = NULL,
-  category_names = NULL, use_biascorr = TRUE, plot_legend = TRUE,
-  total_area_km2 = NULL, plot_log = FALSE, width = NULL,
-  height = NULL, create_covariance_table = FALSE, ...)
+plot_biomass_index(
+  TmbData,
+  Sdreport,
+  Year_Set = NULL,
+  Years2Include = NULL,
+  DirName = paste0(getwd(), "/"),
+  PlotName = "Index",
+  interval_width = 1,
+  strata_names = NULL,
+  category_names = NULL,
+  use_biascorr = TRUE,
+  plot_legend = TRUE,
+  total_area_km2 = NULL,
+  plot_log = FALSE,
+  width = NULL,
+  height = NULL,
+  create_covariance_table = FALSE,
+  Yrange = c(ifelse(plot_log == TRUE, NA, 0), NA),
+  ...
+)
 }
 \arguments{
 \item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}

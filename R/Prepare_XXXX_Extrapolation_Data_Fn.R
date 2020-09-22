@@ -642,7 +642,7 @@ function( input_grid, strata.limits=NULL, projargs=NA, zone=NA, flip_around_date
   # Augment with strata for each extrapolation cell
   Tmp = cbind("BEST_LAT_DD"=Data_Extrap[,'Lat'], "BEST_LON_DD"=Data_Extrap[,'Lon'])
   if( "Depth" %in% colnames(Data_Extrap) ){
-    Tmp = cbind( Tmp, Data_Extrap[,'Depth'] )
+    Tmp = cbind( Tmp, "BEST_DEPTH_M" = Data_Extrap[,'Depth'] )
   }
   a_el = as.data.frame(matrix(NA, nrow=nrow(Data_Extrap), ncol=nrow(strata.limits), dimnames=list(NULL,strata.limits[,'STRATA'])))
   for(l in 1:ncol(a_el)){
