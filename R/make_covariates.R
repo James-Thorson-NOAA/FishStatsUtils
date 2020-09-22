@@ -41,7 +41,7 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
   covariate_df = covariate_data[ which(!is.na(covariate_data[,'Year'])), ]
   for( tI in seq_along(Year_Set) ){
     newrows = covariate_data[ which(is.na(covariate_data[,'Year'])), ]
-    newrows[,"Year"] = Year_Set[tI]
+    newrows[,"Year"] = rep( Year_Set[tI], nrow(newrows) )
     covariate_df = rbind( covariate_df, newrows )
   }
 
