@@ -28,57 +28,22 @@
 #' @export
 make_covariates = function( formula, covariate_data, Year_i, spatial_list, extrapolation_list ){
 
-  # Errors
+  # Check for bad entries
   if( !is.data.frame(covariate_data) ) stop("Please ensure that `covariate_data` is a data frame")
   if( !all(c("Lat","Lon","Year") %in% names(covariate_data)) ){
     stop( "`data` in `make_covariates(.)` must include columns `Lat`, `Lon`, and `Year`" )
   }
 
-  # transform data inputs
-  sample_data = data.frame( "Year"=Year_i, "Lat"=spatial_list$latlon_i[,'Lat'], "Lon"=spatial_list$latlon_i[,'Lon'] )
-  covariate_names = setdiff( names(covariate_data), names(sample_data) )
-
   # set of years needed
   Year_Set = min(Year_i):max(Year_i)
 
-  # extract latitude and longitude for extrapolation grid
-  latlon_g = spatial_list$latlon_g
-
-  # Create data frame of necessary size
-  DF_zp = NULL
-  #DF_ip = cbind( sample_data, covariate_data[rep(1,nrow(sample_data)),covariate_names] )
-  DF_ip = data.frame( sample_data, covariate_data[rep(1,nrow(sample_data)),covariate_names] )
-  colnames(DF_ip) = c( names(sample_data) ,covariate_names )
-  #DF_ip[,covariate_names] = NA
-
-  # Loop through data and extrapolation-grid
+  # Make `covariate_df` by expanding for rows with Year=NA
+  covariate_df = covariate_data[ which(!is.na(covariate_data[,'Year'])), ]
   for( tI in seq_along(Year_Set) ){
-
-    # Subset to same year
-    tmp_covariate_data = covariate_data[ which(Year_Set[tI]==covariate_data[,'Year'] | is.na(covariate_data[,'Year'])), , drop=FALSE]
-    if( nrow(tmp_covariate_data)==0 ){
-      stop("Year ", Year_Set[tI], " not found in `covariate_data` please specify covariate values for all years" )
-    }
-    #
-    Which = which(Year_Set[tI]==sample_data[,'Year'])
-    # Do nearest neighbors to define covariates for observations, skipping years without observations
-    if( length(Which) > 0 ){
-      NN = RANN::nn2( data=tmp_covariate_data[,c("Lat","Lon")], query=sample_data[Which,c("Lat","Lon")], k=1 )
-      # Add to data-frame
-      nearest_covariates = tmp_covariate_data[ NN$nn.idx[,1], covariate_names, drop=FALSE ]
-      DF_ip[Which, covariate_names] = nearest_covariates
-    }
-
-    # Do nearest neighbors to define covariates for extrapolation grid, including years without observations
-    NN = RANN::nn2( data=tmp_covariate_data[,c("Lat","Lon")], query=latlon_g[,c("Lat","Lon")], k=1 )
-    # Add rows
-    nearest_covariates = tmp_covariate_data[ NN$nn.idx[,1], covariate_names, drop=FALSE ]
-    newrows = cbind("Year"=Year_Set[tI], latlon_g, nearest_covariates )
-    DF_zp = rbind( DF_zp, newrows )
+    newrows = covariate_data[ which(is.na(covariate_data[,'Year'])), ]
+    newrows[,"Year"] = Year_Set[tI]
+    covariate_df = rbind( covariate_df, newrows )
   }
-
-  # Convert to dimensions requested
-  DF = rbind( DF_ip, DF_zp )
 
   # Make model.matrix
     # To ensure identifiability given betas (intercepts), add intercept to formula
@@ -86,25 +51,53 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
     # issues arising when both conditions are met:
     # factor(Year) has an interaction with another factor, and
     # betas vary among years (are not constant)
-  Model_matrix = model.matrix( update.formula(formula, ~.+1), data=DF )
+  Model_matrix = model.matrix( update.formula(formula, ~.+1), data=covariate_df )
   Columns_to_keep = which( attr(Model_matrix,"assign") != 0 )
   coefficient_names = attr(Model_matrix,"dimnames")[[2]][Columns_to_keep]
   X = Model_matrix[,Columns_to_keep,drop=FALSE]
+  dimnames(X) = list(NULL, coefficient_names)
 
-  # Make X_ip
-  X_ip = X[ 1:nrow(DF_ip), , drop=FALSE ]
-  X_itp = aperm( X_ip %o% rep(1,length(Year_Set)), perm=c(1,3,2) )
-  if( any(is.na(X_itp)) ) stop("Problem with `X_itp` in `make_covariates(.)")
+  # transform data inputs
+  sample_i = data.frame( "Year"=Year_i, "Lat"=spatial_list$latlon_i[,'Lat'], "Lon"=spatial_list$latlon_i[,'Lon'] )
+  #covariate_names = setdiff( names(covariate_data), names(sample_data) )
 
-  # Make X_gpt and then permute dimensions
-  X_gpt = NULL
-  indices = nrow(X_ip)
+  # extract latitude and longitude for extrapolation grid
+  latlon_g = spatial_list$latlon_g
+
+  # Create data frame of necessary size
+  X_gtp = array( NA, dim=c(nrow(latlon_g),length(Year_Set),ncol(X)), dimnames=list(NULL,Year_Set,colnames(X)) )
+  X_ip = array( NA, dim=c(nrow(sample_i),ncol(X)), dimnames=list(NULL,colnames(X)) )
+
+  # Loop through data and extrapolation-grid
   for( tI in seq_along(Year_Set) ){
-    indices = max(indices) + 1:nrow(latlon_g)
-    if( max(indices)>nrow(X) ) stop("Check problem in `make_covariates`")
-    X_gpt = abind::abind( X_gpt, X[ indices, , drop=FALSE ], along=3 )
+
+    # Subset to same year
+    tmp_covariate_df = covariate_df[ which(Year_Set[tI]==covariate_df[,'Year']), , drop=FALSE]
+    tmp_X = X[ which(Year_Set[tI]==covariate_df[,'Year']), , drop=FALSE]
+    if( nrow(tmp_covariate_df)==0 ){
+      stop("Year ", Year_Set[tI], " not found in `covariate_data` please specify covariate values for all years" )
+    }
+
+    # Fill in values in X_ip
+    Which = which(Year_Set[tI]==sample_i[,'Year'])
+    # Do nearest neighbors to define covariates for observations, skipping years without observations
+    if( length(Which) > 0 ){
+      NN = RANN::nn2( data=tmp_covariate_df[,c("Lat","Lon")], query=sample_i[Which,c("Lat","Lon")], k=1 )
+      # Fill in values
+      X_ip[Which, ] = tmp_X[ NN$nn.idx[,1], , drop=FALSE]
+    }
+
+    # Do nearest neighbors to define covariates for extrapolation grid, including years without observations
+    NN = RANN::nn2( data=tmp_covariate_df[,c("Lat","Lon")], query=latlon_g[,c("Lat","Lon")], k=1 )
+    # Add rows
+    X_gtp[,tI,] = tmp_X[ NN$nn.idx[,1], , drop=FALSE ]
   }
-  X_gtp = aperm( X_gpt, perm=c(1,3,2) )
+
+  # Make X_itp
+  X_itp = aperm( X_ip %o% rep(1,length(Year_Set)), perm=c(1,3,2) )
+
+  # Check for obvious problems
+  if( any(is.na(X_itp)) ) stop("Problem with `X_itp` in `make_covariates(.)")
   if( any(is.na(X_gtp)) ) stop("Problem with `X_gtp` in `make_covariates(.)")
 
   # warnings
@@ -113,7 +106,7 @@ make_covariates = function( formula, covariate_data, Year_i, spatial_list, extra
   }
 
   # return stuff
-  Return = list( "X_gtp"=X_gtp, "X_itp"=X_itp, "covariate_names"=covariate_names,
+  Return = list( "X_gtp"=X_gtp, "X_itp"=X_itp, # "covariate_names"=covariate_names,
     "coefficient_names"=coefficient_names )
   return( Return )
 }
