@@ -28,9 +28,9 @@ make_settings(
 )
 }
 \arguments{
-\item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
+\item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when \code{Method="Mesh"})}
 
-\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile}
+\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are \code{"california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other"}, or the absolute path and file name for a GIS shapefile}
 
 \item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}, \code{purpose="condition_and_density"}, \code{purpose="MICE"}, or \code{purpose="ordination"}.}
 
@@ -42,19 +42,26 @@ make_settings(
 
 \item{FieldConfig}{See Details section of \code{\link[VAST]{make_data}} for details}
 
-\item{RhoConfig}{vector of form c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0) specifying whether either intercepts (Beta1 and Beta2)
+\item{RhoConfig}{vector of form \code{c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0)} specifying whether either intercepts (Beta1 and Beta2)
 or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals (0: each year as fixed effect;
 1: each year as random following IID distribution; 2: each year as random following a random walk;
 3: constant among years as fixed effect; 4: each year as random following AR1 process);  If missing, assumed to be zero for each element}
 
-\item{OverdispersionConfig}{a vector of format c("eta1"=0, "eta2"="AR1") governing any correlated overdispersion
-among categories for each level of v_i, where eta1 is for encounter probability, and eta2 is for positive catch rates,
-where 0 is off, "AR1" is an AR1 process, and >0 is the number of elements in a factor-analysis covariance (by default,
-c("eta1"=0, "eta2"=0) and this turns off overdispersion)}
+\item{OverdispersionConfig}{a vector of format \code{c("eta1"=0, "eta2"="AR1")} governing any correlated overdispersion
+among categories for each level of \code{v_i}, where eta1 is for encounter probability, and eta2 is for positive catch rates,
+where \code{0} is off, code{"AR1"} is an AR1 process, and aninteger greater than zero (e.g., \code{2}) is the number of elements in a factor-analysis covariance (by default,
+\code{c("eta1"=0, "eta2"=0)} and this turns off overdispersion)}
 
-\item{Options}{a vector of form c('SD_site_logdensity'=FALSE,'Calculate_Range'=FALSE,'Calculate_effective_area'=FALSE,
-'Calculate_Cov_SE'=FALSE,'Calculate_Synchrony'=FALSE,'Calculate_proportion'=FALSE), where \code{Calculate_Range=1}
-turns on calculation of center of gravity, and Calculate_effective_area=1 turns on calculation of effective area occupied}
+\item{Options}{a tagged-vector that is empty by default, \code{Options=c()}, but where the following slots might be helpful to add,
+       either by passing \code{Options} to \code{\link[FishStatsUtils]{make_settings}}, or editing after a call to that function:
+\describe{
+  \item{\code{Options["SD_site_logdensity"]=TRUE}}{Turns on standard error calculation for local log-density (which is very slow to calculate!)}
+  \item{\code{Options["Calculate_Range"]=TRUE}}{Turns on internal calculation and SE for center-of-gravity}
+  \item{\code{Options["Calculate_effective_area"]=TRUE}}{Turns on internal calculation and SE for effective area occupied measuring range expansion/contraction}
+  \item{\code{Options["Calculate_Cov_SE"]=TRUE}}{Turns on internal calculation and SE for covariance among categories (i.e. in factor model)}
+  \item{\code{Options["Calculate_proportion"]=TRUE}}{Turns on internal calculation and SE for proportion of response within each category (e.g., for calculating proportion-at-age or species turnover)}
+  \item{\code{Options["Calculate_Synchrony"]=TRUE}}{Turns on internal calculation and SE for Loreau metric of synchrony (a.k.a. portfolio effects)}
+}}
 
 \item{use_anisotropy}{Boolean indicating whether to estimate two additional parameters representing geometric anisotropy}
 
@@ -69,9 +76,9 @@ Can be used to specify using an older CPP, to maintain backwards compatibility.}
 
 \item{VamConfig}{Options to estimate interactions, containing three slots:
 \describe{
-  \item{VamConfig[0]}{selects method for forming interaction matrix; Turn off feature using 0, or I recommend using 2 by default}
-  \item{VamConfig[1]}{indicates the rank of the interaction matrix, indicating the number of community axes that have regulated dynamics}
-  \item{VamConfig[2]}{Indicates whether interactions occur before spatio-temporal variation (\code{VamConfig[2]=0}) or after \code{VamConfig[2]=1}}
+  \item{\code{VamConfig[0]}}{selects method for forming interaction matrix; Turn off feature using 0, or I recommend using 2 by default}
+  \item{\code{VamConfig[1]}}{indicates the rank of the interaction matrix, indicating the number of community axes that have regulated dynamics}
+  \item{\code{VamConfig[2]}}{Indicates whether interactions occur before spatio-temporal variation (\code{VamConfig[2]=0}) or after \code{VamConfig[2]=1}}
 }}
 
 \item{max_cells}{Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.}

@@ -57,11 +57,11 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
 \item{X1config_cp}{matrix of settings for each density covariate for the 1st lienar predictor,
        where the row corresponds to model category, and column corresponds to each density covariate
 \describe{
-  \item{X1config_cp[c,p]=0}{\code{X_ip[,p]} has no effect on the 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=1}{\code{X_ip[,p]} has a linear effect on 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=2}{\code{X_ip[,p]} has a spatially varying, zero-centered linear effect on 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=3}{\code{X_ip[,p]} has a spatially varying linear effect on 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=-1}{\code{X1config_cp[c,p]=-1} is the same as \code{X1config_cp[c,p]=2}, but without including the log-likelihood term; this is useful in special cases when carefully mirroring spatially varying coefficients, e.g., to use cohort effects in a age-structured spatio-temporal model}
+  \item{\code{X1config_cp[c,p]=0}}{\code{X_ip[,p]} has no effect on the 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=1}}{\code{X_ip[,p]} has a linear effect on 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=2}}{\code{X_ip[,p]} has a spatially varying, zero-centered linear effect on 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=3}}{\code{X_ip[,p]} has a spatially varying linear effect on 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=-1}}{\code{X1config_cp[c,p]=-1} is the same as \code{X1config_cp[c,p]=2}, but without including the log-likelihood term; this is useful in special cases when carefully mirroring spatially varying coefficients, e.g., to use cohort effects in a age-structured spatio-temporal model}
 }}
 
 \item{X2config_cp}{Same as argument \code{X1config_cp} but for 2nd linear predictor}
@@ -74,7 +74,8 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
 \item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for density}
 
 \item{Q1config_k}{Same as argument \code{X1config_cp} but affecting affecting the 1st linear predictor for catchability,
-and note that it is a vector (instead of matrix) given the more flexible form for catchability covariates}
+and note that it is a vector (instead of matrix) given that catchability responses do not vary among variables \code{c}
+by default (but can be specified to do so when an appropriate `formula` is supplied)}
 
 \item{Q2config_k}{Same as argument \code{Q1config_cp} but affecting affecting the 2nd linear predictor for catchability}
 

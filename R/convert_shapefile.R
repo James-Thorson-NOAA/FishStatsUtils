@@ -21,8 +21,14 @@
 #'
 #' @author Cecilia O'Leary, James Thorson
 #' @export
-convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), projargs_for_shapefile=NULL,
-  make_plots=FALSE, quiet=TRUE, area_tolerance=0.05, ... ){
+convert_shapefile = function( file_path,
+    projargs = NULL,
+    grid_dim_km = c(2,2),
+    projargs_for_shapefile = NULL,
+    make_plots = FALSE,
+    quiet = TRUE,
+    area_tolerance = 0.05,
+    ... ){
 
   shapefile_orig = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
   # raster::shapefile(.) has simplified read-write interface for future reference

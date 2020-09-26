@@ -31,7 +31,7 @@ make_extrapolation_info(
 )
 }
 \arguments{
-\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile}
+\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are \code{"california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other"}, or the absolute path and file name for a GIS shapefile}
 
 \item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 

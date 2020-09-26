@@ -4,9 +4,16 @@
 \alias{convert_shapefile}
 \title{Convert shapefile to extrapolation-grid}
 \usage{
-convert_shapefile(file_path, projargs = NULL, grid_dim_km = c(2, 2),
-  projargs_for_shapefile = NULL, make_plots = FALSE, quiet = TRUE,
-  area_tolerance = 0.05, ...)
+convert_shapefile(
+  file_path,
+  projargs = NULL,
+  grid_dim_km = c(2, 2),
+  projargs_for_shapefile = NULL,
+  make_plots = FALSE,
+  quiet = TRUE,
+  area_tolerance = 0.05,
+  ...
+)
 }
 \arguments{
 \item{file_path}{path for shapefile on harddrive}
