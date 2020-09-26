@@ -29,7 +29,7 @@ make_spatial_info(
 )
 }
 \arguments{
-\item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when Method="Mesh")}
+\item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when \code{Method="Mesh"})}
 
 \item{Lon_i}{Longitude for each sample}
 
