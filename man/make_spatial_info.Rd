@@ -35,21 +35,29 @@ make_spatial_info(
 
 \item{Lat_i}{Latitude for each sample}
 
-\item{Extrapolation_List}{the output from \code{Prepare_Extrapolation_Data_Fn}}
+\item{Extrapolation_List}{the output from \code{\link{make_extrapolation_info}}}
 
 \item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
 
-\item{Method}{a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy}
+\item{Method}{a string specifying the form of spatial smoother with the following possible options:
+\describe{
+   \item{\code{Method="Mesh"}}{the SPDE method using geometric anisotropy as originally developed by INLA (recommended as default)}
+   \item{\code{Method="Barrier"}}{the isotropic SPDE method but including barriers (i.e., preventing correlations from traveling over land); note that this feature is still in development and may change without warning}
+   \item{\code{Method="Grid"}}{a 1st-order autoregressive process in two-dimensional spatial coordinates}
+   \item{\code{Method="Stream_network"}}{an Ornstein-Uhlenbeck process specified along an acyclic graphc, e.g., representing a stream network}
+   \item{\code{Method="Spherical_mesh"}}{the isotropic SPDE method with distances defined based on sphierical distances; note that this feature has not been extensively tested and please contract package author if interested in helping to do so}
+}}
 
 \item{anisotropic_mesh}{OPTIONAL, anisotropic mesh (if missing, its recalculated from loc_x)}
 
-\item{grid_size_km}{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}}
+\item{grid_size_km}{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when \code{Method="Grid"})}
 
-\item{grid_size_LL}{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}}
+\item{grid_size_LL}{the distance between grid cells for the 2D AR1 grid (determines spatial resolution when \code{Method="Spherical_mesh"})}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
 
-\item{Network_sz_LL}{data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"}
+\item{Network_sz_LL}{data frame with variables \code{"parent_s", "child_s", "dist_s", "Lat", "Lon"}, with default value \code{Network_sz_LL=NULL}
+where non-default values are only needed when \code{Method="Stream_network"} (determines spatial resolution when \code{Method="Stream_network"})}
 
 \item{iter.max}{the number of iterations used per k-means algorithm (default=1000)}
 
@@ -94,4 +102,7 @@ Tagged list containing objects for running a VAST model
 although V8.0.0 may also require changes to input naming conventions for covariates to specify the same model and attain the same fit.
 
 \code{LON_intensity} and \code{LAT_intensity} allow users to specify locations that are used by the k-means algorithm to determine the location of knots, where e.g. users can either hard-code the desired knot locations via these inputs (using \code{n_x} greater than this number of locations), or use the extrapolation-grid to ensure that knots are located proportional to that grid.
+}
+\author{
+James Thorson, Merrill Rudd
 }

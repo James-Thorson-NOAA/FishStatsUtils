@@ -21,12 +21,20 @@
 #' @param Lon_i Longitude for each sample
 #' @param Lat_i Latitude for each sample
 #' @param knot_method whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}
-#' @param Method a character of either "Grid" or "Mesh" where "Grid" is a 2D AR1 process, and "Mesh" is the SPDE method with geometric anisotropy
+#' @param Method a string specifying the form of spatial smoother with the following possible options:
+#' \describe{
+#'    \item{\code{Method="Mesh"}}{the SPDE method using geometric anisotropy as originally developed by INLA (recommended as default)}
+#'    \item{\code{Method="Barrier"}}{the isotropic SPDE method but including barriers (i.e., preventing correlations from traveling over land); note that this feature is still in development and may change without warning}
+#'    \item{\code{Method="Grid"}}{a 1st-order autoregressive process in two-dimensional spatial coordinates}
+#'    \item{\code{Method="Stream_network"}}{an Ornstein-Uhlenbeck process specified along an acyclic graphc, e.g., representing a stream network}
+#'    \item{\code{Method="Spherical_mesh"}}{the isotropic SPDE method with distances defined based on sphierical distances; note that this feature has not been extensively tested and please contract package author if interested in helping to do so}
+#' }
 #' @param fine_scale a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino
-#' @param Extrapolation_List the output from \code{Prepare_Extrapolation_Data_Fn}
-#' @param grid_size_km the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when not using \code{Method="Spherical_mesh"}
-#' @param grid_size_LL the distance between grid cells for the 2D AR1 grid (determines spatial resolution when Method="Grid") when using \code{Method="Spherical_mesh"}
-#' @param Network_sz_LL data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"
+#' @param Extrapolation_List the output from \code{\link{make_extrapolation_info}}
+#' @param grid_size_km the distance between grid cells for the 2D AR1 grid (determines spatial resolution when \code{Method="Grid"})
+#' @param grid_size_LL the distance between grid cells for the 2D AR1 grid (determines spatial resolution when \code{Method="Spherical_mesh"})
+#' @param Network_sz_LL data frame with variables \code{"parent_s", "child_s", "dist_s", "Lat", "Lon"}, with default value \code{Network_sz_LL=NULL}
+#'        where non-default values are only needed when \code{Method="Stream_network"} (determines spatial resolution when \code{Method="Stream_network"})
 #' @param ... additional arguments passed to \code{\link[INLA]{inla.mesh.create}}
 
 #' @return Tagged list containing objects for running a VAST model
@@ -41,12 +49,29 @@
 #'   \item{loc_x}{The UTM location for each knot}
 #' }
 #'
-
+#' @author James Thorson, Merrill Rudd
 #' @export
-make_spatial_info = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_method=NULL, Method="Mesh",
-  anisotropic_mesh=NULL, Kmeans=NULL, grid_size_km=50, grid_size_LL=1, fine_scale=FALSE, Network_sz_LL=NULL,
-  iter.max=1000, randomseed=1, nstart=100, DirPath=paste0(getwd(),"/"), Save_Results=FALSE,
-  LON_intensity, LAT_intensity, backwards_compatible_kmeans=FALSE, ... ){
+make_spatial_info = function( n_x,
+    Lon_i,
+    Lat_i,
+    Extrapolation_List,
+    knot_method = NULL,
+    Method = "Mesh",
+    anisotropic_mesh = NULL,
+    Kmeans = NULL,
+    grid_size_km = 50,
+    grid_size_LL = 1,
+    fine_scale = FALSE,
+    Network_sz_LL = NULL,
+    iter.max = 1000,
+    randomseed = 1,
+    nstart = 100,
+    DirPath = paste0(getwd(),"/"),
+    Save_Results = FALSE,
+    LON_intensity,
+    LAT_intensity,
+    backwards_compatible_kmeans = FALSE,
+    ... ){
 
   # Deprecated options
   if( Method=="Spherical_mesh" ){
