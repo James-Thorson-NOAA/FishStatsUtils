@@ -18,7 +18,8 @@
 #' \dontrun{
 #'  convert_shapefile( file_path="C:/Users/James.Thorson/Desktop/Work files/AFSC/2020-03 -- Add ICES grids/IBTS grids/BITS/Shapefile.shp", make_plots=TRUE )
 #' }
-
+#'
+#' @author Cecilia O'Leary, James Thorson
 #' @export
 convert_shapefile = function( file_path, projargs=NULL, grid_dim_km=c(2,2), projargs_for_shapefile=NULL,
   make_plots=FALSE, quiet=TRUE, area_tolerance=0.05, ... ){
