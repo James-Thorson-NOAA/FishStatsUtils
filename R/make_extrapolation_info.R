@@ -127,7 +127,10 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_GOM_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
-    if( toupper(Region[rI]) %in% c("ATL-IBTS-Q1","ATL-IBTS-Q4","BITS","BTS","BTS-VIIA","EVHOE","IE-IGFS","NIGFS","NS_IBTS","PT-IBTS","SP-ARSA","SP-NORTH","SP-PORC") ){
+    # Pre-packaged shapefile options
+    Shapefile_set = c("ATL-IBTS-Q1","ATL-IBTS-Q4","BITS","BTS","BTS-VIIA","EVHOE","IE-IGFS","NIGFS","NS_IBTS","PT-IBTS","SP-ARSA","SP-NORTH","SP-PORC",
+      "CalCOFI_Winter-Spring","CalCOFI-IMECOCAL_Winter-Spring","IMECOCAL_Winter-Spring")
+    if( toupper(Region[rI]) %in% toupper(Shapefile_set) ){
       if( Region[rI]=="SP-ARSA" ) stop("There's some problem with `SP-ARSA` which precludes it's use")
       Conversion = convert_shapefile( file_path=paste0(system.file("region_shapefiles",package="FishStatsUtils"),"/",toupper(Region[rI]),"/Shapefile.shp"),
         projargs_for_shapefile="+proj=longlat +ellps=WGS84 +no_defs", projargs=projargs, grid_dim_km=grid_dim_km, area_tolerance=area_tolerance, ... )
