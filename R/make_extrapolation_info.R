@@ -129,7 +129,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     }
     # Pre-packaged shapefile options
     Shapefile_set = c("ATL-IBTS-Q1","ATL-IBTS-Q4","BITS","BTS","BTS-VIIA","EVHOE","IE-IGFS","NIGFS","NS_IBTS","PT-IBTS","SP-ARSA","SP-NORTH","SP-PORC",
-      "CalCOFI_Winter-Spring","CalCOFI-IMECOCAL_Winter-Spring","IMECOCAL_Winter-Spring")
+      "CalCOFI_Winter-Spring","CalCOFI-IMECOCAL_Winter-Spring","IMECOCAL_Winter-Spring","CalCOFI-IMECOCAL_Summer")
     if( toupper(Region[rI]) %in% toupper(Shapefile_set) ){
       if( Region[rI]=="SP-ARSA" ) stop("There's some problem with `SP-ARSA` which precludes it's use")
       Conversion = convert_shapefile( file_path=paste0(system.file("region_shapefiles",package="FishStatsUtils"),"/",toupper(Region[rI]),"/Shapefile.shp"),
