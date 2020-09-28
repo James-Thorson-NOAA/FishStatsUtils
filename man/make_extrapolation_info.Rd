@@ -31,7 +31,34 @@ make_extrapolation_info(
 )
 }
 \arguments{
-\item{Region}{a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are \code{"california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other"}, or the absolute path and file name for a GIS shapefile}
+\item{Region}{a character vector, where each element is matched against potential values to create the extrapolation grid, where densities are
+       then predicted at the midpoint of each grid cell when calculating derived quantities or visualizing model outputs.
+       Users will typically supply a single character-string, representing the footprint of a single survey.
+       However, it is also possible to provide a character-vector, where the extrapolation-grid will be created for each string, and then combined together;
+       this is then helpful when extrapolating densities across multiple survey domains.
+       Current options are:
+\describe{
+  \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}}
+  \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
+  \item{\code{"california_current"}}{The spatial fooprint of the stratified-random shelf-slope bottom trawl operated by NWFSC from 2003 onward; specify subsets via \code{surveyname}}
+  \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC}
+  \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS; see \code{strata_to_use} for further specification}
+  \item{\code{"eastern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the eastern Bering Sea}
+  \item{\code{"northern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the northern Bering Sea}
+  \item{\code{"bering_sea_slope"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Bering Sea slope}
+  \item{\code{"st_matthews_island"}}{The spatial fooprint of the survey area defined around St. Matthews Island, representing regular and corner stations from the eastern Bering Sea bottom trawl survey}
+  \item{\code{"aleutian_islands"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Aleutian Islands}
+  \item{\code{"gulf_of_alaska"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Gulf of Alaska and containing shallow and deep stations (where the latter are not consistently sampled in later years)}
+  \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic;  see \code{epu_to_use} for further subdivisions}
+  \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa; see \code{region} to select between South and West Coast surveys}
+  \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence}
+  \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise}
+  \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC}
+  \item{\code{"gulf_of_mexico"}}{The US Gulf of Mexico, surveyed by various fishery-independent surveys; using a definition provided by A. Gruss}
+  \item{\code{"ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC"}}{ICES survey domains as defined by shapefiles provided by M. Lindegren as originated by ICES Secretariat}
+  \item{\code{"stream_network"}}{Specifying a stream network for use when \code{Method="Stream_network"}}
+  \item{\code{"other"}}{Automated creation of an extrapolation-grid by padding an area around observations (not recommended for operational use)}
+}}
 
 \item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
@@ -43,7 +70,7 @@ make_extrapolation_info(
 
 \item{max_cells}{Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.}
 
-\item{input_grid}{a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="user"}}
+\item{input_grid}{a matrix with three columns (labeled \code{'Lat', 'Lon'}, and \code{'Area_km2'}) giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="user"}}
 
 \item{observations_LL}{a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="other"}}
 
@@ -64,8 +91,6 @@ make_extrapolation_info(
 \item{survey}{survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}}
 
 \item{surveyname}{area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}}
-
-\item{flip_around_dateline}{used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used}
 
 \item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
 
