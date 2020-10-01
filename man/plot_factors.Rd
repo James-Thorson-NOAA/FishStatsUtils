@@ -37,7 +37,7 @@ plot_factors(
 
 \item{RotationMethod}{Method used for rotation, Options: "PCA" (recommended) or "Varimax"}
 
-\item{mapdetails_list}{output from \code{FishStatsUtils::MapDetails_Fn}}
+\item{mapdetails_list}{output from \code{\link{make_map_info}}}
 
 \item{Dim_year}{Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)}
 
@@ -51,7 +51,7 @@ plot_factors(
 
 \item{testcutoff}{tolerance for numerical rounding when confirming that rotation doesn't effect results}
 
-\item{...}{additional arguments passed to \code{plot_maps(.)} and/or \code{plot_variable(.)} when plotting factor-values on a map}
+\item{...}{additional arguments passed to \code{\link{plot_maps}} and/or \code{\link{plot_variable}} when plotting factor-values on a map}
 }
 \description{
 \code{plot_factors} plots factor loadings, average spatial factors, and spatio-temporal factors

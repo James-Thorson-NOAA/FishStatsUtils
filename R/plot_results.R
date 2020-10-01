@@ -60,7 +60,7 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
 
   # Plot anisotropy
   message("\n### Making plot of anisotropy")
-  plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"), Report=fit$Report, TmbData=fit$data_list )
+  plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"), Obj=fit$tmb_list$Obj )
 
   # Plot index
   plot_biomass_index_args = list(...)

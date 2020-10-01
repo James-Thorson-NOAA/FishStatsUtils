@@ -52,8 +52,10 @@ make_settings(
   \item{\code{"CalCOFI_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI, in a typical year during Winter and Spring months (as identified by A. Thompson)}
   \item{\code{"IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
   \item{\code{"CalCOFI-IMECOCAL_Summer"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Summer months (as identified by A. Thompson)}
+  \item{\code{"rockfish_recruitment_coastwide"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC across its expanded spatial extent that is sampled during recent years (as identified by J. Field)}
+  \item{\code{"rockfish_recruitment_core"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC within its core spatial extent that is sampled consistently throughout its entire operations (as identified by J. Field)}
   \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic;  see \code{epu_to_use} for further subdivisions}
-  \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa; see \code{region} to select between South and West Coast surveys}
+  \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa (as identified by H. Winker); see \code{region} to select between South and West Coast surveys}
   \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence}
   \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise}
   \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC}

@@ -8,12 +8,12 @@
 #' @inheritParams rotate_factors
 #' @inheritParams plot_maps
 #' @param Year_Set plotting-names for time dimension
-#' @param mapdetails_list output from \code{FishStatsUtils::MapDetails_Fn}
+#' @param mapdetails_list output from \code{\link{make_map_info}}
 #' @param Dim_year Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)
 #' @param Dim_species Plotting dimension (row,column) for plot of categories (default: square with sufficient size for number of categories)
 #' @param plotdir directory for saving plots
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
-#' @param ... additional arguments passed to \code{plot_maps(.)} and/or \code{plot_variable(.)} when plotting factor-values on a map
+#' @param ... additional arguments passed to \code{\link{plot_maps}} and/or \code{\link{plot_variable}} when plotting factor-values on a map
 
 #' @export
 plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
