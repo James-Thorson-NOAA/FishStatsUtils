@@ -16,9 +16,20 @@
 #' @param ... additional arguments passed to \code{\link{plot_maps}} and/or \code{\link{plot_variable}} when plotting factor-values on a map
 
 #' @export
-plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
-  mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey", zlim=NA,
-  testcutoff=1e-4, ... ){
+plot_factors = function( Report,
+  ParHat,
+  Data,
+  SD = NULL,
+  Year_Set = NULL,
+  category_names = NULL,
+  RotationMethod = "PCA",
+  mapdetails_list = NULL,
+  Dim_year = NULL,
+  Dim_species = NULL,
+  plotdir = paste0(getwd(),"/"),
+  land_color = "grey",
+  zlim = NA,
+  testcutoff = 1e-4, ... ){
 
   #
   if(is.null(mapdetails_list)) message( "`plot_factors(.) skipping plots because argument `mapdetails_list` is missing")
@@ -196,9 +207,9 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ){
           if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
             if(any(is.na(as.numeric(Year_Set)))) stop("Check `At` in `plot_factors(.)`")
-            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=as.numeric(Year_Set), LabelPosition="Side" )
+            plot_loadings( L_pj=Lprime_list[[i]], Lsd_pj=Lprime_SE_list[[i]], whichfactor=cI, At=as.numeric(Year_Set), LabelPosition="Side" )
           }else{
-            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=1:nrow(Var_rot$L_pj_rot) )
+            plot_loadings( L_pj=Lprime_list[[i]], Lsd_pj=Lprime_SE_list[[i]], whichfactor=cI, At=1:nrow(Var_rot$L_pj_rot) )
           }
         }
       dev.off()
