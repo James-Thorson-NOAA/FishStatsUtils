@@ -15,10 +15,24 @@
 #'
 
 #' @export
-plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
-  Lat_i=Data_Geostat[,'Lat'], Lon_i=Data_Geostat[,'Lon'], Year_i=Data_Geostat[,'Year'], PlotDir=paste0(getwd(),"/"),
-  Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col="red", cex=0.01, pch=19,
-  Year_Set, projargs='+proj=longlat', map_resolution="medium", land_color="grey", country=NULL, ...){
+plot_data = function( Extrapolation_List,
+  Spatial_List,
+  Data_Geostat = NULL,
+  Lat_i = Data_Geostat[,'Lat'],
+  Lon_i = Data_Geostat[,'Lon'],
+  Year_i = Data_Geostat[,'Year'],
+  PlotDir = paste0(getwd(),"/"),
+  Plot1_name = "Data_and_knots.png",
+  Plot2_name = "Data_by_year.png",
+  col = "red",
+  cex = 0.01,
+  pch = 19,
+  Year_Set,
+  projargs = '+proj=longlat',
+  map_resolution = "medium",
+  land_color = "grey",
+  country = NULL,
+  ...){
 
   # Check for issues
   if( is.null(Lat_i) | is.null(Lon_i) | is.null(Year_i) ){

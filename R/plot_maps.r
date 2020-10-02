@@ -44,10 +44,27 @@
 
 #' @export
 plot_maps <-
-function(plot_set=3, Obj=NULL, PlotDF, Sdreport=NULL, projargs='+proj=longlat',
-         Panel="Category", Year_Set=NULL, Years2Include=NULL, category_names=NULL, quiet=FALSE,
-         working_dir=paste0(getwd(),"/"), MapSizeRatio, n_cells, plot_value="estimate", n_samples=100,
-         Report, TmbData, zlim=NULL, country=NULL, sample_fixed=TRUE, ...){
+function(plot_set = 3,
+  Obj = NULL,
+  PlotDF,
+  Sdreport = NULL,
+  projargs = '+proj=longlat',
+  Panel = "Category",
+  Year_Set = NULL,
+  Years2Include = NULL,
+  category_names = NULL,
+  quiet = FALSE,
+  working_dir = paste0(getwd(),"/"),
+  MapSizeRatio,
+  n_cells,
+  plot_value = "estimate",
+  n_samples = 100,
+  Report,
+  TmbData,
+  zlim = NULL,
+  country = NULL,
+  sample_fixed = TRUE,
+  ...){
 
   # Local functions
   extract_value = function( Sdreport, Report, Obj, variable_name, plot_value="estimate", n_samples, sample_fixed=TRUE ){

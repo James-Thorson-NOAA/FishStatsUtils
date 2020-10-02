@@ -31,10 +31,22 @@
 #' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 #'
 #' @export
-plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=paste0(getwd(),"/"),
-  year_labels=fit$year_labels, years_to_plot=fit$years_to_plot, use_biascorr=TRUE, map_list,
-  category_names, check_residuals=TRUE, projargs='+proj=longlat', zrange, n_samples=100,
-  calculate_relative_to_average=FALSE, type=1, ... ){
+plot_results = function( fit,
+  settings = fit$settings,
+  plot_set = 3,
+  working_dir = paste0(getwd(),"/"),
+  year_labels = fit$year_labels,
+  years_to_plot = fit$years_to_plot,
+  use_biascorr = TRUE,
+  map_list,
+  category_names,
+  check_residuals = TRUE,
+  projargs = '+proj=longlat',
+  zrange,
+  n_samples = 100,
+  calculate_relative_to_average = FALSE,
+  type = 1,
+  ... ){
 
   # Check for known issues
   if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
@@ -47,9 +59,11 @@ plot_results = function( fit, settings=fit$settings, plot_set=3, working_dir=pas
   # plot data
   message("\n### Making plots of data availability and knots")
   plot_data_args = list(...)
-  plot_data_args = combine_lists( "input"=plot_data_args, "default"=list(Extrapolation_List=fit$extrapolation_list,
-    Spatial_List=fit$spatial_list, Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'],
-    Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir, Year_Set=year_labels), "args_to_use"=formalArgs(plot_data) )
+  plot_data_args = combine_lists( "input"=plot_data_args, "args_to_use"=formalArgs(plot_data),
+    "default"=list(Extrapolation_List=fit$extrapolation_list,
+      Spatial_List=fit$spatial_list, Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'],
+      Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir, Year_Set=year_labels, projargs=projargs)
+    )
   do.call( what=plot_data, args=plot_data_args )
 
   # PLot settings
