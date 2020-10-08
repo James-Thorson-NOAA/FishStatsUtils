@@ -8,6 +8,7 @@ plot_factors(
   Report,
   ParHat,
   Data,
+  Obj,
   SD = NULL,
   Year_Set = NULL,
   category_names = NULL,
@@ -28,6 +29,8 @@ plot_factors(
 \item{ParHat}{Tagged list of fitted data, e.g., from \code{ParHat <- obj$env$parList()}}
 
 \item{Data}{tagged list of input data}
+
+\item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
 
 \item{SD}{standard deviation report, e.g., from \code{SD <- sdreport( obj )}}
 

@@ -48,6 +48,7 @@ make_settings(
   \item{\code{"st_matthews_island"}}{The spatial fooprint of the survey area defined around St. Matthews Island, representing regular and corner stations from the eastern Bering Sea bottom trawl survey}
   \item{\code{"aleutian_islands"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Aleutian Islands}
   \item{\code{"gulf_of_alaska"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Gulf of Alaska and containing shallow and deep stations (where the latter are not consistently sampled in later years)}
+  \item{\code{"BFISH_MHI"}}{The spatial fooprint of the visual sampling of reef fishes in the main Hawaiian Islands (as provided by B. Richards)}
   \item{\code{"CalCOFI-IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
   \item{\code{"CalCOFI_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI, in a typical year during Winter and Spring months (as identified by A. Thompson)}
   \item{\code{"IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
