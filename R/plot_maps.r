@@ -20,12 +20,13 @@
 #'   \item{plot_set=8}{Linear predictor for encounter probability}
 #'   \item{plot_set=9}{Linear predictor for positive catch rates}
 #'   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
-#'   \item{plot_set=11}{Covariates that are included in the model}
-#'   \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
-#'   \item{plot_set=13}{Covariate effects on encounter probability}
-#'   \item{plot_set=14}{Covariate effects on positive catch rates}
-#'   \item{plot_set=15}{Spatial variation for 1st linear predictor (Omega1)}
-#'   \item{plot_set=16}{Spatial variation for 2nd linear predictor (Omega2)}
+#'   \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
+#'   \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
+#'   \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
+#'   \item{plot_set=14}{Covariate effects on encounter probability}
+#'   \item{plot_set=15}{Covariate effects on positive catch rates}
+#'   \item{plot_set=16}{Spatial variation for 1st linear predictor (Omega1)}
+#'   \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
 #' }
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
@@ -169,7 +170,7 @@ function(plot_set = 3,
     # Extract elements
     Array_xct = NULL
     plot_code <- c("encounter_prob", "pos_catch", "ln_density", "", "", "epsilon_1", "epsilon_2",
-      "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates", "total_density",
+      "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates_1", "covariates_2", "total_density",
       "covariate_effects_1", "covariate_effects_2", "omega_1", "omega_2")[plot_num]
 
     # Extract matrix to plot
@@ -272,15 +273,22 @@ function(plot_set = 3,
       if(any(c("D_gcy","D_gct")%in%names(Report))) stop("`plot_maps` not implemented for requested plot_num")
     }
     if(plot_num==11){
-      if( quiet==FALSE ) message(" # plot_num 11: Plotting covariates")
+      if( quiet==FALSE ) message(" # plot_num 11: Plotting covariates for 1st linear predictor")
       if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
       #if(!("X_xtp" %in% names(TmbData))) stop( "Can only plot covariates for VAST version >= 2.0.0" )
       if("X_xtp"%in%names(TmbData)) Array_xct = aperm( TmbData$X_xtp, perm=c(1,3,2) )
       if("X_gtp"%in%names(TmbData)) Array_xct = aperm( TmbData$X_gtp, perm=c(1,3,2) )
       if("X_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X_gctp[,1,,],dim(TmbData$X_gctp)[c(1,3,4)]), perm=c(1,3,2) )
+      if("X1_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X1_gctp[,1,,],dim(TmbData$X1_gctp)[c(1,3,4)]), perm=c(1,3,2) )
       category_names = 1:dim(Array_xct)[2]
     }
     if(plot_num==12){
+      if( quiet==FALSE ) message(" # plot_num 12: Plotting covariates for 2nd linear predictor")
+      if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
+      if("X2_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X2_gctp[,1,,],dim(TmbData$X2_gctp)[c(1,3,4)]), perm=c(1,3,2) )
+      category_names = 1:dim(Array_xct)[2]
+    }
+    if(plot_num==13){
       # Total density ("Dens")
       if( quiet==FALSE ) message(" # plot_num 12: Plotting total density")
       if("D_xt"%in%names(Report)) Array_xct = log(Report$D_xt)
@@ -292,7 +300,7 @@ function(plot_set = 3,
       if("dhat_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dhat_ktp,c(1,3,2)), FUN=logsum, MARGIN=c(1,3))
       if("dpred_ktp" %in% names(Report)) Array_xct = apply(aperm(Report$dpred_ktp,c(1,3,2)), FUN=logsum, MARGIN=c(1,3))
     }
-    if(plot_num==13){
+    if(plot_num==14){
       # Covariate effects for probability of encounter
       if( quiet==FALSE ) message(" # plot_num 13: Plotting covariate effects for 1st linear predictor")
       if("D_xt"%in%names(Report)) stop()
@@ -302,7 +310,7 @@ function(plot_set = 3,
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
-    if(plot_num==14){
+    if(plot_num==15){
       # Covariate effects for positive catch rates
       if( quiet==FALSE ) message(" # plot_num 14: Plotting covariate effects for 2nd linear predictor")
       if("D_xt"%in%names(Report)) stop()
@@ -312,7 +320,7 @@ function(plot_set = 3,
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
-    if(plot_num==15){
+    if(plot_num==16){
       # Spatial effects for probability of encounter
       if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 1st linear predictor")
       if("D_xt"%in%names(Report)) stop()
@@ -322,7 +330,7 @@ function(plot_set = 3,
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
-    if(plot_num==16){
+    if(plot_num==17){
       # Spatial effects for positive catch rates
       if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 2nd linear predictor")
       if("D_xt"%in%names(Report)) stop()

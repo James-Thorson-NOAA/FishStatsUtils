@@ -41,12 +41,13 @@ plot_maps(
   \item{plot_set=8}{Linear predictor for encounter probability}
   \item{plot_set=9}{Linear predictor for positive catch rates}
   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
-  \item{plot_set=11}{Covariates that are included in the model}
-  \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
-  \item{plot_set=13}{Covariate effects on encounter probability}
-  \item{plot_set=14}{Covariate effects on positive catch rates}
-  \item{plot_set=15}{Spatial variation for 1st linear predictor (Omega1)}
-  \item{plot_set=16}{Spatial variation for 2nd linear predictor (Omega2)}
+  \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
+  \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
+  \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
+  \item{plot_set=14}{Covariate effects on encounter probability}
+  \item{plot_set=15}{Covariate effects on positive catch rates}
+  \item{plot_set=16}{Spatial variation for 1st linear predictor (Omega1)}
+  \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
 }}
 
 \item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
