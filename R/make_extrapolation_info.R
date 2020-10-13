@@ -70,7 +70,12 @@
 #' @param epu_to_use EPU to include for the Northwest Atlantic (NWA) extrapolation grid, default is "All"; only used if \code{Region="northwest_atlantic"}
 #' @param survey survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}
 #' @param region which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}
-#' @param surveyname area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}
+#' @param surveyname area of West Coast to include in area-weighted extrapolation for California Current;
+#'        only used if \code{Region="california_current"}.  Options are:
+#' \describe{
+#'   \item{\code{surveyname="propInWCGBTS"}}{The proportion of each extrapolation-grid cell within the annual shelf-slope survey operated 2003 to present (the default)}
+#'   \item{\code{surveyname="propInTriennial"}}{The proportion of each extrapolation-grid cell within the triennial slope survey operated 1977-2004}
+#' }
 #' @param max_cells Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.
 #' @param ... other objects passed for individual regions (see example script)
 

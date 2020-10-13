@@ -97,7 +97,12 @@ make_extrapolation_info(
 
 \item{survey}{survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}}
 
-\item{surveyname}{area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}}
+\item{surveyname}{area of West Coast to include in area-weighted extrapolation for California Current;
+       only used if \code{Region="california_current"}.  Options are:
+\describe{
+  \item{\code{surveyname="propInWCGBTS"}}{The proportion of each extrapolation-grid cell within the annual shelf-slope survey operated 2003 to present (the default)}
+  \item{\code{surveyname="propInTriennial"}}{The proportion of each extrapolation-grid cell within the triennial slope survey operated 1977-2004}
+}}
 
 \item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
 
