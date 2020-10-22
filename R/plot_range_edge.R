@@ -36,12 +36,13 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
     stop("Not implemente")
   }
   if( "ln_Index_ctl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-    # VAST Version < 2.0.0
-    stop("Not implemente")
+    # VAST Version < 2.0.0 or >= 3.6.0
+    D_name = "D_gct"
   }
   if( "ln_Index_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-    # VAST Version >= 2.0.0
+    # VAST Version >= 2.0.0 and < 3.6.0
     TmbData[["n_t"]] = nrow(TmbData[["t_yz"]])
+    D_name = "D_gcy"
   }
 
   # Default inputs
@@ -56,25 +57,25 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
   }
 
   ##### Local function
-  D_gcyr = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name="D_gcy", n_samples=n_samples, seed=seed )
+  D_gctr = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name=D_name, n_samples=n_samples, seed=seed )
 
   # Calculate quantiles from observed and sampled densities D_gcy
-  E_zctm = array(NA, dim=c(length(quantiles),dim(Report$D_gcy)[2:3],ncol(TmbData$Z_gm)) )
-  E_zctmr = array(NA, dim=c(length(quantiles),dim(Report$D_gcy)[2:3],ncol(TmbData$Z_gm),n_samples) )
-  Mean_cmr = array(NA, dim=c(dim(Report$D_gcy)[2],ncol(TmbData$Z_gm),n_samples) )
-  prop_zctm = array(NA, dim=c(dim(Report$D_gcy)[1:3],ncol(TmbData$Z_gm)) )
-  prop_zctmr = array(NA, dim=c(dim(Report$D_gcy)[1:3],ncol(TmbData$Z_gm),n_samples) )
+  E_zctm = array(NA, dim=c(length(quantiles),dim(Report[[D_name]])[2:3],ncol(TmbData$Z_gm)) )
+  E_zctmr = array(NA, dim=c(length(quantiles),dim(Report[[D_name]])[2:3],ncol(TmbData$Z_gm),n_samples) )
+  Mean_cmr = array(NA, dim=c(dim(Report[[D_name]])[2],ncol(TmbData$Z_gm),n_samples) )
+  prop_zctm = array(NA, dim=c(dim(Report[[D_name]])[1:3],ncol(TmbData$Z_gm)) )
+  prop_zctmr = array(NA, dim=c(dim(Report[[D_name]])[1:3],ncol(TmbData$Z_gm),n_samples) )
   for( rI in 0:n_samples ){
   for( mI in 1:ncol(TmbData$Z_gm) ){
     order_g = order(TmbData$Z_gm[,mI], decreasing=FALSE)
-    if(rI==0) prop_zctm[,,,mI] = apply( Report$D_gcy, MARGIN=2:3, FUN=function(vec){cumsum(vec[order_g])/sum(vec)} )
-    if(rI>=0) prop_zctmr[,,,mI,rI] = apply( D_gcyr[,,,rI,drop=FALSE], MARGIN=2:3, FUN=function(vec){cumsum(vec[order_g])/sum(vec)} )
+    if(rI==0) prop_zctm[,,,mI] = apply( Report[[D_name]], MARGIN=2:3, FUN=function(vec){cumsum(vec[order_g])/sum(vec)} )
+    if(rI>=0) prop_zctmr[,,,mI,rI] = apply( D_gctr[,,,rI,drop=FALSE], MARGIN=2:3, FUN=function(vec){cumsum(vec[order_g])/sum(vec)} )
 
     # Calculate edge
     for( cI in 1:dim(E_zctm)[2] ){
       if(rI>=1){
         if( calculate_relative_to_average==TRUE ){
-          Mean_cmr[cI,mI,rI] = weighted.mean( as.vector(TmbData$Z_gm[,mI]%o%rep(1,dim(Report$D_gcy)[3])), w=as.vector(D_gcyr[,cI,,rI]) )
+          Mean_cmr[cI,mI,rI] = weighted.mean( as.vector(TmbData$Z_gm[,mI]%o%rep(1,dim(Report[[D_name]])[3])), w=as.vector(D_gctr[,cI,,rI]) )
         }else{
           Mean_cmr[cI,mI,rI] = 0
         }
