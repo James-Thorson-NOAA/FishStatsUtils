@@ -27,6 +27,8 @@
 #'   \item{plot_set=15}{Covariate effects on positive catch rates}
 #'   \item{plot_set=16}{Spatial variation for 1st linear predictor (Omega1)}
 #'   \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
+#'   \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
+#'   \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
 #' }
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
@@ -322,7 +324,7 @@ function(plot_set = 3,
     }
     if(plot_num==16){
       # Spatial effects for probability of encounter
-      if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 1st linear predictor")
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatial effects (Omega) for 1st linear predictor")
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
@@ -332,11 +334,31 @@ function(plot_set = 3,
     }
     if(plot_num==17){
       # Spatial effects for positive catch rates
-      if( quiet==FALSE ) message(" # Plotting spatial effects (Omega) for 2nd linear predictor")
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatial effects (Omega) for 2nd linear predictor")
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
       if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = Report$Omega2_gc %o% 1
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+    }
+    if(plot_num==18){
+      # Spatially-varying response for density covariates in 1st linear predictor
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatially-varying response to density covariates (Xi) for 1st linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) stop()
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Xi1_gcp")
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+    }
+    if(plot_num==19){
+      # Spatially-varying response for density covariates in 1st linear predictor
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatially-varying response to density covariates (Xi) for 2nd linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) stop()
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Xi2_gcp")
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
