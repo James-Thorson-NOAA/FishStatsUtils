@@ -24,7 +24,7 @@ plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residual
 
   # Aggregate quantile residuals
   # See Eq. 1 here: https://www.researchgate.net/publication/259073068_Giants'_shoulders_15_years_later_Lessons_challenges_and_guidelines_in_fisheries_meta-analysis
-  aggregate_pvales = function( pvec, na.rm=TRUE ){
+  aggregate_pvalues = function( pvec, na.rm=TRUE ){
     chisq = -2*sum(log(pvec), na.rm=na.rm)
     p = pchisq( chisq, df=2*length(pvec) )
   }
@@ -40,7 +40,7 @@ plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residual
   Y_gt = Y_gt[,Years2Include,drop=FALSE]
   col_function = colorRampPalette(colors=c("darkblue","lightblue","white","pink","red"))
   plot_variable( Y_gt=Y_gt, map_list=list(PlotDF=PlotDF), file_name=file_name,
-    fun=aggregate_pvales, col=col_function,
+    fun=aggregate_pvalues, col=col_function,
     panel_labels=Year_Set[Years2Include], ... )
 
   return( NULL )
