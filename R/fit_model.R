@@ -216,8 +216,12 @@ fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 
   # Extract standard outputs
-  Report = tmb_list$Obj$report()
-  ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+  if( "par" %in% names(parameter_estimates) ){
+    Report = tmb_list$Obj$report()
+    ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+  }else{
+    Report = ParHat = "Model is not converged"
+  }
 
   # Build and output
   input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
