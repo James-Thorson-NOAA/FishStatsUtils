@@ -316,6 +316,10 @@ plot.fit_model <- function(x, what="results", ...)
 #' are not correct when using a delta-model (due to additional jittered values added by DHARMa when detecting multiple 0-valued observations), hence
 #' the need to call this function to correctly calculate PIT residuals for a delta-model.
 #'
+#' Note that \code{summary(fit, ..., type=0} uses \code{\link[FishStatsUtils]{oneStepPredict_deltaModel}} to calculate one-step-ahead
+#' residuals.  These are probably the most appropriate method for evaluating residuals, but are also *very* slow to calculate relative
+#' to other methods.
+#'
 #' @inheritParams simulate_data
 #'
 #' @param x Output from \code{\link{fit_model}}
@@ -368,36 +372,60 @@ summary.fit_model <- function(x, what="density", n_samples=250,
     on.exit( revert_settings(n_g_orig) )
     Obj$env$data$n_g = 0
 
-    # check for issues
-    if( !(type %in% c(1,4)) ){
-      warning("`type` only makes sense for 1 (measurement error) or 4 (unconditional) simulations")
-    }
-
-    b_iz = matrix(NA, nrow=length(x$data_list$b_i), ncol=n_samples)
-    message( "Sampling from the distribution of data conditional on estimated fixed and random effects" )
-    for( zI in 1:n_samples ){
-      if( zI%%max(1,floor(n_samples/10)) == 0 ){
-        message( "  Finished sample ", zI, " of ",n_samples )
+    if( type %in% c(1,4) ){
+      b_iz = matrix(NA, nrow=length(x$data_list$b_i), ncol=n_samples)
+      message( "Sampling from the distribution of data conditional on estimated fixed and random effects" )
+      for( zI in 1:n_samples ){
+        if( zI%%max(1,floor(n_samples/10)) == 0 ){
+          message( "  Finished sample ", zI, " of ",n_samples )
+        }
+        b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type )$b_i
       }
-      b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type )$b_i
-    }
-    if( any(is.na(b_iz)) ){
-      stop("Check simulated residuals for NA values")
-    }
+      if( any(is.na(b_iz)) ){
+        stop("Check simulated residuals for NA values")
+      }
 
-    # Run DHARMa
-    dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz, # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
-      observedResponse=x$data_list$b_i,
-      integer=FALSE)
+      # Run DHARMa
+      dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz, # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
+        observedResponse=x$data_list$b_i,
+        fittedPredictedResponse=fit$Report$D_i,
+        integer=FALSE)
 
-    # Calculate probability-integral-transform (PIT) residuals
-    message( "Substituting probability-integral-transform (PIT) residuals for DHARMa-calculated residuals" )
-    prop_lessthan_i = apply( b_iz<outer(x$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
-    prop_lessthanorequalto_i = apply( b_iz<=outer(x$data_list$b_i,rep(1,n_samples)), MARGIN=1, FUN=mean )
-    # c( "Proportion_PIT_randomized"=mean(abs(prop_lessthan_i-prop_lessthanorequalto_i)>0.00001), "Proportion_zero"=mean(x$data_list$b_i==0) )
-    PIT_i = runif(min=prop_lessthan_i, max=prop_lessthanorequalto_i, n=length(prop_lessthan_i) )
-    # cbind( "Difference"=dharmaRes$scaledResiduals - PIT_i, "PIT"=PIT_i, "Original"=dharmaRes$scaledResiduals, "b_i"=x$data_list$b_i )
-    dharmaRes$scaledResiduals = PIT_i
+      # Calculate probability-integral-transform (PIT) residuals
+      message( "Substituting probability-integral-transform (PIT) residuals for DHARMa-calculated residuals" )
+      prop_lessthan_i = apply( b_iz<outer(x$data_list$b_i,rep(1,n_samples)),
+        MARGIN=1,
+        FUN=mean )
+      prop_lessthanorequalto_i = apply( b_iz<=outer(x$data_list$b_i,rep(1,n_samples)),
+        MARGIN=1,
+        FUN=mean )
+      PIT_i = runif(min=prop_lessthan_i, max=prop_lessthanorequalto_i, n=length(prop_lessthan_i) )
+      # cbind( "Difference"=dharmaRes$scaledResiduals - PIT_i, "PIT"=PIT_i, "Original"=dharmaRes$scaledResiduals, "b_i"=x$data_list$b_i )
+      dharmaRes$scaledResiduals = PIT_i
+    }else if( type==0 ){
+      # Check for issues
+      if( !all(x$data_list$ObsModel_ez[1,] %in% c(1,2)) ){
+        stop("oneStepAhead residuals only code for gamma and lognormal distributions")
+      }
+
+      # Run OSA
+      message( "Running oneStepPredict_deltaModel for each observation, to then load them into DHARMa object for plotting" )
+      osa = TMBhelper::oneStepPredict_deltaModel( obj = fit$tmb_list$Obj,
+        observation.name = "b_i",
+        method = "cdf",
+        data.term.indicator = "keep",
+        deltaSupport = 0,
+        trace = TRUE )
+
+      # Build DHARMa object on fake inputs and load OSA into DHARMa object
+      dharmaRes = DHARMa::createDHARMa(simulatedResponse=matrix(rnorm(x$data_list$n_i*10,mean=x$data_list$b_i),ncol=10),
+        observedResponse=x$data_list$b_i,
+        fittedPredictedResponse=fit$Report$D_i,
+        integer=FALSE)
+      dharmaRes$scaledResiduals = pnorm(osa$residual)
+    }else{
+      stop("`type` only makes sense for 0 (oneStepAhead), 1 (conditional, a.k.a. measurement error) or 4 (unconditional) simulations")
+    }
 
     # do plot
     if( is.null(working_dir) ){

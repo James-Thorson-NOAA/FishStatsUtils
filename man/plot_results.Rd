@@ -65,7 +65,15 @@ plot_results(
 
 \item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default), or instead calculate relative to median across all years. The latter reduces standard errors, and is appropriate when checking significance for comparison across years for a single species.  The former (default) is appropriate for checking significance for comparison across species.}
 
-\item{type}{integer stating what type of simulation to use. See details for description.}
+\item{type}{integer stating what type of simulation to use from the following options:
+\itemize{
+\item \code{type=1} is a "measurement error" or "conditional" simulator that simulates new data conditional upon estimated fixed and random effects.
+\item \code{type=2} is an "unconditional" simulator that simulates new random effects conditional upon fixed effects
+(but not otherwise conditioning upon original data), and new data conditional upon both.
+\item \code{type=3} simulates new fixed and random effects from the joint precision matrix (i.e., conditioning upon the original data), and new data conditional upon these values.
+\item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
+and new data conditional upon these values.
+}}
 
 \item{...}{additional settings to pass to \code{FishStatsUtils::plot_maps}}
 }
