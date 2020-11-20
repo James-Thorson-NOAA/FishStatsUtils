@@ -97,8 +97,9 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi_sjt=NULL, RotationMethod=
   # Check covariance matrix
     # Should be identical for rotated and unrotated
   if( !is.na(testcutoff) ){
-    if( !all(approx_equal(L_pj%*%t(L_pj),L_pj_rot%*%t(L_pj_rot), d=testcutoff)) ){
-      stop("Covariance matrix is changed by rotation")
+    if( !all(approx_equal(L_pj%*%t(L_pj),L_pj_rot%*%t(L_pj_rot), d=testcutoff, denominator=1)) ){
+      Diff = L_pj%*%t(L_pj) - L_pj_rot%*%t(L_pj_rot)
+      stop("Covariance matrix is changed by rotation; maximum absolute difference = ", max(abs(Diff)) )
     }
     # Check linear predictor
       # Should give identical predictions as unrotated
