@@ -91,11 +91,31 @@
 #' @export
 #' @md
 # Using https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html for guidance on markdown-enabled documentation
-fit_model = function( settings, Lat_i, Lon_i, t_i, b_i, a_i, c_iz=rep(0,length(b_i)),
-  v_i=rep(0,length(b_i)), working_dir=paste0(getwd(),"/"),
-  X1config_cp=NULL, X2config_cp=NULL, covariate_data, X1_formula=~0, X2_formula=~0,
-  Q1config_k=NULL, Q2config_k=NULL, catchability_data, Q1_formula=~0, Q2_formula=~0,
-  newtonsteps=1, silent=TRUE, build_model=TRUE, run_model=TRUE, test_fit=TRUE, ... ){
+fit_model = function( settings,
+      Lat_i,
+      Lon_i,
+      t_i,
+      b_i,
+      a_i,
+      c_iz = rep(0,length(b_i)),
+      v_i = rep(0,length(b_i)),
+      working_dir = paste0(getwd(),"/"),
+      X1config_cp = NULL,
+      X2config_cp = NULL,
+      covariate_data,
+      X1_formula = ~ 0,
+      X2_formula = ~ 0,
+      Q1config_k = NULL,
+      Q2config_k = NULL,
+      catchability_data,
+      Q1_formula = ~ 0,
+      Q2_formula = ~ 0,
+      newtonsteps = 1,
+      silent = TRUE,
+      build_model = TRUE,
+      run_model = TRUE,
+      test_fit = TRUE,
+      ... ){
 
   # Capture extra arguments to function
   extra_args = list(...)

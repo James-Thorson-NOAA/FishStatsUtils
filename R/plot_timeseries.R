@@ -9,18 +9,26 @@
 #' @param ybounds alternate specification of y-coordinate whiskers; useful to avoid normal approximation
 #' @param fn what plotting function to use; default \code{fn=lines} does not create a new plotting window
 #' @param bounds_type which type either \code{"whiskers"} or \code{"shading"}
-#' @param bounds_args tagged list of additional arguments to pass to \code{lines} or \code{polygon}
+#' @param bounds_args tagged list of additional arguments to pass to \code{\link[graphics]{lines}} or \code{\link[graphics]{polygon}}
 #' @param interval_width width of interval in normal approximation; only used when specifying \code{ysd} without \code{ybounds}
 #'
 #' @export
-plot_timeseries = function( x, y, y_sd, ybounds, fn=lines, bounds_type="whiskers",
-  bounds_args=list(), interval_width=1, ... ){
+plot_timeseries = function( x,
+                y,
+                y_sd,
+                ybounds,
+                fn=lines,
+                ylim = NULL,
+                bounds_type="whiskers",
+                bounds_args=list(),
+                interval_width=1, ... ){
 
   # fill in missing
   if(missing(ybounds)) ybounds = cbind(y-interval_width*y_sd, y+interval_width*y_sd)
+  if(is.null(ylim)) ylim = range(ybounds,na.rm=TRUE)
 
   # Plot lines
-  fn( y=y, x=x, ... )
+  fn( y=y, x=x, ylim=ylim, ... )
 
   # Plot shading
   if( bounds_type=="whiskers" ){
