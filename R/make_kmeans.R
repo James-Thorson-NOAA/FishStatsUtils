@@ -50,7 +50,7 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
     Kmeans = NULL
     Kmeans[["centers"]] = unique( loc_orig )
     Kmeans[["cluster"]] = RANN::nn2( data=Kmeans[["centers"]], query=loc_orig, k=1)$nn.idx[,1]
-    message( "n_x less than n_unique so no calculation necessary" )
+    message( "n_x greater than or equal to n_unique so no calculation necessary" )
   }else{
     if( paste0("Kmeans-",n_x,".RData") %in% list.files(DirPath) ){
       # If previously saved knots are available

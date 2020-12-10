@@ -485,6 +485,7 @@ function( strata.limits, observations_LL, projargs=NA, grid_dim_km=c(2,2), maxim
     Data_Extrap = expand.grid( "E_km"=E_seq, "N_km"=N_seq, "Area_km2"=prod(grid_dim_km) )
 
     # Add LL
+    # NOTE:  inputs to project_coordinates are reversed due to projecting from projargs back to origargs
     #TmpUTM = rename_columns( Data_Extrap[,c("E_km","N_km")], newname=c("X","Y"))
     #attr(TmpUTM, "projection") = "UTM"
     #attr(TmpUTM, "zone") = attr(TmpUTM,"zone")
