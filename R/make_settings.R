@@ -5,7 +5,16 @@
 #'
 #' This function assembles a default set of user-decisions for a specified modelling purpose. The default settings are guessed based on generic guidance, and should be carefully reviewed for real-world purposes. If the user supplies values for individual settings e.g. \code{FieldConfig}, then these values override the defaults that are provided by interpreting \code{purpose}
 #'
-#' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}, \code{purpose="condition_and_density"}, \code{purpose="MICE"}, or \code{purpose="ordination"}.
+#' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Many of these have examples at the VAST wiki https://github.com/James-Thorson-NOAA/VAST/wiki. Only currently implemented for:
+#'  \describe{
+#' \item{\code{purpose="index"}}{Index of abundance calculated summing across space to get annual abundance values for each category}
+#' \item{\code{purpose="index2"}}{The same as "index" except uses gamma distribution for positive catches, restricts \code{max_cells} to 2000, and uses bias correction. This is currently recommended over "index".}
+#' \item{\code{purpose="condition_and_density"}}{Jointly estimate density (numbers per area) and fish condition (relative weight given length, used to predict density-weighted average condition}
+#' \item{\code{purpose="MICE"}}{Model of intermediate complexity to estimate species interactions spatially}
+#' \item{\code{purpose="ordination"}}{Multivariate ordination to identify similar species by estimating a reduced set of axes that collectively explain variability}
+#' \item{\code{purpose="EOF"}}{An empirical orthogonal function analysis to ordinate on years instead of categories as in "ordination". Deprecated, use "EOF2" instead.}
+#' \item{\code{purpose="EOF2"}}{Same as "EOF" but uses improved settings that match updates to the package.}
+#' }
 #' @inheritParams VAST::make_data
 #' @inheritParams make_extrapolation_info
 #' @inheritParams make_spatial_info
@@ -16,7 +25,7 @@
 #' @param treat_nonencounter_as_zero Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates
 #' @param n_categories number of categories in a multivariate model (only necessary to specify given some values for \code{purpose})
 #'
-#' @return Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.
+#' @return Tagged list containing default settings for a given purpose, use \code{names} on output to see or modify list of settings.
 #'
 #' @family wrapper functions
 #' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
