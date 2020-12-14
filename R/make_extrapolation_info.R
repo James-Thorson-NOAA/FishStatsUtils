@@ -29,7 +29,7 @@
 #'        this is then helpful when extrapolating densities across multiple survey domains.
 #'        Current options are:
 #' \describe{
-#'   \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}}
+#'   \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
 #'   \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
 #'   \item{\code{"california_current"}}{The spatial fooprint of the stratified-random shelf-slope bottom trawl operated by NWFSC from 2003 onward; specify subsets via \code{surveyname}}
 #'   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC}
