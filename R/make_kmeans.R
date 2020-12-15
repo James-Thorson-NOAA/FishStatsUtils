@@ -47,7 +47,7 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
   if( backwards_compatible_kmeans==TRUE ){
     if( identical(formalArgs(RNGkind), c("kind","normal.kind","sample.kind")) ){
       RNGkind_orig = RNGkind()
-      on.exit( RNGkind(kind=RNGkind_orig[1], xnormal.kind=RNGkind_orig[2], sample.kind=RNGkind_orig[3]), add=TRUE )
+      on.exit( RNGkind(kind=RNGkind_orig[1], normal.kind=RNGkind_orig[2], sample.kind=RNGkind_orig[3]), add=TRUE )
       RNGkind( sample.kind="Rounding" )
     }else if( !identical(formalArgs(RNGkind), c("kind","normal.kind")) ){
       stop("Assumptions about `RNGkind` are not met within `make_kmeans`; please report problem to package developers")
