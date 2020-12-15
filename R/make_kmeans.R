@@ -10,7 +10,7 @@
 #' @param iter.max the number of iterations used per k-means algorithm (default=1000)
 #' @param DirPath a directory where the algorithm looks for a previously-saved output (default is working directory)
 #' @param Save_Results a boolean stating whether to save the output (Default=TRUE)
-#' @param purpose a character representing whether the call is to calculate "extrapolation" or "spatial" information
+#' @param kmeans_purpose a character representing whether the call is to calculate "extrapolation" or "spatial" information
 #' @param backwards_compatible_kmeans a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
 #'        where \code{backwards_compatible_kmeans==TRUE} modifies the default algorithm to maintain backwards compatibility, and
 #'        where \code{backwards_compatible_kmeans==FALSE} breaks backwards compatibility between R versions prior to and after R 3.6.0.
@@ -24,7 +24,7 @@
 #' @export
 make_kmeans <-
 function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"),
-  Save_Results=TRUE, purpose="spatial", backwards_compatible_kmeans=FALSE ){
+  Save_Results=TRUE, kmeans_purpose="spatial", backwards_compatible_kmeans=FALSE ){
 
   # get old seed
   oldseed = ceiling(runif(1,min=1,max=1e6))
@@ -34,13 +34,13 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
   options( "warn" = -1 )
   on.exit( options(old.options) )
 
-  if(purpose=="spatial"){
-    tmpfile <- paste0("Kmeans-",n_x,".RData")
-  } else if(purpose=="extrapolation"){
+  if(kmeans_purpose=="spatial"){
+    tmpfile <- paste0("Kmeans_knots-",n_x,".RData")
+  } else if(kmeans_purpose=="extrapolation"){
     ## n_x is really max_cells in this case
     tmpfile <- paste0("Kmeans_extrapolation-",n_x,".RData")
   } else {
-    stop("Invalid purpose for make_kmeans:", purpose)
+    stop("Invalid kmeans_purpose for make_kmeans:", kmeans_purpose)
   }
 
   # Backwards compatibility

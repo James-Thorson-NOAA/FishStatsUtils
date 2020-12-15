@@ -106,7 +106,7 @@ make_spatial_info = function( n_x,
 
     # Calculate k-means centroids
     if(is.null(Kmeans)) Kmeans = make_kmeans(n_x=n_x,
-    loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, purpose='spatial', backwards_compatible_kmeans=backwards_compatible_kmeans, ... )
+    loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, kmeans_purpose='spatial', backwards_compatible_kmeans=backwards_compatible_kmeans, ... )
 
     # Calculate grid for 2D AR1 process
     loc_grid = expand.grid( 'Lon'=seq(Grid_bounds[1,1],Grid_bounds[2,1],by=grid_size_LL), 'Lat'=seq(Grid_bounds[1,2],Grid_bounds[2,2],by=grid_size_LL) )
