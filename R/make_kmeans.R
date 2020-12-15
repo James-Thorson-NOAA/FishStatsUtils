@@ -68,17 +68,25 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
       message( "Loaded from ", DirPath, tmpfile)
     }else{
       # Multiple runs to find optimal knots
+      message("Using ", nstart, " iterations to find optimal ",
+              ifelse(kmeans_purpose=="extrapolation", "extrapolation grid", "spatial knot"),
+              " placement because no saved file found...")
       Kmeans = list( "tot.withinss"=Inf )
+      tries <- 1
       for(i in 1:nstart){
         Tmp = stats::kmeans( x=loc_orig, centers=n_x, iter.max=iter.max, nstart=1, trace=0)
-        message( 'Num=',i,' Current_Best=',round(Kmeans$tot.withinss,1),' New=',round(Tmp$tot.withinss,1) )#,' Time=',round(Time,4)) )
+        if(i==1) message("Iter=1: Current=", round(Tmp$tot.withinss,0))
+        if(i!=1 & i!=nstart & i %% 10 ==0)
+          message( 'Iter=',i,': Current=',round(Kmeans$tot.withinss,0),' Proposed=',round(Tmp$tot.withinss,0) )#,' Time=',round(Time,4)) )
         if( Tmp$tot.withinss < Kmeans$tot.withinss ){
           Kmeans = Tmp
+          tries <- i # which iteration was the optimal
         }
       }
+      message("Iter=", nstart, ': Final=', round(Kmeans$tot.withinss,0), " after ", tries, " iterations")
       if(Save_Results==TRUE){
         save( Kmeans, file=paste0(DirPath, tmpfile))
-        message( "Calculated and saved to ", DirPath, tmpfile )
+        message( "Results saved to ", DirPath, tmpfile, "\n for subsequent runs by default (delete it to override)")
       }
     }
   }
