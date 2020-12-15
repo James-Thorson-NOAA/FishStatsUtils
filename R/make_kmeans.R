@@ -10,6 +10,7 @@
 #' @param iter.max the number of iterations used per k-means algorithm (default=1000)
 #' @param DirPath a directory where the algorithm looks for a previously-saved output (default is working directory)
 #' @param Save_Results a boolean stating whether to save the output (Default=TRUE)
+#' @param purpose a character representing whether the call is to calculate "extrapolation" or "spatial" information
 #' @param backwards_compatible_kmeans a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
 #'        where \code{backwards_compatible_kmeans==TRUE} modifies the default algorithm to maintain backwards compatibility, and
 #'        where \code{backwards_compatible_kmeans==FALSE} breaks backwards compatibility between R versions prior to and after R 3.6.0.
@@ -23,7 +24,7 @@
 #' @export
 make_kmeans <-
 function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"),
-  Save_Results=TRUE, backwards_compatible_kmeans=FALSE ){
+  Save_Results=TRUE, purpose="spatial", backwards_compatible_kmeans=FALSE ){
 
   # get old seed
   oldseed = ceiling(runif(1,min=1,max=1e6))
@@ -32,6 +33,15 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
   old.options <- options()
   options( "warn" = -1 )
   on.exit( options(old.options) )
+
+  if(purpose=="spatial"){
+    tmpfile <- paste0("Kmeans-",n_x,".RData")
+  } else if(purpose=="extrapolation"){
+    ## n_x is really max_cells in this case
+    tmpfile <- paste0("Kmeans_extrapolation-",n_x,".RData")
+  } else {
+    stop("Invalid purpose for make_kmeans:", purpose)
+  }
 
   # Backwards compatibility
   if( backwards_compatible_kmeans==TRUE ){
@@ -52,10 +62,10 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
     Kmeans[["cluster"]] = RANN::nn2( data=Kmeans[["centers"]], query=loc_orig, k=1)$nn.idx[,1]
     message( "n_x greater than or equal to n_unique so no calculation necessary" )
   }else{
-    if( paste0("Kmeans-",n_x,".RData") %in% list.files(DirPath) ){
+    if(tmpfile  %in% list.files(DirPath) ){
       # If previously saved knots are available
-      load( file=paste0(DirPath,"/","Kmeans-",n_x,".RData") )
-      message( "Loaded from ",DirPath,"/","Kmeans-",n_x,".RData" )
+      load( file=file.path(DirPath, tmpfile))
+      message( "Loaded from ",DirPath,"/",tmpfile)
     }else{
       # Multiple runs to find optimal knots
       Kmeans = list( "tot.withinss"=Inf )
@@ -67,7 +77,7 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
         }
       }
       if(Save_Results==TRUE){
-        save( Kmeans, file=paste0(DirPath,"/","Kmeans-",n_x,".RData"))
+        save( Kmeans, file=paste0(DirPath,"/",tmpfile))
         message( "Calculated and saved to ",DirPath,"/","Kmeans-",n_x,".RData" )
       }
     }
