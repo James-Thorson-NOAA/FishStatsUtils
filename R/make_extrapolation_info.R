@@ -230,7 +230,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     loc_orig = Return$Data_Extrap[,c("E_km","N_km")]
       loc_orig = loc_orig[ which(Return$Area_km2_x>0), ]
     Kmeans = make_kmeans( n_x=max_cells, loc_orig=loc_orig, nstart=nstart,
-      randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=FALSE,
+      randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=TRUE, kmeans_purpose='extrapolation',
       backwards_compatible_kmeans=backwards_compatible_kmeans )
     Kmeans[["cluster"]] = RANN::nn2( data=Kmeans[["centers"]], query=Return$Data_Extrap[,c("E_km","N_km")], k=1)$nn.idx[,1]
     # Transform Extrapolation_List
