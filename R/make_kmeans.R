@@ -64,8 +64,8 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
   }else{
     if(tmpfile  %in% list.files(DirPath) ){
       # If previously saved knots are available
-      load( file=paste0(DirPath, tmpfile))
-      message( "Loaded from ", DirPath, tmpfile)
+      load( file=paste0(DirPath,"/",tmpfile))
+      message( "Loaded from ", DirPath, "/", tmpfile)
     }else{
       # Multiple runs to find optimal knots
       message("Using ", nstart, " iterations to find optimal ",
