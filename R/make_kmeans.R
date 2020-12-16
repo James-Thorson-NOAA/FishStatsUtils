@@ -34,6 +34,11 @@ function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0
   options( "warn" = -1 )
   on.exit( options(old.options) )
 
+  # warnings
+  if( paste0("Kmeans-",n_x,".RData") %in% list.files(DirPath) ){
+    warning("Found `Kmeans-",n_x,".RData` in directory; this might indicate a desire to import previously constructed k-means under deprecated naming conventions")
+  }
+
   if(kmeans_purpose=="spatial"){
     tmpfile <- paste0("Kmeans_knots-",n_x,".RData")
   } else if(kmeans_purpose=="extrapolation"){
