@@ -169,7 +169,9 @@ load_example = function( data_set="EBS_pollock" ){
   }
   if( tolower(data_set) %in% tolower("PESC_example_red_grouper") ){
     data( PESC_example_red_grouper, package="FishStatsUtils" )
-    sampling_data = example$sampling_data
+    sampling_data = NULL
+    Predator_biomass_cath_rate_data = example$Predator_biomass_cath_rate_data
+    Stomach_content_data = example$Stomach_content_data
     region = example$Region
     strata.limits = example$strata.limits
     input_grid = example$input_grid
@@ -184,7 +186,9 @@ load_example = function( data_set="EBS_pollock" ){
   if( !is.null(F_ct)) Return[["F_ct"]] = F_ct
   if( !is.null(covariate_data)) Return[["covariate_data"]] = covariate_data
   if( !is.null(input_grid)) Return[["input_grid"]] = input_grid
-
+  if( !is.null(Predator_biomass_cath_rate_data)) Return[["Predator_biomass_cath_rate_data"]] = Predator_biomass_cath_rate_data
+  if( !is.null(Stomach_content_data)) Return[["Stomach_content_data"]] = Stomach_content_data
+  
   # return stuff
   return(Return)
 }
