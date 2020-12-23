@@ -30,13 +30,14 @@ convert_shapefile = function( file_path,
     area_tolerance = 0.05,
     ... ){
 
-  shapefile_orig = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
+  shapefile_input = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
+  message("Reading shapefile with projargs: ", shapefile_input@proj4string)
   # raster::shapefile(.) has simplified read-write interface for future reference
-  if( !(shapefile_orig@class %in% c("SpatialPolygonsDataFrame","SpatialPolygons")) ){
+  if( !(shapefile_input@class %in% c("SpatialPolygonsDataFrame","SpatialPolygons")) ){
     warning( "object at `file_path` doesn't appear to be a shapefile")
   }
   proj_orig = "+proj=longlat +ellps=WGS84 +no_defs"
-  shapefile_orig = sp::spTransform(shapefile_orig, CRSobj=sp::CRS(proj_orig) )
+  shapefile_orig = sp::spTransform(shapefile_input, CRSobj=sp::CRS(proj_orig) )
   #shapefile_orig@proj4string = sp::CRS(proj_orig)
 
   # Infer projargs if missing, and project
@@ -96,6 +97,7 @@ convert_shapefile = function( file_path,
   }
 
   # Compare areas
+  area_shapefile_input = sum( raster::area(shapefile_input) )
   area_shapefile_orig = sum( raster::area(shapefile_orig) ) / 1000^2  # Convert to square-kiometers
   area_shapefile_proj = sum( raster::area(shapefile_proj) )
   area_grid_proj = sum( extrapolation_grid[,'Area_km2'] )
