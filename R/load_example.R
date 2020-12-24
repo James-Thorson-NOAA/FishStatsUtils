@@ -58,7 +58,10 @@ load_example = function( data_set="EBS_pollock" ){
                    "PESC_example_red_grouper" = tolower("User"),
                    tolower("Other") )
 
-  input_grid = covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
+  # Initialize all objects as NULL
+  Predator_biomass_cath_rate_data = Stomach_content_data =
+    input_grid = covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
+
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
     Year = as.numeric(sapply(WCGBTS_Canary_example[,'PROJECT_CYCLE'], FUN=function(Char){strsplit(as.character(Char)," ")[[1]][2]}))
@@ -169,7 +172,6 @@ load_example = function( data_set="EBS_pollock" ){
   }
   if( tolower(data_set) %in% tolower("PESC_example_red_grouper") ){
     data( PESC_example_red_grouper, package="FishStatsUtils" )
-    sampling_data = NULL
     Predator_biomass_cath_rate_data = example$Predator_biomass_cath_rate_data
     Stomach_content_data = example$Stomach_content_data
     region = example$Region
