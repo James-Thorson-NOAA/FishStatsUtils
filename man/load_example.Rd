@@ -15,25 +15,25 @@ load_example(data_set = "EBS_pollock")
 \details{
 Current options for \code{data_set} include:
 \itemize{
-\item "Chatham_rise_hake",
-\item "Iceland_cod",
-\item "WCGBTS_canary",
-\item "GSL_american_plaice",
-\item "BC_pacific_cod",
-\item "EBS_pollock",
-\item "GOA_Pcod",
-\item "GOA_pollock",
-\item "GB_spring_haddock",
-\item "GB_fall_haddock",
-\item "SAWC_jacopever",
-\item "Aleutian_islands_POP",
-\item "GOA_arrowtooth_condition_and_density",
-\item "condition_and_density",
-\item "multimodal_red_snapper",
-\item "lingcod_comp_expansion",
-\item "covariate_example",
-\item "PESC_example_red_grouper", and
-\item "ordination".
+\item \code{"Chatham_rise_hake"},
+\item \code{"Iceland_cod"},
+\item \code{"WCGBTS_canary"},
+\item \code{"GSL_american_plaice"},
+\item \code{"BC_pacific_cod"},
+\item \code{"EBS_pollock"},
+\item \code{"GOA_Pcod"},
+\item \code{"GOA_pollock"},
+\item \code{"GB_spring_haddock"},
+\item \code{"GB_fall_haddock"},
+\item \code{"SAWC_jacopever"},
+\item \code{"Aleutian_islands_POP"},
+\item \code{"GOA_arrowtooth_condition_and_density"},
+\item \code{"condition_and_density"},
+\item \code{"multimodal_red_snapper"},
+\item \code{"lingcod_comp_expansion"},
+\item \code{"covariate_example"},
+\item \code{"PESC_example_red_grouper"}, and
+\item \code{"ordination"}.
 }
 These examples are used to highlight different functionality for spatio-temporal analysis,
 as well as during integrated testing to check whether updates are backwards compatible for these examples.

@@ -12,6 +12,7 @@ make_kmeans(
   iter.max = 1000,
   DirPath = paste0(getwd(), "/"),
   Save_Results = TRUE,
+  kmeans_purpose = "spatial",
   backwards_compatible_kmeans = FALSE
 )
 }
@@ -29,6 +30,8 @@ make_kmeans(
 \item{DirPath}{a directory where the algorithm looks for a previously-saved output (default is working directory)}
 
 \item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
+
+\item{kmeans_purpose}{a character representing whether the call is to calculate "extrapolation" or "spatial" information}
 
 \item{backwards_compatible_kmeans}{a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
 where \code{backwards_compatible_kmeans==TRUE} modifies the default algorithm to maintain backwards compatibility, and

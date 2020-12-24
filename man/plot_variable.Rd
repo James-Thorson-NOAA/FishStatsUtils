@@ -41,7 +41,7 @@ plot_variable(
 
 \item{panel_labels}{vector defining titles to use for each panel; defaults to blank}
 
-\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value. With \pkg{rgdal} built with PROJ >= 6 and GDAL >= 3, the \code{+init=} key may only be used with value \code{epsg:<code>}. From \pkg{sp} version 1.4-4, the string associated with the SRS_string argument may be entered as-is and will be set as SRS_string if the projargs argument does not begin with a \code{+} (suggested by Mikko Vihtakari).}
+\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
 \item{add}{boolean indicating whether to add plot to an existing panel figure, or to define a new panel figure}
 

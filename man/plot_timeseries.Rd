@@ -10,6 +10,7 @@ plot_timeseries(
   y_sd,
   ybounds,
   fn = lines,
+  ylim = NULL,
   bounds_type = "whiskers",
   bounds_args = list(),
   interval_width = 1,
@@ -27,7 +28,7 @@ plot_timeseries(
 
 \item{bounds_type}{which type either \code{"whiskers"} or \code{"shading"}}
 
-\item{bounds_args}{tagged list of additional arguments to pass to \code{lines} or \code{polygon}}
+\item{bounds_args}{tagged list of additional arguments to pass to \code{\link[graphics]{lines}} or \code{\link[graphics]{polygon}}}
 
 \item{interval_width}{width of interval in normal approximation; only used when specifying \code{ysd} without \code{ybounds}}
 

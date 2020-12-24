@@ -38,7 +38,7 @@ make_extrapolation_info(
        this is then helpful when extrapolating densities across multiple survey domains.
        Current options are:
 \describe{
-  \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}}
+  \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
   \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
   \item{\code{"california_current"}}{The spatial fooprint of the stratified-random shelf-slope bottom trawl operated by NWFSC from 2003 onward; specify subsets via \code{surveyname}}
   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC}
@@ -67,7 +67,7 @@ make_extrapolation_info(
   \item{\code{"other"}}{Automated creation of an extrapolation-grid by padding an area around observations (not recommended for operational use)}
 }}
 
-\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value. With \pkg{rgdal} built with PROJ >= 6 and GDAL >= 3, the \code{+init=} key may only be used with value \code{epsg:<code>}. From \pkg{sp} version 1.4-4, the string associated with the SRS_string argument may be entered as-is and will be set as SRS_string if the projargs argument does not begin with a \code{+} (suggested by Mikko Vihtakari).}
+\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 
 \item{zone}{UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples}
 

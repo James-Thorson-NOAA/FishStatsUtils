@@ -37,7 +37,7 @@ make_settings(
        this is then helpful when extrapolating densities across multiple survey domains.
        Current options are:
 \describe{
-  \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}}
+  \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
   \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
   \item{\code{"california_current"}}{The spatial fooprint of the stratified-random shelf-slope bottom trawl operated by NWFSC from 2003 onward; specify subsets via \code{surveyname}}
   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC}
@@ -66,7 +66,16 @@ make_settings(
   \item{\code{"other"}}{Automated creation of an extrapolation-grid by padding an area around observations (not recommended for operational use)}
 }}
 
-\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Only currently implemented for \code{purpose="index"}, \code{purpose="condition_and_density"}, \code{purpose="MICE"}, or \code{purpose="ordination"}.}
+\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Many of these have examples at the VAST wiki https://github.com/James-Thorson-NOAA/VAST/wiki. Only currently implemented for:
+ \describe{
+\item{\code{purpose="index"}}{Index of abundance calculated summing across space to get annual abundance values for each category}
+\item{\code{purpose="index2"}}{The same as "index" except uses gamma distribution for positive catches, restricts \code{max_cells} to 2000, and uses bias correction. This is currently recommended over "index".}
+\item{\code{purpose="condition_and_density"}}{Jointly estimate density (numbers per area) and fish condition (relative weight given length, used to predict density-weighted average condition}
+\item{\code{purpose="MICE"}}{Model of intermediate complexity to estimate species interactions spatially}
+\item{\code{purpose="ordination"}}{Multivariate ordination to identify similar species by estimating a reduced set of axes that collectively explain variability}
+\item{\code{purpose="EOF"}}{An empirical orthogonal function analysis to ordinate on years instead of categories as in "ordination". Deprecated, use "EOF2" instead.}
+\item{\code{purpose="EOF2"}}{Same as "EOF" but uses improved settings that match updates to the package.}
+}}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
 
@@ -127,7 +136,7 @@ Can be used to specify using an older CPP, to maintain backwards compatibility.}
 \item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
 }
 \value{
-Tagged list containing default settings for a given purpose, use \code{names} on output to see list of settings.
+Tagged list containing default settings for a given purpose, use \code{names} on output to see or modify list of settings.
 }
 \description{
 \code{make_settings} makes a list of settings for a given purpose
