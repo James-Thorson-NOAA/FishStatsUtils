@@ -27,7 +27,7 @@ make_kmeans(
 
 \item{iter.max}{the number of iterations used per k-means algorithm (default=1000)}
 
-\item{DirPath}{a directory where the algorithm looks for a previously-saved output (default is working directory)}
+\item{DirPath}{a directory where the function looks for a previously-saved output (default is working directory)}
 
 \item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
 

@@ -27,6 +27,7 @@ make_extrapolation_info(
   nstart = 100,
   area_tolerance = 0.05,
   backwards_compatible_kmeans = FALSE,
+  DirPath = paste0(getwd(), "/"),
   ...
 )
 }
@@ -109,6 +110,8 @@ make_extrapolation_info(
 \item{backwards_compatible_kmeans}{a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
 where \code{backwards_compatible_kmeans==TRUE} modifies the default algorithm to maintain backwards compatibility, and
 where \code{backwards_compatible_kmeans==FALSE} breaks backwards compatibility between R versions prior to and after R 3.6.0.}
+
+\item{DirPath}{a directory where the function looks for a previously-saved output (default is working directory)}
 
 \item{...}{other objects passed for individual regions (see example script)}
 }

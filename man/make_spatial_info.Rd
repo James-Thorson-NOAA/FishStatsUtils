@@ -65,7 +65,7 @@ where non-default values are only needed when \code{Method="Stream_network"} (de
 
 \item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
 
-\item{DirPath}{a directory where the algorithm looks for a previously-saved output (default is working directory)}
+\item{DirPath}{a directory where the function looks for a previously-saved output (default is working directory)}
 
 \item{Save_Results}{a boolean stating whether to save the output (Default=TRUE)}
 

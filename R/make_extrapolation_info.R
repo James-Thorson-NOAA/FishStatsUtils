@@ -89,13 +89,29 @@
 #' }
 
 #' @export
-make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
-  create_strata_per_region=FALSE, max_cells=NULL, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
-  maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
-  region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
-  epu_to_use=c('All','Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')[1],
-  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100,
-  area_tolerance=0.05, backwards_compatible_kmeans=FALSE, ... ){
+make_extrapolation_info = function( Region,
+        projargs=NA,
+        zone=NA,
+        strata.limits=data.frame('STRATA'="All_areas"),
+        create_strata_per_region=FALSE,
+        max_cells=NULL,
+        input_grid=NULL,
+        observations_LL=NULL,
+        grid_dim_km=c(2,2),
+        maximum_distance_from_sample=NULL,
+        grid_in_UTM=TRUE,
+        grid_dim_LL=c(0.1,0.1),
+        region=c("south_coast","west_coast"),
+        strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
+        epu_to_use=c('All','Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')[1],
+        survey="Chatham_rise",
+        surveyname='propInWCGBTS',
+        flip_around_dateline,
+        nstart=100,
+        area_tolerance=0.05,
+        backwards_compatible_kmeans=FALSE,
+        DirPath = paste0(getwd(),"/"),
+        ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
   # However, it requires a different default value for different regions; hence the input format being used.
@@ -230,7 +246,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     loc_orig = Return$Data_Extrap[,c("E_km","N_km")]
       loc_orig = loc_orig[ which(Return$Area_km2_x>0), ]
     Kmeans = make_kmeans( n_x=max_cells, loc_orig=loc_orig, nstart=nstart,
-      randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=TRUE, kmeans_purpose='extrapolation',
+      randomseed=1, iter.max=1000, DirPath=DirPath, Save_Results=TRUE, kmeans_purpose='extrapolation',
       backwards_compatible_kmeans=backwards_compatible_kmeans )
     Kmeans[["cluster"]] = RANN::nn2( data=Kmeans[["centers"]], query=Return$Data_Extrap[,c("E_km","N_km")], k=1)$nn.idx[,1]
     # Transform Extrapolation_List

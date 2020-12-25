@@ -8,7 +8,7 @@
 #' @param nstart the number of times that the k-means algorithm is run while searching for the best solution (default=100)
 #' @param randomseed a random number seed
 #' @param iter.max the number of iterations used per k-means algorithm (default=1000)
-#' @param DirPath a directory where the algorithm looks for a previously-saved output (default is working directory)
+#' @param DirPath a directory where the function looks for a previously-saved output (default is working directory)
 #' @param Save_Results a boolean stating whether to save the output (Default=TRUE)
 #' @param kmeans_purpose a character representing whether the call is to calculate "extrapolation" or "spatial" information
 #' @param backwards_compatible_kmeans a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,
