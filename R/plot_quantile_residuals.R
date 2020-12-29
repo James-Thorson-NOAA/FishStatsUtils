@@ -26,7 +26,7 @@ plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residual
   # See Eq. 1 here: https://www.researchgate.net/publication/259073068_Giants'_shoulders_15_years_later_Lessons_challenges_and_guidelines_in_fisheries_meta-analysis
   aggregate_pvalues = function( pvec, na.rm=TRUE ){
     chisq = -2*sum(log(pvec), na.rm=na.rm)
-    p = pchisq( chisq, df=2*length(pvec) )
+    p = 1 - pchisq( chisq, df=2*length(pvec) )
   }
 
   # Sanity check that equation holds for p-values
