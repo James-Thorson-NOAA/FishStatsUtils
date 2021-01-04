@@ -60,7 +60,7 @@ load_example = function( data_set="EBS_pollock" ){
 
   # Initialize all objects as NULL
   Predator_biomass_cath_rate_data = Stomach_content_data =
-    input_grid = Predator_biomass_cath_rate_data = Stomach_content_data = covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
+    input_grid = Predator_biomass_cath_rate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = Stomach_content_data = covariate_data = NULL
 
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
