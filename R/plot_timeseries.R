@@ -17,15 +17,36 @@ plot_timeseries = function( x,
                 y,
                 y_sd,
                 ybounds,
-                fn=lines,
-                ylim = NULL,
-                bounds_type="whiskers",
-                bounds_args=list(),
-                interval_width=1, ... ){
+                fn = lines,
+                ylim  =  NULL,
+                bounds_type = "whiskers",
+                bounds_args = list(),
+                interval_width = 1,
+                connect_ascending = TRUE,
+                ... ){
 
   # fill in missing
   if(missing(ybounds)) ybounds = cbind(y-interval_width*y_sd, y+interval_width*y_sd)
   if(is.null(ylim)) ylim = range(ybounds,na.rm=TRUE)
+
+  # Decide which to break up
+  if( connect_ascending==TRUE ){
+    if(length(x)==1){
+      obs_order = 1
+    }else{
+      obs_order = 1
+      for( xI in 2:length(x) ){
+        if( x[xI]>x[xI-1] ){
+          obs_order = c(obs_order,xI)
+        }else{
+          obs_order = c(obs_order,NA,xI)
+        }
+      }
+    }
+    x = x[obs_order]
+    y = y[obs_order]
+    ybounds = ybounds[obs_order,]
+  }
 
   # Plot lines
   fn( y=y, x=x, ylim=ylim, ... )

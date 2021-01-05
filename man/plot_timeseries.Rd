@@ -14,6 +14,7 @@ plot_timeseries(
   bounds_type = "whiskers",
   bounds_args = list(),
   interval_width = 1,
+  connect_ascending = TRUE,
   ...
 )
 }
