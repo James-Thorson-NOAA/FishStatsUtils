@@ -16,6 +16,11 @@
 #' the nearest row of \code{covariate_data} in that year
 #' is used to assign covariate values. \code{make_covariates} then formats these covariate values appropriately and returns them.
 #'
+#' If all covariates as "static" (not changing among years),
+#' then set Year = NA to cause values to be duplicated internally for all values of Year.
+#' If using a mix of static and dynamic covariates,
+#' then duplicate rows for static covariates for every value of Year
+#'
 #' @param formula an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}
 #' @param covariate_data data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)
 #'

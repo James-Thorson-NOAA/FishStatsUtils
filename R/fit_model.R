@@ -253,6 +253,27 @@ fit_model = function( settings,
     "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings, "input_args"=input_args,
     "X1config_cp"=X1config_cp, "X2config_cp"=X2config_cp, "covariate_data"=covariate_data, "X1_formula"=X1_formula, "X2_formula"=X2_formula,
     "Q1config_k"=Q1config_k, "Q2config_k"=Q1config_k, "catchability_data"=catchability_data, "Q1_formula"=Q1_formula, "Q2_formula"=Q2_formula)
+
+  # Add stuff for effects package
+  Return$effects = list()
+  if( !is.null(catchability_data) ){
+    catchability_data_full = data.frame( catchability_data, "linear_predictor"=0 )
+    Q1_formula_full = update.formula(Q1_formula, linear_predictor~.+0)
+    call_Q1 = lm( Q1_formula_full, data=catchability_data_full)$call
+    Q2_formula_full = update.formula(Q2_formula, linear_predictor~.+0)
+    call_Q2 = lm( Q2_formula_full, data=catchability_data_full)$call
+    Return$effects = c( Return$effects, list(call_Q1=call_Q1, call_Q2=call_Q2, catchability_data_full=catchability_data_full) )
+  }
+  if( !is.null(covariate_data) ){
+    covariate_data_full = data.frame( covariate_data, "linear_predictor"=0 )
+    X1_formula_full = update.formula(X1_formula, linear_predictor~.+0)
+    call_X1 = lm( X1_formula_full, data=covariate_data_full)$call
+    X2_formula_full = update.formula(X2_formula, linear_predictor~.+0)
+    call_X2 = lm( X2_formula_full, data=covariate_data_full)$call
+    Return$effects = c( Return$effects, list(call_X1=call_X1, call_X2=call_X2, covariate_data_full=covariate_data_full) )
+  }
+
+  # class and return
   class(Return) = "fit_model"
   return( Return )
 }

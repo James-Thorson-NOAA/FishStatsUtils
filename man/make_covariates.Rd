@@ -39,4 +39,9 @@ values in that row of \code{covariate_data} are assigned to observation \code{i}
 Similarly, for every extrapolation-grid cell \code{g} at location \code{spatial_list$latlon_g[i,]} in each year,
 the nearest row of \code{covariate_data} in that year
 is used to assign covariate values. \code{make_covariates} then formats these covariate values appropriately and returns them.
+
+If all covariates as "static" (not changing among years),
+then set Year = NA to cause values to be duplicated internally for all values of Year.
+If using a mix of static and dynamic covariates,
+then duplicate rows for static covariates for every value of Year
 }
