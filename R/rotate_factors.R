@@ -31,7 +31,7 @@ rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi_sjt=NULL, RotationMethod=
   trunc_machineprec = function(n) ifelse(n<1e-10,0,n)
   Nknots = dim(Psi_sjt)[1]
   Nfactors = ncol(L_pj)
-  Nyears = nrow(L_pj)
+  #Nyears = nrow(L_pj)
 
   # Optional inputs
   if( !is.null(Cov_jj) ){
