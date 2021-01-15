@@ -16,17 +16,19 @@
 #' @param ... additional arguments passed to \code{\link{plot_maps}} and/or \code{\link{plot_variable}} when plotting factor-values on a map
 
 #' @export
-plot_factors = function( Report,
-  ParHat,
-  Data,
-  Obj,
-  SD = NULL,
-  Year_Set = NULL,
+plot_factors = function( fit,
+  Report = fit$Report,
+  ParHat = fit$ParHat,
+  Data = fit$data_list,
+  Obj = fit$tmb_list$Obj,
+  SD = fit$parameter_estimates$SD,
+  Year_Set = fit$year_labels,
   category_names = NULL,
   RotationMethod = "PCA",
   mapdetails_list = NULL,
   Dim_year = NULL,
   Dim_species = NULL,
+  projargs = fit$extrapolation_list$projargs,
   plotdir = paste0(getwd(),"/"),
   land_color = "grey",
   zlim = NA,
@@ -210,7 +212,7 @@ plot_factors = function( Report,
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
             working_dir=plotdir, Year_Set=Year_Set, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
             legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim,
-            land_color=land_color, ...)
+            land_color=land_color, projargs=projargs, ...)
         }  #
 
         # Plot Omega
@@ -218,7 +220,7 @@ plot_factors = function( Report,
         if( Par_name %in% c("Omega1", "Omega2")){
           plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
             panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name),
-            land_color=land_color, ... )
+            land_color=land_color, projargs=projargs, ... )
         }
 
         ## Doesn't make sense to make maps of beta factors since they aren't spatial
@@ -233,7 +235,7 @@ plot_factors = function( Report,
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
             working_dir=plotdir, category_names=factor_names, Panel="Year",
             legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim,
-            land_color=land_color, ...)
+            land_color=land_color, projargs=projargs, ...)
         }  #
       }
     }else{
