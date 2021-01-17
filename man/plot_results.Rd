@@ -15,7 +15,7 @@ plot_results(
   map_list,
   category_names,
   check_residuals = TRUE,
-  projargs = "+proj=longlat",
+  projargs = fit$extrapolation_list$projargs,
   zrange,
   n_samples = 100,
   calculate_relative_to_average = FALSE,

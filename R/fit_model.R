@@ -56,7 +56,8 @@
 #'
 #' @family wrapper functions
 #' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
-#' @seealso \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities
+#' @seealso \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities and an explanation of DHARMa Probability-Integral-Transform residuals
+#' @seealso \code{\link{predict.fit_model}} for methods to predict at new locations using existing or updated covariate values
 #'
 #' @examples
 #' \dontrun{
@@ -501,23 +502,102 @@ summary.fit_model <- function(x, what="density", n_samples=250,
 #'
 #' \code{predict.fit_model} calculates predictions given new data
 #'
-#' When the user does not supply \code{covariate_data}, predictions are based upon covariate values
-#' interpolated from covariates supplied when fitting the model.  When the user does supply \code{covariate_data},
-#' predictions are created when interpolating based on those new supplied values.
+#' \code{predict.fit_model} is designed with two purposes in mind:
+#' \enumerate{
+#' \item If \code{new_covariate_data=NULL} as by default, then the model uses the covariate values supplied during original model fits,
+#'       and interpolates as needed from those supplied values to new predicted locations.  This then uses *exactly* the same information
+#'       as was available during model fitting.
+#' \item If \code{new_covariate_data} is supplied with new values (e.g., at locations for predictions), then these values are used in
+#'       combination with original covariate values when interpolating to new values.  However, supplying \code{new_oovariate_data}
+#'       at the same Lat-Lon-Year combination as any original covariate value will delete those matches in the latter, such that originally fitted data
+#'       can be predicted using alternative values for covariates (e.g., when calculating partial dependence plots)
+#' }
 #'
 #' @inheritParams make_covariates
 #' @inheritParams VAST::make_data
 #' @param x Output from \code{\link{fit_model}}
 #' @param what Which output from \code{fit$Report} should be extracted; default is predicted density
+#' @param keep_old_covariates Whether to add new_covariate_data to existing data.
+#'        This is useful when predicting values at new locations, but does not work
+#'        when predicting data are locations with existing data (because the interpolation of
+#'        covariate values will conflict for existing and new covariate values), e.g.,
+#'        when calculating partial dependence plots for existing data.
 #'
 #' @return NULL
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # Showing use of package pdp for partial dependence plots
+#' pred.fun = function( object, newdata ){
+#'   predict( x=object,
+#'     Lat_i = object$data_frame$Lat_i,
+#'     Lon_i = object$data_frame$Lon_i,
+#'     t_i = object$data_frame$t_i,
+#'     a_i = object$data_frame$a_i,
+#'     what = "P1_iz",
+#'     new_covariate_data = newdata,
+#'     do_checks = FALSE )
+#' }
+#'
+#' library(ggplot2)
+#' library(pdp)
+#' Partial = partial( object = fit,
+#'                    pred.var = "BOT_DEPTH",
+#'                    pred.fun = pred.fun,
+#'                    train = fit$covariate_data )
+#' autoplot(Partial)
+#'
+#' }
+#'
 #' @method predict fit_model
 #' @export
-predict.fit_model <- function(x, what="D_i", Lat_i, Lon_i, t_i, a_i, c_iz=rep(0,length(t_i)),
-  v_i=rep(0,length(t_i)), covariate_data=NULL, catchability_data=NULL,
-  working_dir=paste0(getwd(),"/"))
+predict.fit_model <- function(x,
+                  what="D_i",
+                  Lat_i,
+                  Lon_i,
+                  t_i,
+                  a_i,
+                  c_iz = rep(0,length(t_i)),
+                  v_i = rep(0,length(t_i)),
+                  new_covariate_data = NULL,
+                  new_catchability_data = NULL,
+                  do_checks = TRUE,
+                  working_dir = paste0(getwd(),"/") )
 {
   warning("`predict.fit_model(.)` is still in development")
+
+  # Check issues
+  if( !(what %in% c("D_i","P1_iz","P2_iz","R1_i","R2_i")) ){
+    stop("`what` can only take a few options")
+  }
+  if( !is.null(new_covariate_data) ){
+    # Confirm all columns are available
+    if( !all(colnames(x$covariate_data) %in% colnames(new_covariate_data)) ){
+      stop("Please ensure that all columns of `x$covariate_data` are present in `new_covariate_data`")
+    }
+    # Eliminate unnecessary columns
+    new_covariate_data = new_covariate_data[,match(colnames(x$covariate_data),colnames(new_covariate_data))]
+    # Eliminate old-covariates that are also present in new_covariate_data
+    #keep_row = rep(TRUE,nrow(x$covariate_data))
+    #for( i in 1:nrow(x$covariate_data) ){
+    #  if(any(x$covariate_data[i,'Lat']==new_covariate_data[,'Lat']) & any(x$covariate_data[i,'Lon']==new_covariate_data[,'Lon']) & any(x$covariate_data[i,'Year']==new_covariate_data[,'Year'])){
+    #    keep_row[i] = FALSE
+    #  }
+    #}
+    #x$covariate_data[which(keep_row),,drop=FALSE]
+    NN = RANN::nn2( query=x$covariate_data[,c('Lat','Lon','Year')], data=new_covariate_data[,c('Lat','Lon','Year')], k=1 )
+    if( any(NN$nn.dist==0) ){
+      x$covariate_data = x$covariate_data[-which(NN$nn.dist==0),,drop=FALSE]
+    }
+  }
+  if( !is.null(new_catchability_data) ){
+    stop("Option not implemented")
+  }
+
+  # Process covariates
+  catchability_data = rbind( x$catchability_data, new_catchability_data )
+  covariate_data = rbind( x$covariate_data, new_covariate_data )
 
   # Process inputs
   PredTF_i = c( x$data_list$PredTF_i, rep(1,length(t_i)) )
@@ -528,26 +608,29 @@ predict.fit_model <- function(x, what="D_i", Lat_i, Lon_i, t_i, a_i, c_iz=rep(0,
   a_i = c( x$data_frame[,"a_i"], a_i )
   v_i = c( x$data_frame[,"v_i"], v_i )
   t_i = c( x$data_frame[,"t_i"], t_i )
-  catchability_data = rbind( x$catchability_data, catchability_data )
-  assign("b_i", b_i, envir=.GlobalEnv)
+  #assign("b_i", b_i, envir=.GlobalEnv)
 
   # Populate covariate_data
   # Default: use original covariate values
   # When user provides new values, deal with missing years in covariate_data so that it doesn't throw an unnecessary error
-  if( is.null(covariate_data) ){
-    message("Using `covariate_data` supplied during original fit to interpolate covariate values for predictions")
-    covariate_data = x$covariate_data
-  }else{
-    if( !(all(t_i %in% covariate_data[,'Year']) | any(is.na(covariate_data[,'Year']))) ){
-      stop("Some `t_i` values are supplied without covariates")
-    }else{
-      message("Covariates not provided for all modeled years, so filling in zeros for covariates in other years")
-      zeros_data = covariate_data[match(covariate_data[,'Year'],unique(covariate_data[,'Year'])),]
-      zeros_data[,setdiff(names(zeros_data),c('Lat','Lon','Year'))] = 0
-      zeros_data[,c('Lat','Lon')] = Inf
-      covariate_data = rbind( covariate_data, zeros_data)
-    }
-  }
+  #if( is.null(new_covariate_data) ){
+  #  message("Using `covariate_data` supplied during original fit to interpolate covariate values for predictions")
+  #  covariate_data = x$covariate_data
+  #}else{
+  #  covariate_data = rbind( x$covariate_data, new_covariate_data )
+    #if( !(all(t_i %in% covariate_data[,'Year'])) | any(is.na(covariate_data[,'Year'])) ){
+    #  stop("Some `t_i` values are supplied without covariates")
+    #}else{
+    #  message("Covariates not provided for all modeled years, so filling in zeros for covariates in other years")
+    #  zeros_data = covariate_data[match(covariate_data[,'Year'],unique(covariate_data[,'Year'])),]
+    #  zeros_data[,setdiff(names(zeros_data),c('Lat','Lon','Year'))] = 0
+    #  zeros_data[,c('Lat','Lon')] = Inf
+    #  covariate_data = rbind( covariate_data, zeros_data)
+    #}
+  #}
+  #if( !is.null(new_catchability_data) ){
+  #  stop("Option not implemented")
+  #}
 
   # Build information regarding spatial location and correlation
   message("\n### Re-making spatial information")
@@ -579,7 +662,8 @@ predict.fit_model <- function(x, what="D_i", Lat_i, Lon_i, t_i, a_i, c_iz=rep(0,
   Y_i = Report[[what]][(1+nrow(x$data_frame)):length(Report$D_i)]
 
   # sanity check
-  if( all.equal(covariate_data,x$covariate_data) & Report$jnll!=x$Report$jnll){
+  #if( all.equal(covariate_data,x$covariate_data) & Report$jnll!=x$Report$jnll){
+  if( do_checks==TRUE && (Report$jnll!=x$Report$jnll) ){
     message("Problem detected in `predict.fit_model`; returning outputs for diagnostic purposes")
     Return = list("Report"=Report, "data_list"=data_list)
     return(Return)

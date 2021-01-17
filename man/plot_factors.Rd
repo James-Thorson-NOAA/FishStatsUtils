@@ -5,17 +5,19 @@
 \title{Plot factor-decomposition of covariance}
 \usage{
 plot_factors(
-  Report,
-  ParHat,
-  Data,
-  Obj,
-  SD = NULL,
-  Year_Set = NULL,
+  fit,
+  Report = fit$Report,
+  ParHat = fit$ParHat,
+  Data = fit$data_list,
+  Obj = fit$tmb_list$Obj,
+  SD = fit$parameter_estimates$SD,
+  Year_Set = fit$year_labels,
   category_names = NULL,
   RotationMethod = "PCA",
   mapdetails_list = NULL,
   Dim_year = NULL,
   Dim_species = NULL,
+  projargs = fit$extrapolation_list$projargs,
   plotdir = paste0(getwd(), "/"),
   land_color = "grey",
   zlim = NA,
@@ -45,6 +47,8 @@ plot_factors(
 \item{Dim_year}{Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)}
 
 \item{Dim_species}{Plotting dimension (row,column) for plot of categories (default: square with sufficient size for number of categories)}
+
+\item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
 
 \item{plotdir}{directory for saving plots}
 
