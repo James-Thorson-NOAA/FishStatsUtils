@@ -568,7 +568,7 @@ predict.fit_model <- function(x,
   warning("`predict.fit_model(.)` is still in development")
 
   # Check issues
-  if( !(what%in%names(x$Report)) || (length(x$Report[[what]])!=fit$data_list$n_i) ){
+  if( !(what%in%names(x$Report)) || (length(x$Report[[what]])!=x$data_list$n_i) ){
     stop("`what` can only take a few options")
   }
   if( !is.null(new_covariate_data) ){
@@ -611,7 +611,7 @@ predict.fit_model <- function(x,
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
   # Check spatial_list
-  if( !all.equal(spatial_list$MeshList,fit$spatial_list$MeshList) ){
+  if( !all.equal(spatial_list$MeshList,x$spatial_list$MeshList) ){
     stop("`MeshList` generated during `predict.fit_model` doesn't match that of original fit; please email package author to report issue")
   }
 

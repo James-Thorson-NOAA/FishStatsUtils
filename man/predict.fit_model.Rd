@@ -60,6 +60,7 @@ when calculating partial dependence plots for existing data.}
 }
 \examples{
 \dontrun{
+
 # Showing use of package pdp for partial dependence plots
 pred.fun = function( object, newdata ){
   predict( x=object,
@@ -79,6 +80,7 @@ Partial = partial( object = fit,
                    pred.fun = pred.fun,
                    train = fit$covariate_data )
 autoplot(Partial)
+
 }
 
 }
