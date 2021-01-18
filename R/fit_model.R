@@ -568,7 +568,7 @@ predict.fit_model <- function(x,
   warning("`predict.fit_model(.)` is still in development")
 
   # Check issues
-  if( !(what %in% c("D_i","P1_iz","P2_iz","R1_i","R2_i")) ){
+  if( !(what%in%names(x$Report)) || (length(x$Report[[what]])!=fit$data_list$n_i) ){
     stop("`what` can only take a few options")
   }
   if( !is.null(new_covariate_data) ){
@@ -579,13 +579,6 @@ predict.fit_model <- function(x,
     # Eliminate unnecessary columns
     new_covariate_data = new_covariate_data[,match(colnames(x$covariate_data),colnames(new_covariate_data))]
     # Eliminate old-covariates that are also present in new_covariate_data
-    #keep_row = rep(TRUE,nrow(x$covariate_data))
-    #for( i in 1:nrow(x$covariate_data) ){
-    #  if(any(x$covariate_data[i,'Lat']==new_covariate_data[,'Lat']) & any(x$covariate_data[i,'Lon']==new_covariate_data[,'Lon']) & any(x$covariate_data[i,'Year']==new_covariate_data[,'Year'])){
-    #    keep_row[i] = FALSE
-    #  }
-    #}
-    #x$covariate_data[which(keep_row),,drop=FALSE]
     NN = RANN::nn2( query=x$covariate_data[,c('Lat','Lon','Year')], data=new_covariate_data[,c('Lat','Lon','Year')], k=1 )
     if( any(NN$nn.dist==0) ){
       x$covariate_data = x$covariate_data[-which(NN$nn.dist==0),,drop=FALSE]
@@ -610,34 +603,17 @@ predict.fit_model <- function(x,
   t_i = c( x$data_frame[,"t_i"], t_i )
   #assign("b_i", b_i, envir=.GlobalEnv)
 
-  # Populate covariate_data
-  # Default: use original covariate values
-  # When user provides new values, deal with missing years in covariate_data so that it doesn't throw an unnecessary error
-  #if( is.null(new_covariate_data) ){
-  #  message("Using `covariate_data` supplied during original fit to interpolate covariate values for predictions")
-  #  covariate_data = x$covariate_data
-  #}else{
-  #  covariate_data = rbind( x$covariate_data, new_covariate_data )
-    #if( !(all(t_i %in% covariate_data[,'Year'])) | any(is.na(covariate_data[,'Year'])) ){
-    #  stop("Some `t_i` values are supplied without covariates")
-    #}else{
-    #  message("Covariates not provided for all modeled years, so filling in zeros for covariates in other years")
-    #  zeros_data = covariate_data[match(covariate_data[,'Year'],unique(covariate_data[,'Year'])),]
-    #  zeros_data[,setdiff(names(zeros_data),c('Lat','Lon','Year'))] = 0
-    #  zeros_data[,c('Lat','Lon')] = Inf
-    #  covariate_data = rbind( covariate_data, zeros_data)
-    #}
-  #}
-  #if( !is.null(new_catchability_data) ){
-  #  stop("Option not implemented")
-  #}
-
   # Build information regarding spatial location and correlation
   message("\n### Re-making spatial information")
   spatial_args_new = list("anisotropic_mesh"=x$spatial_list$MeshList$anisotropic_mesh, "Kmeans"=x$spatial_list$Kmeans,
     "Lon_i"=Lon_i, "Lat_i"=Lat_i )
   spatial_args_input = combine_lists( input=spatial_args_new, default=x$input_args$spatial_args_input )
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
+
+  # Check spatial_list
+  if( !all.equal(spatial_list$MeshList,fit$spatial_list$MeshList) ){
+    stop("`MeshList` generated during `predict.fit_model` doesn't match that of original fit; please email package author to report issue")
+  }
 
   # Build data
   # Do *not* restrict inputs to formalArgs(make_data) because other potential inputs are still parsed by make_data for backwards compatibility

@@ -81,7 +81,9 @@ load_example = function( data_set="EBS_pollock" ){
   }
   if( tolower(data_set) %in% tolower("EBS_pollock") ){
     data( EBS_pollock_data, package="FishStatsUtils" )
-    sampling_data = data.frame( "Catch_KG"=EBS_pollock_data[,'catch'], "Year"=EBS_pollock_data[,'year'], "Vessel"="missing", "AreaSwept_km2"=0.01, "Lat"=EBS_pollock_data[,'lat'], "Lon"=EBS_pollock_data[,'long'], "Pass"=0)
+    covariate_data = EBS_pollock_data$covariate_data
+    sampling_data = EBS_pollock_data$sampling_data
+    sampling_data = data.frame( "Catch_KG"=sampling_data[,'catch'], "Year"=sampling_data[,'year'], "Vessel"="missing", "AreaSwept_km2"=0.01, "Lat"=sampling_data[,'lat'], "Lon"=sampling_data[,'long'], "Pass"=0)
     strata.limits = data.frame('STRATA'="All_areas")
   }
   if( tolower(data_set) %in% tolower("GOA_Pcod") ){
