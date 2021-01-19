@@ -15,7 +15,7 @@
 #' @param legend_x two numeric values (generally between 0 and 1, but slightly lower/higher values generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend
 #' @param legend_y two numeric values (see legend_y) giving bottom and top location of color legend
 #' @param map_list output from \code{FishStatsUtils::make_map_info}
-#' @param zlim range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.
+#' @param zlim range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of the plotted variable and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.
 #' @param add boolean indicating whether to add plot to an existing panel figure, or to define a new panel figure
 #' @param outermargintext vector defining text to plot in outer margins of panel figure
 #' @param panel_labels vector defining titles to use for each panel; defaults to blank
@@ -37,7 +37,8 @@ function( Y_gt,
   Res = 200,
   add = FALSE,
   outermargintext = c("Eastings","Northings"),
-  zlim = NULL, col,
+  zlim = NULL,
+  col,
   mar = c(0,0,2,0),
   oma = c(4,4,0,0),
   legend_x = c(0,0.05),

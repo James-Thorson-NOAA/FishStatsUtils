@@ -4,14 +4,23 @@
 #' @description
 #' \code{plot_quantile_residuals} shows aggregated quantile residuals at a user-specified spatial resolution
 #'
+#' This function plots quantile residuals on a map, and is useful to check for persistent spatial patterns
+#' in those residuals.  For a check for outliers (i.e., the scale of residuals) please see the separate Q-Q plot.
+#' See \code{\link{summary.fit_model}} for more details regarding inputs
+#'
 #' @inheritParams plot_variable
+#' @param output from \code{summary.fit_model(x,what="residuals")}
 #'
 #' @param x Output from \code{\link{fit_model}}
-#' @param ... arguments passed to \code{FisshStatsUtils::plot_variable}
+#' @param ... arguments passed to \code{\link{plot_variable}}
 #'
 #' @export
-plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residuals_on_map",
-  Year_Set=NULL, Years2Include=NULL, ... ){
+plot_quantile_residuals = function( dharmaRes,
+                        fit,
+                        file_name="quantile_residuals_on_map",
+                        zlim = NULL,
+                        Year_Set=NULL,
+                        Years2Include=NULL, ... ){
 
   # labels
   if( is.null(Year_Set) ) Year_Set = 1:fit$data_list$n_t
@@ -39,9 +48,14 @@ plot_quantile_residuals = function( dharmaRes, fit, file_name="quantile_residual
   Y_gt[ cbind(1:fit$data_list$n_i,fit$data_list$t_i+1) ] = dharmaRes$scaledResiduals
   Y_gt = Y_gt[,Years2Include,drop=FALSE]
   col_function = colorRampPalette(colors=c("darkblue","lightblue","white","pink","red"))
-  plot_variable( Y_gt=Y_gt, map_list=list(PlotDF=PlotDF), file_name=file_name,
-    fun=aggregate_pvalues, col=col_function,
-    panel_labels=Year_Set[Years2Include], ... )
+  plot_variable( Y_gt=Y_gt,
+    map_list=list(PlotDF=PlotDF),
+    file_name=file_name,
+    fun=aggregate_pvalues,
+    col=col_function,
+    panel_labels=Year_Set[Years2Include],
+    zlim=zlim,
+    ... )
 
   return( NULL )
 }

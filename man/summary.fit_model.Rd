@@ -59,3 +59,6 @@ Note that \code{summary(fit, ..., type=0} uses \code{\link[FishStatsUtils]{oneSt
 residuals.  These are probably the most appropriate method for evaluating residuals, but are also *very* slow to calculate relative
 to other methods.
 }
+\seealso{
+\code{\link{plot_quantile_residuals}} to plot output of \code{summary.fit_model(x,what="residuals")}
+}
