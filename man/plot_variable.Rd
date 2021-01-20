@@ -25,7 +25,7 @@ plot_variable(
   cex.legend = 1,
   mfrow,
   land_color = "grey",
-  n_cells,
+  n_cells = NULL,
   xlim,
   ylim,
   country = NULL,
@@ -54,6 +54,12 @@ plot_variable(
 \item{legend_y}{two numeric values (see legend_y) giving bottom and top location of color legend}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
+
+\item{n_cells}{Integer used to determine the argument \code{cell.size} passed
+to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
+\code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
+will often need to be modified for a given purpose.}
 
 \item{country}{a character vector of country names.}
 

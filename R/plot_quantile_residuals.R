@@ -17,10 +17,12 @@
 #' @export
 plot_quantile_residuals = function( dharmaRes,
                         fit,
-                        file_name="quantile_residuals_on_map",
+                        file_name = "quantile_residuals_on_map",
                         zlim = NULL,
-                        Year_Set=NULL,
-                        Years2Include=NULL, ... ){
+                        Year_Set = NULL,
+                        n_cells = NULL,
+                        Years2Include = NULL,
+                        ... ){
 
   # labels
   if( is.null(Year_Set) ) Year_Set = 1:fit$data_list$n_t
@@ -48,13 +50,14 @@ plot_quantile_residuals = function( dharmaRes,
   Y_gt[ cbind(1:fit$data_list$n_i,fit$data_list$t_i+1) ] = dharmaRes$scaledResiduals
   Y_gt = Y_gt[,Years2Include,drop=FALSE]
   col_function = colorRampPalette(colors=c("darkblue","lightblue","white","pink","red"))
-  plot_variable( Y_gt=Y_gt,
-    map_list=list(PlotDF=PlotDF),
-    file_name=file_name,
-    fun=aggregate_pvalues,
-    col=col_function,
-    panel_labels=Year_Set[Years2Include],
-    zlim=zlim,
+  plot_variable( Y_gt = Y_gt,
+    map_list = list(PlotDF = PlotDF),
+    file_name = file_name,
+    fun = aggregate_pvalues,
+    col = col_function,
+    panel_labels = Year_Set[Years2Include],
+    zlim = zlim,
+    n_cells = n_cells,
     ... )
 
   return( NULL )

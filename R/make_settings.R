@@ -5,6 +5,12 @@
 #'
 #' This function assembles a default set of user-decisions for a specified modelling purpose. The default settings are guessed based on generic guidance, and should be carefully reviewed for real-world purposes. If the user supplies values for individual settings e.g. \code{FieldConfig}, then these values override the defaults that are provided by interpreting \code{purpose}
 #'
+#' @inheritParams VAST::make_data
+#' @inheritParams make_extrapolation_info
+#' @inheritParams make_spatial_info
+#' @inheritParams Convert_LL_to_UTM_Fn
+#' @inheritParams plot_biomass_index
+#' @inheritParams TMBhelper::fit_tmb
 #' @param purpose character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Many of these have examples at the VAST wiki https://github.com/James-Thorson-NOAA/VAST/wiki. Only currently implemented for:
 #'  \describe{
 #' \item{\code{purpose="index"}}{Index of abundance calculated summing across space to get annual abundance values for each category}
@@ -15,13 +21,8 @@
 #' \item{\code{purpose="EOF"}}{An empirical orthogonal function analysis to ordinate on years instead of categories as in "ordination". Deprecated, use "EOF2" instead.}
 #' \item{\code{purpose="EOF2"}}{Same as "EOF" but uses improved settings that match updates to the package.}
 #' }
-#' @inheritParams VAST::make_data
-#' @inheritParams make_extrapolation_info
-#' @inheritParams make_spatial_info
-#' @inheritParams Convert_LL_to_UTM_Fn
-#' @inheritParams plot_biomass_index
 #' @param use_anisotropy Boolean indicating whether to estimate two additional parameters representing geometric anisotropy
-#' @param vars_to_correct a character-vector listing which parameters to include for bias-correction, as passed to \code{TMBhelper::Optimize}
+#' @param vars_to_correct a character-vector listing which parameters to include for bias-correction, as passed to \code{\link[TMBhelper]{fit_tmb}}
 #' @param treat_nonencounter_as_zero Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates
 #' @param n_categories number of categories in a multivariate model (only necessary to specify given some values for \code{purpose})
 #'

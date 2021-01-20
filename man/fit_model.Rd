@@ -35,9 +35,9 @@ fit_model(
 \arguments{
 \item{settings}{Output from \code{\link{make_settings}}}
 
-\item{Lat_i}{Latitude for each sample}
+\item{Lat_i}{Numeric vector, providing latitude for each sample}
 
-\item{Lon_i}{Longitude for each sample}
+\item{Lon_i}{Numeric vector, providing longitude for each sample}
 
 \item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
 

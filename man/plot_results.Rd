@@ -20,6 +20,7 @@ plot_results(
   n_samples = 100,
   calculate_relative_to_average = FALSE,
   type = 1,
+  n_cells = NULL,
   ...
 )
 }
@@ -53,6 +54,8 @@ plot_results(
 
 \item{working_dir}{Directory for plots}
 
+\item{map_list}{output from \code{FishStatsUtils::make_map_info}}
+
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
 \item{check_residuals}{Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)}
@@ -74,6 +77,12 @@ plot_results(
 \item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
 and new data conditional upon these values.
 }}
+
+\item{n_cells}{Integer used to determine the argument \code{cell.size} passed
+to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
+\code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
+will often need to be modified for a given purpose.}
 
 \item{...}{additional settings to pass to \code{FishStatsUtils::plot_maps}}
 }

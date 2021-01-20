@@ -8,6 +8,7 @@
 #'
 #' @inheritParams fit_model
 #' @inheritParams plot_maps
+#' @inheritParams plot_variable
 #' @inheritParams plot_residuals
 #' @inheritParams plot_range_edge
 #' @inheritParams simulate_data
@@ -32,21 +33,22 @@
 #'
 #' @export
 plot_results = function( fit,
-  settings = fit$settings,
-  plot_set = 3,
-  working_dir = paste0(getwd(),"/"),
-  year_labels = fit$year_labels,
-  years_to_plot = fit$years_to_plot,
-  use_biascorr = TRUE,
-  map_list,
-  category_names,
-  check_residuals = TRUE,
-  projargs = fit$extrapolation_list$projargs,
-  zrange,
-  n_samples = 100,
-  calculate_relative_to_average = FALSE,
-  type = 1,
-  ... ){
+              settings = fit$settings,
+              plot_set = 3,
+              working_dir = paste0(getwd(),"/"),
+              year_labels = fit$year_labels,
+              years_to_plot = fit$years_to_plot,
+              use_biascorr = TRUE,
+              map_list,
+              category_names,
+              check_residuals = TRUE,
+              projargs = fit$extrapolation_list$projargs,
+              zrange,
+              n_samples = 100,
+              calculate_relative_to_average = FALSE,
+              type = 1,
+              n_cells = NULL,
+              ... ){
 
   # Check for known issues
   if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
@@ -134,7 +136,7 @@ plot_results = function( fit,
   plot_maps_args = combine_lists( "input"=plot_maps_args, "default"=list(plot_set=plot_set, category_names=category_names, TmbData=fit$data_list,
     Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
     working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100,
-    Obj=fit$tmb_list$Obj, projargs=projargs) ) # , "args_to_use"=formalArgs(plot_maps)
+    Obj=fit$tmb_list$Obj, projargs=projargs, n_cells=n_cells) ) # , "args_to_use"=formalArgs(plot_maps)
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
 
   # Plot quantile-quantile plot
@@ -161,7 +163,7 @@ plot_results = function( fit,
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")
     plot_quantile_residuals( dharmaRes=dharmaRes, fit=fit, working_dir=working_dir,
-      Year_Set=year_labels, Years2Include=years_to_plot, ... )
+      Year_Set=year_labels, Years2Include=years_to_plot, n_cells=n_cells, ... )
   }else{
     #Q = "Not run"
     #message("\n### Skipping Q-Q plot")

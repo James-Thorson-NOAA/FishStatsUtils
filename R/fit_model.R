@@ -570,7 +570,7 @@ predict.fit_model <- function(x,
                   do_checks = TRUE,
                   working_dir = paste0(getwd(),"/") )
 {
-  warning("`predict.fit_model(.)` is still in development")
+  message("`predict.fit_model(.)` is in beta-testing, and please explore results carefully prior to using")
 
   # Check issues
   if( !(what%in%names(x$Report)) || (length(x$Report[[what]])!=x$data_list$n_i) ){

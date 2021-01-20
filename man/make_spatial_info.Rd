@@ -31,13 +31,15 @@ make_spatial_info(
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when \code{Method="Mesh"})}
 
-\item{Lon_i}{Longitude for each sample}
+\item{Lon_i}{Numeric vector, providing longitude for each sample}
 
-\item{Lat_i}{Latitude for each sample}
+\item{Lat_i}{Numeric vector, providing latitude for each sample}
 
 \item{Extrapolation_List}{the output from \code{\link{make_extrapolation_info}}}
 
-\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
+\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples
+\code{knot_method=`samples`} or extrapolation-grid cells within the specified strata
+\code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
 
 \item{Method}{a string specifying the form of spatial smoother with the following possible options:
 \describe{

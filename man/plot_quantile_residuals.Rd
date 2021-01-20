@@ -10,12 +10,19 @@ plot_quantile_residuals(
   file_name = "quantile_residuals_on_map",
   zlim = NULL,
   Year_Set = NULL,
+  n_cells = NULL,
   Years2Include = NULL,
   ...
 )
 }
 \arguments{
 \item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of the plotted variable and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+
+\item{n_cells}{Integer used to determine the argument \code{cell.size} passed
+to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
+\code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
+will often need to be modified for a given purpose.}
 
 \item{...}{arguments passed to \code{\link{plot_variable}}}
 

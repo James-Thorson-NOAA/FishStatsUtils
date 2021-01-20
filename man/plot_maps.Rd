@@ -68,6 +68,12 @@ plot_maps(
 
 \item{MapSizeRatio}{Default size for each panel}
 
+\item{n_cells}{Integer used to determine the argument \code{cell.size} passed
+to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
+\code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
+will often need to be modified for a given purpose.}
+
 \item{plot_value}{either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}

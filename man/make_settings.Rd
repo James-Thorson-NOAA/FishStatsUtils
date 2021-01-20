@@ -102,6 +102,8 @@ among categories for each level of \code{v_i}, where eta1 is for encounter proba
 where \code{0} is off, code{"AR1"} is an AR1 process, and aninteger greater than zero (e.g., \code{2}) is the number of elements in a factor-analysis covariance (by default,
 \code{c("eta1"=0, "eta2"=0)} and this turns off overdispersion)}
 
+\item{bias.correct}{Boolean whether to do epsilon bias-correction}
+
 \item{Options}{a tagged-vector that is empty by default, \code{Options=c()}, but where the following slots might be helpful to add,
        either by passing \code{Options} to \code{\link[FishStatsUtils]{make_settings}}, or editing after a call to that function:
 \describe{
@@ -115,7 +117,7 @@ where \code{0} is off, code{"AR1"} is an AR1 process, and aninteger greater than
 
 \item{use_anisotropy}{Boolean indicating whether to estimate two additional parameters representing geometric anisotropy}
 
-\item{vars_to_correct}{a character-vector listing which parameters to include for bias-correction, as passed to \code{TMBhelper::Optimize}}
+\item{vars_to_correct}{a character-vector listing which parameters to include for bias-correction, as passed to \code{\link[TMBhelper]{fit_tmb}}}
 
 \item{Version}{Which CPP version to use.  If missing, defaults to latest version using \code{FishStatsUtils::get_latest_version(package="VAST")}.
 Can be used to specify using an older CPP, to maintain backwards compatibility.}
@@ -133,7 +135,9 @@ Can be used to specify using an older CPP, to maintain backwards compatibility.}
 
 \item{max_cells}{Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.}
 
-\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
+\item{knot_method}{whether to determine location of GMRF vertices based on the location of samples
+\code{knot_method=`samples`} or extrapolation-grid cells within the specified strata
+\code{knot_method='grid'}; default \code{knot_method=NULL} is coerced to \code{knot_method=`samples`}}
 }
 \value{
 Tagged list containing default settings for a given purpose, use \code{names} on output to see or modify list of settings.
