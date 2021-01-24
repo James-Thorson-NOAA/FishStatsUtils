@@ -40,7 +40,8 @@ plot_factors(
 
 \item{category_names}{character-vector listing name for each category}
 
-\item{RotationMethod}{Method used for rotation, Options: "PCA" (recommended) or "Varimax"}
+\item{RotationMethod}{Method used for rotation when visualing factor decomposition results,
+Options: "PCA" (recommended) or "Varimax"}
 
 \item{mapdetails_list}{output from \code{\link{make_map_info}}}
 

@@ -20,7 +20,8 @@ rotate_factors(
 
 \item{Psi_sjt}{Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)}
 
-\item{RotationMethod}{Method used for rotation, Options: "PCA" (recommended) or "Varimax"}
+\item{RotationMethod}{Method used for rotation when visualing factor decomposition results,
+Options: "PCA" (recommended) or "Varimax"}
 
 \item{testcutoff}{tolerance for numerical rounding when confirming that rotation doesn't effect results}
 }

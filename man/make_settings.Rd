@@ -67,7 +67,7 @@ make_settings(
 }}
 
 \item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Many of these have examples at the VAST wiki https://github.com/James-Thorson-NOAA/VAST/wiki. Only currently implemented for:
- \describe{
+\describe{
 \item{\code{purpose="index"}}{Index of abundance calculated summing across space to get annual abundance values for each category}
 \item{\code{purpose="index2"}}{The same as "index" except uses gamma distribution for positive catches, restricts \code{max_cells} to 2000, and uses bias correction. This is currently recommended over "index".}
 \item{\code{purpose="condition_and_density"}}{Jointly estimate density (numbers per area) and fish condition (relative weight given length, used to predict density-weighted average condition}
@@ -75,6 +75,7 @@ make_settings(
 \item{\code{purpose="ordination"}}{Multivariate ordination to identify similar species by estimating a reduced set of axes that collectively explain variability}
 \item{\code{purpose="EOF"}}{An empirical orthogonal function analysis to ordinate on years instead of categories as in "ordination". Deprecated, use "EOF2" instead.}
 \item{\code{purpose="EOF2"}}{Same as "EOF" but uses improved settings that match updates to the package.}
+\item{\code{purpose="EOF3"}}{Same as "EOF2" but ensures that spatio-temporal factors are zero-centered, such that estimated Omega represents distribution in the "average" year.}
 }}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}

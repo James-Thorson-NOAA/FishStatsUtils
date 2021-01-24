@@ -92,7 +92,8 @@ to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}. 
 \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 will often need to be modified for a given purpose.}
 
-\item{RotationMethod}{Method used for rotation, Options: "PCA" (recommended) or "Varimax"}
+\item{RotationMethod}{Method used for rotation when visualing factor decomposition results,
+Options: "PCA" (recommended) or "Varimax"}
 
 \item{...}{additional settings to pass to \code{FishStatsUtils::plot_maps}}
 }
