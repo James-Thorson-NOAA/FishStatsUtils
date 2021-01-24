@@ -18,18 +18,19 @@
 #' }
 
 #' @export
-plot_loadings = function( L_pj,
-  Lsd_pj = NULL,
-  At = 1:nrow(L_pj),
-  whichfactor = 1,
-  addtitle = TRUE,
-  LabelPosition = "Right",
-  Buffer = c(0,0.1),
-  Labels = rownames(L_pj),
-  Cex = 1.2,
-  legend_text = "Proportion of explained variance",
-  interval_width = 1,
-  ... ){
+plot_loadings <-
+function( L_pj,
+          Lsd_pj = NULL,
+          At = 1:nrow(L_pj),
+          whichfactor = 1,
+          addtitle = TRUE,
+          LabelPosition = "Right",
+          Buffer = c(0,0.1),
+          Labels = rownames(L_pj),
+          Cex = 1.2,
+          legend_text = "Proportion of explained variance",
+          interval_width = 1,
+          ... ){
 
   # Modify inputs
   if( is.null(Lsd_pj) ){

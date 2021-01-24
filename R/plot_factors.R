@@ -7,7 +7,6 @@
 #' @inheritParams summarize_covariance
 #' @inheritParams rotate_factors
 #' @inheritParams plot_maps
-#' @param Year_Set plotting-names for time dimension
 #' @param mapdetails_list output from \code{\link{make_map_info}}
 #' @param Dim_year Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)
 #' @param Dim_species Plotting dimension (row,column) for plot of categories (default: square with sufficient size for number of categories)
@@ -16,24 +15,25 @@
 #' @param ... additional arguments passed to \code{\link{plot_maps}} and/or \code{\link{plot_variable}} when plotting factor-values on a map
 
 #' @export
-plot_factors = function( fit,
-  Report = fit$Report,
-  ParHat = fit$ParHat,
-  Data = fit$data_list,
-  Obj = fit$tmb_list$Obj,
-  SD = fit$parameter_estimates$SD,
-  Year_Set = fit$year_labels,
-  category_names = NULL,
-  RotationMethod = "PCA",
-  mapdetails_list = NULL,
-  Dim_year = NULL,
-  Dim_species = NULL,
-  projargs = fit$extrapolation_list$projargs,
-  plotdir = paste0(getwd(),"/"),
-  land_color = "grey",
-  zlim = NA,
-  testcutoff = 1e-4,
-  ... ){
+plot_factors <-
+function( fit,
+          Report = fit$Report,
+          ParHat = fit$ParHat,
+          Data = fit$data_list,
+          Obj = fit$tmb_list$Obj,
+          SD = fit$parameter_estimates$SD,
+          year_labels = fit$year_labels,
+          category_names = NULL,
+          RotationMethod = "PCA",
+          mapdetails_list = NULL,
+          Dim_year = NULL,
+          Dim_species = NULL,
+          projargs = fit$extrapolation_list$projargs,
+          plotdir = paste0(getwd(),"/"),
+          land_color = "grey",
+          zlim = NA,
+          testcutoff = 1e-4,
+          ... ){
 
   #
   if(is.null(mapdetails_list)) message( "`plot_factors(.) skipping plots because argument `mapdetails_list` is missing")
@@ -66,21 +66,21 @@ plot_factors = function( fit,
 
   # Fill in missing inputs
   if( "D_xct" %in% names(Report) ){
-    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_xct)[3]
+    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xct)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_xct)[2]
   }
   if( "D_xcy" %in% names(Report) ){
-    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_xcy)[3]
+    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
   }
   if( "D_gcy" %in% names(Report) ){
-    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_gcy)[3]
+    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
   }
 
   # Dimensions for plotting
   Dim = function( num ) c(ceiling(sqrt(num)), ceiling(num/ceiling(sqrt(num))) )
-  Dim_year = Dim(length(Year_Set))
+  Dim_year = Dim(length(year_labels))
   Dim_species = Dim(length(category_names))
 
   # Extract loadings matrices (more numerically stable than extracting covariances, and then re-creating Cholesky)
@@ -195,8 +195,8 @@ plot_factors = function( fit,
         par( mfrow=Dim_factor, mar=c(2,2,1,0), oma=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.02 )
         for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ){
           if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
-            if(any(is.na(as.numeric(Year_Set)))) stop("Check `At` in `plot_factors(.)`")
-            plot_loadings( L_pj=Lprime_list[[i]], Lsd_pj=Lprime_SE_list[[i]], whichfactor=cI, At=as.numeric(Year_Set), LabelPosition="Side" )
+            if(any(is.na(as.numeric(year_labels)))) stop("Check `At` in `plot_factors(.)`")
+            plot_loadings( L_pj=Lprime_list[[i]], Lsd_pj=Lprime_SE_list[[i]], whichfactor=cI, At=as.numeric(year_labels), LabelPosition="Side" )
           }else{
             plot_loadings( L_pj=Lprime_list[[i]], Lsd_pj=Lprime_SE_list[[i]], whichfactor=cI, At=1:nrow(Var_rot$L_pj_rot) )
           }
@@ -210,7 +210,7 @@ plot_factors = function( fit,
         # Use plot_maps to automatically make one figure per factor
         if( Par_name %in% c("Epsilon1","Epsilon2") ){
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-            working_dir=plotdir, Year_Set=Year_Set, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+            working_dir=plotdir, year_labels=year_labels, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
             legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim,
             land_color=land_color, projargs=projargs, ...)
         }  #

@@ -16,9 +16,24 @@
 #' }
 #'
 #' @export
-calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NULL, Years2Include=NULL, strata_names=NULL, category_names=NULL,
-  plot_legend=ifelse(TmbData$n_l>1,TRUE,FALSE), DirName=paste0(getwd(),"/"), PlotName="Proportion.png", PlotName2="Average.png",
-  interval_width=1, width=6, height=6, xlab="Category", ylab="Proportion", ... ){
+calculate_proportion <-
+function( TmbData,
+          Index,
+          Expansion_cz = NULL,
+          year_labels = NULL,
+          years_to_plot = NULL,
+          strata_names = NULL,
+          category_names = NULL,
+          plot_legend = ifelse(TmbData$n_l>1,TRUE,FALSE),
+          DirName = paste0(getwd(),"/"),
+          PlotName = "Proportion.png",
+          PlotName2 = "Average.png",
+          interval_width = 1,
+          width = 6,
+          height = 6,
+          xlab = "Category",
+          ylab = "Proportion",
+          ... ){
 
   # Warnings and errors
   if( !all(TmbData[['FieldConfig']] %in% c(-3,-2,-1)) ){
@@ -58,7 +73,7 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
 
   # Plot
   if( !is.na(PlotName) ){
-    plot_index( Index_ctl=Prop_ctl, sd_Index_ctl=sqrt(var_Prop_ctl), Year_Set=Year_Set, Years2Include=Years2Include,
+    plot_index( Index_ctl=Prop_ctl, sd_Index_ctl=sqrt(var_Prop_ctl), year_labels=year_labels, years_to_plot=years_to_plot,
       strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
       DirName=DirName, PlotName=PlotName, interval_width=interval_width, width=width, height=height,
       xlab=xlab, ylab=ylab, scale="uniform", ... )
@@ -73,7 +88,7 @@ calculate_proportion = function( TmbData, Index, Expansion_cz=NULL, Year_Set=NUL
 
   # Plot
   if( !is.na(PlotName2) ){
-    plot_index( Index_ctl=1%o%Mean_tl, sd_Index_ctl=1%o%sd_Mean_tl, Year_Set=Year_Set, Years2Include=Years2Include,
+    plot_index( Index_ctl=1%o%Mean_tl, sd_Index_ctl=1%o%sd_Mean_tl, year_labels=year_labels, years_to_plot=years_to_plot,
       strata_names=strata_names, category_names=category_names, plot_legend=plot_legend,
       DirName=DirName, PlotName=PlotName2, interval_width=interval_width, width=width, height=height,
       xlab=xlab, ylab="Category", scale="uniform", Yrange=c(NA,NA), ... )     # , Yrange=c(1,dim(var_Prop_ctl)[1])

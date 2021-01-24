@@ -26,8 +26,13 @@
 #' }
 #'
 #' @export
-sample_variable = function( Sdreport, Obj, variable_name, n_samples=100,
-  sample_fixed=TRUE, seed=123456 ){
+sample_variable <-
+function( Sdreport,
+          Obj,
+          variable_name,
+          n_samples = 100,
+          sample_fixed = TRUE,
+          seed = 123456 ){
 
   # Informative error messages
   if( !("jointPrecision" %in% names(Sdreport)) ){

@@ -8,8 +8,8 @@ plot_range_index(
   Sdreport,
   Report,
   TmbData,
-  Year_Set = NULL,
-  Years2Include = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   strata_names = NULL,
   PlotDir = paste0(getwd(), "/"),
   FileName_COG = paste0(PlotDir, "/center_of_gravity.png"),
@@ -29,9 +29,9 @@ plot_range_index(
 
 \item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
 
-\item{Year_Set}{Year names for plotting}
+\item{year_labels}{Year names for labeling panels}
 
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{strata_names}{names for spatial strata}
 

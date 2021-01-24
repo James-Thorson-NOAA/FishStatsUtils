@@ -18,8 +18,12 @@
 #' }
 
 #' @export
-rotate_factors = function( Cov_jj=NULL, L_pj=NULL, Psi_sjt=NULL, RotationMethod="PCA", testcutoff=1e-10,
-  quiet=FALSE ){
+rotate_factors = function( Cov_jj = NULL,
+                 L_pj = NULL,
+                 Psi_sjt = NULL,
+                 RotationMethod = "PCA",
+                 testcutoff = 1e-10,
+                 quiet = FALSE ){
 
   # If missing time, add a third dimension
   if( length(dim(Psi_sjt))==2 ){

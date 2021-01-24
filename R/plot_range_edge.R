@@ -11,13 +11,29 @@
 #' @inheritParams sample_variable
 #' @param working_dir Directory for plots
 #' @param quantiles vector
-#' @param calculate_relative_to_average Boolean, whether to calculate edge in UTM coordinates (default), or instead calculate relative to median across all years. The latter reduces standard errors, and is appropriate when checking significance for comparison across years for a single species.  The former (default) is appropriate for checking significance for comparison across species.
+#' @param calculate_relative_to_average Boolean, whether to calculate edge in UTM coordinates (default),
+#'        or instead calculate relative to median across all years. The latter reduces standard errors,
+#'        and is appropriate when checking significance for comparison across years for a single species.
+#'        The former (default) is appropriate for checking significance for comparison across species.
 #'
 
 #' @export
-plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, strata_names=NULL,
-  category_names=NULL, working_dir=paste0(getwd(),"/"), quantiles=c(0.05,0.95), n_samples=100,
-  interval_width=1, width=NULL, height=NULL, calculate_relative_to_average=FALSE, seed=123456, ...){
+plot_range_edge <-
+function( Sdreport,
+          Obj,
+          year_labels = NULL,
+          years_to_plot = NULL,
+          strata_names = NULL,
+          category_names = NULL,
+          working_dir = paste0(getwd(),"/"),
+          quantiles = c(0.05,0.95),
+          n_samples = 100,
+          interval_width = 1,
+          width = NULL,
+          height = NULL,
+          calculate_relative_to_average = FALSE,
+          seed = 123456,
+          ...){
 
   # Unpack
   Report = Obj$report()
@@ -46,8 +62,8 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
   }
 
   # Default inputs
-  if( is.null(Year_Set)) Year_Set = 1:TmbData$n_t
-  if( is.null(Years2Include) ) Years2Include = 1:TmbData$n_t
+  if( is.null(year_labels)) year_labels = 1:TmbData$n_t
+  if( is.null(years_to_plot) ) years_to_plot = 1:TmbData$n_t
   if( is.null(strata_names) ) strata_names = 1:TmbData$n_l
   if( is.null(category_names) ) category_names = 1:TmbData$n_c
   if( is.null(colnames(TmbData$Z_gm)) ){
@@ -105,13 +121,13 @@ plot_range_edge = function( Sdreport, Obj, Year_Set=NULL, Years2Include=NULL, st
     Index_zct = array(Edge_zctm[,,,mI,'Estimate'],dim(Edge_zctm)[1:3])
     sd_Index_zct = array(Edge_zctm[,,,mI,'Std. Error'],dim(Edge_zctm)[1:3])
     plot_index( Index_ctl=aperm(Index_zct,c(2,3,1)), sd_Index_ctl=aperm(sd_Index_zct,c(2,3,1)),
-      Year_Set=Year_Set, Years2Include=Years2Include, strata_names=quantiles, category_names=category_names,
+      year_labels=year_labels, years_to_plot=years_to_plot, strata_names=quantiles, category_names=category_names,
       DirName=working_dir, PlotName=paste0("RangeEdge_",m_labels[mI],".png"), Yrange=c(NA,NA),
       interval_width=interval_width, width=width, height=height, xlab="Year", ylab=paste0("Quantiles (",m_labels[mI],")") )
   }
 
   # Return list of stuff
-  Return = list( "Year_Set"=Year_Set, "Edge_zctm"=Edge_zctm )
+  Return = list( "year_labels"=year_labels, "Edge_zctm"=Edge_zctm )
   return( invisible(Return) )
 }
 

@@ -17,7 +17,7 @@ plot_data(
   col = "red",
   cex = 0.01,
   pch = 19,
-  Year_Set,
+  year_labels,
   projargs = "+proj=longlat",
   map_resolution = "medium",
   land_color = "grey",
@@ -33,6 +33,8 @@ plot_data(
 \item{Data_Geostat}{data-frame of data (with columns 'E_km', 'N_km', 'Year', 'Lon', 'Lat' at a minimum)}
 
 \item{PlotDir}{Directory for plots}
+
+\item{year_labels}{Year names for labeling panels}
 
 \item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
 

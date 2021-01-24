@@ -11,7 +11,7 @@ plot_factors(
   Data = fit$data_list,
   Obj = fit$tmb_list$Obj,
   SD = fit$parameter_estimates$SD,
-  Year_Set = fit$year_labels,
+  year_labels = fit$year_labels,
   category_names = NULL,
   RotationMethod = "PCA",
   mapdetails_list = NULL,
@@ -36,7 +36,7 @@ plot_factors(
 
 \item{SD}{standard deviation report, e.g., from \code{SD <- sdreport( obj )}}
 
-\item{Year_Set}{plotting-names for time dimension}
+\item{year_labels}{Year names for labeling panels}
 
 \item{category_names}{character-vector listing name for each category}
 

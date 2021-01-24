@@ -28,7 +28,10 @@
 #' }
 
 #' @export
-simulate_data = function( fit, type=1, random_seed=NULL ){
+simulate_data <-
+function( fit,
+          type = 1,
+          random_seed = NULL ){
 
   # Sample from GMRF using sparse precision
   rmvnorm_prec <- function(mu, prec, n.sims, random_seed ) {

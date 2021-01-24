@@ -13,17 +13,18 @@
 #' @param interval_width width of interval in normal approximation; only used when specifying \code{ysd} without \code{ybounds}
 #'
 #' @export
-plot_timeseries = function( x,
-                y,
-                y_sd,
-                ybounds,
-                fn = lines,
-                ylim  =  NULL,
-                bounds_type = "whiskers",
-                bounds_args = list(),
-                interval_width = 1,
-                connect_ascending = TRUE,
-                ... ){
+plot_timeseries <-
+function( x,
+          y,
+          y_sd,
+          ybounds,
+          fn = lines,
+          ylim  =  NULL,
+          bounds_type = "whiskers",
+          bounds_args = list(),
+          interval_width = 1,
+          connect_ascending = TRUE,
+          ... ){
 
   # fill in missing
   if(missing(ybounds)) ybounds = cbind(y-interval_width*y_sd, y+interval_width*y_sd)

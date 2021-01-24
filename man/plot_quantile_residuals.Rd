@@ -9,14 +9,18 @@ plot_quantile_residuals(
   fit,
   file_name = "quantile_residuals_on_map",
   zlim = NULL,
-  Year_Set = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   n_cells = NULL,
-  Years2Include = NULL,
   ...
 )
 }
 \arguments{
 \item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of the plotted variable and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+
+\item{year_labels}{Year names for labeling panels}
+
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{n_cells}{Integer used to determine the argument \code{cell.size} passed
 to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells

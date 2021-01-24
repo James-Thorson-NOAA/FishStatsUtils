@@ -7,8 +7,8 @@
 plot_range_edge(
   Sdreport,
   Obj,
-  Year_Set = NULL,
-  Years2Include = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   strata_names = NULL,
   category_names = NULL,
   working_dir = paste0(getwd(), "/"),
@@ -27,9 +27,9 @@ plot_range_edge(
 
 \item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
 
-\item{Year_Set}{Year names for labeling panels}
+\item{year_labels}{Year names for labeling panels}
 
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{strata_names}{names for spatial strata}
 
@@ -47,7 +47,10 @@ plot_range_edge(
 
 \item{height}{plot height in inches}
 
-\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default), or instead calculate relative to median across all years. The latter reduces standard errors, and is appropriate when checking significance for comparison across years for a single species.  The former (default) is appropriate for checking significance for comparison across species.}
+\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default),
+or instead calculate relative to median across all years. The latter reduces standard errors,
+and is appropriate when checking significance for comparison across years for a single species.
+The former (default) is appropriate for checking significance for comparison across species.}
 
 \item{seed}{integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}}
 

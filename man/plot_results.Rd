@@ -54,6 +54,10 @@ plot_results(
 
 \item{working_dir}{Directory for plots}
 
+\item{year_labels}{Year names for labeling panels}
+
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
+
 \item{map_list}{output from \code{FishStatsUtils::make_map_info}}
 
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
@@ -66,7 +70,10 @@ plot_results(
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 
-\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default), or instead calculate relative to median across all years. The latter reduces standard errors, and is appropriate when checking significance for comparison across years for a single species.  The former (default) is appropriate for checking significance for comparison across species.}
+\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default),
+or instead calculate relative to median across all years. The latter reduces standard errors,
+and is appropriate when checking significance for comparison across years for a single species.
+The former (default) is appropriate for checking significance for comparison across species.}
 
 \item{type}{integer stating what type of simulation to use from the following options:
 \itemize{

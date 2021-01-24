@@ -7,8 +7,8 @@
 plot_index(
   Index_ctl,
   sd_Index_ctl = array(0, dim(Index_ctl)),
-  Year_Set = NULL,
-  Years2Include = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   strata_names = NULL,
   category_names = NULL,
   scale = "uniform",
@@ -38,9 +38,9 @@ plot_index(
 
 \item{sd_Index_ctl}{A matrix or array of variances for each estimate}
 
-\item{Year_Set}{Year names for labeling panels}
+\item{year_labels}{Year names for labeling panels}
 
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{strata_names}{names for spatial strata}
 
@@ -58,7 +58,8 @@ plot_index(
 
 \item{height}{plot height in inches}
 
-\item{Yrange}{lower and upper bound for left-hand y-axis, corresponding to input \code{Index_ctl} (use \code{Yrange[1]=NA} and/or \code{Yrange[2]=NA} for using the lower and upper bound of estimate intervals)}
+\item{Yrange}{lower and upper bound for left-hand y-axis, corresponding to input \code{Index_ctl}
+(use \code{Yrange[1]=NA} and/or \code{Yrange[2]=NA} for using the lower and upper bound of estimate intervals)}
 
 \item{plot_lines_args}{additional arguments to pass to \code{plot_lines}}
 

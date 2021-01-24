@@ -33,10 +33,6 @@ plot_residuals(
 
 \item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
 
-\item{Year_Set}{Year names for labeling panels}
-
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
-
 \item{zrange}{lower and upper bounds for plotted value of Pearson residuals, used to change plotting scale to eliminate influence of outliers on plotting scale}
 
 \item{...}{arguments passed to \code{FisshStatsUtils::plot_variable}}

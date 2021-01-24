@@ -32,23 +32,24 @@
 #' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 #'
 #' @export
-plot_results = function( fit,
-              settings = fit$settings,
-              plot_set = 3,
-              working_dir = paste0(getwd(),"/"),
-              year_labels = fit$year_labels,
-              years_to_plot = fit$years_to_plot,
-              use_biascorr = TRUE,
-              map_list,
-              category_names,
-              check_residuals = TRUE,
-              projargs = fit$extrapolation_list$projargs,
-              zrange,
-              n_samples = 100,
-              calculate_relative_to_average = FALSE,
-              type = 1,
-              n_cells = NULL,
-              ... ){
+plot_results <-
+function( fit,
+          settings = fit$settings,
+          plot_set = 3,
+          working_dir = paste0(getwd(),"/"),
+          year_labels = fit$year_labels,
+          years_to_plot = fit$years_to_plot,
+          use_biascorr = TRUE,
+          map_list,
+          category_names,
+          check_residuals = TRUE,
+          projargs = fit$extrapolation_list$projargs,
+          zrange,
+          n_samples = 100,
+          calculate_relative_to_average = FALSE,
+          type = 1,
+          n_cells = NULL,
+          ... ){
 
   # Check for known issues
   if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
@@ -64,7 +65,7 @@ plot_results = function( fit,
   plot_data_args = combine_lists( "input"=plot_data_args, "args_to_use"=formalArgs(plot_data),
     "default"=list(Extrapolation_List=fit$extrapolation_list,
       Spatial_List=fit$spatial_list, Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'],
-      Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir, Year_Set=year_labels, projargs=projargs)
+      Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir, year_labels=year_labels, projargs=projargs)
     )
   do.call( what=plot_data, args=plot_data_args )
 
@@ -84,8 +85,8 @@ plot_results = function( fit,
     message("\n### Making plot of abundance index")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
     plot_biomass_index_args = combine_lists( "input"=plot_biomass_index_args, "default"=list(DirName=working_dir,
-      TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
-      Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names), "args_to_use"=formalArgs(plot_biomass_index) )
+      TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, year_labels=year_labels,
+      years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names), "args_to_use"=formalArgs(plot_biomass_index) )
     Index = do.call( what=plot_biomass_index, args=plot_biomass_index_args )
   }else{
     Index = "Not run"
@@ -96,10 +97,10 @@ plot_results = function( fit,
   if( !is.null(fit$parameter_estimates$SD) & fit$data_list$n_c>1 ){
     message("\n### Making plot of composition data")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
-    Proportions = calculate_proportion( TmbData=fit$data_list, Index=Index, Year_Set=year_labels,
-      Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names, DirName=working_dir )
-    #Compositions = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Year_Set=year_labels,
-    #  Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
+    Proportions = calculate_proportion( TmbData=fit$data_list, Index=Index, year_labels=year_labels,
+      years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names, DirName=working_dir )
+    #Compositions = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, year_labels=year_labels,
+    #  years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
     Proportions = "Not run"
     message("\n### Skipping plot of composition data; must re-run with standard errors and multiple categories to plot")
@@ -110,7 +111,7 @@ plot_results = function( fit,
     message("\n### Making plot of spatial indices")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_range_index` isn't built to handle non-numeric `year_labels`")
     Range = plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm),
-      PlotDir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
+      PlotDir=working_dir, year_labels=year_labels, years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
     Range = "Not run"
     message("\n### Skipping plot of spatial indices; must re-run with standard errors to plot")
@@ -120,7 +121,7 @@ plot_results = function( fit,
   if( "jointPrecision"%in%names(fit$parameter_estimates$SD) & n_samples>0 & fit$data_list$Options_list$Options['Calculate_Range']==TRUE ){
     message("\n### Making plot of range edges")
     Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
-      working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot,
+      working_dir=working_dir, year_labels=year_labels, years_to_plot=years_to_plot,
       category_names=category_names, n_samples=n_samples, quantiles=c(0.05,0.5,0.95),
       calculate_relative_to_average=calculate_relative_to_average )
   }else{
@@ -135,7 +136,7 @@ plot_results = function( fit,
   plot_maps_args = list(...)
   plot_maps_args = combine_lists( "input"=plot_maps_args, "default"=list(plot_set=plot_set, category_names=category_names, TmbData=fit$data_list,
     Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
-    working_dir=working_dir, Year_Set=year_labels, Years2Include=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100,
+    working_dir=working_dir, year_labels=year_labels, years_to_plot=years_to_plot, legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100,
     Obj=fit$tmb_list$Obj, projargs=projargs, n_cells=n_cells) ) # , "args_to_use"=formalArgs(plot_maps)
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
 
@@ -153,7 +154,7 @@ plot_results = function( fit,
     #message("\n### Making plot of Pearson residuals")
     #plot_residuals(Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'], TmbData=fit$data_list, Report=fit$Report,
     #  Q=Q, working_dir=working_dir, spatial_list=fit$spatial_list, extrapolation_list=fit$extrapolation_list,
-    #  Year_Set=year_labels, Years2Include=years_to_plot, zrange=zrange,
+    #  year_labels=year_labels, years_to_plot=years_to_plot, zrange=zrange,
     #  legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100 )
 
     # Plotting quantile residuals
@@ -163,7 +164,7 @@ plot_results = function( fit,
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")
     plot_quantile_residuals( dharmaRes=dharmaRes, fit=fit, working_dir=working_dir,
-      Year_Set=year_labels, Years2Include=years_to_plot, n_cells=n_cells, ... )
+      year_labels=year_labels, years_to_plot=years_to_plot, n_cells=n_cells, ... )
   }else{
     #Q = "Not run"
     #message("\n### Skipping Q-Q plot")

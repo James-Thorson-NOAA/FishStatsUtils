@@ -11,8 +11,8 @@ plot_maps(
   Sdreport = NULL,
   projargs = "+proj=longlat",
   Panel = "Category",
-  Year_Set = NULL,
-  Years2Include = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   category_names = NULL,
   quiet = FALSE,
   working_dir = paste0(getwd(), "/"),
@@ -60,9 +60,9 @@ plot_maps(
 
 \item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
 
-\item{Year_Set}{Year names for labeling panels}
+\item{year_labels}{Year names for labeling panels}
 
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
