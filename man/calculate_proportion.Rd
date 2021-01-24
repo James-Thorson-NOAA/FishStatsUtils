@@ -69,3 +69,6 @@ Tagged list of output
 \description{
 \code{calculate_proportion} takes output from a VAST run and calculates the proportion of biomass in different categories
 }
+\references{
+For details regarding multivariate index standardization and expansion see \url{https://cdnsciencepub.com/doi/full/10.1139/cjfas-2018-0015}
+}

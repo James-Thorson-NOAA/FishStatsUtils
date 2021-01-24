@@ -22,7 +22,8 @@
 #'   \item{EffectiveArea_Table}{table of effective-area approximation to area occupied, estimated by year, recommended over \code{KernelArea_Table}}
 #' }
 #'
-
+#' @references For details regarding center of gravity see \url{https://doi.org/10.1111/2041-210X.12567}
+#' @references For details regarding effective area occupied see \url{https://doi.org/10.1098/rspb.2016.1853}
 #' @export
 plot_range_index <-
 function( Sdreport,

@@ -25,7 +25,7 @@
 #'   \item{Table}{table of index estimates by stratum and year, e.g., for including in an assessment model}
 #' }
 #'
-
+#' @references For details regarding spatio-temporal index standardization see \url{https://doi.org/10.1093/icesjms/fsu243}
 #' @export
 plot_biomass_index <-
 function( TmbData,

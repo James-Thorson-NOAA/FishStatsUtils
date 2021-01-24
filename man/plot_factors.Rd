@@ -63,3 +63,8 @@ plot_factors(
 \description{
 \code{plot_factors} plots factor loadings, average spatial factors, and spatio-temporal factors
 }
+\references{
+For details regarding spatial factor analysis see \url{https://doi.org/10.1111/2041-210X.12359}
+
+For details regarding multi-species ordination see \url{https://doi.org/10.1016/j.fishres.2018.10.013}
+}

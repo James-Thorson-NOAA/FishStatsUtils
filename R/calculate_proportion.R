@@ -15,6 +15,7 @@
 #'   \item{Neff_tl}{Effective sample size (median across categories) for each time t and stratum l}
 #' }
 #'
+#' @references For details regarding multivariate index standardization and expansion see \url{https://cdnsciencepub.com/doi/full/10.1139/cjfas-2018-0015}
 #' @export
 calculate_proportion <-
 function( TmbData,

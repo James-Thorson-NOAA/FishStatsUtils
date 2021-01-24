@@ -64,3 +64,8 @@ Return Tagged list of output
 \description{
 \code{plot_range_index} plots center-of-gravity, kernel-area occupied, and effective-area occupied
 }
+\references{
+For details regarding center of gravity see \url{https://doi.org/10.1111/2041-210X.12567}
+
+For details regarding effective area occupied see \url{https://doi.org/10.1098/rspb.2016.1853}
+}

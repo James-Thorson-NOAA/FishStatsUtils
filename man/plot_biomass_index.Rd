@@ -67,3 +67,6 @@ Return Tagged list of output
 \description{
 \code{plot_biomass_index} plots an index proportion to population abundance
 }
+\references{
+For details regarding spatio-temporal index standardization see \url{https://doi.org/10.1093/icesjms/fsu243}
+}

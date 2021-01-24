@@ -6,7 +6,8 @@
 #' @param Cov_jj Covariance calculated from loadings matrix
 #' @param L_pj Loadings matrix for `p` categories and `j` factors (calculated from \code{Cov_jj} if it is provided)
 #' @param Psi_sjt Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)
-#' @param RotationMethod Method used for rotation, Options: "PCA" (recommended) or "Varimax"
+#' @param RotationMethod Method used for rotation when visualing factor decomposition results,
+#'        Options: "PCA" (recommended) or "Varimax"
 #' @param testcutoff tolerance for numerical rounding when confirming that rotation doesn't effect results
 
 #' @return tagged list of outputs
@@ -18,12 +19,13 @@
 #' }
 
 #' @export
-rotate_factors = function( Cov_jj = NULL,
-                 L_pj = NULL,
-                 Psi_sjt = NULL,
-                 RotationMethod = "PCA",
-                 testcutoff = 1e-10,
-                 quiet = FALSE ){
+rotate_factors <-
+function( Cov_jj = NULL,
+          L_pj = NULL,
+          Psi_sjt = NULL,
+          RotationMethod = "PCA",
+          testcutoff = 1e-10,
+          quiet = FALSE ){
 
   # If missing time, add a third dimension
   if( length(dim(Psi_sjt))==2 ){

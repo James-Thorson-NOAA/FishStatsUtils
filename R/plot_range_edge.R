@@ -16,7 +16,6 @@
 #'        and is appropriate when checking significance for comparison across years for a single species.
 #'        The former (default) is appropriate for checking significance for comparison across species.
 #'
-
 #' @export
 plot_range_edge <-
 function( Sdreport,
