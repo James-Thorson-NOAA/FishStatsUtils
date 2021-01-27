@@ -103,7 +103,8 @@ among categories for each level of \code{v_i}, where eta1 is for encounter proba
 where \code{0} is off, code{"AR1"} is an AR1 process, and aninteger greater than zero (e.g., \code{2}) is the number of elements in a factor-analysis covariance (by default,
 \code{c("eta1"=0, "eta2"=0)} and this turns off overdispersion)}
 
-\item{bias.correct}{Boolean whether to do epsilon bias-correction}
+\item{bias.correct}{Boolean indicating whether to do epsilon bias-correction;
+see \code{\link[TMB]{sdreport}} and \code{\link[TMBhelper]{fit_tmb}}for details}
 
 \item{Options}{a tagged-vector that is empty by default, \code{Options=c()}, but where the following slots might be helpful to add,
        either by passing \code{Options} to \code{\link[FishStatsUtils]{make_settings}}, or editing after a call to that function:
@@ -148,6 +149,9 @@ Tagged list containing default settings for a given purpose, use \code{names} on
 }
 \details{
 This function assembles a default set of user-decisions for a specified modelling purpose. The default settings are guessed based on generic guidance, and should be carefully reviewed for real-world purposes. If the user supplies values for individual settings e.g. \code{FieldConfig}, then these values override the defaults that are provided by interpreting \code{purpose}
+}
+\references{
+For discussion of some of these options see \url{https://doi.org/10.1016/j.fishres.2018.10.013}
 }
 \seealso{
 \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots

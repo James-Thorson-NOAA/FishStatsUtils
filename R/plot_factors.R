@@ -106,7 +106,7 @@ function( fit,
     if(Par_name == "EpsilonTime2"){ Var_name = "Epsiloninput2_sff"; Var2_name = "Epsiloninput2_gff"; L_name = "Ltime_epsilon2_tf" }
 
     # Continue if component is included
-    if( as.vector(Data[["FieldConfig"]])[i] > 0 ){
+    if( as.vector(Data[["FieldConfig"]])[i] > 1 ){
 
       # Get loadings matrix
       if( L_name %in% names(Report) ){

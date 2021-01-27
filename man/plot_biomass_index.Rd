@@ -69,4 +69,6 @@ Return Tagged list of output
 }
 \references{
 For details regarding spatio-temporal index standardization see \url{https://doi.org/10.1093/icesjms/fsu243}
+
+For details regarding fishing mortality and biomass reference points in models generating those, see \url{https://doi.org/10.1111/faf.12398}
 }

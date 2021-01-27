@@ -17,10 +17,14 @@
 #'        \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 #'        will often need to be modified for a given purpose.
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
-#' @param legend_x two numeric values (generally between 0 and 1, but slightly lower/higher values generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend
-#' @param legend_y two numeric values (see legend_y) giving bottom and top location of color legend
-#' @param map_list output from \code{FishStatsUtils::make_map_info}
-#' @param zlim range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of the plotted variable and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.
+#' @param legend_x two numeric values (generally between 0 and 1, but slightly lower/higher values
+#'        generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend
+#' @param legend_y two numeric values (see description for legend_x) giving bottom and top location of color legend
+#' @param map_list output from \code{\link{make_map_info}}
+#' @param zlim two numeric values, specifying range for defining bounds of color scale.
+#'        If \code{zlim=NULL}, then a constant scale is inferred
+#'        from the range of the plotted variable and a color-legend is plotted in the last panel.
+#'        If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.
 #' @param add boolean indicating whether to add plot to an existing panel figure, or to define a new panel figure
 #' @param outermargintext vector defining text to plot in outer margins of panel figure
 #' @param panel_labels vector defining titles to use for each panel; defaults to blank

@@ -85,7 +85,15 @@ by default (but can be specified to do so when an appropriate `formula` is suppl
 
 \item{Q2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for catchability (a.k.a. detectability)}
 
-\item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
+\item{newtonsteps}{Integer specifying the number of extra newton steps to take
+after optimization (alternative to \code{loopnum}).
+Each newtonstep requires calculating the Hessian matrix and is therefore slow.
+But for well-behaved models, each Newton step will typically
+decrease the maximum gradient of the loglikelihood with respect to each fixed effect,
+and therefore this option can be used to achieve an arbitrarily low final gradient
+given sufficient time for well-behaved models.  However, this option will also
+perform strangely or have unexpected consequences for poorly-behaved models, e.g.,
+when fixed effects are at upper or lower bounds.}
 
 \item{build_model}{Boolean indicating whether to build the model, \code{build_model=TRUE}, or simply build the inputs, \code{build_model=FALSE}}
 

@@ -26,6 +26,7 @@
 #' }
 #'
 #' @references For details regarding spatio-temporal index standardization see \url{https://doi.org/10.1093/icesjms/fsu243}
+#' @references For details regarding fishing mortality and biomass reference points in models generating those, see \url{https://doi.org/10.1111/faf.12398}
 #' @export
 plot_biomass_index <-
 function( TmbData,
@@ -248,11 +249,22 @@ function( TmbData,
   # Plot
   if( !is.null(Fratio_ct) ){
     Array_ct = Fratio_ct
-      Array_ct = ifelse( Array_ct==0, NA, Array_ct )
-    plot_index( Index_ctl=array(Array_ct[,,'Estimate'],dim(Array_ct)[1:2]), sd_Index_ctl=array(Array_ct[,,'Std. Error'],dim(Array_ct)[1:2]),
-      year_labels=year_labels, years_to_plot=years_to_plot, strata_names=strata_names, category_names=category_names,
-      DirName=DirName, PlotName=paste0(PlotName,"-Fratio.png"), scale="uniform",
-      interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Fishing ratio" )
+      #Array_ct = ifelse( Array_ct==0, NA, Array_ct )
+      Array_ct[,,'Estimate'] = ifelse( Array_ct[,,'Estimate']==0, NA, Array_ct[,,'Estimate'] )
+    plot_index( Index_ctl=array(Array_ct[,,'Estimate'],dim(Array_ct)[1:2]),
+                sd_Index_ctl=array(Array_ct[,,'Std. Error'],dim(Array_ct)[1:2]),
+                year_labels=year_labels,
+                years_to_plot=years_to_plot,
+                strata_names=strata_names,
+                category_names=category_names,
+                DirName=DirName,
+                PlotName=paste0(PlotName,"-Fratio.png"),
+                scale="uniform",
+                interval_width=interval_width,
+                width=width,
+                height=height,
+                xlab="Year",
+                ylab="Fishing ratio" )
   }
 
   # Plot stock status

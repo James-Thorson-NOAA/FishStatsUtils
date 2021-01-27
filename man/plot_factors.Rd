@@ -55,7 +55,10 @@ Options: "PCA" (recommended) or "Varimax"}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
 
-\item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of the plotted variable and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+\item{zlim}{two numeric values, specifying range for defining bounds of color scale.
+If \code{zlim=NULL}, then a constant scale is inferred
+from the range of the plotted variable and a color-legend is plotted in the last panel.
+If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
 \item{testcutoff}{tolerance for numerical rounding when confirming that rotation doesn't effect results}
 

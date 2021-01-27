@@ -59,7 +59,7 @@ plot_results(
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
-\item{map_list}{output from \code{FishStatsUtils::make_map_info}}
+\item{map_list}{output from \code{\link{make_map_info}}}
 
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
