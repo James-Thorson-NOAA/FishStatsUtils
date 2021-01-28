@@ -4,7 +4,14 @@
 #' @description
 #' \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 #'
-#' See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user to center eastings on a specified longitude. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
+#' See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+#' I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user
+#' to center eastings on a specified longitude. If maps are generating visual artefacts,
+#' please try using argument \code{country} to simplify the polygons used to represent land features.
+#'
+#' In some sampling designs and/or analyses, it is not appropriate to extrapolate beyond samping stations.  In these cases,
+#' the analyst may define the extrapolation-grid to only represent sampling stations, and then use \code{format="points"}
+#' to restrict mapping to bullets at those locations.
 #'
 #' @inheritParams sp::CRS
 #' @inheritParams rnaturalearth::ne_countries
@@ -29,6 +36,8 @@
 #' @param outermargintext vector defining text to plot in outer margins of panel figure
 #' @param panel_labels vector defining titles to use for each panel; defaults to blank
 #' @param contour_nlevels number of levels used when adding contour lines, passed to \code{\link[graphics]{contour}} as argument \code{nlevels}
+#' @param format Character specifying whether to plot maps as a raster (the default), \code{format="raster"}, or as points \code{format="points"}
+#' @param cex.points Numeric specifying the size of bullets when \code{format="points"}
 #'
 #' @param ... arguments passed to \code{par}
 #'
@@ -61,6 +70,8 @@ function( Y_gt,
           country = NULL,
           contour_nlevels = 0,
           fun = mean,
+          format = "raster",
+          cex.points = 1,
           ...){
 
   ###################
@@ -154,14 +165,20 @@ function( Y_gt,
     Points_proj = sp::spTransform( Points_orig, CRS_proj )
 
     # Interpolate to raster
-    # library(plotKML)
+    Zlim = zlim
+    if(is.na(Zlim[1])) Zlim = range(Y_gt[,tI],na.rm=TRUE)
     cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
     Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
     if(missing(xlim)) xlim = Raster_proj@bbox[1,]
     if(missing(ylim)) ylim = Raster_proj@bbox[2,]
-    Zlim = zlim
-    if(is.na(Zlim[1])) Zlim = range(Y_gt[,tI],na.rm=TRUE)
-    image( Raster_proj, col=col, zlim=Zlim, xlim=xlim, ylim=ylim )
+
+    # Do plot
+    if( format=="raster" ){
+      image( Raster_proj, col=col, zlim=Zlim, xlim=xlim, ylim=ylim )
+    }else if( format=="points" ){
+      Points_col = col[cut(Y_gt[,tI],breaks=seq(Zlim[1],Zlim[2],length=length(col)),include.lowest=TRUE)]
+      plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], col=Points_col, pch=20, cex=cex.points )
+    }
 
     # Plot maps using rnaturalearth
     sp::plot( map_data, col=land_color, add=TRUE )

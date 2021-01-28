@@ -31,6 +31,8 @@ plot_variable(
   country = NULL,
   contour_nlevels = 0,
   fun = mean,
+  format = "raster",
+  cex.points = 1,
   ...
 )
 }
@@ -77,10 +79,21 @@ If \code{x} represents points, \code{fun} must accept a \code{na.rm} argument, e
 You can also pass multiple functions using a statement like \code{fun=function(x, ...) c(length(x),mean(x))}, in which case the returned object is a RasterBrick (multiple layers).
 }
 
+\item{format}{Character specifying whether to plot maps as a raster (the default), \code{format="raster"}, or as points \code{format="points"}}
+
+\item{cex.points}{Numeric specifying the size of bullets when \code{format="points"}}
+
 \item{...}{arguments passed to \code{par}}
 }
 \description{
 \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 
-See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user to center eastings on a specified longitude. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user
+to center eastings on a specified longitude. If maps are generating visual artefacts,
+please try using argument \code{country} to simplify the polygons used to represent land features.
+
+In some sampling designs and/or analyses, it is not appropriate to extrapolate beyond samping stations.  In these cases,
+the analyst may define the extrapolation-grid to only represent sampling stations, and then use \code{format="points"}
+to restrict mapping to bullets at those locations.
 }
