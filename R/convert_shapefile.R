@@ -31,7 +31,7 @@ convert_shapefile = function( file_path,
     ... ){
 
   shapefile_input = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
-  message("Reading shapefile with projargs: ", shapefile_input@proj4string)
+  message("Reading shapefile with projargs: ", print(shapefile_input@proj4string))
   # raster::shapefile(.) has simplified read-write interface for future reference
   if( !(shapefile_input@class %in% c("SpatialPolygonsDataFrame","SpatialPolygons")) ){
     warning( "object at `file_path` doesn't appear to be a shapefile")
