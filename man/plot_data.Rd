@@ -36,7 +36,10 @@ plot_data(
 
 \item{year_labels}{Year names for labeling panels}
 
-\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
+\item{projargs}{Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
+where argument \code{+lon_0} allows the user to center eastings on a specified longitude.}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
 

@@ -4,10 +4,7 @@
 #' @description
 #' \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 #'
-#' See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
-#' I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user
-#' to center eastings on a specified longitude. If maps are generating visual artefacts,
-#' please try using argument \code{country} to simplify the polygons used to represent land features.
+#' If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
 #'
 #' In some sampling designs and/or analyses, it is not appropriate to extrapolate beyond samping stations.  In these cases,
 #' the analyst may define the extrapolation-grid to only represent sampling stations, and then use \code{format="points"}
@@ -18,6 +15,10 @@
 #' @inheritParams raster::rasterize
 #'
 #' @param Y_gt matrix where values for every column are plotted as a map
+#' @param projargs Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
+#'        See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+#'        As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
+#'        where argument \code{+lon_0} allows the user to center eastings on a specified longitude.
 #' @param n_cells Integer used to determine the argument \code{cell.size} passed
 #'        to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
 #'        to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
@@ -56,7 +57,7 @@ function( Y_gt,
           add = FALSE,
           outermargintext = c("Eastings","Northings"),
           zlim = NULL,
-          col,
+          col = viridisLite::viridis,
           mar = c(0,0,2,0),
           oma = c(4,4,0,0),
           legend_x = c(0,0.05),

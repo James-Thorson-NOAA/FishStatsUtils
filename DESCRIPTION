@@ -42,7 +42,8 @@ Imports:
     rnaturalearthdata,
     formatR,
     splancs,
-    DHARMa
+    DHARMa,
+    viridisLite
 Depends:
     R (>= 3.5.0)
 Suggests:
