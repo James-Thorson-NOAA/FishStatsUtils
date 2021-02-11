@@ -88,13 +88,15 @@ make_settings(
 
 \item{RhoConfig}{vector of form \code{c("Beta1"=0,"Beta2"=0,"Epsilon1"=0,"Epsilon2"=0)} specifying whether either intercepts (Beta1 and Beta2)
        or spatio-temporal variation (Epsilon1 and Epsilon2) is structured among time intervals, e.g.
-       for component \code{Epsilon1} indicated in the 3rd slot:
+       for component \code{Epsilon2} indicated in the 4rd slot:
 \describe{
-  \item{\code{RhoConfig[3]=0}}{Each year as fixed effect}
-  \item{\code{RhoConfig[3]=1}}{Each year as an independent and identically distributed random effect, thus estimating the variance as fixed effect}
-  \item{\code{RhoConfig[3]=2}}{Each year as a random effect following a random walk, thus estimating the variance as fixed effect}
-  \item{\code{RhoConfig[3]=3}}{Constant among years as fixed effect}
-  \item{\code{RhoConfig[3]=4}}{Each year as a random effect following a first-order autoregressive process, thus estimating the variance and autocorrelation as fixed effects}
+  \item{\code{RhoConfig[4]=0}}{Each year as fixed effect}
+  \item{\code{RhoConfig[4]=1}}{Each year as an independent and identically distributed random effect, thus estimating the variance as fixed effect}
+  \item{\code{RhoConfig[4]=2}}{Each year as a random effect following a random walk, thus estimating the variance as fixed effect}
+  \item{\code{RhoConfig[4]=3}}{Constant among years as fixed effect}
+  \item{\code{RhoConfig[4]=4}}{Each year as a random effect following a first-order autoregressive process, thus estimating the variance as fixed effects and a single first-order autoregression parameter}
+  \item{\code{RhoConfig[4]=5}}{Each year as a random effect following a first-order autoregressive process, estimating the variance as fixed effects and a separate first-order autoregression parameter for each category}
+  \item{\code{RhoConfig[4]=6}}{Only possible for \code{Epsilon2} or \code{Beta2}, and specifying that that associated hyperparameters parameters have identical values to the first component \code{Epsilon1} or \code{Beta1}}
 }
 If missing, the default is to assume a value of zero for each element (i.e., \code{RhoConfig[1:4]=0})}
 
@@ -115,13 +117,14 @@ see \code{\link[TMB]{sdreport}} and \code{\link[TMBhelper]{fit_tmb}}for details}
   \item{\code{Options["Calculate_Cov_SE"]=TRUE}}{Turns on internal calculation and SE for covariance among categories (i.e. in factor model)}
   \item{\code{Options["Calculate_proportion"]=TRUE}}{Turns on internal calculation and SE for proportion of response within each category (e.g., for calculating proportion-at-age or species turnover)}
   \item{\code{Options["Calculate_Synchrony"]=TRUE}}{Turns on internal calculation and SE for Loreau metric of synchrony (a.k.a. portfolio effects)}
+  \item{\code{Options["report_additional_variables"]=TRUE}}{Export additional variables to \code{Report} object, to use for diagnostics or additional exploration}
 }}
 
 \item{use_anisotropy}{Boolean indicating whether to estimate two additional parameters representing geometric anisotropy}
 
 \item{vars_to_correct}{a character-vector listing which parameters to include for bias-correction, as passed to \code{\link[TMBhelper]{fit_tmb}}}
 
-\item{Version}{Which CPP version to use.  If missing, defaults to latest version using \code{\link[FishStatsUtils]{get_latest_version(package="VAST")}}.
+\item{Version}{Which CPP version to use.  If missing, defaults to latest version using \code{\link[FishStatsUtils]{get_latest_version}}.
 Can be used to specify using an older CPP, to maintain backwards compatibility.}
 
 \item{treat_nonencounter_as_zero}{Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates}
