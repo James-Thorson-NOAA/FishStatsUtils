@@ -15,6 +15,11 @@ get_latest_version <- function(version = NULL, package = "VAST") {
 
   # Determine location of files on machine
   thedir <- system.file("executables", package = package)
+  if(thedir==""){
+    stop("Could not find an executables folder for", package,
+         "\n Something is likely wrong with the installation. Try manually specifiying\n",
+         "the version number, or try reinstalling", package)
+  }
 
   # Determine list of available files
   if (!is.null(version)) {
