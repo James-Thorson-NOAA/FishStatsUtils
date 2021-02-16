@@ -18,18 +18,20 @@
 get_latest_version <- function(version = NULL, package = "VAST", path=NULL) {
 
   # Determine location of files on machine
-  if(is.null(path)){
-    thedir <- system.file("executables", package = package)
-    if(thedir==""){
-      stop("Could not find an executables folder for ", package,
-           "\n Something is likely wrong with the installation. Try manually specifiying\n",
-           "the version number, or try reinstalling ", package)
+  if(!is.null(path)){
+    thedir <- path
+    if(!dir.exists(path)){
+      warning("Manually specified path to executables is not valid, trying system files")
+      thedir <- system.file("executables", package = package)
     }
   } else {
-    thedir <- path
-    if(!dir.exists(path))
-      stop("Manually specified path to executables is not valid")
+    thedir <- system.file("executables", package = package)
   }
+
+  if(thedir==""){
+    stop("Could not find an executables folder for ", package,
+         "\n Something is likely wrong with the installation. Try manually specifiying\n",
+         "the version number, or try reinstalling ", package)
 
   # Determine list of available files
   if (!is.null(version)) {
