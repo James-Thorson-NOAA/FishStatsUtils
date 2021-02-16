@@ -1,9 +1,13 @@
 #' Determine latest version of VAST
 #'
-#' @param version The default is \code{NULL}, which will cause the function
-#' to look for the latest version of the \code{.cpp} file to compile.
-#' If a version is supplied, then \code{R} will look for that version name
-#' within the appropriate folder the disk.
+#' @param version The default is \code{NULL}, which will cause
+#'   the function to look for the latest version of the
+#'   \code{.cpp} file to compile.  If a version is supplied, then
+#'   \code{R} will look for that version name within the
+#'   appropriate folder the disk.
+#' @param path Optional path for running tests locally and with
+#'   continuous integration since the default looks in the wrong
+#'   place (installed library).
 #'
 #' @return A full file path as a character value supplying the location of
 #' the latest, or supplied, version of the VAST code to compile.
@@ -11,14 +15,20 @@
 #' @author Kelli Faye Johnson
 #'
 #' @export
-get_latest_version <- function(version = NULL, package = "VAST") {
+get_latest_version <- function(version = NULL, package = "VAST", path=NULL) {
 
   # Determine location of files on machine
-  thedir <- system.file("executables", package = package)
-  if(thedir==""){
-    stop("Could not find an executables folder for ", package,
-         "\n Something is likely wrong with the installation. Try manually specifiying\n",
-         "the version number, or try reinstalling ", package)
+  if(is.null(path)){
+    thedir <- system.file("executables", package = package)
+    if(thedir==""){
+      stop("Could not find an executables folder for ", package,
+           "\n Something is likely wrong with the installation. Try manually specifiying\n",
+           "the version number, or try reinstalling ", package)
+    }
+  } else {
+    thedir <- path
+    if(!dir.exists(path))
+      stop("Manually specified path to executables is not valid")
   }
 
   # Determine list of available files
