@@ -31,7 +31,11 @@
 #' }
 
 #' @export
-make_covariates = function( formula, covariate_data, Year_i, spatial_list, extrapolation_list ){
+make_covariates <-
+function( formula,
+          covariate_data,
+          Year_i,
+          spatial_list ){
 
   # Check for bad entries
   if( !is.data.frame(covariate_data) ) stop("Please ensure that `covariate_data` is a data frame")

@@ -36,17 +36,21 @@ function( Cov_jj = NULL,
   approx_equal = function(m1,m2,denominator=mean(m1+m2),d=1e-10) (2*abs(m1-m2)/denominator) < d
   trunc_machineprec = function(n) ifelse(n<1e-10,0,n)
   Nknots = dim(Psi_sjt)[1]
-  Nfactors = ncol(L_pj)
   #Nyears = nrow(L_pj)
 
   # Optional inputs
   if( !is.null(Cov_jj) ){
     if(quiet==FALSE) message( "Re-calculating L_pj from Cov_jj")
-    if( sum(eigen(Cov_jj)$values>testcutoff)<ncol(Cov_jj) ){
-      stop("Calculating L_pj from Cov_jj in 'Rotate_Fn' only works well when Cov_jj is full rank")
-    }
-    L_pj = t(chol(Cov_jj))[,1:Nfactors]
+    if( any(abs(Cov_jj-t(Cov_jj))>1e-6) ) stop("Cov_jj does not appear to be symmetric")
+    Nfactors = sum(abs(eigen(Cov_jj)$values)>1e-6)
+    #if( sum(eigen(Cov_jj)$values>testcutoff)<ncol(Cov_jj) ){
+    #  stop("Calculating L_pj from Cov_jj in 'Rotate_Fn' only works well when Cov_jj is full rank")
+    #}
+    #L_pj = t(chol(Cov_jj))[,1:Nfactors]
+    SVD = svd(V_cc)    # SVD$u %*% diag(SVD$d) %*% t(SVD$v) AND SVD$u == t(SVD$v) for a diagonal V_cc
+    L_pj = SVD$u %*% diag(sqrt(SVD$d))[,1:Nfactors,drop=FALSE]
   }else{
+    Nfactors = ncol(L_pj)
     if( !is.null(L_pj) ){
       if(quiet==FALSE) message("Using L_pj for loadings matrix")
     }else{
