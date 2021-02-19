@@ -105,6 +105,7 @@ function( settings,
           X1config_cp = NULL,
           X2config_cp = NULL,
           covariate_data,
+          contrasts = NULL,
           X1_formula = ~ 0,
           X2_formula = ~ 0,
           Q1config_k = NULL,
@@ -158,7 +159,7 @@ function( settings,
   data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
     "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
     "s_i"=spatial_list$knot_i-1, "t_i"=t_i, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
-    "X1config_cp"=X1config_cp, "X2config_cp"=X2config_cp, "covariate_data"=covariate_data, "X1_formula"=X1_formula, "X2_formula"=X2_formula,
+    "X1config_cp"=X1config_cp, "X2config_cp"=X2config_cp, "covariate_data"=covariate_data, "contrasts"=contrasts, "X1_formula"=X1_formula, "X2_formula"=X2_formula,
     "Q1config_k"=Q1config_k, "Q2config_k"=Q2config_k, "catchability_data"=catchability_data, "Q1_formula"=Q1_formula, "Q2_formula"=Q2_formula )
   data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
   data_list = do.call( what=make_data, args=data_args_input )
