@@ -18,7 +18,7 @@
 #' When supplying a shapefile, I recommend using a UTM projection for projargs, which appears to have lower
 #' projection errors regarding total area than rnaturalearth.
 #'
-#' @inheritParams sp::CRS
+#' @inheritParams project_coordinates
 #' @inheritParams make_kmeans
 #' @inheritParams convert_shapefile
 #'

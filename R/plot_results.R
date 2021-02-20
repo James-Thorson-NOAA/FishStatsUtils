@@ -52,6 +52,7 @@ function( fit,
           type = 1,
           n_cells = NULL,
           RotationMethod = "PCA",
+          quantiles = c(0.05,0.5,0.95),
           ... ){
 
   # Check for known issues
@@ -125,7 +126,7 @@ function( fit,
     message("\n### Making plot of range edges")
     Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
       working_dir=working_dir, year_labels=year_labels, years_to_plot=years_to_plot,
-      category_names=category_names, n_samples=n_samples, quantiles=c(0.05,0.5,0.95),
+      category_names=category_names, n_samples=n_samples, quantiles=quantiles,
       calculate_relative_to_average=calculate_relative_to_average )
   }else{
     Edge = "Not run"

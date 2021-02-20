@@ -22,6 +22,7 @@ plot_results(
   type = 1,
   n_cells = NULL,
   RotationMethod = "PCA",
+  quantiles = c(0.05, 0.5, 0.95),
   ...
 )
 }
@@ -94,6 +95,8 @@ will often need to be modified for a given purpose.}
 
 \item{RotationMethod}{Method used for rotation when visualing factor decomposition results,
 Options: "PCA" (recommended) or "Varimax"}
+
+\item{quantiles}{vector specifying quantiles to use for calculating range edges}
 
 \item{...}{additional settings to pass to \code{FishStatsUtils::plot_maps}}
 }

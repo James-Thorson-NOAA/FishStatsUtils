@@ -10,7 +10,7 @@
 #' @inheritParams plot_biomass_index
 #' @inheritParams sample_variable
 #' @param working_dir Directory for plots
-#' @param quantiles vector
+#' @param quantiles vector specifying quantiles to use for calculating range edges
 #' @param calculate_relative_to_average Boolean, whether to calculate edge in UTM coordinates (default),
 #'        or instead calculate relative to median across all years. The latter reduces standard errors,
 #'        and is appropriate when checking significance for comparison across years for a single species.

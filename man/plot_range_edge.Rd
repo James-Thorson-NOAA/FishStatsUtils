@@ -37,7 +37,7 @@ plot_range_edge(
 
 \item{working_dir}{Directory for plots}
 
-\item{quantiles}{vector}
+\item{quantiles}{vector specifying quantiles to use for calculating range edges}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 

@@ -105,6 +105,8 @@ make_extrapolation_info(
   \item{\code{surveyname="propInTriennial"}}{The proportion of each extrapolation-grid cell within the triennial slope survey operated 1977-2004}
 }}
 
+\item{flip_around_dateline}{DEPRECATED INPUT; boolean specifying whether to flip Lat-Lon locations around the dateline, and then retransform back (only useful if Lat-Lon straddle the dateline)}
+
 \item{nstart}{the number of times that the k-means algorithm is run while searching for the best solution (default=100)}
 
 \item{backwards_compatible_kmeans}{a boolean stating how to deal with changes in the kmeans algorithm implemented in R version 3.6.0,

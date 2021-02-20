@@ -10,7 +10,7 @@
 #' the analyst may define the extrapolation-grid to only represent sampling stations, and then use \code{format="points"}
 #' to restrict mapping to bullets at those locations.
 #'
-#' @inheritParams sp::CRS
+#' @inheritParams project_coordinates
 #' @inheritParams rnaturalearth::ne_countries
 #' @inheritParams raster::rasterize
 #'
