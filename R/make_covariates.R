@@ -34,6 +34,7 @@
 make_covariates <-
 function( formula,
           covariate_data,
+          contrasts,
           Year_i,
           spatial_list ){
 
@@ -60,7 +61,7 @@ function( formula,
     # issues arising when both conditions are met:
     # factor(Year) has an interaction with another factor, and
     # betas vary among years (are not constant)
-  Model_matrix = model.matrix( update.formula(formula, ~.+1), data=covariate_df )
+  Model_matrix = model.matrix( update.formula(formula, ~.+1), data=covariate_df,  contrasts.arg=contrasts )
   Columns_to_keep = which( attr(Model_matrix,"assign") != 0 )
   coefficient_names = attr(Model_matrix,"dimnames")[[2]][Columns_to_keep]
   X = Model_matrix[,Columns_to_keep,drop=FALSE]
