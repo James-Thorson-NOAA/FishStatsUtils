@@ -23,17 +23,18 @@ Current options for \code{data_set} include:
 \item \code{"EBS_pollock"},
 \item \code{"GOA_Pcod"},
 \item \code{"GOA_pollock"},
-\item \code{"GB_spring_haddock"},
-\item \code{"GB_fall_haddock"},
-\item \code{"SAWC_jacopever"},
+\item \code{"GB_spring_haddock"} (with thanks to L. Brooks for assembling the data),
+\item \code{"GB_fall_haddock"} (with thanks to L. Brooks for assembling the data),
+\item \code{"SAWC_jacopever"} (with thanks to H. Winker for assembling the data),
 \item \code{"Aleutian_islands_POP"},
-\item \code{"GOA_arrowtooth_condition_and_density"},
-\item \code{"condition_and_density"},
-\item \code{"multimodal_red_snapper"},
-\item \code{"lingcod_comp_expansion"},
-\item \code{"covariate_example"},
-\item \code{"PESC_example_red_grouper"}, and
-\item \code{"ordination"}.
+\item \code{"GOA_arrowtooth_condition_and_density"} (with thanks to A. Gruss for assembling the data),
+\item \code{"condition_and_density"} (with thanks to A. Gruss for assembling the data),
+\item \code{"multimodal_red_snapper"} (with thanks to A. Gruss for assembling the data),
+\item \code{"lingcod_comp_expansion"} (with thanks to M. Haltuch for assembling the data),
+\item \code{"covariate_example"} (with thanks to D. McGowan for assembling the data),
+\item \code{"PESC_example_red_grouper"} (with thanks to A. Gruss for assembling the data),
+\item \code{"ordination"}, and
+\item \code{"NWA_yellowtail_seasons"} (with thanks to L. Brooks, C. Adams, and C. Legault for assembling the data).
 }
 These examples are used to highlight different functionality for spatio-temporal analysis,
 as well as during integrated testing to check whether updates are backwards compatible for these examples.
