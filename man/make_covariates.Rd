@@ -4,12 +4,25 @@
 \alias{make_covariates}
 \title{Format habitat covariate matrix}
 \usage{
-make_covariates(formula, covariate_data, Year_i, spatial_list)
+make_covariates(
+  formula,
+  covariate_data,
+  Year_i,
+  spatial_list,
+  contrasts.arg = NULL
+)
 }
 \arguments{
 \item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}}
 
 \item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)}
+
+\item{contrasts.arg}{a list, whose entries are values (numeric
+    matrices, \code{\link{function}}s or character strings naming
+    functions) to be used
+    as replacement values for the \code{\link[stats]{contrasts}}
+    replacement function and whose names are the names of
+    columns of \code{data} containing \code{\link{factor}}s.}
 }
 \value{
 Tagged list of useful output
