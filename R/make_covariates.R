@@ -21,6 +21,7 @@
 #' If using a mix of static and dynamic covariates,
 #' then duplicate rows for static covariates for every value of Year
 #'
+#' @inheritParams stats::model.matrix
 #' @param formula an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}
 #' @param covariate_data data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)
 #'
@@ -35,7 +36,8 @@ make_covariates <-
 function( formula,
           covariate_data,
           Year_i,
-          spatial_list ){
+          spatial_list,
+          contrasts.arg = NULL ){
 
   # Check for bad entries
   if( !is.data.frame(covariate_data) ) stop("Please ensure that `covariate_data` is a data frame")
@@ -60,7 +62,7 @@ function( formula,
     # issues arising when both conditions are met:
     # factor(Year) has an interaction with another factor, and
     # betas vary among years (are not constant)
-  Model_matrix = model.matrix( update.formula(formula, ~.+1), data=covariate_df )
+  Model_matrix = model.matrix( update.formula(formula, ~.+1), data=covariate_df, contrasts.arg=contrasts.arg )
   Columns_to_keep = which( attr(Model_matrix,"assign") != 0 )
   coefficient_names = attr(Model_matrix,"dimnames")[[2]][Columns_to_keep]
   X = Model_matrix[,Columns_to_keep,drop=FALSE]
