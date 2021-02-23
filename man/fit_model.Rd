@@ -127,10 +127,10 @@ perform separate components of a spatio-temporal analysis:
 \item determine the extrapolation-grid \code{\link{make_extrapolation_info}},
 \item define spatial objects \code{\link{make_spatial_info}},
 \item build covariates from a formula interface \code{\link{make_covariates}},
-\item assemble data \code{\link{make_data}},
-\item build model \code{\link{make_model}},
+\item assemble data \code{\link[VAST]{make_data}},
+\item build model \code{\link[VAST]{make_model}},
 \item estimate parameters \code{\link[TMBhelper]{fit_tmb}}, and
-\item check for obvious problems with the estimates \code{\link{check_fit}}.
+\item check for obvious problems with the estimates \code{\link[VAST]{check_fit}}.
 }
 Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
 

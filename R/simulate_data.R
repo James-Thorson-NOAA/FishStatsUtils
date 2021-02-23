@@ -17,7 +17,7 @@
 #' \item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
 #' and new data conditional upon these values.
 #' }
-#' @param random_seed integer passed to \code{\link[base]{set.seed}}, where the default value \code{random_seed=NULL} resets the random-number seed.
+#' @param random_seed integer passed to \code{set.seed}, where the default value \code{random_seed=NULL} resets the random-number seed.
 #'
 
 #' @return Report object containing new data and population variables including

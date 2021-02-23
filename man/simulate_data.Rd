@@ -19,7 +19,7 @@ simulate_data(fit, type = 1, random_seed = NULL)
 and new data conditional upon these values.
 }}
 
-\item{random_seed}{integer passed to \code{\link[base]{set.seed}}, where the default value \code{random_seed=NULL} resets the random-number seed.}
+\item{random_seed}{integer passed to \code{set.seed}, where the default value \code{random_seed=NULL} resets the random-number seed.}
 }
 \value{
 Report object containing new data and population variables including

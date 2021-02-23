@@ -22,7 +22,7 @@
 #' then duplicate rows for static covariates for every value of Year
 #'
 #' @inheritParams stats::model.matrix
-#' @param formula an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}
+#' @param formula an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link[stats]{lm}}
 #' @param covariate_data data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)
 #'
 #' @return Tagged list of useful output
