@@ -9,7 +9,6 @@
 #' @param Sdreport TMB output from `TMB::sdreport(Obj)`
 #' @param Report Reporting output from `Obj$report()`
 #' @param TmbData Formatted data inputs, from `VAST::Data_Fn(...)`
-#' @param Year_Set Year names for plotting
 #' @param PlotDir Directory for plots
 #' @param FileName_COG Full filename (including directory) for center-of-gravity plot
 #' @param FileName_Area Full filename (including directory) for center-of-gravity plot
@@ -23,12 +22,25 @@
 #'   \item{EffectiveArea_Table}{table of effective-area approximation to area occupied, estimated by year, recommended over \code{KernelArea_Table}}
 #' }
 #'
-
+#' @references For details regarding center of gravity see \url{https://doi.org/10.1111/2041-210X.12567}
+#' @references For details regarding effective area occupied see \url{https://doi.org/10.1098/rspb.2016.1853}
 #' @export
-plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Include=NULL, strata_names=NULL,
-  PlotDir=paste0(getwd(),"/"), FileName_COG=paste0(PlotDir,"/center_of_gravity.png"),
-  FileName_Area=paste0(PlotDir,"/Area.png"), FileName_EffArea=paste0(PlotDir,"/Effective_Area.png"), Znames=rep("",ncol(TmbData$Z_xm)), use_biascorr=TRUE,
-  category_names=NULL, interval_width=1, ...){
+plot_range_index <-
+function( Sdreport,
+          Report,
+          TmbData,
+          year_labels = NULL,
+          years_to_plot = NULL,
+          strata_names = NULL,
+          PlotDir = paste0(getwd(),"/"),
+          FileName_COG = paste0(PlotDir,"/center_of_gravity.png"),
+          FileName_Area = paste0(PlotDir,"/Area.png"),
+          FileName_EffArea = paste0(PlotDir,"/Effective_Area.png"),
+          Znames = rep("",ncol(TmbData$Z_xm)),
+          use_biascorr = TRUE,
+          category_names = NULL,
+          interval_width = 1,
+          ...){
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
@@ -55,11 +67,11 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
 
 
   # Default inputs
-  if( is.null(Year_Set)) Year_Set = 1:TmbData$n_t
-  if( is.null(Years2Include) ) Years2Include = 1:TmbData$n_t
+  if( is.null(year_labels)) year_labels = 1:TmbData$n_t
+  if( is.null(years_to_plot) ) years_to_plot = 1:TmbData$n_t
   if( is.null(strata_names) ) strata_names = 1:TmbData$n_l
   if( is.null(category_names) ) category_names = 1:TmbData$n_c
-  Return = list( "Year_Set"=Year_Set )
+  Return = list( "year_labels"=year_labels )
 
   # Plot distribution shift and kernal-area approximation to area occupied if necessary outputs are available
   if( !any(c("mean_Z_tm","mean_Z_ctm","mean_Z_cym") %in% names(Report)) ){
@@ -86,9 +98,9 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
       par( mar=c(2,2,1,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(1,1,0,1.5), mfrow=c(TmbData$n_c,dim(SD_mean_Z_ctm)[[3]]), ... )  #
       for( cI in 1:TmbData$n_c ){
       for( mI in 1:dim(SD_mean_Z_ctm)[[3]]){
-        Ybounds = (SD_mean_Z_ctm[cI,Years2Include,mI,'Estimate']%o%rep(interval_width,2) + SD_mean_Z_ctm[cI,Years2Include,mI,'Std. Error']%o%c(-interval_width,interval_width))
+        Ybounds = (SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate']%o%rep(interval_width,2) + SD_mean_Z_ctm[cI,years_to_plot,mI,'Std. Error']%o%c(-interval_width,interval_width))
         Ylim = range(Ybounds,na.rm=TRUE)
-        plot_lines(x=Year_Set[Years2Include], y=SD_mean_Z_ctm[cI,Years2Include,mI,'Estimate'], ybounds=Ybounds, col_bounds=rgb(1,0,0,0.2), fn=plot,
+        plot_lines(x=year_labels[years_to_plot], y=SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate'], ybounds=Ybounds, col_bounds=rgb(1,0,0,0.2), fn=plot,
           type="l", lwd=2, col="red", bounds_type="shading", ylim=Ylim, xlab="", ylab="", main="")
         if( cI==1 ) mtext(side=3, text=Znames[mI], outer=FALSE )
         if( mI==dim(SD_mean_Z_ctm)[[3]] & TmbData$n_c>1 ) mtext(side=4, text=category_names[cI], outer=FALSE, line=0.5)
@@ -100,16 +112,16 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
     COG_Table = NULL
     for( cI in 1:TmbData$n_c ){
     for( mI in 1:dim(SD_mean_Z_ctm)[[3]]){
-      Tmp = cbind("m"=mI, "Year"=Year_Set, "COG_hat"=SD_mean_Z_ctm[cI,,mI,'Estimate'], "SE"=SD_mean_Z_ctm[cI,,mI,'Std. Error'])
+      Tmp = cbind("m"=mI, "Year"=year_labels, "COG_hat"=SD_mean_Z_ctm[cI,,mI,'Estimate'], "SE"=SD_mean_Z_ctm[cI,,mI,'Std. Error'])
       if( TmbData$n_c>1 ) Tmp = cbind( "Category"=category_names[cI], Tmp)
       COG_Table = rbind(COG_Table, Tmp)
     }}
 
     # Plot area
-    #KernelArea_Table = cbind("Year"=Year_Set, "KernelArea"=SD_log_area_Z_tmm[,2,1,1], "SE"=SD_log_area_Z_tmm[,2,1,2])
+    #KernelArea_Table = cbind("Year"=year_labels, "KernelArea"=SD_log_area_Z_tmm[,2,1,1], "SE"=SD_log_area_Z_tmm[,2,1,2])
     #png( file=FileName_Area, width=4, height=4, res=200, units="in")
     #  par( mfrow=c(1,1), mar=c(3,3,2,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(0,0,0,0))
-    #  plot_lines( x=Year_Set, y=SD_log_area_Z_tmm[,2,1,1], ybounds=SD_log_area_Z_tmm[,2,1,1]%o%rep(1,2)+SD_log_area_Z_tmm[,2,1,2]%o%c(-1,1), fn=plot, bounds_type="shading", col_bounds=rgb(1,0,0,0.2), col="red", lwd=2, xlab="Year", ylab="ln(km^2)", type="l", main="Kernel approximation to area occupied")
+    #  plot_lines( x=year_labels, y=SD_log_area_Z_tmm[,2,1,1], ybounds=SD_log_area_Z_tmm[,2,1,1]%o%rep(1,2)+SD_log_area_Z_tmm[,2,1,2]%o%c(-1,1), fn=plot, bounds_type="shading", col_bounds=rgb(1,0,0,0.2), col="red", lwd=2, xlab="Year", ylab="ln(km^2)", type="l", main="Kernel approximation to area occupied")
     #dev.off()
 
     # Return stuff
@@ -150,7 +162,7 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
     # Plot area
     plot_index( Index_ctl=array(SD_log_effective_area_ctl[,,,'Estimate'],dim(SD_log_effective_area_ctl)[1:3]),
       sd_Index_ctl=array(SD_log_effective_area_ctl[,,,'Std. Error'],dim(SD_log_effective_area_ctl)[1:3]),
-      Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
+      year_labels=year_labels, years_to_plot=years_to_plot, strata_names=strata_names, category_names=category_names,
       DirName="", PlotName=FileName_EffArea, scale="uniform",
       interval_width=interval_width, xlab="Year", ylab="Effective area occupied, ln(km^2)", Yrange=c(NA,NA),
       width=ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))*4, height=ceiling(sqrt(TmbData$n_c))*4 )
@@ -158,7 +170,7 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
     #  par( mfrow=c(1,1), mar=c(2,2,1,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(1,1,1,0), mfrow=c(ceiling(sqrt(TmbData$n_c)),ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))))
     #  for( cI in 1:TmbData$n_c ){
     #    Ybounds = SD_log_effective_area_ctl[cI,,1,1]%o%rep(interval_width,2) + SD_log_effective_area_ctl[cI,,1,2]%o%c(-interval_width,interval_width)
-    #    plot_lines( x=Year_Set, y=SD_log_effective_area_ctl[cI,,1,1], ybounds=Ybounds, ylim=range(Ybounds), fn=plot, bounds_type="shading", col_bounds=rgb(1,0,0,0.2), col="red", lwd=2, xlab="", ylab="", type="l", main=category_names[cI])
+    #    plot_lines( x=year_labels, y=SD_log_effective_area_ctl[cI,,1,1], ybounds=Ybounds, ylim=range(Ybounds), fn=plot, bounds_type="shading", col_bounds=rgb(1,0,0,0.2), col="red", lwd=2, xlab="", ylab="", type="l", main=category_names[cI])
     #  }
     #  mtext( side=1:3, text=c("Year","ln(km^2)","Effective area occupied"), outer=TRUE, line=c(0,0,0) )
     #dev.off()
@@ -166,7 +178,7 @@ plot_range_index = function( Sdreport, Report, TmbData, Year_Set=NULL, Years2Inc
     # Write to file
     EffectiveArea_Table = NULL
     for( cI in 1:TmbData$n_c ){
-      Tmp = cbind("Year"=Year_Set, "EffectiveArea"=SD_log_effective_area_ctl[cI,,1,1], "SE"=SD_log_effective_area_ctl[cI,,1,2])
+      Tmp = cbind("Year"=year_labels, "EffectiveArea"=SD_log_effective_area_ctl[cI,,1,1], "SE"=SD_log_effective_area_ctl[cI,,1,2])
       if( TmbData$n_c>1 ) Tmp = cbind( "Category"=category_names[cI], Tmp)
       EffectiveArea_Table = rbind(EffectiveArea_Table, Tmp)
     }

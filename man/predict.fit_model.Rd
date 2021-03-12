@@ -13,8 +13,9 @@
   a_i,
   c_iz = rep(0, length(t_i)),
   v_i = rep(0, length(t_i)),
-  covariate_data = NULL,
-  catchability_data = NULL,
+  new_covariate_data = NULL,
+  new_catchability_data = NULL,
+  do_checks = TRUE,
   working_dir = paste0(getwd(), "/")
 )
 }
@@ -36,15 +37,50 @@ category (e.g., species, length-bin) for each observation i}
 providing sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
 (by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
 
-\item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)}
-
-\item{catchability_data}{data-frame of covariates for use when specifying \code{Q1_formula} and \code{Q2_formula}}
+\item{keep_old_covariates}{Whether to add new_covariate_data to existing data.
+This is useful when predicting values at new locations, but does not work
+when predicting data are locations with existing data (because the interpolation of
+covariate values will conflict for existing and new covariate values), e.g.,
+when calculating partial dependence plots for existing data.}
 }
 \description{
 \code{predict.fit_model} calculates predictions given new data
 }
 \details{
-When the user does not supply \code{covariate_data}, predictions are based upon covariate values
-interpolated from covariates supplied when fitting the model.  When the user does supply \code{covariate_data},
-predictions are created when interpolating based on those new supplied values.
+\code{predict.fit_model} is designed with two purposes in mind:
+\enumerate{
+\item If \code{new_covariate_data=NULL} as by default, then the model uses the covariate values supplied during original model fits,
+      and interpolates as needed from those supplied values to new predicted locations.  This then uses *exactly* the same information
+      as was available during model fitting.
+\item If \code{new_covariate_data} is supplied with new values (e.g., at locations for predictions), then these values are used in
+      combination with original covariate values when interpolating to new values.  However, supplying \code{new_oovariate_data}
+      at the same Lat-Lon-Year combination as any original covariate value will delete those matches in the latter, such that originally fitted data
+      can be predicted using alternative values for covariates (e.g., when calculating partial dependence plots)
+}
+}
+\examples{
+\dontrun{
+
+# Showing use of package pdp for partial dependence plots
+pred.fun = function( object, newdata ){
+  predict( x=object,
+    Lat_i = object$data_frame$Lat_i,
+    Lon_i = object$data_frame$Lon_i,
+    t_i = object$data_frame$t_i,
+    a_i = object$data_frame$a_i,
+    what = "P1_iz",
+    new_covariate_data = newdata,
+    do_checks = FALSE )
+}
+
+library(ggplot2)
+library(pdp)
+Partial = partial( object = fit,
+                   pred.var = "BOT_DEPTH",
+                   pred.fun = pred.fun,
+                   train = fit$covariate_data )
+autoplot(Partial)
+
+}
+
 }

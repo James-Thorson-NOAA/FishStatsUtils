@@ -6,6 +6,7 @@
 #' \code{plot_data} produces diagnostics plots for the spatial distribution of data and knots
 #'
 #' @inheritParams plot_variable
+#' @inheritParams plot_maps
 #'
 #' @param Extrapolation_List Output from \code{Prepare_Extrapolation_Data_Fn}
 #' @param Spatial_List Output from \code{Spatial_Information_Fn}
@@ -15,10 +16,25 @@
 #'
 
 #' @export
-plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
-  Lat_i=Data_Geostat[,'Lat'], Lon_i=Data_Geostat[,'Lon'], Year_i=Data_Geostat[,'Year'], PlotDir=paste0(getwd(),"/"),
-  Plot1_name="Data_and_knots.png", Plot2_name="Data_by_year.png", col="red", cex=0.01, pch=19,
-  Year_Set, projargs='+proj=longlat', map_resolution="medium", land_color="grey", country=NULL, ...){
+plot_data <-
+function( Extrapolation_List,
+          Spatial_List,
+          Data_Geostat = NULL,
+          Lat_i = Data_Geostat[,'Lat'],
+          Lon_i = Data_Geostat[,'Lon'],
+          Year_i = Data_Geostat[,'Year'],
+          PlotDir = paste0(getwd(),"/"),
+          Plot1_name = "Data_and_knots.png",
+          Plot2_name = "Data_by_year.png",
+          col = "red",
+          cex = 0.01,
+          pch = 19,
+          year_labels,
+          projargs = '+proj=longlat',
+          map_resolution = "medium",
+          land_color = "grey",
+          country = NULL,
+          ...){
 
   # Check for issues
   if( is.null(Lat_i) | is.null(Lon_i) | is.null(Year_i) ){
@@ -65,20 +81,20 @@ plot_data = function( Extrapolation_List, Spatial_List, Data_Geostat=NULL,
 
   # Plot data by year
   # Use Data_Geostat, instead of TmbData, because I want raw locations, not locations at knots
-  if(missing(Year_Set)) Year_Set = min(Year_i):max(Year_i)
-  if( !any(unique(Year_i) %in% Year_Set) ) Year_Set = sort(unique(Year_i))
-    Nrow = ceiling( sqrt(length(Year_Set)) )
-    Ncol = ceiling( length(Year_Set)/Nrow )
+  if(missing(year_labels)) year_labels = min(Year_i):max(Year_i)
+  if( !any(unique(Year_i) %in% year_labels) ) year_labels = sort(unique(Year_i))
+    Nrow = ceiling( sqrt(length(year_labels)) )
+    Ncol = ceiling( length(year_labels)/Nrow )
   if(!is.null(Plot2_name)) png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
-    for( t in 1:length(Year_Set) ){
-      plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i), main=Year_Set[t], xaxt="n", yaxt="n" )
+    for( t in 1:length(year_labels) ){
+      plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i), main=year_labels[t], xaxt="n", yaxt="n" )
       sp::plot( map_data, col=land_color, add=TRUE )
-      Which = which( Year_i == Year_Set[t] )
+      Which = which( Year_i == year_labels[t] )
       if( length(Which)>0 ){
         points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
       }
-      if( t>(length(Year_Set)-Ncol) ) axis(1)
+      if( t>(length(year_labels)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)
       mtext( side=c(1,2), text=c("Longitude","Latitude"), outer=TRUE, line=1)
     }

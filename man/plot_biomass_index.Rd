@@ -7,8 +7,8 @@
 plot_biomass_index(
   TmbData,
   Sdreport,
-  Year_Set = NULL,
-  Years2Include = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   DirName = paste0(getwd(), "/"),
   PlotName = "Index",
   interval_width = 1,
@@ -30,9 +30,9 @@ plot_biomass_index(
 
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
-\item{Year_Set}{Year names for labeling panels}
+\item{year_labels}{Year names for labeling panels}
 
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{DirName}{Directory for saving plot and table}
 
@@ -66,4 +66,9 @@ Return Tagged list of output
 }
 \description{
 \code{plot_biomass_index} plots an index proportion to population abundance
+}
+\references{
+For details regarding spatio-temporal index standardization see \url{https://doi.org/10.1093/icesjms/fsu243}
+
+For details regarding fishing mortality and biomass reference points in models generating those, see \url{https://doi.org/10.1111/faf.12398}
 }

@@ -18,17 +18,50 @@
 #' When supplying a shapefile, I recommend using a UTM projection for projargs, which appears to have lower
 #' projection errors regarding total area than rnaturalearth.
 #'
-#' @inheritParams sp::CRS
+#' @inheritParams project_coordinates
 #' @inheritParams make_kmeans
 #' @inheritParams convert_shapefile
 #'
-#' @param Region a character vector, where each element that is matched against potential values to determine the region for the extrapolation grid. Current options are "california_current", "west_coast_hook_and_line", "british_columbia", "eastern_bering_sea", "northern_bering_sea", "bering_sea_slope", "st_matthews_island", "aleutian_islands", "gulf_of_alaska", "northwest_atlantic", "south_africa", "gulf_of_st_lawrence", "new_zealand", "habcam", "gulf_of_mexico", "ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC", "stream_network", "user", "other", or the absolute path and file name for a GIS shapefile
+#' @param Region a character vector, where each element is matched against potential values to create the extrapolation grid, where densities are
+#'        then predicted at the midpoint of each grid cell when calculating derived quantities or visualizing model outputs.
+#'        Users will typically supply a single character-string, representing the footprint of a single survey.
+#'        However, it is also possible to provide a character-vector, where the extrapolation-grid will be created for each string, and then combined together;
+#'        this is then helpful when extrapolating densities across multiple survey domains.
+#'        Current options are:
+#' \describe{
+#'   \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
+#'   \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
+#'   \item{\code{"california_current"}}{The spatial fooprint of the stratified-random shelf-slope bottom trawl operated by NWFSC from 2003 onward; specify subsets via \code{surveyname}}
+#'   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC}
+#'   \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS; see \code{strata_to_use} for further specification}
+#'   \item{\code{"eastern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the eastern Bering Sea}
+#'   \item{\code{"northern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the northern Bering Sea}
+#'   \item{\code{"bering_sea_slope"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Bering Sea slope}
+#'   \item{\code{"st_matthews_island"}}{The spatial fooprint of the survey area defined around St. Matthews Island, representing regular and corner stations from the eastern Bering Sea bottom trawl survey}
+#'   \item{\code{"aleutian_islands"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Aleutian Islands}
+#'   \item{\code{"gulf_of_alaska"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Gulf of Alaska and containing shallow and deep stations (where the latter are not consistently sampled in later years)}
+#'   \item{\code{"BFISH_MHI"}}{The spatial fooprint of the visual sampling of reef fishes in the main Hawaiian Islands (as provided by B. Richards)}
+#'   \item{\code{"CalCOFI-IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
+#'   \item{\code{"CalCOFI_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI, in a typical year during Winter and Spring months (as identified by A. Thompson)}
+#'   \item{\code{"IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
+#'   \item{\code{"CalCOFI-IMECOCAL_Summer"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Summer months (as identified by A. Thompson)}
+#'   \item{\code{"rockfish_recruitment_coastwide"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC across its expanded spatial extent that is sampled during recent years (as identified by J. Field)}
+#'   \item{\code{"rockfish_recruitment_core"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC within its core spatial extent that is sampled consistently throughout its entire operations (as identified by J. Field)}
+#'   \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic;  see \code{epu_to_use} for further subdivisions}
+#'   \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa (as identified by H. Winker); see \code{region} to select between South and West Coast surveys}
+#'   \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence}
+#'   \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise}
+#'   \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC}
+#'   \item{\code{"gulf_of_mexico"}}{The US Gulf of Mexico, surveyed by various fishery-independent surveys; using a definition provided by A. Gruss}
+#'   \item{\code{"ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC"}}{ICES survey domains as defined by shapefiles provided by M. Lindegren as originated by ICES Secretariat}
+#'   \item{\code{"stream_network"}}{Specifying a stream network for use when \code{Method="Stream_network"}}
+#'   \item{\code{"other"}}{Automated creation of an extrapolation-grid by padding an area around observations (not recommended for operational use)}
+#' }
 #' @param strata.limits an input for determining stratification of indices (see example script)
 #' @param zone UTM zone used for projecting Lat-Lon to km distances; use \code{zone=NA} by default to automatically detect UTM zone from the location of extrapolation-grid samples
-#' @param flip_around_dateline used applies when using UTM projection, where {flip_around_dateline=TRUE} causes code to convert given latitude on other side of globe (as helpful when data straddle dateline); default value depends upon \code{Region} used
 #' @param create_strata_per_region Boolean indicating whether to create a single stratum for all regions listed in \code{Region} (the default), or a combined stratum in addition to a stratum for each individual Region
 #' @param observations_LL a matrix with two columns (labeled 'Lat' and 'Lon') giving latitude and longitude for each observation; only used when \code{Region="other"}
-#' @param input_grid a matrix with three columns (labeled 'Lat', 'Lon', and 'Area_km2') giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="user"}
+#' @param input_grid a matrix with three columns (labeled \code{'Lat', 'Lon'}, and \code{'Area_km2'}) giving latitude, longitude, and area for each cell of a user-supplied grid; only used when \code{Region="user"}
 #' @param grid_dim_km numeric-vector with length two, giving the distance in km between cells in the automatically generated extrapolation grid; only used if \code{Region="other"}
 #' @param maximum_distance_from_sample maximum distance that an extrapolation grid cell can be from the nearest sample and still be included in area-weighted extrapolation of density; only used if \code{Region="other"}
 #' @param grid_dim_LL same as \code{grid_dim_km} except measured in latitude-longitude coordinates; only used if \code{Region="other"}
@@ -37,7 +70,12 @@
 #' @param epu_to_use EPU to include for the Northwest Atlantic (NWA) extrapolation grid, default is "All"; only used if \code{Region="northwest_atlantic"}
 #' @param survey survey to use for New Zealand extrapolation grid; only used if \code{Region="new_zealand"}
 #' @param region which coast to use for South Africa extrapolation grid; only used if \code{Region="south_africa"}
-#' @param surveyname area of West Coast to include in area-weighted extrapolation for California Current; only used if \code{Region="california_current"}
+#' @param surveyname area of West Coast to include in area-weighted extrapolation for California Current;
+#'        only used if \code{Region="california_current"}.  Options are:
+#' \describe{
+#'   \item{\code{surveyname="propInWCGBTS"}}{The proportion of each extrapolation-grid cell within the annual shelf-slope survey operated 2003 to present (the default)}
+#'   \item{\code{surveyname="propInTriennial"}}{The proportion of each extrapolation-grid cell within the triennial slope survey operated 1977-2004}
+#' }
 #' @param max_cells Maximum number of extrapolation-grid cells.  If number of cells in extrapolation-grid is less than this number, then its value is ignored.  Default \code{max_cells=Inf} results in no reduction in number of grid cells from the default extrapolation-grid for a given region.  Using a lower value is particularly useful when \code{fine_scale=TRUE} and using epsilon bias-correction, such that the number of extrapolation-grid cells is often a limiting factor in estimation speed.
 #' @param ... other objects passed for individual regions (see example script)
 
@@ -51,13 +89,29 @@
 #' }
 
 #' @export
-make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=data.frame('STRATA'="All_areas"),
-  create_strata_per_region=FALSE, max_cells=NULL, input_grid=NULL, observations_LL=NULL, grid_dim_km=c(2,2),
-  maximum_distance_from_sample=NULL, grid_in_UTM=TRUE, grid_dim_LL=c(0.1,0.1),
-  region=c("south_coast","west_coast"), strata_to_use=c('SOG','WCVI','QCS','HS','WCHG'),
-  epu_to_use=c('All','Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')[1],
-  survey="Chatham_rise", surveyname='propInWCGBTS', flip_around_dateline, nstart=100,
-  area_tolerance=0.05, backwards_compatible_kmeans=FALSE, ... ){
+make_extrapolation_info = function( Region,
+        projargs = NA,
+        zone = NA,
+        strata.limits = data.frame('STRATA' = "All_areas"),
+        create_strata_per_region = FALSE,
+        max_cells = NULL,
+        input_grid = NULL,
+        observations_LL = NULL,
+        grid_dim_km = c(2,2),
+        maximum_distance_from_sample = NULL,
+        grid_in_UTM = TRUE,
+        grid_dim_LL = c(0.1,0.1),
+        region = c("south_coast","west_coast"),
+        strata_to_use = c('SOG','WCVI','QCS','HS','WCHG'),
+        epu_to_use = c('All','Georges_Bank','Mid_Atlantic_Bight','Scotian_Shelf','Gulf_of_Maine','Other')[1],
+        survey = "Chatham_rise",
+        surveyname = 'propInWCGBTS',
+        flip_around_dateline,
+        nstart = 100,
+        area_tolerance = 0.05,
+        backwards_compatible_kmeans = FALSE,
+        DirPath = paste0(getwd(),"/"),
+        ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
   # However, it requires a different default value for different regions; hence the input format being used.
@@ -103,6 +157,10 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_GOA_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
+    if( tolower(Region[rI]) == tolower("BFISH_MHI") ){
+      if(missing(flip_around_dateline)) flip_around_dateline = FALSE
+      Extrapolation_List = Prepare_BFISH_MHI_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
+    }
     if( tolower(Region[rI]) == "northwest_atlantic" ){
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_NWA_Extrapolation_Data_Fn( strata.limits=strata.limits, epu_to_use=epu_to_use, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
@@ -127,7 +185,11 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
       if(missing(flip_around_dateline)) flip_around_dateline = FALSE
       Extrapolation_List = Prepare_GOM_Extrapolation_Data_Fn( strata.limits=strata.limits, projargs=projargs, zone=zone, flip_around_dateline=flip_around_dateline, ... )
     }
-    if( toupper(Region[rI]) %in% c("ATL-IBTS-Q1","ATL-IBTS-Q4","BITS","BTS","BTS-VIIA","EVHOE","IE-IGFS","NIGFS","NS_IBTS","PT-IBTS","SP-ARSA","SP-NORTH","SP-PORC") ){
+    # Pre-packaged shapefile options
+    Shapefile_set = c("ATL-IBTS-Q1","ATL-IBTS-Q4","BITS","BTS","BTS-VIIA","EVHOE","IE-IGFS","NIGFS","NS_IBTS","PT-IBTS","SP-ARSA","SP-NORTH","SP-PORC",
+      "CalCOFI_Winter-Spring","CalCOFI-IMECOCAL_Winter-Spring","IMECOCAL_Winter-Spring","CalCOFI-IMECOCAL_Summer",
+      "rockfish_recruitment_coastwide","rockfish_recruitment_core")
+    if( toupper(Region[rI]) %in% toupper(Shapefile_set) ){
       if( Region[rI]=="SP-ARSA" ) stop("There's some problem with `SP-ARSA` which precludes it's use")
       Conversion = convert_shapefile( file_path=paste0(system.file("region_shapefiles",package="FishStatsUtils"),"/",toupper(Region[rI]),"/Shapefile.shp"),
         projargs_for_shapefile="+proj=longlat +ellps=WGS84 +no_defs", projargs=projargs, grid_dim_km=grid_dim_km, area_tolerance=area_tolerance, ... )
@@ -184,7 +246,7 @@ make_extrapolation_info = function( Region, projargs=NA, zone=NA, strata.limits=
     loc_orig = Return$Data_Extrap[,c("E_km","N_km")]
       loc_orig = loc_orig[ which(Return$Area_km2_x>0), ]
     Kmeans = make_kmeans( n_x=max_cells, loc_orig=loc_orig, nstart=nstart,
-      randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"), Save_Results=FALSE,
+      randomseed=1, iter.max=1000, DirPath=DirPath, Save_Results=TRUE, kmeans_purpose='extrapolation',
       backwards_compatible_kmeans=backwards_compatible_kmeans )
     Kmeans[["cluster"]] = RANN::nn2( data=Kmeans[["centers"]], query=Return$Data_Extrap[,c("E_km","N_km")], k=1)$nn.idx[,1]
     # Transform Extrapolation_List

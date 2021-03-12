@@ -35,9 +35,9 @@ fit_model(
 \arguments{
 \item{settings}{Output from \code{\link{make_settings}}}
 
-\item{Lat_i}{Latitude for each sample}
+\item{Lat_i}{Numeric vector, providing latitude for each sample}
 
-\item{Lon_i}{Longitude for each sample}
+\item{Lon_i}{Numeric vector, providing longitude for each sample}
 
 \item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
 
@@ -57,11 +57,11 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
 \item{X1config_cp}{matrix of settings for each density covariate for the 1st lienar predictor,
        where the row corresponds to model category, and column corresponds to each density covariate
 \describe{
-  \item{X1config_cp[c,p]=0}{\code{X_ip[,p]} has no effect on the 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=1}{\code{X_ip[,p]} has a linear effect on 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=2}{\code{X_ip[,p]} has a spatially varying, zero-centered linear effect on 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=3}{\code{X_ip[,p]} has a spatially varying linear effect on 1st linear predictor for category c}
-  \item{X1config_cp[c,p]=-1}{\code{X1config_cp[c,p]=-1} is the same as \code{X1config_cp[c,p]=2}, but without including the log-likelihood term; this is useful in special cases when carefully mirroring spatially varying coefficients, e.g., to use cohort effects in a age-structured spatio-temporal model}
+  \item{\code{X1config_cp[c,p]=0}}{\code{X_ip[,p]} has no effect on the 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=1}}{\code{X_ip[,p]} has a linear effect on 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=2}}{\code{X_ip[,p]} has a spatially varying, zero-centered linear effect on 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=3}}{\code{X_ip[,p]} has a spatially varying linear effect on 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=-1}}{\code{X1config_cp[c,p]=-1} is the same as \code{X1config_cp[c,p]=2}, but without including the log-likelihood term; this is useful in special cases when carefully mirroring spatially varying coefficients, e.g., to use cohort effects in a age-structured spatio-temporal model}
 }}
 
 \item{X2config_cp}{Same as argument \code{X1config_cp} but for 2nd linear predictor}
@@ -74,7 +74,8 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
 \item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for density}
 
 \item{Q1config_k}{Same as argument \code{X1config_cp} but affecting affecting the 1st linear predictor for catchability,
-and note that it is a vector (instead of matrix) given the more flexible form for catchability covariates}
+and note that it is a vector (instead of matrix) given that catchability responses do not vary among variables \code{c}
+by default (but can be specified to do so when an appropriate `formula` is supplied)}
 
 \item{Q2config_k}{Same as argument \code{Q1config_cp} but affecting affecting the 2nd linear predictor for catchability}
 
@@ -84,7 +85,15 @@ and note that it is a vector (instead of matrix) given the more flexible form fo
 
 \item{Q2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for catchability (a.k.a. detectability)}
 
-\item{newtonsteps}{number of extra newton steps to take after optimization (alternative to \code{loopnum})}
+\item{newtonsteps}{Integer specifying the number of extra newton steps to take
+after optimization (alternative to \code{loopnum}).
+Each newtonstep requires calculating the Hessian matrix and is therefore slow.
+But for well-behaved models, each Newton step will typically
+decrease the maximum gradient of the loglikelihood with respect to each fixed effect,
+and therefore this option can be used to achieve an arbitrarily low final gradient
+given sufficient time for well-behaved models.  However, this option will also
+perform strangely or have unexpected consequences for poorly-behaved models, e.g.,
+when fixed effects are at upper or lower bounds.}
 
 \item{build_model}{Boolean indicating whether to build the model, \code{build_model=TRUE}, or simply build the inputs, \code{build_model=FALSE}}
 
@@ -99,13 +108,13 @@ passes named arguments to \code{\link[INLA]{inla.mesh.create}}.}
 \value{
 Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
 \describe{
-\item{parameter_estimates}{Output from \code{\link[TMBhelper]{fit_tmb}}; see that documentation for definition of contents}
-\item{extrapolation_list}{Output from \code{\link{make_extrapolation_info}}; see that documentation for definition of contents}
-\item{spatial_list}{Output from \code{\link{make_spatial_info}}; see that documentation for definition of contents}
-\item{data_list}{Output from \code{\link[VAST]{make_data}}; see that documentation for definition of contents}
-\item{tmb_list}{Output from \code{\link[VAST]{make_model}}; see that documentation for definition of contents}
-\item{ParHat}{Tagged list of maximum likelihood estimatesion of fixed effects and empirical Bayes estimates of random effects, following format of initial values generated by \code{\link[VAST]{make_parameters}}; see that documentation for definition of contents}
-\item{Report}{Tagged list of VAST outputs. For example, estimated density for grid \code{g}, category \code{c}, and time \code{y} is available as \code{fit$Report$D_gcy[g,c,y]}; see Details section for description of indexing}
+\item{\code{parameter_estimates}}{Output from \code{\link[TMBhelper]{fit_tmb}}; see that documentation for definition of contents}
+\item{\code{extrapolation_list}}{Output from \code{\link{make_extrapolation_info}}; see that documentation for definition of contents}
+\item{\code{spatial_list}}{Output from \code{\link{make_spatial_info}}; see that documentation for definition of contents}
+\item{\code{data_list}}{Output from \code{\link[VAST]{make_data}}; see that documentation for definition of contents}
+\item{\code{tmb_list}}{Output from \code{\link[VAST]{make_model}}; see that documentation for definition of contents}
+\item{\code{ParHat}}{Tagged list of maximum likelihood estimatesion of fixed effects and empirical Bayes estimates of random effects, following format of initial values generated by \code{\link[VAST]{make_parameters}}; see that documentation for definition of contents}
+\item{\code{Report}}{Tagged list of VAST outputs. For example, estimated density for grid \code{g}, category \code{c}, and time \code{y} is available as \code{fit$Report$D_gcy[g,c,y]}; see Details section for description of indexing}
 }
 }
 \description{
@@ -118,10 +127,10 @@ perform separate components of a spatio-temporal analysis:
 \item determine the extrapolation-grid \code{\link{make_extrapolation_info}},
 \item define spatial objects \code{\link{make_spatial_info}},
 \item build covariates from a formula interface \code{\link{make_covariates}},
-\item assemble data \code{\link{make_data}},
-\item build model \code{\link{make_model}},
+\item assemble data \code{\link[VAST]{make_data}},
+\item build model \code{\link[VAST]{make_model}},
 \item estimate parameters \code{\link[TMBhelper]{fit_tmb}}, and
-\item check for obvious problems with the estimates \code{\link{check_fit}}.
+\item check for obvious problems with the estimates \code{\link[VAST]{check_fit}}.
 }
 Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
 
@@ -173,7 +182,9 @@ plot_results( settings=settings, fit=fit )
 \seealso{
 \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 
-\code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities
+\code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities and an explanation of DHARMa Probability-Integral-Transform residuals
+
+\code{\link{predict.fit_model}} for methods to predict at new locations using existing or updated covariate values
 
 Other wrapper functions: 
 \code{\link{make_settings}()},

@@ -37,9 +37,10 @@ PlotMap_Fn(
 \arguments{
 \item{MapSizeRatio}{Default size for each panel}
 
-\item{Year_Set}{Year names for labeling panels}
-
-\item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+\item{zlim}{two numeric values, specifying range for defining bounds of color scale.
+If \code{zlim=NULL}, then a constant scale is inferred
+from the range of the plotted variable and a color-legend is plotted in the last panel.
+If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
 \item{plot_legend_fig}{Boolean, whether to plot a separate figure for the heatmap legend or not}
 

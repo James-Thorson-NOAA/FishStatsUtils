@@ -25,17 +25,33 @@
 #'   \item{Table}{table of index estimates by stratum and year, e.g., for including in an assessment model}
 #' }
 #'
-
+#' @references For details regarding spatio-temporal index standardization see \url{https://doi.org/10.1093/icesjms/fsu243}
+#' @references For details regarding fishing mortality and biomass reference points in models generating those, see \url{https://doi.org/10.1111/faf.12398}
 #' @export
 plot_biomass_index <-
-function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(getwd(),"/"), PlotName="Index", interval_width=1,
-  strata_names=NULL, category_names=NULL, use_biascorr=TRUE, plot_legend=TRUE, total_area_km2=NULL, plot_log=FALSE,
-  width=NULL, height=NULL, create_covariance_table=FALSE, Yrange=c(ifelse(plot_log==TRUE,NA,0),NA), ... ){
+function( TmbData,
+          Sdreport,
+          year_labels = NULL,
+          years_to_plot = NULL,
+          DirName = paste0(getwd(),"/"),
+          PlotName = "Index",
+          interval_width = 1,
+          strata_names = NULL,
+          category_names = NULL,
+          use_biascorr = TRUE,
+          plot_legend = TRUE,
+          total_area_km2 = NULL,
+          plot_log = FALSE,
+          width = NULL,
+          height = NULL,
+          create_covariance_table = FALSE,
+          Yrange = c(ifelse(plot_log==TRUE,NA,0),NA),
+          ... ){
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
   if(!is.null(category_names) && length(category_names)!=TmbData$n_c ) stop("`category_names` must have same length as `TmbData$n_c`")
-  if(!is.null(Year_Set) && length(Year_Set)!=TmbData$n_t ) stop("`Year_Set` must have same length as `TmbData$n_t`")
+  if(!is.null(year_labels) && length(year_labels)!=TmbData$n_t ) stop("`year_labels` must have same length as `TmbData$n_t`")
   if(!is.null(strata_names) && length(strata_names)!=TmbData$n_l ) stop("`strata_names` must have same length as `TmbData$n_l`")
 
   # Which parameters
@@ -74,8 +90,8 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
   mfrow = c( ceiling(sqrt(TmbData$n_c)), ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c))) )
   if( is.null(width)) width = mfrow[2] * 3
   if( is.null(height)) height = mfrow[1] * 3
-  if( is.null(Year_Set) ) Year_Set = 1:TmbData$n_t
-  if( is.null(Years2Include) ) Years2Include = 1:TmbData$n_t
+  if( is.null(year_labels) ) year_labels = 1:TmbData$n_t
+  if( is.null(years_to_plot) ) years_to_plot = 1:TmbData$n_t
   if( is.null(strata_names) ) strata_names = 1:TmbData$n_l
   if( is.null(category_names) ) category_names = 1:TmbData$n_c
 
@@ -109,7 +125,7 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
 
   # Extract index (using bias-correctino if available and requested)
   if( ParName %in% c("Index_tl","Index_ctl","Index_cyl")){
-    Index_ctl = log_Index_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,Year_Set,strata_names,c('Estimate','Std. Error')) )
+    Index_ctl = log_Index_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,year_labels,strata_names,c('Estimate','Std. Error')) )
     # Index
     if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
       Index_ctl[] = SD[which(rownames(SD)==ParName),c('Est. (bias.correct)','Std. Error')]
@@ -155,7 +171,7 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
 
   # Extract biomass ratio Bratio_cty if available (only available if >= V5.3.0 and using spatial Gompertz model features)
   if( "Bratio_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-    Bratio_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,Year_Set,strata_names,c('Estimate','Std. Error')) )
+    Bratio_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,year_labels,strata_names,c('Estimate','Std. Error')) )
     if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
       Bratio_ctl[] = SD[which(rownames(SD)=="Bratio_cyl"),c('Est. (bias.correct)','Std. Error')]
     }
@@ -169,7 +185,7 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
     Bratio_ctl = NULL
   }
   if( "ln_Bratio_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-    log_Bratio_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,Year_Set,strata_names,c('Estimate','Std. Error')) )
+    log_Bratio_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,year_labels,strata_names,c('Estimate','Std. Error')) )
     if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
       log_Bratio_ctl[] = SD[which(rownames(SD)=="ln_Bratio_cyl"),c('Est. (bias.correct)','Std. Error')]
     }
@@ -185,10 +201,10 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
 
   # Extract Fratio
   if( "Fratio_ct" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-    Fratio_ct = array( NA, dim=c(unlist(TmbData[c('n_c','n_t')]),2), dimnames=list(category_names,Year_Set,c('Estimate','Std. Error')) )
+    Fratio_ct = array( NA, dim=c(unlist(TmbData[c('n_c','n_t')]),2), dimnames=list(category_names,year_labels,c('Estimate','Std. Error')) )
     Fratio_ct[] = SD[which(rownames(SD)=="Fratio_ct"),c('Estimate','Std. Error')]
     #Fratio_ct = abind::abind( SD_estimate$Fratio, SD_stderr$Fratio, along=3 )
-    #dimnames(Fratio_ct) = list(category_names,Year_Set,c('Estimate','Std. Error'))
+    #dimnames(Fratio_ct) = list(category_names,year_labels,c('Estimate','Std. Error'))
   }else{
     Fratio_ct = NULL
   }
@@ -224,7 +240,7 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
     if( Plot_suffix[plotI]=="Bratio" ){ Array_ctl = Bratio_ctl; log_Array_ctl = log_Bratio_ctl }
     plot_index( Index_ctl=array(Index_ctl[,,,'Estimate'],dim(Index_ctl)[1:3]),
       sd_Index_ctl=array(log_Index_ctl[,,,'Std. Error'],dim(log_Index_ctl)[1:3]),
-      Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
+      year_labels=year_labels, years_to_plot=years_to_plot, strata_names=strata_names, category_names=category_names,
       DirName=DirName, PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"),
       interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Index",
       scale="log", plot_args=list("log"=ifelse(plot_log==TRUE,"y","")), "Yrange"=Yrange )
@@ -233,11 +249,22 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
   # Plot
   if( !is.null(Fratio_ct) ){
     Array_ct = Fratio_ct
-      Array_ct = ifelse( Array_ct==0, NA, Array_ct )
-    plot_index( Index_ctl=array(Array_ct[,,'Estimate'],dim(Array_ct)[1:2]), sd_Index_ctl=array(Array_ct[,,'Std. Error'],dim(Array_ct)[1:2]),
-      Year_Set=Year_Set, Years2Include=Years2Include, strata_names=strata_names, category_names=category_names,
-      DirName=DirName, PlotName=paste0(PlotName,"-Fratio.png"), scale="uniform",
-      interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Fishing ratio" )
+      #Array_ct = ifelse( Array_ct==0, NA, Array_ct )
+      Array_ct[,,'Estimate'] = ifelse( Array_ct[,,'Estimate']==0, NA, Array_ct[,,'Estimate'] )
+    plot_index( Index_ctl=array(Array_ct[,,'Estimate'],dim(Array_ct)[1:2]),
+                sd_Index_ctl=array(Array_ct[,,'Std. Error'],dim(Array_ct)[1:2]),
+                year_labels=year_labels,
+                years_to_plot=years_to_plot,
+                strata_names=strata_names,
+                category_names=category_names,
+                DirName=DirName,
+                PlotName=paste0(PlotName,"-Fratio.png"),
+                scale="uniform",
+                interval_width=interval_width,
+                width=width,
+                height=height,
+                xlab="Year",
+                ylab="Fishing ratio" )
   }
 
   # Plot stock status
@@ -252,19 +279,19 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
       Array2_ct = ifelse( Array2_ct==0, NA, Array2_ct )
       for( cI in 1:TmbData$n_c ){
         # Calculate y-axis limits
-        Xlim = c(0, max(1, Array1_ct[cI,Years2Include,'Estimate']%o%c(1,1) + Array1_ct[cI,Years2Include,'Std. Error']%o%c(-interval_width,interval_width),na.rm=TRUE) )
-        Ylim = c(0, max(2, Array2_ct[cI,Years2Include,'Estimate']%o%c(1,1) + Array2_ct[cI,Years2Include,'Std. Error']%o%c(-interval_width,interval_width),na.rm=TRUE) )
+        Xlim = c(0, max(1, Array1_ct[cI,years_to_plot,'Estimate']%o%c(1,1) + Array1_ct[cI,years_to_plot,'Std. Error']%o%c(-interval_width,interval_width),na.rm=TRUE) )
+        Ylim = c(0, max(2, Array2_ct[cI,years_to_plot,'Estimate']%o%c(1,1) + Array2_ct[cI,years_to_plot,'Std. Error']%o%c(-interval_width,interval_width),na.rm=TRUE) )
         # Plot stuff
         plot(1, type="n", xlim=Xlim, ylim=Ylim, xlab="", ylab="", main=ifelse(TmbData$n_c>1,category_names[cI],"") )
-        points( x=Array1_ct[cI,Years2Include,'Estimate'], y=Array2_ct[cI,Years2Include,'Estimate'], col=Col(length(Year_Set))[Years2Include] )
-        for( tI in Years2Include ){
-          lines( x=rep(Array1_ct[cI,tI,'Estimate'],2), y=Array2_ct[cI,tI,'Estimate']+Array2_ct[cI,tI,'Std. Error']*c(-interval_width,interval_width), col=Col(length(Year_Set))[tI] )
-          lines( x=Array1_ct[cI,tI,'Estimate']+Array1_ct[cI,tI,'Std. Error']*c(-interval_width,interval_width), y=rep(Array2_ct[cI,tI,'Estimate'],2), col=Col(length(Year_Set))[tI] )
+        points( x=Array1_ct[cI,years_to_plot,'Estimate'], y=Array2_ct[cI,years_to_plot,'Estimate'], col=Col(length(year_labels))[years_to_plot] )
+        for( tI in years_to_plot ){
+          lines( x=rep(Array1_ct[cI,tI,'Estimate'],2), y=Array2_ct[cI,tI,'Estimate']+Array2_ct[cI,tI,'Std. Error']*c(-interval_width,interval_width), col=Col(length(year_labels))[tI] )
+          lines( x=Array1_ct[cI,tI,'Estimate']+Array1_ct[cI,tI,'Std. Error']*c(-interval_width,interval_width), y=rep(Array2_ct[cI,tI,'Estimate'],2), col=Col(length(year_labels))[tI] )
         }
         abline( v=0.4, lty="dotted" )
         abline( h=1, lty="dotted" )
       }
-      legend( "topright", bty="n", fill=c(Col(length(Year_Set))[Years2Include[1]],Col(length(Year_Set))[rev(Years2Include)[1]]), legend=c(Year_Set[Years2Include[1]],Year_Set[rev(Years2Include)[1]]) )
+      legend( "topright", bty="n", fill=c(Col(length(year_labels))[years_to_plot[1]],Col(length(year_labels))[rev(years_to_plot)[1]]), legend=c(year_labels[years_to_plot[1]],year_labels[rev(years_to_plot)[1]]) )
       mtext( side=1:2, text=c("Biomass relative to unfished","Fishing relative to F_40%"), outer=TRUE, line=c(0,0) )
     dev.off()
   }
@@ -272,7 +299,7 @@ function( TmbData, Sdreport, Year_Set=NULL, Years2Include=NULL, DirName=paste0(g
   # Write to file
   Table = NULL
   for( cI in 1:TmbData$n_c ){
-    Tmp = data.frame( "Year"=Year_Set, "Unit"=1, "Fleet"=rep(strata_names,each=TmbData$n_t), "Estimate_metric_tons"=as.vector(Index_ctl[cI,,,'Estimate']), "SD_log"=as.vector(log_Index_ctl[cI,,,'Std. Error']), "SD_mt"=as.vector(Index_ctl[cI,,,'Std. Error']) )
+    Tmp = data.frame( "Year"=year_labels, "Unit"=1, "Fleet"=rep(strata_names,each=TmbData$n_t), "Estimate_metric_tons"=as.vector(Index_ctl[cI,,,'Estimate']), "SD_log"=as.vector(log_Index_ctl[cI,,,'Std. Error']), "SD_mt"=as.vector(Index_ctl[cI,,,'Std. Error']) )
     if( TmbData$n_c>1 ) Tmp = cbind( "Category"=category_names[cI], Tmp)
     Table = rbind( Table, Tmp )
   }

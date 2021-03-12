@@ -6,6 +6,9 @@
 #' \code{simulate_data} conducts a parametric bootstrap to simulate new data and potentially simulate new population dynamics and associated variables
 #'
 #' Simulate new data given various potential procedures to propagate uncertainty about parameters.
+#'
+#' @param fit output form \code{fit_model(.)}
+#' @param type integer stating what type of simulation to use from the following options:
 #' \itemize{
 #' \item \code{type=1} is a "measurement error" or "conditional" simulator that simulates new data conditional upon estimated fixed and random effects.
 #' \item \code{type=2} is an "unconditional" simulator that simulates new random effects conditional upon fixed effects
@@ -14,10 +17,7 @@
 #' \item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
 #' and new data conditional upon these values.
 #' }
-#'
-#' @param fit output form \code{fit_model(.)}
-#' @param type integer stating what type of simulation to use. See details for description.
-#' @param random_seed integer passed to \code{\link[base]{set.seed}}, where the default value \code{random_seed=NULL} resets the random-number seed.
+#' @param random_seed integer passed to \code{set.seed}, where the default value \code{random_seed=NULL} resets the random-number seed.
 #'
 
 #' @return Report object containing new data and population variables including
@@ -28,7 +28,10 @@
 #' }
 
 #' @export
-simulate_data = function( fit, type=1, random_seed=NULL ){
+simulate_data <-
+function( fit,
+          type = 1,
+          random_seed = NULL ){
 
   # Sample from GMRF using sparse precision
   rmvnorm_prec <- function(mu, prec, n.sims, random_seed ) {
@@ -46,9 +49,12 @@ simulate_data = function( fit, type=1, random_seed=NULL ){
   dlls <- getLoadedDLLs()
   isTMBdll <- function(dll) !is(try(getNativeSymbolInfo("MakeADFunObject",dll), TRUE), "try-error")
   TMBdll <- sapply(dlls, isTMBdll)
-  if( sum(TMBdll)!=1 ){
+  if( sum(TMBdll)==0 ){
     stop("VAST is not linked as a DLL, so `simulate_data` will not work.
     Please re-run model (potentially from informative starting values to save time) to use `simulate_data`")
+  }else if(sum(TMBdll)>=2){
+    warning("VAST is linked to multiple DLLs. Please consider using dyn.unload() to unload
+    earlier VAST runs to avoid potentially ambiguous behavior when running `simulate_data`")
   }
 
   # Extract stuff

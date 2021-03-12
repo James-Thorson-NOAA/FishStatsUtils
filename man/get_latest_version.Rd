@@ -4,13 +4,18 @@
 \alias{get_latest_version}
 \title{Determine latest version of VAST}
 \usage{
-get_latest_version(version = NULL, package = "VAST")
+get_latest_version(version = NULL, package = "VAST", path = NULL)
 }
 \arguments{
-\item{version}{The default is \code{NULL}, which will cause the function
-to look for the latest version of the \code{.cpp} file to compile.
-If a version is supplied, then \code{R} will look for that version name
-within the appropriate folder the disk.}
+\item{version}{The default is \code{NULL}, which will cause
+the function to look for the latest version of the
+\code{.cpp} file to compile.  If a version is supplied, then
+\code{R} will look for that version name within the
+appropriate folder the disk.}
+
+\item{path}{Optional path for running tests locally and with
+continuous integration since the default looks in the wrong
+place (installed library).}
 }
 \value{
 A full file path as a character value supplying the location of

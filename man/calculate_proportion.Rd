@@ -8,8 +8,8 @@ calculate_proportion(
   TmbData,
   Index,
   Expansion_cz = NULL,
-  Year_Set = NULL,
-  Years2Include = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   strata_names = NULL,
   category_names = NULL,
   plot_legend = ifelse(TmbData$n_l > 1, TRUE, FALSE),
@@ -37,9 +37,9 @@ or the index is calculated as the weighted average of density weighted by the ex
 ("abundance weighted-average expansion" \code{Expansion[c1,1]=2}).  The 2nd column is only used when \code{Expansion[c1,1]=1} or \code{Expansion[c1,1]=2},
 and specifies the category to use for abundance-weighted expansion, where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
 
-\item{Year_Set}{Year names for labeling panels}
+\item{year_labels}{Year names for labeling panels}
 
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{strata_names}{names for spatial strata}
 
@@ -68,4 +68,7 @@ Tagged list of output
 }
 \description{
 \code{calculate_proportion} takes output from a VAST run and calculates the proportion of biomass in different categories
+}
+\references{
+For details regarding multivariate index standardization and expansion see \url{https://cdnsciencepub.com/doi/full/10.1139/cjfas-2018-0015}
 }

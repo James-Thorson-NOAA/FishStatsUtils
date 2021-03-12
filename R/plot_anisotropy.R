@@ -1,7 +1,23 @@
 
+#' Plot geometric anisotropy
+#'
+#' \code{plot_anisotropy} plots the degree of geometric anisotropy
+#'
+#' VAST estimates a matrix \code{H}, representing a linear transformation of coordinates (typically eastings-northings)
+#' when computing a distance measure used to calculate correlations between sites. Geometric anisotropy represents the
+#' tendancy for correlations to decline faster in some direction than others, as represented by \code{H}.
+#' \code{plot_anistropy} visualizes the distance needed to achieve a correlation of approximately 10% from a location
+#' centered at coordinates (0,0).  Therefore, an ellipse with a major (long) axis pointed northwest-southeast will
+#' have correlations that decline slower along this axis then movement northeast-southwest. This ellipse is shown for
+#' both linear predictors, which share the same \code{H} estimate but differ in their overall estimated decorrelation rate.
+#'
 #' @export
-plot_anisotropy <-
-function( FileName, Report, ControlList=list("Width"=4, "Height"=5, "Res"=200, "Units"='in'), type="ellipse", TmbData=list("Options_vec"=c("Aniso"=1),"Options"=NULL) ){
+plot_anisotropy = function( Obj,
+  FileName,
+  ControlList = list("Width"=4, "Height"=5, "Res"=200, "Units"='in'),
+  type = "ellipse",
+  Report = Obj$report(),
+  TmbData = Obj$env$data ){
 
   # Extract Options and Options_vec (depends upon version)
   if( all(c("Options","Options_vec") %in% names(TmbData)) ){
@@ -12,6 +28,10 @@ function( FileName, Report, ControlList=list("Width"=4, "Height"=5, "Res"=200, "
     Options_vec = TmbData$Options_list$Options_vec
     Options = TmbData$Options_list$Options
   }
+
+  # extract map
+  Map = Obj$env$map
+  Params = Obj$env$last.par.best
 
   if( Options_vec['Aniso']!=1 ){
     message("Skipping plot of geometric anisotropy because it has been turned off")
@@ -31,20 +51,29 @@ function( FileName, Report, ControlList=list("Width"=4, "Height"=5, "Res"=200, "
     # Ellipses
     if( type=="ellipse" ){
       rss = function(V) sqrt(sum(V[1]^2+V[2]^2))
-      Pos_Major = Eigen$vectors[,1]*Eigen$values[1] * Report$Range_raw1
-      Pos_Minor = Eigen$vectors[,2]*Eigen$values[2] * Report$Range_raw1
-      Pres_Major = Eigen$vectors[,1]*Eigen$values[1] * Report$Range_raw2
-      Pres_Minor = Eigen$vectors[,2]*Eigen$values[2] * Report$Range_raw2
+      Major_1 = Minor_1 = Major_2 = Minor_2 = NA
+      if( !("logkappa1"%in%names(Map)) || !is.na(Map$logkappa1) ){
+        Major_1 = Eigen$vectors[,1]*Eigen$values[1] * Report$Range_raw1
+        Minor_1 = Eigen$vectors[,2]*Eigen$values[2] * Report$Range_raw1
+      }
+      if( !("logkappa2"%in%names(Map)) || !is.na(Map$logkappa2) ){
+        Major_2 = Eigen$vectors[,1]*Eigen$values[1] * Report$Range_raw2
+        Minor_2 = Eigen$vectors[,2]*Eigen$values[2] * Report$Range_raw2
+      }
       png(file=FileName, width=ControlList$Width, height=ControlList$Height, res=ControlList$Res, units=ControlList$Units)
         par( mar=c(3,3,2,0), mgp=c(1.25,0.25,0), tck=-0.02)
-        Range = 1.1 * c(-1,1) * max(abs( cbind(Pos_Major,Pos_Minor, Pres_Major,Pres_Minor) ))
+        Range = 1.1 * c(-1,1) * max(abs( cbind(Major_1,Minor_1, Major_2,Minor_2) ),na.rm=TRUE)
         plot( 1, type="n", xlim=Range, ylim=c(Range[1],Range[2]*1.2), xlab="", ylab="")
-        shape::plotellipse( rx=rss(Pres_Major), ry=rss(Pres_Minor), angle=-1*(atan(Pres_Major[1]/Pres_Major[2])/(2*pi)*360-90), lcol=c("green","black")[1], lty=c("solid","dotted")[1])
-        shape::plotellipse( rx=rss(Pos_Major), ry=rss(Pos_Minor), angle=-1*(atan(Pos_Major[1]/Pos_Major[2])/(2*pi)*360-90), lcol="black", lty="solid")
+        if( !any(is.na(Major_1)) ){
+          shape::plotellipse( rx=rss(Major_1), ry=rss(Minor_1), angle=-1*(atan(Major_1[1]/Major_1[2])/(2*pi)*360-90), lcol="green", lty="solid")
+        }
+        if( !any(is.na(Major_2)) ){
+          shape::plotellipse( rx=rss(Major_2), ry=rss(Minor_2), angle=-1*(atan(Major_2[1]/Major_2[2])/(2*pi)*360-90), lcol="black", lty="solid")
+        }
         title( "Distance at 10% correlation" )
         mtext(side=1, outer=FALSE, line=2, text="Eastings (km.)")
         mtext(side=2, outer=FALSE, line=2, text="Northings (km.)")
-        legend( "top", legend=c("Encounter probability","Positive catch rates"), fill=c("green","black"), bty="n")
+        legend( "top", legend=c("1st linear predictor","2nd linear predictor"), fill=c("green","black"), bty="n")
         #abline( h=0, v=0, lty="dotted")
       dev.off()
     }

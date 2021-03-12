@@ -11,8 +11,8 @@ plot_maps(
   Sdreport = NULL,
   projargs = "+proj=longlat",
   Panel = "Category",
-  Year_Set = NULL,
-  Years2Include = NULL,
+  year_labels = NULL,
+  years_to_plot = NULL,
   category_names = NULL,
   quiet = FALSE,
   working_dir = paste0(getwd(), "/"),
@@ -41,12 +41,15 @@ plot_maps(
   \item{plot_set=8}{Linear predictor for encounter probability}
   \item{plot_set=9}{Linear predictor for positive catch rates}
   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
-  \item{plot_set=11}{Covariates that are included in the model}
-  \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
-  \item{plot_set=13}{Covariate effects on encounter probability}
-  \item{plot_set=14}{Covariate effects on positive catch rates}
-  \item{plot_set=15}{Spatial variation for 1st linear predictor (Omega1)}
-  \item{plot_set=16}{Spatial variation for 2nd linear predictor (Omega2)}
+  \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
+  \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
+  \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
+  \item{plot_set=14}{Covariate effects on encounter probability}
+  \item{plot_set=15}{Covariate effects on positive catch rates}
+  \item{plot_set=16}{Spatial variation for 1st linear predictor (Omega1)}
+  \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
+  \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
+  \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
 }}
 
 \item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
@@ -57,13 +60,19 @@ plot_maps(
 
 \item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
 
-\item{Year_Set}{Year names for labeling panels}
+\item{year_labels}{Year names for labeling panels}
 
-\item{Years2Include}{integer vector, specifying positions of \code{Year_Set} for plotting (used to avoid plotting years with no data, etc.)}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
 \item{MapSizeRatio}{Default size for each panel}
+
+\item{n_cells}{Integer used to determine the argument \code{cell.size} passed
+to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
+\code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
+will often need to be modified for a given purpose.}
 
 \item{plot_value}{either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}}
 
@@ -71,7 +80,10 @@ plot_maps(
 
 \item{Report}{tagged list of outputs from TMB model via \code{Obj$report()}}
 
-\item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+\item{zlim}{two numeric values, specifying range for defining bounds of color scale.
+If \code{zlim=NULL}, then a constant scale is inferred
+from the range of the plotted variable and a color-legend is plotted in the last panel.
+If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
 \item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
 

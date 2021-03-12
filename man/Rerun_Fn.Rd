@@ -31,7 +31,9 @@ Rerun_Fn(
 
 \item{figname}{name for figure to plot density in counter-factual scenario}
 
-\item{Map}{OPTIONAL, a tagged list of parameters to either mirror or turn off, using standard TMB interface. This input is useful, e.g., to build a model without estimating parameters, extracting Map from the list of outputs, modifying it manually, and then passing it explicitly, \code{make_model(Map=NewMap)}}
+\item{Map}{a tagged list of parameters to either mirror or turn off, using standard TMB interface.
+This input is useful, e.g., to build a model without estimating parameters, extracting Map
+from the list of outputs, modifying it manually, and then passing it explicitly, \code{make_model(Map=NewMap)} (OPTIONAL)}
 
 \item{MapDetails_List}{output from \code{FishStatsUtils::MapDetails_Fn}}
 

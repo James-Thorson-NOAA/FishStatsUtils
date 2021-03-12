@@ -7,18 +7,35 @@
 #' @inheritParams summarize_covariance
 #' @inheritParams rotate_factors
 #' @inheritParams plot_maps
-#' @param Year_Set plotting-names for time dimension
-#' @param mapdetails_list output from \code{FishStatsUtils::MapDetails_Fn}
+#' @param mapdetails_list output from \code{\link{make_map_info}}
 #' @param Dim_year Plotting dimension (row,column) for plot of years (default: square with sufficient size for number of years)
 #' @param Dim_species Plotting dimension (row,column) for plot of categories (default: square with sufficient size for number of categories)
 #' @param plotdir directory for saving plots
 #' @param land_color color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)
-#' @param ... additional arguments passed to \code{plot_maps(.)} and/or \code{plot_variable(.)} when plotting factor-values on a map
-
+#' @param ... additional arguments passed to \code{\link{plot_maps}} and/or \code{\link{plot_variable}} when plotting factor-values on a map
+#'
+#' @references For details regarding spatial factor analysis see \url{https://doi.org/10.1111/2041-210X.12359}
+#' @references For details regarding multi-species ordination see \url{https://doi.org/10.1016/j.fishres.2018.10.013}
 #' @export
-plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_names=NULL, RotationMethod="PCA",
-  mapdetails_list=NULL, Dim_year=NULL, Dim_species=NULL, plotdir=paste0(getwd(),"/"), land_color="grey", zlim=NA,
-  testcutoff=1e-4, ... ){
+plot_factors <-
+function( fit,
+          Report = fit$Report,
+          ParHat = fit$ParHat,
+          Data = fit$data_list,
+          Obj = fit$tmb_list$Obj,
+          SD = fit$parameter_estimates$SD,
+          year_labels = fit$year_labels,
+          category_names = NULL,
+          RotationMethod = "PCA",
+          mapdetails_list = NULL,
+          Dim_year = NULL,
+          Dim_species = NULL,
+          projargs = fit$extrapolation_list$projargs,
+          plotdir = paste0(getwd(),"/"),
+          land_color = "grey",
+          zlim = NA,
+          testcutoff = 1e-4,
+          ... ){
 
   #
   if(is.null(mapdetails_list)) message( "`plot_factors(.) skipping plots because argument `mapdetails_list` is missing")
@@ -51,25 +68,25 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
 
   # Fill in missing inputs
   if( "D_xct" %in% names(Report) ){
-    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_xct)[3]
+    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xct)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_xct)[2]
   }
   if( "D_xcy" %in% names(Report) ){
-    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_xcy)[3]
+    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
   }
   if( "D_gcy" %in% names(Report) ){
-    if( is.null(Year_Set) ) Year_Set = 1:dim(Report$D_gcy)[3]
+    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gcy)[3]
     if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
   }
 
   # Dimensions for plotting
   Dim = function( num ) c(ceiling(sqrt(num)), ceiling(num/ceiling(sqrt(num))) )
-  Dim_year = Dim(length(Year_Set))
+  Dim_year = Dim(length(year_labels))
   Dim_species = Dim(length(category_names))
 
   # Extract loadings matrices (more numerically stable than extracting covariances, and then re-creating Cholesky)
-  Psi2prime_list = Psiprime_list = Lprime_SE_list = Hinv_list = L_SE_list = Lprime_list = L_list = vector("list", length=8)    # Add names at end so that NULL doesn't interfere
+  Psi2prime_list = Psiprime_list = Psi2prime_SE_list = Lprime_SE_list = Hinv_list = Lprime_list = L_list = vector("list", length=8)    # Add names at end so that NULL doesn't interfere
 
   # Loop through
   for(i in 1:8){
@@ -89,34 +106,16 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
     if(Par_name == "EpsilonTime2"){ Var_name = "Epsiloninput2_sff"; Var2_name = "Epsiloninput2_gff"; L_name = "Ltime_epsilon2_tf" }
 
     # Continue if component is included
-    if( as.vector(Data[["FieldConfig"]])[i] > 0 ){
+    if( as.vector(Data[["FieldConfig"]])[i] > 1 ){
 
       # Get loadings matrix
-      if( "L_beta1_cf" %in% names(Report) ){
+      if( L_name %in% names(Report) ){
         L_list[[i]] = Report[[L_name]]
       }else{
         L_list[[i]] = calc_cov( L_z=ParHat[[Lpar_name]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c, returntype="loadings_matrix" )
       }
       if( !Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
         rownames(L_list[[i]]) = category_names
-      }
-
-      # Load SE
-      if( class(SD)=="sdreport" ){
-        rowindex = grep( Lpar_name, rownames(SD$cov.fixed) )
-        if( length(rowindex)>0 ){
-          L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[Lpar_name]], sigma=SD$cov.fixed[rowindex,rowindex] )
-          L_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
-          for( rI in 1:nrow(L_rz) ){
-            L_rcf[rI,,] = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=nrow(L_list[[i]]), returntype="loadings_matrix" )
-          }
-          Lmean_cf = apply(L_rcf, MARGIN=2:3, FUN=mean)
-          Lsd_cf = apply(L_rcf, MARGIN=2:3, FUN=sd)
-          L_SE_list[[i]] = Lsd_cf
-          if( nrow(L_SE_list[[i]])==length(category_names) ){
-            rownames(L_SE_list[[i]]) = category_names
-          }
-        }
       }
 
       # Get covariance
@@ -155,26 +154,29 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
       Hinv_list[[i]] = Var_rot$Hinv
 
       # Extract SEs if available
-      if( class(SD)=="sdreport" ){
-        rowindex = grep( Lpar_name, rownames(SD$cov.fixed) )
-        if( length(rowindex)>0 ){
-          L_rz = mvtnorm::rmvnorm( n=1e3, mean=ParHat[[Lpar_name]], sigma=SD$cov.fixed[rowindex,rowindex] )
-          Lprime_rcf = array(NA, dim=c(nrow(L_rz),dim(L_list[[i]])) )
-          for( rI in 1:nrow(L_rz) ){
-            tmpmat = calc_cov( L_z=L_rz[rI,], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=nrow(L_list[[i]]), returntype="loadings_matrix" )
-            Lprime_rcf[rI,,] = rotate_factors( L_pj=tmpmat, RotationMethod="PCA", testcutoff=testcutoff, quiet=TRUE )$L_pj_rot
-            # Rotate to maximize correlation with original factors, to prevent effect of label switching on SEs
-            for( fI in 1:ncol(Lprime_list[[i]]) ){
-              Lprime_rcf[rI,,fI] = Lprime_rcf[rI,,fI] * sign(cor(Lprime_rcf[rI,,fI],Lprime_list[[i]][,fI]))
-            }
-          }
-          Lmean_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=mean)
-          Lsd_cf = apply(Lprime_rcf, MARGIN=2:3, FUN=sd)
-          Lprime_SE_list[[i]] = Lsd_cf
-          if( nrow(L_SE_list[[i]])==length(category_names) ){
-            rownames(Lprime_SE_list[[i]]) = category_names
-          }
+      # Could also edit to extract L_SE_list and Psi2_SE_list
+      if( !missing(Obj) && class(SD)=="sdreport" ){
+        L_cfr = sample_variable( Sdreport=SD, Obj=Obj, variable_name=L_name, n_samples=100, sample_fixed=TRUE, seed=123456 )
+        Psi_gjtr = sample_variable( Sdreport=SD, Obj=Obj, variable_name=Var2_name, n_samples=100, sample_fixed=TRUE, seed=123456 )
+        if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
+          Psi_gjtr = aperm( Psi_gjtr, c(1,3,2,4) )
         }
+        Lprime_cfr = array(NA, dim=dim(L_cfr) )
+        Psiprime_gjtr = array(NA, dim=dim(Psi_gjtr) )
+        for( rI in 1:100 ){
+          tmplist = rotate_factors( L_pj=array(L_cfr[,,rI],dim=dim(L_cfr)[1:2]),
+            Psi_sjt=array(Psi_gjtr[,,,rI],dim=dim(Psi_gjtr)[1:3])/tau, RotationMethod=RotationMethod, testcutoff=testcutoff, quiet=TRUE )
+          Lprime_cfr[,,rI] = tmplist$L_pj_rot
+          Psiprime_gjtr[,,,rI] = tmplist$Psi_rot
+        }
+        if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
+          Psiprime_gjtr = aperm( Psiprime_gjtr, c(1,3,2,4) )
+        }
+        Lprime_SE_list[[i]] = apply(Lprime_cfr, MARGIN=1:2, FUN=sd)
+        if( nrow(Lprime_SE_list[[i]])==length(category_names) ){
+          rownames(Lprime_SE_list[[i]]) = category_names
+        }
+        Psi2prime_SE_list[[i]] = apply(Psiprime_gjtr, MARGIN=1:3, FUN=sd)
       }
 
       # Extract projected factors is available
@@ -195,10 +197,10 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         par( mfrow=Dim_factor, mar=c(2,2,1,0), oma=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.02 )
         for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ){
           if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
-            if(any(is.na(as.numeric(Year_Set)))) stop("Check `At` in `plot_factors(.)`")
-            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=as.numeric(Year_Set), LabelPosition="Side" )
+            if(any(is.na(as.numeric(year_labels)))) stop("Check `At` in `plot_factors(.)`")
+            plot_loadings( L_pj=Lprime_list[[i]], Lsd_pj=Lprime_SE_list[[i]], whichfactor=cI, At=as.numeric(year_labels), LabelPosition="Side" )
           }else{
-            plot_loadings( L_pj=Var_rot$L_pj_rot, whichfactor=cI, At=1:nrow(Var_rot$L_pj_rot) )
+            plot_loadings( L_pj=Lprime_list[[i]], Lsd_pj=Lprime_SE_list[[i]], whichfactor=cI, At=1:nrow(Var_rot$L_pj_rot) )
           }
         }
       dev.off()
@@ -210,15 +212,17 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
         # Use plot_maps to automatically make one figure per factor
         if( Par_name %in% c("Epsilon1","Epsilon2") ){
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-            working_dir=plotdir, Year_Set=Year_Set, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
-            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim, ...)
+            working_dir=plotdir, year_labels=year_labels, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim,
+            land_color=land_color, projargs=projargs, ...)
         }  #
 
         # Plot Omega
         # Use plot_variable to plot all factors on single figure
         if( Par_name %in% c("Omega1", "Omega2")){
           plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
-            panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name), ... )
+            panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name),
+            land_color=land_color, projargs=projargs, ... )
         }
 
         ## Doesn't make sense to make maps of beta factors since they aren't spatial
@@ -232,20 +236,21 @@ plot_factors = function( Report, ParHat, Data, SD=NULL, Year_Set=NULL, category_
           }
           plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
             working_dir=plotdir, category_names=factor_names, Panel="Year",
-            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim, ...)
+            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim,
+            land_color=land_color, projargs=projargs, ...)
         }  #
       }
     }else{
-      Lprime_SE_list[[i]] = L_SE_list[[i]] = L_SE_list[[i]] = Psi2prime_list[[i]] = Psiprime_list[[i]] = Lprime_list[[i]] = L_list[[i]] = "Element not estimated, and therefore empty"
+      Psi2prime_SE_list[[i]] = Psiprime_list[[i]] = Psi2prime_list[[i]] = Lprime_SE_list[[i]] = Hinv_list[[i]] = Lprime_list[[i]] = L_list[[i]] = "Element not estimated, and therefore empty"
     }
   }
 
   # Return stuff invisibly
-  names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(L_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "EpsilonTime1", "Omega2", "Epsilon2", "Beta2", "EpsilonTime2")
+  names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "EpsilonTime1", "Omega2", "Epsilon2", "Beta2", "EpsilonTime2")
   Return = list("Loadings"=L_list, "Rotated_loadings"=Lprime_list, "Rotated_factors"=Psiprime_list, "Rotated_projected_factors"=Psi2prime_list, "Rotation_matrices"=Hinv_list)
-  if( class(SD)=="sdreport" ){
-    Return[["Loadings_SE"]] = L_SE_list
+  if( !missing(Obj) && class(SD)=="sdreport" ){
     Return[["Rotated_loadings_SE"]] = Lprime_SE_list
+    Return[["Rotated_projected_factors_SE"]] = Psi2prime_SE_list
   }
   return( invisible(Return) )
 }

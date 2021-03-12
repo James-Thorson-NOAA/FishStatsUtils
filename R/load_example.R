@@ -5,25 +5,26 @@
 #'
 #' Current options for \code{data_set} include:
 #' \itemize{
-#' \item "Chatham_rise_hake",
-#' \item "Iceland_cod",
-#' \item "WCGBTS_canary",
-#' \item "GSL_american_plaice",
-#' \item "BC_pacific_cod",
-#' \item "EBS_pollock",
-#' \item "GOA_Pcod",
-#' \item "GOA_pollock",
-#' \item "GB_spring_haddock",
-#' \item "GB_fall_haddock",
-#' \item "SAWC_jacopever",
-#' \item "Aleutian_islands_POP",
-#' \item "GOA_arrowtooth_condition_and_density",
-#' \item "condition_and_density",
-#' \item "multimodal_red_snapper",
-#' \item "lingcod_comp_expansion",
-#' \item "covariate_example",
-#' \item "PESC_example_red_grouper", and
-#' \item "ordination".
+#' \item \code{"Chatham_rise_hake"},
+#' \item \code{"Iceland_cod"},
+#' \item \code{"WCGBTS_canary"},
+#' \item \code{"GSL_american_plaice"},
+#' \item \code{"BC_pacific_cod"},
+#' \item \code{"EBS_pollock"},
+#' \item \code{"GOA_Pcod"},
+#' \item \code{"GOA_pollock"},
+#' \item \code{"GB_spring_haddock"} (with thanks to L. Brooks for assembling the data),
+#' \item \code{"GB_fall_haddock"} (with thanks to L. Brooks for assembling the data),
+#' \item \code{"SAWC_jacopever"} (with thanks to H. Winker for assembling the data),
+#' \item \code{"Aleutian_islands_POP"},
+#' \item \code{"GOA_arrowtooth_condition_and_density"} (with thanks to A. Gruss for assembling the data),
+#' \item \code{"condition_and_density"} (with thanks to A. Gruss for assembling the data),
+#' \item \code{"multimodal_red_snapper"} (with thanks to A. Gruss for assembling the data),
+#' \item \code{"lingcod_comp_expansion"} (with thanks to M. Haltuch for assembling the data),
+#' \item \code{"covariate_example"} (with thanks to D. McGowan for assembling the data),
+#' \item \code{"PESC_example_red_grouper"} (with thanks to A. Gruss for assembling the data),
+#' \item \code{"ordination"}, and
+#' \item \code{"NWA_yellowtail_seasons"} (with thanks to L. Brooks, C. Adams, and C. Legault for assembling the data).
 #' }
 #' These examples are used to highlight different functionality for spatio-temporal analysis,
 #' as well as during integrated testing to check whether updates are backwards compatible for these examples.
@@ -56,9 +57,13 @@ load_example = function( data_set="EBS_pollock" ){
                    "goa_pcod_covariate_example" = tolower("Gulf_of_Alaska"),
                    "goa_mice_example" = tolower("Gulf_of_Alaska"),
                    "PESC_example_red_grouper" = tolower("User"),
+                   "nwa_yellowtail_seasons" = tolower("Northwest_Atlantic"),
                    tolower("Other") )
 
-  input_grid = covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
+  # Initialize all objects as NULL
+  Predator_biomass_cath_rate_data = Stomach_content_data =
+    input_grid = covariate_data = F_ct = X_xtp = X_gtp = X_itp = Q_ik = NULL
+
   if( tolower(data_set) %in% tolower("WCGBTS_canary") ){
     data( WCGBTS_Canary_example, package="FishStatsUtils" )
     Year = as.numeric(sapply(WCGBTS_Canary_example[,'PROJECT_CYCLE'], FUN=function(Char){strsplit(as.character(Char)," ")[[1]][2]}))
@@ -78,7 +83,9 @@ load_example = function( data_set="EBS_pollock" ){
   }
   if( tolower(data_set) %in% tolower("EBS_pollock") ){
     data( EBS_pollock_data, package="FishStatsUtils" )
-    sampling_data = data.frame( "Catch_KG"=EBS_pollock_data[,'catch'], "Year"=EBS_pollock_data[,'year'], "Vessel"="missing", "AreaSwept_km2"=0.01, "Lat"=EBS_pollock_data[,'lat'], "Lon"=EBS_pollock_data[,'long'], "Pass"=0)
+    covariate_data = EBS_pollock_data$covariate_data
+    sampling_data = EBS_pollock_data$sampling_data
+    sampling_data = data.frame( "Catch_KG"=sampling_data[,'catch'], "Year"=sampling_data[,'year'], "Vessel"="missing", "AreaSwept_km2"=0.01, "Lat"=sampling_data[,'lat'], "Lon"=sampling_data[,'long'], "Pass"=0)
     strata.limits = data.frame('STRATA'="All_areas")
   }
   if( tolower(data_set) %in% tolower("GOA_Pcod") ){
@@ -169,10 +176,16 @@ load_example = function( data_set="EBS_pollock" ){
   }
   if( tolower(data_set) %in% tolower("PESC_example_red_grouper") ){
     data( PESC_example_red_grouper, package="FishStatsUtils" )
-    sampling_data = example$sampling_data
+    Predator_biomass_cath_rate_data = example$Predator_biomass_cath_rate_data
+    Stomach_content_data = example$Stomach_content_data
     region = example$Region
     strata.limits = example$strata.limits
     input_grid = example$input_grid
+  }
+  if( tolower(data_set) %in% tolower("NWA_yellowtail_seasons") ){
+    data( NWA_yellowtail_seasons, package="FishStatsUtils" )
+    sampling_data = NWA_yellowtail_seasons
+    strata.limits = list( c(1130, 1140, 1150, 1160, 1170, 1180, 1190, 1200, 1210) )
   }
   #sampling_data = na.omit( sampling_data )
 
@@ -184,7 +197,9 @@ load_example = function( data_set="EBS_pollock" ){
   if( !is.null(F_ct)) Return[["F_ct"]] = F_ct
   if( !is.null(covariate_data)) Return[["covariate_data"]] = covariate_data
   if( !is.null(input_grid)) Return[["input_grid"]] = input_grid
-
+  if( !is.null(Predator_biomass_cath_rate_data)) Return[["Predator_biomass_cath_rate_data"]] = Predator_biomass_cath_rate_data
+  if( !is.null(Stomach_content_data)) Return[["Stomach_content_data"]] = Stomach_content_data
+  
   # return stuff
   return(Return)
 }

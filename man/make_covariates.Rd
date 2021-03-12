@@ -9,13 +9,20 @@ make_covariates(
   covariate_data,
   Year_i,
   spatial_list,
-  extrapolation_list
+  contrasts.arg = NULL
 )
 }
 \arguments{
-\item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link{stats::lm}}}
+\item{formula}{an object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. Similar specification to \code{\link[stats]{lm}}}
 
 \item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)}
+
+\item{contrasts.arg}{a list, whose entries are values (numeric
+    matrices, \code{\link{function}}s or character strings naming
+    functions) to be used
+    as replacement values for the \code{\link[stats]{contrasts}}
+    replacement function and whose names are the names of
+    columns of \code{data} containing \code{\link{factor}}s.}
 }
 \value{
 Tagged list of useful output
@@ -39,4 +46,9 @@ values in that row of \code{covariate_data} are assigned to observation \code{i}
 Similarly, for every extrapolation-grid cell \code{g} at location \code{spatial_list$latlon_g[i,]} in each year,
 the nearest row of \code{covariate_data} in that year
 is used to assign covariate values. \code{make_covariates} then formats these covariate values appropriately and returns them.
+
+If all covariates as "static" (not changing among years),
+then set Year = NA to cause values to be duplicated internally for all values of Year.
+If using a mix of static and dynamic covariates,
+then duplicate rows for static covariates for every value of Year
 }

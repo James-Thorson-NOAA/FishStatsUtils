@@ -16,7 +16,7 @@ Geostat_Sim(
 \arguments{
 \item{Sim_Settings}{an optional tagged list for specifying input parameters (see function code to determine settings)}
 
-\item{Extrapolation_List}{the output from \code{Prepare_Extrapolation_Data_Fn}}
+\item{Extrapolation_List}{the output from \code{\link{make_extrapolation_info}}}
 
 \item{Data_Geostat}{A data frame with column headers \code{c('Lon','Lat','Year','Vessel','AreaSwept_km2')} containing sample design to mimic}
 

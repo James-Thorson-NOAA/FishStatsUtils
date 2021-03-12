@@ -20,7 +20,15 @@
 
 \item{n_samples}{Number of samples used when \code{what="residuals"}}
 
-\item{type}{integer stating what type of simulation to use. See details for description.}
+\item{type}{integer stating what type of simulation to use from the following options:
+\itemize{
+\item \code{type=1} is a "measurement error" or "conditional" simulator that simulates new data conditional upon estimated fixed and random effects.
+\item \code{type=2} is an "unconditional" simulator that simulates new random effects conditional upon fixed effects
+(but not otherwise conditioning upon original data), and new data conditional upon both.
+\item \code{type=3} simulates new fixed and random effects from the joint precision matrix (i.e., conditioning upon the original data), and new data conditional upon these values.
+\item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
+and new data conditional upon these values.
+}}
 
 \item{...}{additional arguments passed to \code{\link[DHARMa]{plotResiduals}} when \code{what="residuals"}}
 }
@@ -46,4 +54,11 @@ It then replaces the automatically calculated residuals in the DHARMa object wit
 so that DHARMa can be used to plot those PIT residuals. PIT residuals are used because the original DHARMa calculations
 are not correct when using a delta-model (due to additional jittered values added by DHARMa when detecting multiple 0-valued observations), hence
 the need to call this function to correctly calculate PIT residuals for a delta-model.
+
+Note that \code{summary(fit, ..., type=0} uses \code{\link[FishStatsUtils]{oneStepPredict_deltaModel}} to calculate one-step-ahead
+residuals.  These are probably the most appropriate method for evaluating residuals, but are also *very* slow to calculate relative
+to other methods.
+}
+\seealso{
+\code{\link{plot_quantile_residuals}} to plot output of \code{summary.fit_model(x,what="residuals")}
 }

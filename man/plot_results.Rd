@@ -15,11 +15,14 @@ plot_results(
   map_list,
   category_names,
   check_residuals = TRUE,
-  projargs = "+proj=longlat",
+  projargs = fit$extrapolation_list$projargs,
   zrange,
   n_samples = 100,
   calculate_relative_to_average = FALSE,
   type = 1,
+  n_cells = NULL,
+  RotationMethod = "PCA",
+  quantiles = c(0.05, 0.5, 0.95),
   ...
 )
 }
@@ -40,15 +43,24 @@ plot_results(
   \item{plot_set=8}{Linear predictor for encounter probability}
   \item{plot_set=9}{Linear predictor for positive catch rates}
   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
-  \item{plot_set=11}{Covariates that are included in the model}
-  \item{plot_set=12}{Total biomass across all categories (only useful in a multivariate model)}
-  \item{plot_set=13}{Covariate effects on encounter probability}
-  \item{plot_set=14}{Covariate effects on positive catch rates}
-  \item{plot_set=15}{Spatial variation for 1st linear predictor (Omega1)}
-  \item{plot_set=16}{Spatial variation for 2nd linear predictor (Omega2)}
+  \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
+  \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
+  \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
+  \item{plot_set=14}{Covariate effects on encounter probability}
+  \item{plot_set=15}{Covariate effects on positive catch rates}
+  \item{plot_set=16}{Spatial variation for 1st linear predictor (Omega1)}
+  \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
+  \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
+  \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
 }}
 
 \item{working_dir}{Directory for plots}
+
+\item{year_labels}{Year names for labeling panels}
+
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
+
+\item{map_list}{output from \code{\link{make_map_info}}}
 
 \item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
 
@@ -60,22 +72,45 @@ plot_results(
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 
-\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default), or instead calculate relative to median across all years. The latter reduces standard errors, and is appropriate when checking significance for comparison across years for a single species.  The former (default) is appropriate for checking significance for comparison across species.}
+\item{calculate_relative_to_average}{Boolean, whether to calculate edge in UTM coordinates (default),
+or instead calculate relative to median across all years. The latter reduces standard errors,
+and is appropriate when checking significance for comparison across years for a single species.
+The former (default) is appropriate for checking significance for comparison across species.}
 
-\item{type}{integer stating what type of simulation to use. See details for description.}
+\item{type}{integer stating what type of simulation to use from the following options:
+\itemize{
+\item \code{type=1} is a "measurement error" or "conditional" simulator that simulates new data conditional upon estimated fixed and random effects.
+\item \code{type=2} is an "unconditional" simulator that simulates new random effects conditional upon fixed effects
+(but not otherwise conditioning upon original data), and new data conditional upon both.
+\item \code{type=3} simulates new fixed and random effects from the joint precision matrix (i.e., conditioning upon the original data), and new data conditional upon these values.
+\item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
+and new data conditional upon these values.
+}}
+
+\item{n_cells}{Integer used to determine the argument \code{cell.size} passed
+to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
+\code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
+will often need to be modified for a given purpose.}
+
+\item{RotationMethod}{Method used for rotation when visualing factor decomposition results,
+Options: "PCA" (recommended) or "Varimax"}
+
+\item{quantiles}{vector specifying quantiles to use for calculating range edges}
 
 \item{...}{additional settings to pass to \code{FishStatsUtils::plot_maps}}
 }
 \value{
-Invisibly returns a tagged list of outputs generated by standard plots.
+Invisibly returns a tagged list of outputs generated by standard plots. See linked functions for details
 \describe{
-  \item{dharmaRes}{Quantile residuals calculated using package DHARMa}
-  \item{Enc_prob}{Output from \code{\link{plot_encounter_diagnostic}}; see that documentation for definition of optional arguments and contents}
-  \item{Index}{Output from \code{\link{plot_biomass_index}}; see that documentation for definition of optional arguments and contents}
-  \item{Proportions}{Output from \code{\link{calculate_proportion}}; see that documentation for definition of optional arguments and contents}
-  \item{Range}{Output from \code{\link{plot_range_index}}; see that documentation for definition of optional arguments and contents}
-  \item{Dens_xt}{Output from \code{\link{plot_maps}}; see that documentation for definition of optional arguments and contents}
-  \item{Edge}{Output from \code{\link{plot_range_edge}}; see that documentation for definition of optional arguments and contents}
+  \item{dharmaRes}{Output from \code{\link{summary.fit_model}}, representing quantile residuals calculated using package DHARMa}
+  \item{Enc_prob}{Output from \code{\link{plot_encounter_diagnostic}}}
+  \item{Index}{Output from \code{\link{plot_biomass_index}}}
+  \item{Proportions}{Output from \code{\link{calculate_proportion}}}
+  \item{Range}{Output from \code{\link{plot_range_index}}}
+  \item{Dens_xt}{Output from \code{\link{plot_maps}}}
+  \item{Edge}{Output from \code{\link{plot_range_edge}}}
+  \item{Factors}{Output from \code{\link{plot_factors}}}
 }
 }
 \description{

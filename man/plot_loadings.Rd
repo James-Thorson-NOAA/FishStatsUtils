@@ -6,6 +6,7 @@
 \usage{
 plot_loadings(
   L_pj,
+  Lsd_pj = NULL,
   At = 1:nrow(L_pj),
   whichfactor = 1,
   addtitle = TRUE,
@@ -14,6 +15,7 @@ plot_loadings(
   Labels = rownames(L_pj),
   Cex = 1.2,
   legend_text = "Proportion of explained variance",
+  interval_width = 1,
   ...
 )
 }

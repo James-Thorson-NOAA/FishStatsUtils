@@ -38,4 +38,8 @@ extrapolation-grid
 \dontrun{
  convert_shapefile( file_path="C:/Users/James.Thorson/Desktop/Work files/AFSC/2020-03 -- Add ICES grids/IBTS grids/BITS/Shapefile.shp", make_plots=TRUE )
 }
+
+}
+\author{
+Cecilia O'Leary, James Thorson
 }

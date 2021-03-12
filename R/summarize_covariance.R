@@ -16,9 +16,21 @@
 #' @param ... passed to \code{ThorsonUtilities::save_fig}
 
 #' @export
-summarize_covariance = function( Report, Data, ParHat, SD=NULL, category_order=1:Data$n_c, category_names=1:Data$n_c,
-  plotdir=paste0(getwd(),"/"), figname="Cov", plotTF=NULL, plot_cor=TRUE,
-  mgp=c(2,0.5,0), tck=-0.02, oma=c(0,5,2,0), ...){
+summarize_covariance <-
+function( Report,
+          Data,
+          ParHat,
+          SD=NULL,
+          category_order = 1:Data$n_c,
+          category_names = 1:Data$n_c,
+          plotdir = paste0(getwd(),"/"),
+          figname = "Cov",
+          plotTF = NULL,
+          plot_cor = TRUE,
+          mgp = c(2,0.5,0),
+          tck = -0.02,
+          oma = c(0,5,2,0),
+          ...){
 
   # Adds intercept defaults to FieldConfig if missing
   if( is.vector(Data[["FieldConfig"]]) && length(Data[["FieldConfig"]])==4 ){

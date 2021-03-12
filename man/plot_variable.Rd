@@ -17,7 +17,7 @@ plot_variable(
   add = FALSE,
   outermargintext = c("Eastings", "Northings"),
   zlim = NULL,
-  col,
+  col = viridisLite::viridis,
   mar = c(0, 0, 2, 0),
   oma = c(4, 4, 0, 0),
   legend_x = c(0, 0.05),
@@ -25,35 +25,50 @@ plot_variable(
   cex.legend = 1,
   mfrow,
   land_color = "grey",
-  n_cells,
+  n_cells = NULL,
   xlim,
   ylim,
   country = NULL,
   contour_nlevels = 0,
   fun = mean,
+  format = "raster",
+  cex.points = 1,
   ...
 )
 }
 \arguments{
 \item{Y_gt}{matrix where values for every column are plotted as a map}
 
-\item{map_list}{output from \code{FishStatsUtils::make_map_info}}
+\item{map_list}{output from \code{\link{make_map_info}}}
 
 \item{panel_labels}{vector defining titles to use for each panel; defaults to blank}
 
-\item{projargs}{A character string of projection arguments; the arguments must be entered exactly as in the PROJ.4 documentation; if the projection is unknown, use \code{as.character(NA)}, it may be missing or an empty string of zero length and will then set to the missing value.}
+\item{projargs}{Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
+where argument \code{+lon_0} allows the user to center eastings on a specified longitude.}
 
 \item{add}{boolean indicating whether to add plot to an existing panel figure, or to define a new panel figure}
 
 \item{outermargintext}{vector defining text to plot in outer margins of panel figure}
 
-\item{zlim}{range for defining bounds of color scale.  If \code{zlim=NULL}, then a constant scale is inferred from the range of \code{Y_gt} and a color-legend is plotted in the last panel.  If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
+\item{zlim}{two numeric values, specifying range for defining bounds of color scale.
+If \code{zlim=NULL}, then a constant scale is inferred
+from the range of the plotted variable and a color-legend is plotted in the last panel.
+If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
-\item{legend_x}{two numeric values (generally between 0 and 1, but slightly lower/higher values generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend}
+\item{legend_x}{two numeric values (generally between 0 and 1, but slightly lower/higher values
+generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend}
 
-\item{legend_y}{two numeric values (see legend_y) giving bottom and top location of color legend}
+\item{legend_y}{two numeric values (see description for legend_x) giving bottom and top location of color legend}
 
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
+
+\item{n_cells}{Integer used to determine the argument \code{cell.size} passed
+to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
+\code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
+will often need to be modified for a given purpose.}
 
 \item{country}{a character vector of country names.}
 
@@ -67,10 +82,18 @@ If \code{x} represents points, \code{fun} must accept a \code{na.rm} argument, e
 You can also pass multiple functions using a statement like \code{fun=function(x, ...) c(length(x),mean(x))}, in which case the returned object is a RasterBrick (multiple layers).
 }
 
+\item{format}{Character specifying whether to plot maps as a raster (the default), \code{format="raster"}, or as points \code{format="points"}}
+
+\item{cex.points}{Numeric specifying the size of bullets when \code{format="points"}}
+
 \item{...}{arguments passed to \code{par}}
 }
 \description{
 \code{plot_variable} plots a map and fills in regions with colors to represent intensity in an areal-interpretion of model results
 
-See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lon_0=0 +units=km'} where argument \code{+lon_0} allows the user to center eastings on a specified longitude. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
+If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
+
+In some sampling designs and/or analyses, it is not appropriate to extrapolate beyond samping stations.  In these cases,
+the analyst may define the extrapolation-grid to only represent sampling stations, and then use \code{format="points"}
+to restrict mapping to bullets at those locations.
 }
