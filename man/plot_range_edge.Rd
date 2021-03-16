@@ -59,3 +59,6 @@ The former (default) is appropriate for checking significance for comparison acr
 \description{
 \code{plot_range_edge} plots range edges
 }
+\references{
+For details regarding multivariate index standardization and expansion see \url{https://doi.org/10.22541/au.160331933.33155622/v1}
+}

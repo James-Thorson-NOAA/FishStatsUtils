@@ -16,6 +16,7 @@
 #'        and is appropriate when checking significance for comparison across years for a single species.
 #'        The former (default) is appropriate for checking significance for comparison across species.
 #'
+#' @references For details regarding multivariate index standardization and expansion see \url{https://doi.org/10.22541/au.160331933.33155622/v1}
 #' @export
 plot_range_edge <-
 function( Sdreport,
