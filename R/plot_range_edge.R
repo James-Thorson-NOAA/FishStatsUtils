@@ -116,13 +116,23 @@ function( Sdreport,
   # matplot( x=Z_zm[,mI], y=prop_zcym[,1,,mI], type="l" )
 
   # Plot edges
-  for( mI in 1:dim(E_zctm)[4] ){
+  for( mI in 1:dim(Edge_zctm)[4] ){
     Index_zct = array(Edge_zctm[,,,mI,'Estimate'],dim(Edge_zctm)[1:3])
     sd_Index_zct = array(Edge_zctm[,,,mI,'Std. Error'],dim(Edge_zctm)[1:3])
-    plot_index( Index_ctl=aperm(Index_zct,c(2,3,1)), sd_Index_ctl=aperm(sd_Index_zct,c(2,3,1)),
-      year_labels=year_labels, years_to_plot=years_to_plot, strata_names=quantiles, category_names=category_names,
-      DirName=working_dir, PlotName=paste0("RangeEdge_",m_labels[mI],".png"), Yrange=c(NA,NA),
-      interval_width=interval_width, width=width, height=height, xlab="Year", ylab=paste0("Quantiles (",m_labels[mI],")") )
+    plot_index( Index_ctl=aperm(Index_zct,c(2,3,1)),
+                sd_Index_ctl=aperm(sd_Index_zct,c(2,3,1)),
+                year_labels=year_labels,
+                years_to_plot=years_to_plot,
+                strata_names=quantiles,
+                category_names=category_names,
+                DirName=working_dir,
+                PlotName=paste0("RangeEdge_",m_labels[mI],".png"),
+                Yrange=c(NA,NA),
+                interval_width=interval_width,
+                width=width,
+                height=height,
+                xlab="Year",
+                ylab=paste0("Quantiles (",m_labels[mI],")") )
   }
 
   # Return list of stuff

@@ -122,7 +122,11 @@ function( settings,
   # Capture extra arguments to function
   extra_args = list(...)
   # Backwards-compatible way to capture previous format to input extra arguments for each function via specific input-lists
-  extra_args = c( extra_args, extra_args$extrapolation_args, extra_args$spatial_args, extra_args$optimize_args, extra_args$model_args )
+  extra_args = c( extra_args,
+             extra_args$extrapolation_args,
+             extra_args$spatial_args,
+             extra_args$optimize_args,
+             extra_args$model_args )
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
@@ -138,15 +142,28 @@ function( settings,
 
   # Build extrapolation grid
   message("\n### Making extrapolation-grid")
-  extrapolation_args_default = list(Region=settings$Region, strata.limits=settings$strata.limits, zone=settings$zone,
-    max_cells=settings$max_cells, DirPath=working_dir)
-  extrapolation_args_input = combine_lists( input=extra_args, default=extrapolation_args_default, args_to_use=formalArgs(make_extrapolation_info) )
+  extrapolation_args_default = list(Region = settings$Region,
+                             strata.limits = settings$strata.limits,
+                             zone = settings$zone,
+                             max_cells = settings$max_cells,
+                             DirPath = working_dir)
+  extrapolation_args_input = combine_lists( input = extra_args,
+                           default = extrapolation_args_default,
+                           args_to_use = formalArgs(make_extrapolation_info) )
   extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
 
   # Build information regarding spatial location and correlation
   message("\n### Making spatial information")
-  spatial_args_default = list(grid_size_km=settings$grid_size_km, n_x=settings$n_x, Method=settings$Method, Lon_i=Lon_i, Lat_i=Lat_i,
-    Extrapolation_List=extrapolation_list, DirPath=working_dir, Save_Results=TRUE, fine_scale=settings$fine_scale, knot_method=settings$knot_method)
+  spatial_args_default = list( grid_size_km = settings$grid_size_km,
+                       n_x = settings$n_x,
+                       Method = settings$Method,
+                       Lon_i = Lon_i,
+                       Lat_i = Lat_i,
+                       Extrapolation_List = extrapolation_list,
+                       DirPath = working_dir,
+                       Save_Results = TRUE,
+                       fine_scale = settings$fine_scale,
+                       knot_method = settings$knot_method)
   spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
   spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
 
@@ -155,31 +172,64 @@ function( settings,
   message("\n### Making data object") # VAST::
   if(missing(covariate_data)) covariate_data = NULL
   if(missing(catchability_data)) catchability_data = NULL
-  data_args_default = list("Version"=settings$Version, "FieldConfig"=settings$FieldConfig, "OverdispersionConfig"=settings$OverdispersionConfig,
-    "RhoConfig"=settings$RhoConfig, "VamConfig"=settings$VamConfig, "ObsModel"=settings$ObsModel, "c_iz"=c_iz, "b_i"=b_i, "a_i"=a_i, "v_i"=v_i,
-    "s_i"=spatial_list$knot_i-1, "t_i"=t_i, "spatial_list"=spatial_list, "Options"=settings$Options, "Aniso"=settings$use_anisotropy,
-    "X1config_cp"=X1config_cp, "X2config_cp"=X2config_cp, "covariate_data"=covariate_data, "X1_formula"=X1_formula, "X2_formula"=X2_formula,
-    "Q1config_k"=Q1config_k, "Q2config_k"=Q2config_k, "catchability_data"=catchability_data, "Q1_formula"=Q1_formula, "Q2_formula"=Q2_formula )
+  data_args_default = list( "Version" = settings$Version,
+                    "FieldConfig" = settings$FieldConfig,
+                    "OverdispersionConfig" = settings$OverdispersionConfig,
+                    "RhoConfig" = settings$RhoConfig,
+                    "VamConfig" = settings$VamConfig,
+                    "ObsModel" = settings$ObsModel,
+                    "c_iz" = c_iz,
+                    "b_i" = b_i,
+                    "a_i" = a_i,
+                    "v_i" = v_i,
+                    "s_i" = spatial_list$knot_i-1,
+                    "t_i" = t_i,
+                    "spatial_list" = spatial_list,
+                    "Options" = settings$Options,
+                    "Aniso" = settings$use_anisotropy,
+                    "X1config_cp" = X1config_cp,
+                    "X2config_cp" = X2config_cp,
+                    "covariate_data" = covariate_data,
+                    "X1_formula" = X1_formula,
+                    "X2_formula" = X2_formula,
+                    "Q1config_k" = Q1config_k,
+                    "Q2config_k" = Q2config_k,
+                    "catchability_data" = catchability_data,
+                    "Q1_formula" = Q1_formula,
+                    "Q2_formula" = Q2_formula )
   data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
   data_list = do.call( what=make_data, args=data_args_input )
   #return(data_list) }
 
   # Build object
   message("\n### Making TMB object")
-  model_args_default = list("TmbData"=data_list, "RunDir"=working_dir, "Version"=settings$Version,
-    "RhoConfig"=settings$RhoConfig, "loc_x"=spatial_list$loc_x, "Method"=spatial_list$Method, "build_model"=build_model)
+  model_args_default = list("TmbData" = data_list,
+                     "RunDir" = working_dir,
+                     "Version" = settings$Version,
+                     "RhoConfig" = settings$RhoConfig,
+                     "loc_x" = spatial_list$loc_x,
+                     "Method" = spatial_list$Method,
+                     "build_model" = build_model)
   model_args_input = combine_lists( input=extra_args, default=model_args_default, args_to_use=formalArgs(make_model) )
   tmb_list = do.call( what=make_model, args=model_args_input )
 
   # Run the model or optionally don't
   if( run_model==FALSE | build_model==FALSE ){
     # Build and output
-    input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
-      "model_args_input"=model_args_input, "spatial_args_input"=spatial_args_input,
-      "data_args_input"=data_args_input )
-    Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
-      "data_list"=data_list, "tmb_list"=tmb_list, "year_labels"=year_labels, "years_to_plot"=years_to_plot,
-      "settings"=settings, "input_args"=input_args)
+    input_args = list( "extra_args" = extra_args,
+               "extrapolation_args_input" = extrapolation_args_input,
+               "model_args_input" = model_args_input,
+               "spatial_args_input" = spatial_args_input,
+               "data_args_input" = data_args_input )
+    Return = list( "data_frame" = data_frame,
+           "extrapolation_list" = extrapolation_list,
+           "spatial_list" = spatial_list,
+           "data_list" = data_list,
+           "tmb_list" = tmb_list,
+           "year_labels" = year_labels,
+           "years_to_plot" = years_to_plot,
+           "settings" = settings,
+           "input_args" = input_args)
     class(Return) = "fit_model"
     return(Return)
   }
@@ -201,11 +251,18 @@ function( settings,
   # Optimize object
   message("\n### Estimating parameters")
   # have user override upper, lower, and loopnum
-  optimize_args_default1 = combine_lists( default=list(lower=tmb_list$Lower, upper=tmb_list$Upper, loopnum=2),
-    input=extra_args, args_to_use=formalArgs(TMBhelper::fit_tmb) )
+  optimize_args_default1 = list( lower = tmb_list$Lower,
+                         upper = tmb_list$Upper,
+                         loopnum = 2)
+  optimize_args_default1 = combine_lists( default=optimize_args_default1, input=extra_args, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # auto-override user inputs for optimizer-related inputs for first test run
-  optimize_args_input1 = list(obj=tmb_list$Obj, savedir=NULL, newtonsteps=0, bias.correct=FALSE,
-    control=list(eval.max=10000,iter.max=10000,trace=1), quiet=TRUE, getsd=FALSE )
+  optimize_args_input1 = list(obj = tmb_list$Obj,
+                       savedir = NULL,
+                       newtonsteps = 0,
+                       bias.correct = FALSE,
+                       control = list(eval.max = 10000, iter.max = 10000, trace = 1),
+                       quiet = TRUE,
+                       getsd = FALSE )
   # combine
   optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
@@ -217,20 +274,19 @@ function( settings,
       message("\n")
       stop("Please change model structure to avoid problems with parameter estimates and then re-try; see details in `?check_fit`\n", call.=FALSE)
     }
-    #Report = tmb_list$Obj$report()
-    #ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
-    #Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
-    #  "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
-    #  "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings,
-    #  "input_args"=input_args )
-    #return( invisible(Return) )
   }
 
   # Restart estimates after checking parameters
-  optimize_args_default2 = list(obj=tmb_list$Obj, lower=tmb_list$Lower, upper=tmb_list$Upper,
-    savedir=working_dir, bias.correct=settings$bias.correct, newtonsteps=newtonsteps,
-    bias.correct.control=list(sd=FALSE, split=NULL, nsplit=1, vars_to_correct=settings$vars_to_correct),
-    control=list(eval.max=10000,iter.max=10000,trace=1), loopnum=1)
+  optimize_args_default2 = list( obj = tmb_list$Obj,
+                         lower = tmb_list$Lower,
+                         upper = tmb_list$Upper,
+                         savedir = working_dir,
+                         bias.correct = settings$bias.correct,
+                         newtonsteps = newtonsteps,
+                         bias.correct.control = list(sd = FALSE, split = NULL, nsplit = 1, vars_to_correct = settings$vars_to_correct),
+                         control = list(eval.max = 10000, iter.max = 10000, trace = 1),
+                         loopnum = 1,
+                         getJointPrecision = TRUE)
   # combine while over-riding defaults using user inputs
   optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # over-ride inputs to start from previous MLE
@@ -246,15 +302,35 @@ function( settings,
   }
 
   # Build and output
-  input_args = list( "extra_args"=extra_args, "extrapolation_args_input"=extrapolation_args_input,
-    "model_args_input"=model_args_input, "spatial_args_input"=spatial_args_input,
-    "optimize_args_input1"=optimize_args_input1, "optimize_args_input2"=optimize_args_input2,
-    "data_args_input"=data_args_input )
-  Return = list("data_frame"=data_frame, "extrapolation_list"=extrapolation_list, "spatial_list"=spatial_list,
-    "data_list"=data_list, "tmb_list"=tmb_list, "parameter_estimates"=parameter_estimates, "Report"=Report,
-    "ParHat"=ParHat, "year_labels"=year_labels, "years_to_plot"=years_to_plot, "settings"=settings, "input_args"=input_args,
-    "X1config_cp"=X1config_cp, "X2config_cp"=X2config_cp, "covariate_data"=covariate_data, "X1_formula"=X1_formula, "X2_formula"=X2_formula,
-    "Q1config_k"=Q1config_k, "Q2config_k"=Q1config_k, "catchability_data"=catchability_data, "Q1_formula"=Q1_formula, "Q2_formula"=Q2_formula)
+  input_args = list( "extra_args" = extra_args,
+             "extrapolation_args_input" = extrapolation_args_input,
+             "model_args_input" = model_args_input,
+             "spatial_args_input" = spatial_args_input,
+             "optimize_args_input1" = optimize_args_input1,
+             "optimize_args_input2" = optimize_args_input2,
+             "data_args_input" = data_args_input )
+  Return = list( "data_frame" = data_frame,
+         "extrapolation_list" = extrapolation_list,
+         "spatial_list" = spatial_list,
+         "data_list" = data_list,
+         "tmb_list" = tmb_list,
+         "parameter_estimates" = parameter_estimates,
+         "Report" = Report,
+         "ParHat" = ParHat,
+         "year_labels" = year_labels,
+         "years_to_plot" = years_to_plot,
+         "settings" = settings,
+         "input_args" = input_args,
+         "X1config_cp" = X1config_cp,
+         "X2config_cp" = X2config_cp,
+         "covariate_data" = covariate_data,
+         "X1_formula" = X1_formula,
+         "X2_formula" = X2_formula,
+         "Q1config_k" = Q1config_k,
+         "Q2config_k" = Q1config_k,
+         "catchability_data" = catchability_data,
+         "Q1_formula" = Q1_formula,
+         "Q2_formula" = Q2_formula)
 
   # Add stuff for effects package
   Return$effects = list()
@@ -388,8 +464,10 @@ summary.fit_model <- function(x,
     ans[["extrapolation_grid"]] = print( x$extrapolation_list, quiet=TRUE )
 
     # Load density estimates
-    if( "D_gcy" %in% names(x$Report)){
-      ans[["Density_array"]] =  x$Report$D_gcy
+    if( any(c("D_gct","D_gcy") %in% names(x$Report)) ){
+      if("D_gcy" %in% names(x$Report)) Dvar_name = "D_gcy"
+      if("D_gct" %in% names(x$Report)) Dvar_name = "D_gct"
+      ans[["Density_array"]] =  x$Report[[Dvar_name]]
       if( !( x$settings$fine_scale==TRUE | x$spatial_list$Method=="Stream_network" ) ){
         index_tmp = x$spatial_list$NN_Extrap$nn.idx[ which(x$extrapolation_list[["Area_km2_x"]]>0), 1 ]
         ans[["Density_array"]] = ans[["Density_array"]][ index_tmp,,,drop=FALSE]
@@ -399,6 +477,7 @@ summary.fit_model <- function(x,
       Density_dataframe = expand.grid("Grid"=1:dim(ans[["Density_array"]])[[1]], "Category"=dimnames(ans[["Density_array"]])[[2]], "Year"=dimnames(ans[["Density_array"]])[[3]])
       Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Grid'],], "Density"=as.vector(ans[["Density_array"]]) )
       ans[["Density_dataframe"]] = Density_dataframe
+      ans[['year_labels']] = x[['year_labels']]
       rownames(Density_dataframe) = NULL
       cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object")
       print(head(Density_dataframe))
