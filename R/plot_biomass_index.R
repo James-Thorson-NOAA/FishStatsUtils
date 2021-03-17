@@ -3,7 +3,7 @@
 #' Plot index of abundance
 #'
 #' @description
-#' \code{plot_biomass_index} plots an index proportion to population abundance
+#' \code{plot_biomass_index} plots an index proportional to population abundance
 #'
 #' @inheritParams plot_maps
 #' @param TmbData Formatted data inputs, from `VAST::Data_Fn(...)`
@@ -239,11 +239,21 @@ function( TmbData,
     if( Plot_suffix[plotI]=="Biomass" ){ Array_ctl = Index_ctl; log_Array_ctl = log_Index_ctl }
     if( Plot_suffix[plotI]=="Bratio" ){ Array_ctl = Bratio_ctl; log_Array_ctl = log_Bratio_ctl }
     plot_index( Index_ctl=array(Index_ctl[,,,'Estimate'],dim(Index_ctl)[1:3]),
-      sd_Index_ctl=array(log_Index_ctl[,,,'Std. Error'],dim(log_Index_ctl)[1:3]),
-      year_labels=year_labels, years_to_plot=years_to_plot, strata_names=strata_names, category_names=category_names,
-      DirName=DirName, PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"),
-      interval_width=interval_width, width=width, height=height, xlab="Year", ylab="Index",
-      scale="log", plot_args=list("log"=ifelse(plot_log==TRUE,"y","")), "Yrange"=Yrange )
+                sd_Index_ctl=array(log_Index_ctl[,,,'Std. Error'],dim(log_Index_ctl)[1:3]),
+                year_labels=year_labels,
+                years_to_plot=years_to_plot,
+                strata_names=strata_names,
+                category_names=category_names,
+                DirName=DirName,
+                PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"),
+                interval_width=interval_width,
+                width=width,
+                height=height,
+                xlab="Year",
+                ylab="Index",
+                scale="log",
+                plot_args=list("log"=ifelse(plot_log==TRUE,"y","")),
+                Yrange=Yrange )
   }
 
   # Plot

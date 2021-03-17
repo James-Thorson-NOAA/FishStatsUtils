@@ -1,8 +1,8 @@
 Package: FishStatsUtils
 Type: Package
 Title: Utilities (shared code and data) for FishStats spatio-temporal modeling toolbox
-Version: 2.9.0
-Date: 2021-03-12
+Version: 2.9.1
+Date: 2021-03-16
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
