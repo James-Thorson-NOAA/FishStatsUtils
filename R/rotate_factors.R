@@ -45,6 +45,9 @@ function( L_pj = NULL,
   if( length(dim(Psi_sjt))==2 ){
     Psi_sjt = array( Psi_sjt, dim=c(dim(Psi_sjt),1) )
   }
+  if( length(dim(Psi_spt))==2 ){
+    Psi_spt = array( Psi_spt, dim=c(dim(Psi_spt),1) )
+  }
 
   # Local functions
   approx_equal = function(m1,m2,denominator=mean(m1+m2),d=1e-10) (2*abs(m1-m2)/denominator) < d
