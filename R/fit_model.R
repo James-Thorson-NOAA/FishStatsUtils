@@ -265,11 +265,11 @@ function( settings,
                        getsd = FALSE )
   # combine
   optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1, args_to_use=formalArgs(TMBhelper::fit_tmb) )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
+  parameter_estimates1 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
   if(exists("check_fit") & test_fit==TRUE ){
-    problem_found = VAST::check_fit( parameter_estimates )
+    problem_found = VAST::check_fit( parameter_estimates1 )
     if( problem_found==TRUE ){
       message("\n")
       stop("Please change model structure to avoid problems with parameter estimates and then re-try; see details in `?check_fit`\n", call.=FALSE)
@@ -290,13 +290,13 @@ function( settings,
   # combine while over-riding defaults using user inputs
   optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # over-ride inputs to start from previous MLE
-  optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates$par), default=optimize_args_input2 )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
+  optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates1$par), default=optimize_args_input2 )
+  parameter_estimates2 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 
   # Extract standard outputs
-  if( "par" %in% names(parameter_estimates) ){
+  if( "par" %in% names(parameter_estimates2) ){
     Report = tmb_list$Obj$report()
-    ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+    ParHat = tmb_list$Obj$env$parList( parameter_estimates2$par )
   }else{
     Report = ParHat = "Model is not converged"
   }
@@ -314,7 +314,7 @@ function( settings,
          "spatial_list" = spatial_list,
          "data_list" = data_list,
          "tmb_list" = tmb_list,
-         "parameter_estimates" = parameter_estimates,
+         "parameter_estimates" = parameter_estimates2,
          "Report" = Report,
          "ParHat" = ParHat,
          "year_labels" = year_labels,
