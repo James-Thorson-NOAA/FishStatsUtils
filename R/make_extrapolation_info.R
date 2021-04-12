@@ -33,7 +33,7 @@
 #'   \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
 #'   \item{\code{"california_current"}}{The spatial fooprint of the bottom trawl surveys operated by AFSC/NWFSC, including the AFSC triennial from 1977-2004 and the NWFSC combined shelf-slope survey from 2003 onward (as identified by B. Feist and C. Whitmire); specify subsets via \code{surveyname}}
 #'   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC (as identified by J. Harms)}
-#'   \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS; see \code{strata_to_use} for further specification}
+#'   \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS (as identified by N. Olsen); see \code{strata_to_use} for further specification}
 #'   \item{\code{"eastern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the eastern Bering Sea (as identified by A. Greig)}
 #'   \item{\code{"northern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the northern Bering Sea (as identified by J. Conner)}
 #'   \item{\code{"bering_sea_slope"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Bering Sea slope (as identified by A. Greig)}
@@ -47,9 +47,9 @@
 #'   \item{\code{"CalCOFI-IMECOCAL_Summer"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Summer months (as identified by A. Thompson)}
 #'   \item{\code{"rockfish_recruitment_coastwide"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC across its expanded spatial extent that is sampled during recent years (as identified by J. Field)}
 #'   \item{\code{"rockfish_recruitment_core"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC within its core spatial extent that is sampled consistently throughout its entire operations (as identified by J. Field)}
-#'   \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic;  see \code{epu_to_use} for further subdivisions}
+#'   \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic (as identified by D. Chevrier);  see \code{epu_to_use} for further subdivisions}
 #'   \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa (as identified by H. Winker); see \code{region} to select between South and West Coast surveys}
-#'   \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence}
+#'   \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence (as identified by H. Benoit)}
 #'   \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise (as identified by V. McGregor)}
 #'   \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC (as identified by D. Hart)}
 #'   \item{\code{"gulf_of_mexico"}}{The US Gulf of Mexico, surveyed by various fishery-independent surveys; using a definition provided by A. Gruss}
