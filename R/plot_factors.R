@@ -30,7 +30,7 @@ function( fit,
           mapdetails_list = NULL,
           Dim_year = NULL,
           Dim_species = NULL,
-          projargs = fit$extrapolation_list$projargs,
+          projargs = '+proj=longlat',
           plotdir = paste0(getwd(),"/"),
           land_color = "grey",
           zlim = NA,
@@ -231,7 +231,7 @@ function( fit,
         # Plot Omega
         # Use plot_variable to plot all factors on single figure
         if( Par_name %in% c("Omega1", "Omega2")){
-          plot_variable( Y_gt=array(Report_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
+          plot_variable( Y_gt=array(Report2_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
             panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name),
             land_color=land_color, projargs=projargs, ... )
         }
