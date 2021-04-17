@@ -58,6 +58,11 @@ function( L_pj = NULL,
   if( !is.null(L_pj) ){
     #if(quiet==FALSE) message("Using `L_pj` for loadings matrix")
     Nfactors = ncol(L_pj)
+    # Drop singular factors
+    #Cov_pp = L_pj %*% t(L_pj)
+    #Nfactors = sum(abs(eigen(Cov_pp)$values)>1e-6)
+    #L_pj = L_pj[,1:Nfactors,drop=FALSE]
+    #Psi_sjt = Psi_sjt[,1:Nfactors,,drop=FALSE]
   }else{
     # Backup:  Calculate L_pj from Cov_pp, and Psi_sjt from Psi_spt
     if( !is.null(Cov_pp) ){
@@ -67,6 +72,7 @@ function( L_pj = NULL,
     }
     if( any(abs(Cov_pp-t(Cov_pp))>1e-6) ) stop("`Cov_pp` does not appear to be symmetric")
     Nfactors = sum(abs(eigen(Cov_pp)$values)>1e-6)
+    #Nfactors = nrow(Cov_pp)
     SVD = svd(Cov_pp)    # SVD$u %*% diag(SVD$d) %*% t(SVD$v) AND SVD$u == t(SVD$v) for a diagonal Cov_pp
     L_pj = SVD$u %*% diag(sqrt(SVD$d))[,1:Nfactors,drop=FALSE]
 
@@ -155,8 +161,8 @@ function( L_pj = NULL,
       # Should be orthogonal (R %*% transpose = identity matrix) with determinant one
       # Doesn't have det(R) = 1; determinant(Hinv$rotmat)!=1 ||
     Diag = Hinv$rotmat %*% t(Hinv$rotmat)
-    diag(Diag) = ifelse( diag(Diag)==0,1,diag(Diag) )
-    if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff)) ){
+    diag(Diag) = ifelse( abs(diag(Diag))<testcutoff, 1, diag(Diag) )
+    if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff, denominator=1)) ){
       stop("Rotation matrix is not a rotation")
     }
   }

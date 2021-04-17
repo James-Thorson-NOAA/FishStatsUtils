@@ -141,7 +141,11 @@ function( fit,
       }else stop("Check 'Options_vec[8]' for allowable entries")
 
       # Rotate stuff
-      Var_rot = rotate_factors( L_pj=L_list[[i]], Psi=Psi_sjt/tau, RotationMethod=RotationMethod, testcutoff=testcutoff, quiet=TRUE )
+      Var_rot = rotate_factors( L_pj = L_list[[i]],
+                Psi_sjt = Psi_sjt/tau,
+                RotationMethod = RotationMethod,
+                testcutoff = testcutoff,
+                quiet = TRUE )
       if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
         Var_rot$Psi_rot = aperm( Var_rot$Psi_rot, c(1,3,2) )
       }
@@ -164,11 +168,11 @@ function( fit,
         Lprime_cfr = array(NA, dim=dim(L_cfr) )
         Psiprime_gjtr = array(NA, dim=dim(Psi_gjtr) )
         for( rI in 1:100 ){
-          tmplist = rotate_factors( L_pj=array(L_cfr[,,rI],dim=dim(L_cfr)[1:2]),
-            Psi_sjt=array(Psi_gjtr[,,,rI],dim=dim(Psi_gjtr)[1:3])/tau,
-            RotationMethod=RotationMethod,
-            testcutoff=testcutoff,
-            quiet=TRUE )
+          tmplist = rotate_factors( L_pj = array(L_cfr[,,rI],dim=dim(L_cfr)[1:2]),
+            Psi_sjt = array(Psi_gjtr[,,,rI],dim=dim(Psi_gjtr)[1:3])/tau,
+            RotationMethod = RotationMethod,
+            testcutoff = testcutoff,
+            quiet = TRUE )
           Lprime_cfr[,,rI] = tmplist$L_pj_rot
           Psiprime_gjtr[,,,rI] = tmplist$Psi_rot
         }
@@ -184,11 +188,11 @@ function( fit,
 
       # Extract projected factors is available
       if( !is.null(Psi_gjt) ){
-        Var2_rot = rotate_factors( L_pj=L_list[[i]],
-          Psi=Psi_gjt/tau,
-          RotationMethod=RotationMethod,
-          testcutoff=testcutoff,
-          quiet=TRUE )
+        Var2_rot = rotate_factors( L_pj = L_list[[i]],
+          Psi_sjt = Psi_gjt/tau,
+          RotationMethod = RotationMethod,
+          testcutoff = testcutoff,
+          quiet = TRUE )
         if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
           Var2_rot$Psi_rot = aperm( Var2_rot$Psi_rot, c(1,3,2) )
         }
