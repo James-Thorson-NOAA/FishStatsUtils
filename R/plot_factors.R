@@ -122,9 +122,17 @@ function( fit,
       if(Var_name%in%names(ParHat)) Psi_sjt = ParHat[[Var_name]]
       if(Var_name%in%names(Report)) Psi_sjt = Report[[Var_name]]
       Psi_gjt = Report[[Var2_name]]
+      # Get tau
+      logkappa = unlist(ParHat[c('logkappa1','logkappa2')])[c(1,1,1,1,2,2,2,2)[i]]
+      if(Options_vec[8]==0){
+        tau = 1 / (exp(logkappa) * sqrt(4*pi));
+      }else if(Options_vec[8]==1){
+        tau = 1 / sqrt(1-exp(logkappa*2));
+      }else stop("Check 'Options_vec[8]' for allowable entries")
       ## the betas and EpsilonTimeare transposed compared to others so fix that here
       if( Par_name %in% c("Beta1","Beta2") ){
-        Psi_sjt <- t(Psi_sjt)
+        Psi_sjt = t(Psi_sjt)
+        tau = 1
       }
       if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
         Psi_sjt = aperm( Psi_sjt, c(1,3,2) )
@@ -133,12 +141,6 @@ function( fit,
       if(is.null(Psi_sjt)){
         stop(paste("Covariance is empty for parameter", Var_name))
       }
-      logkappa = unlist(ParHat[c('logkappa1','logkappa2')])[c(1,1,1,1,2,2,2,2)[i]]
-      if(Options_vec[8]==0){
-        tau = 1 / (exp(logkappa) * sqrt(4*pi));
-      }else if(Options_vec[8]==1){
-        tau = 1 / sqrt(1-exp(logkappa*2));
-      }else stop("Check 'Options_vec[8]' for allowable entries")
 
       # Rotate stuff
       Var_rot = rotate_factors( L_pj = L_list[[i]],
@@ -216,24 +218,53 @@ function( fit,
         }
       dev.off()
 
+      # Plot Beta
+      if( Par_name %in% c("Beta1","Beta2") ){
+        png(file=paste0(plotdir,"factor_values--",Par_name,".png"),
+            width=4, height=4, res=200, units='in')
+        matplot( x = as.numeric(year_labels),
+                 y = array(Psiprime_list[[i]][,,1],dim=dim(Psiprime_list[[i]])[1:2]),
+                 type = "l",
+                 col = rainbow(ncol(Psiprime_list[[i]])),
+                 lty = "solid",
+                 xlab = "Time",
+                 ylab = "" )
+        legend( "topleft", bty = "n", fill = rainbow(ncol(Psiprime_list[[i]])), legend = 1:ncol(Psiprime_list[[i]]))
+        dev.off()
+      }
+
       # Plot factors
       if( !is.null(mapdetails_list) & !is.null(Report2_tmp) ){
 
         # Plot Epsilon
         # Use plot_maps to automatically make one figure per factor
         if( Par_name %in% c("Epsilon1","Epsilon2") ){
-          plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-            working_dir=plotdir, year_labels=year_labels, category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
-            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim,
-            land_color=land_color, projargs=projargs, ...)
+          plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
+                     Report=Report2_tmp,
+                     PlotDF=mapdetails_list[["PlotDF"]],
+                     MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
+                     working_dir=plotdir,
+                     year_labels=year_labels,
+                     category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+                     legend_x=mapdetails_list[["Legend"]]$x/100,
+                     legend_y=mapdetails_list[["Legend"]]$y/100,
+                     zlim=zlim,
+                     land_color=land_color,
+                     projargs=projargs,
+                     ...)
         }  #
 
         # Plot Omega
         # Use plot_variable to plot all factors on single figure
         if( Par_name %in% c("Omega1", "Omega2")){
-          plot_variable( Y_gt=array(Report2_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]), map_list=mapdetails_list, working_dir=plotdir,
-            panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]), file_name=paste0("Factor_maps--",Par_name),
-            land_color=land_color, projargs=projargs, ... )
+          plot_variable( Y_gt=array(Report2_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]),
+                         map_list=mapdetails_list,
+                         working_dir=plotdir,
+                         panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+                         file_name=paste0("Factor_maps--",Par_name),
+                         land_color=land_color,
+                         projargs=projargs,
+                         ... )
         }
 
         ## Doesn't make sense to make maps of beta factors since they aren't spatial
@@ -245,10 +276,19 @@ function( fit,
           }else{
             factor_names = paste0("Factor_",1:dim(Var_rot$Psi_rot)[2])
           }
-          plot_maps(plot_set=c(6,6,NA,6,7,7,NA,7)[i], Report=Report2_tmp, PlotDF=mapdetails_list[["PlotDF"]], MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-            working_dir=plotdir, category_names=factor_names, Panel="Year",
-            legend_x=mapdetails_list[["Legend"]]$x/100, legend_y=mapdetails_list[["Legend"]]$y/100, zlim=zlim,
-            land_color=land_color, projargs=projargs, ...)
+          plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
+                     Report=Report2_tmp,
+                     PlotDF=mapdetails_list[["PlotDF"]],
+                     MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
+                     working_dir=plotdir,
+                     category_names=factor_names,
+                     Panel="Year",
+                     legend_x=mapdetails_list[["Legend"]]$x/100,
+                     legend_y=mapdetails_list[["Legend"]]$y/100,
+                     zlim=zlim,
+                     land_color=land_color,
+                     projargs=projargs,
+                     ...)
         }  #
       }
     }else{

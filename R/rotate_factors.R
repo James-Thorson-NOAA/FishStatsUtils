@@ -163,7 +163,9 @@ function( L_pj = NULL,
     Diag = Hinv$rotmat %*% t(Hinv$rotmat)
     diag(Diag) = ifelse( abs(diag(Diag))<testcutoff, 1, diag(Diag) )
     if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff, denominator=1)) ){
-      stop("Rotation matrix is not a rotation")
+      message("Rotation Hinv times its transpose:")
+      print( Diag )
+      stop("Error: Rotation matrix is not a rotation")
     }
   }
 
