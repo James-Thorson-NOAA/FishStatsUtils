@@ -515,7 +515,7 @@ summary.fit_model <- function(x,
       # Run DHARMa
       dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz, # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
         observedResponse=x$data_list$b_i,
-        fittedPredictedResponse=fit$Report$D_i,
+        fittedPredictedResponse=x$Report$D_i,
         integer=FALSE)
 
       # Calculate probability-integral-transform (PIT) residuals
@@ -537,7 +537,7 @@ summary.fit_model <- function(x,
 
       # Run OSA
       message( "Running oneStepPredict_deltaModel for each observation, to then load them into DHARMa object for plotting" )
-      osa = TMBhelper::oneStepPredict_deltaModel( obj = fit$tmb_list$Obj,
+      osa = TMBhelper::oneStepPredict_deltaModel( obj = x$tmb_list$Obj,
         observation.name = "b_i",
         method = "cdf",
         data.term.indicator = "keep",
@@ -547,7 +547,7 @@ summary.fit_model <- function(x,
       # Build DHARMa object on fake inputs and load OSA into DHARMa object
       dharmaRes = DHARMa::createDHARMa(simulatedResponse=matrix(rnorm(x$data_list$n_i*10,mean=x$data_list$b_i),ncol=10),
         observedResponse=x$data_list$b_i,
-        fittedPredictedResponse=fit$Report$D_i,
+        fittedPredictedResponse=x$Report$D_i,
         integer=FALSE)
       dharmaRes$scaledResiduals = pnorm(osa$residual)
     }else{
