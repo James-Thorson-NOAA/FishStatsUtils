@@ -401,11 +401,16 @@ function( plot_set = 3,
       for( cI in 1:Nplot){
         if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
         if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
+        if( Nplot == length(year_labels) ){
+          panel_labels = year_labels[years_to_plot]
+        }else{
+          panel_labels = rep("", Nplot)
+        }
 
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
         plot_args = plot_variable( Y_gt=Mat_xt[,years_to_plot,drop=FALSE],
           map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=year_labels[years_to_plot], file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
+          panel_labels=panel_labels, file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
       }
     }
     # Plot for each year
