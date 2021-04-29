@@ -29,6 +29,8 @@
 #'   \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
 #'   \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
 #'   \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
+#'   \item{plot_set=20}{Spatially-varying response for catchability covariates in 1st linear predictor (Phi1)}
+#'   \item{plot_set=21}{Spatially-varying response for catchability covariates in 2nd linear predictor (Phi2)}
 #' }
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
@@ -173,7 +175,7 @@ function( plot_set = 3,
     Array_xct = NULL
     plot_code <- c("encounter_prob", "pos_catch", "ln_density", "", "", "epsilon_1", "epsilon_2",
       "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates_1", "covariates_2", "total_density",
-      "covariate_effects_1", "covariate_effects_2", "omega_1", "omega_2")[plot_num]
+      "covariate_effects_1", "covariate_effects_2", "omega_1", "omega_2", "xi_1", "xi_2", "phi_1", "phi_2")[plot_num]
 
     # Extract matrix to plot
     if(plot_num==1){
@@ -361,6 +363,30 @@ function( plot_set = 3,
       if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Xi2_gcp")
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
+    }
+    if(plot_num==20){
+      # Spatially-varying response for catchability covariates in 1st linear predictor
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatially-varying response to catchability covariates (Phi) for 1st linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) stop()
+      if(any(c("Phi1_gk")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Phi1_gk")
+      #if(any(c("D_gcy","D_gct")%in%names(Report))) stop("not yet implemented")
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+      Array_xct = aperm( Array_xct %o% 1, c(1,3,2) )
+    }
+    if(plot_num==21){
+      # Spatially-varying response for catchability covariates in 1st linear predictor
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatially-varying response to catchability covariates (Phi) for 2nd linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) stop()
+      if(any(c("Phi2_gk")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Phi2_gk")
+      #if(any(c("D_gcy","D_gct")%in%names(Report))) stop("not yet implemented")
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+      Array_xct = aperm( Array_xct %o% 1, c(1,3,2) )
     }
     if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
     if( any(abs(Array_xct)==Inf) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")

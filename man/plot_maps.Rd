@@ -50,6 +50,8 @@ plot_maps(
   \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
   \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
   \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
+  \item{plot_set=20}{Spatially-varying response for catchability covariates in 1st linear predictor (Phi1)}
+  \item{plot_set=21}{Spatially-varying response for catchability covariates in 2nd linear predictor (Phi2)}
 }}
 
 \item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}

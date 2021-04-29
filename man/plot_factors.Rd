@@ -17,7 +17,7 @@ plot_factors(
   mapdetails_list = NULL,
   Dim_year = NULL,
   Dim_species = NULL,
-  projargs = fit$extrapolation_list$projargs,
+  projargs = "+proj=longlat",
   plotdir = paste0(getwd(), "/"),
   land_color = "grey",
   zlim = NA,
