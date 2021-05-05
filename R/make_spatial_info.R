@@ -202,12 +202,12 @@ make_spatial_info = function( n_x,
     n_s = MeshList$anisotropic_spde$n.spde
     loc_s = MeshList$anisotropic_spde$mesh$loc[,1:2]
   }
-  if(is.na(loc_s)){
+  if(is.na(as.vector(loc_s)[1])){
+    latlon_s = NA
+  }else{
     colnames(loc_s) = c("E_km", "N_km")
     latlon_s = project_coordinates( X=loc_s[,"E_km"], Y=loc_s[,"N_km"], projargs=origargs, origargs=Extrapolation_List$projargs )[,c("Y","X")]
     colnames(latlon_s) = c("Lat", "Lon")
-  }else{
-    latlon_s = NA
   }
 
   # Make matrices for 2D AR1 process
