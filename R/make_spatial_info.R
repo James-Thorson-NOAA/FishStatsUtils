@@ -184,7 +184,7 @@ make_spatial_info = function( n_x,
   # Deal with loc_s and latlon_s
   if( tolower(Method)=="mesh"){
     n_s = MeshList$anisotropic_spde$n.spde
-    loc_s = fit$spatial_list$MeshList$anisotropic_spde$mesh$loc[,1:2]
+    loc_s = MeshList$anisotropic_spde$mesh$loc[,1:2]
   }
   if( tolower(Method)=="grid"){
     n_s = nrow(loc_x)
@@ -200,7 +200,7 @@ make_spatial_info = function( n_x,
   }
   if( tolower(Method)=="barrier"){
     n_s = MeshList$anisotropic_spde$n.spde
-    loc_s = fit$spatial_list$MeshList$anisotropic_spde$mesh$loc[,1:2]
+    loc_s = MeshList$anisotropic_spde$mesh$loc[,1:2]
   }
   if(is.na(loc_s)){
     colnames(loc_s) = c("E_km", "N_km")
