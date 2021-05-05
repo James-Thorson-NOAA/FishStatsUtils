@@ -401,10 +401,10 @@ function( plot_set = 3,
       for( cI in 1:Nplot){
         if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
         if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
-        if( Nplot == length(year_labels) ){
+        if( ncol(Mat_xt[,years_to_plot,drop=FALSE]) == length(year_labels[years_to_plot]) ){
           panel_labels = year_labels[years_to_plot]
         }else{
-          panel_labels = rep("", Nplot)
+          panel_labels = rep("", ncol(Mat_xt[,years_to_plot,drop=FALSE]))
         }
 
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )

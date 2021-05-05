@@ -180,8 +180,35 @@ make_spatial_info = function( n_x,
     MeshList = make_mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
       fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
   }
-  n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x),
-    "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x), "barrier"=MeshList$anisotropic_spde$n.spde,  )
+
+  # Deal with loc_s and latlon_s
+  if( tolower(Method)=="mesh"){
+    n_s = MeshList$anisotropic_spde$n.spde
+    loc_s = fit$spatial_list$MeshList$anisotropic_spde$mesh$loc[,1:2]
+  }
+  if( tolower(Method)=="grid"){
+    n_s = nrow(loc_x)
+    loc_s = loc_x
+  }
+  if( tolower(Method)=="spherical_mesh"){
+    n_s = MeshList$isotropic_spde$n.spde
+    loc_s = NA
+  }
+  if( tolower(Method)=="stream_network"){
+    n_s = nrow(loc_x)
+    loc_s = loc_x
+  }
+  if( tolower(Method)=="barrier"){
+    n_s = MeshList$anisotropic_spde$n.spde
+    loc_s = fit$spatial_list$MeshList$anisotropic_spde$mesh$loc[,1:2]
+  }
+  if(is.na(loc_s)){
+    colnames(loc_s) = c("E_km", "N_km")
+    latlon_s = project_coordinates( X=loc_s[,"E_km"], Y=loc_s[,"N_km"], projargs=origargs, origargs=Extrapolation_List$projargs )[,c("Y","X")]
+    colnames(latlon_s) = c("Lat", "Lon")
+  }else{
+    latlon_s = NA
+  }
 
   # Make matrices for 2D AR1 process
   Dist_grid = dist(loc_grid, diag=TRUE, upper=TRUE)
@@ -240,9 +267,9 @@ make_spatial_info = function( n_x,
   # Return
   Return = list( "fine_scale"=fine_scale, "A_is"=A_is, "A_gs"=A_gs, "n_x"=n_x, "n_s"=n_s, "n_g"=nrow(a_gl), "n_i"=nrow(loc_i),
     "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
-    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g), "g_e"=g_e,
+    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g), "loc_s"=as.matrix(loc_s), "g_e"=g_e,
     "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap, "knot_method"=knot_method,
-    "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i )
+    "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i, "latlon_s"=latlon_s )
   class(Return) = "make_spatial_info"
   return( Return )
 }

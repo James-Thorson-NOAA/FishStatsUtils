@@ -2,7 +2,7 @@
 % Please edit documentation in R/make_covariates.R
 \name{make_covariates}
 \alias{make_covariates}
-\title{Format habitat covariate matrix}
+\title{Format density covariate matrix}
 \usage{
 make_covariates(
   formula,
@@ -27,28 +27,41 @@ make_covariates(
 \value{
 Tagged list of useful output
 \describe{
-  \item{Cov_gtp}{3-dimensional array for use in \code{VAST::make_data}}
-  \item{Cov_itp}{3-dimensional array for use in \code{VAST::make_data}}
+  \item{\code{Cov_gtp}}{3-dimensional array for use in \code{VAST::make_data}}
+  \item{\code{Cov_itp}}{3-dimensional array for use in \code{VAST::make_data}}
+  \item{\code{Cov_stp}}{3-dimensional array for use in \code{VAST::make_data}}
 }
 }
 \description{
 \code{make_covariates} uses a formula interface to generate covariates
 }
 \details{
-This function generates 3D arrays \code{Cov_gtp} and \code{Cov_itp} required by \code{VAST::make_data} to incorporate density covariates.
-The user must supply a data frame \code{covariate_data} of covariate values, with columns named Lat, Lon, and Year,
+This function generates 3D arrays \code{Cov_gtp}, \code{Cov_itp}, and  \code{Cov_stp} as
+required by \code{VAST::make_data} to incorporate density covariates.
+The user must supply a data frame \code{covariate_data} of covariate values, with columns named \code{Lat}, \code{Lon}, and \code{Year},
 as well as values for all covariates as additional named columns.
 This data frame is then used as a "look-up table", and is matched against variables listed in \code{formula}.
 
-Specifically, for every observation \code{i} at location \code{Lat_i[i]} and \code{Lon_i[i]} in year \code{t_i[t]}, the nearest
-Lat-Lon observation in that year is identified in \code{covariate_data}, and covariate
-values in that row of \code{covariate_data} are assigned to observation \code{i}.
-Similarly, for every extrapolation-grid cell \code{g} at location \code{spatial_list$latlon_g[i,]} in each year,
-the nearest row of \code{covariate_data} in that year
-is used to assign covariate values. \code{make_covariates} then formats these covariate values appropriately and returns them.
+Specifically,
+\enumerate{
+\item for every observation \code{i} at location \code{Lat_i[i]} and \code{Lon_i[i]} in year \code{t_i[t]}, the nearest
+      Lat-Lon observation in that year is identified in \code{covariate_data}, and covariate
+      values in that row of \code{covariate_data} are assigned to observation \code{i}.
+      Covariate values are then used to predict densities at each sample location.
+\item Similarly, for every extrapolation-grid cell \code{g} at location \code{spatial_list$latlon_g[g,]} in each year,
+      the nearest row of \code{covariate_data} in that year
+      is used to assign covariate values.
+      Covariate values are then used to predict densities at each extrapolation-grid cell.
+\item Finally, for every mesh-location \code{s} at location \code{spatial_list$latlon_s[s,]} in each year,
+      the nearest row of \code{covariate_data} in that year
+      is used to assign covariate values.
+      Covariate values could be used in the future to predict habitat-specific variance-covariance
+      for spatial variables (although this feature has not been built yet).
+}
+\code{make_covariates} then formats these covariate values appropriately and returns them.
 
 If all covariates as "static" (not changing among years),
-then set Year = NA to cause values to be duplicated internally for all values of Year.
+then set \code{Year = NA} to cause values to be duplicated internally for all values of Year.
 If using a mix of static and dynamic covariates,
 then duplicate rows for static covariates for every value of Year
 }
