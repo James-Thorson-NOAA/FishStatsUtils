@@ -105,7 +105,7 @@ function( Y_gt,
     warning( "panel_labels and `ncol(Y_gt)` don't match: Changing panel_labels'")
     panel_labels = 1:ncol(Y_gt)
   }
-  if( missing(col)){
+  if( is.null(col)){
     col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
   }
   if( is.function(col)){

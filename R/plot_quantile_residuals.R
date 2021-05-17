@@ -21,9 +21,9 @@ function( dharmaRes,
           fit,
           file_name = "quantile_residuals_on_map",
           zlim = NULL,
-          year_labels = NULL,
-          years_to_plot = NULL,
           n_cells = NULL,
+          year_labels = fit$year_labels,
+          years_to_plot = fit$years_to_plot,
           ... ){
 
   # labels
