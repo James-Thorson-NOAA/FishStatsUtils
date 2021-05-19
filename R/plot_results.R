@@ -69,8 +69,13 @@ function( fit,
   plot_data_args = list(...)
   plot_data_args = combine_lists( "input"=plot_data_args, "args_to_use"=formalArgs(plot_data),
     "default" = list(Extrapolation_List=fit$extrapolation_list,
-                Spatial_List=fit$spatial_list, Lat_i=fit$data_frame[,'Lat_i'], Lon_i=fit$data_frame[,'Lon_i'],
-                Year_i=fit$data_frame[,'t_i'], PlotDir=working_dir, year_labels=year_labels, projargs=projargs) )
+                Spatial_List=fit$spatial_list,
+                Lat_i=fit$data_frame[,'Lat_i'],
+                Lon_i=fit$data_frame[,'Lon_i'],
+                Year_i=fit$data_frame[,'t_i'],
+                PlotDir=working_dir,
+                year_labels=year_labels,
+                projargs=projargs) )
   do.call( what=plot_data, args=plot_data_args )
 
   # PLot settings
@@ -90,8 +95,12 @@ function( fit,
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
     plot_biomass_index_args = combine_lists( "input"=plot_biomass_index_args, "args_to_use"=formalArgs(plot_biomass_index),
       "default" = list(DirName=working_dir,
-                  TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, year_labels=year_labels,
-                  years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names) )
+                  TmbData=fit$data_list,
+                  Sdreport=fit$parameter_estimates$SD,
+                  year_labels=year_labels,
+                  years_to_plot=years_to_plot,
+                  use_biascorr=use_biascorr,
+                  category_names=category_names) )
     Index = do.call( what=plot_biomass_index, args=plot_biomass_index_args )
   }else{
     Index = "Not run"
@@ -179,8 +188,13 @@ function( fit,
 
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")
-    plot_quantile_residuals( dharmaRes=dharmaRes, fit=fit, working_dir=working_dir,
-      year_labels=year_labels, years_to_plot=years_to_plot, n_cells=n_cells, ... )
+    plot_quantile_residuals( dharmaRes=dharmaRes,
+                             fit=fit,
+                             working_dir=working_dir,
+                             year_labels=year_labels,
+                             years_to_plot=years_to_plot,
+                             n_cells=n_cells,
+                             ... )
   }else{
     #Q = "Not run"
     #message("\n### Skipping Q-Q plot")

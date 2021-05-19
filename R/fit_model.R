@@ -513,9 +513,9 @@ summary.fit_model <- function(x,
       }
 
       # Run DHARMa
-      dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz, # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
-        observedResponse=x$data_list$b_i,
-        fittedPredictedResponse=x$Report$D_i,
+      dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz), # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
+        observedResponse=strip_units(x$data_list$b_i),
+        fittedPredictedResponse=strip_units(x$Report$D_i),
         integer=FALSE)
 
       # Calculate probability-integral-transform (PIT) residuals

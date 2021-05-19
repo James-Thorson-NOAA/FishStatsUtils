@@ -69,7 +69,7 @@ function( Extrapolation_List,
   if( !missing(Extrapolation_List) & !missing(Spatial_List) ){
     png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
       par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
-      which_rows = which( Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
+      which_rows = which( strip_units(Extrapolation_List[["Area_km2_x"]])>0 & strip_units(rowSums(Extrapolation_List[["a_el"]]))>0 )
       plot( Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
       sp::plot( map_data, col=land_color, add=TRUE )
       if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){

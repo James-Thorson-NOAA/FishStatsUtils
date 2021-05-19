@@ -16,7 +16,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     }
   }
   if( missing(Include) ){
-    Include = Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0
+    Include = strip_units(Extrapolation_List[["Area_km2_x"]])>0 & strip_units(rowSums(Extrapolation_List[["a_el"]]))>0
   }
 
   # Initialize
@@ -98,8 +98,8 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
   if( tolower(Region) == "gulf_of_st_lawrence" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("worldHires", "Canada" )
-    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lon'])
-    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lat'])
+    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lon'])
+    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lat'])
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=4)
     Rotate = 0
     Cex = 1.0
@@ -119,8 +119,8 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include)
     #MappingDetails = list("state", c("alabama","arizona","arkansas","california","colorado","connecticut","delaware","district of columbia","florida","georgia","idaho","illinois","indiana","iowa","kansas","kentucky","louisiana","maine","maryland","massachusetts:martha's vineyard","massachusetts:main","massachusetts:nantucket","michigan:north","michigan:south","minnesota","mississippi","missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york:manhattan","new york:main","new york:statenisland","new york:longisland","north carolina:knotts","north carolina:main","north carolina:spit","north dakota","ohio","oklahoma","oregon","pennsylvania","rhode island","south carolina","south dakota","tennessee","texas","utah","vermont","virginia:chesapeake","virginia:chincoteague","virginia:main","washington:san juan island","washington:lopez island","washington:orcas island","washington:whidbey island","washington:main","west virginia","wisconsin","wyoming"))
     MappingDetails = list("worldHires", NULL )
-    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lon'])
-    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lat'])
+    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lon'])
+    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lat'])
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=3)
     Rotate = 20     # Degrees counter-clockwise
     Cex = 0.01
@@ -130,8 +130,8 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include)
     #MappingDetails = list("state", c("alabama","arizona","arkansas","california","colorado","connecticut","delaware","district of columbia","florida","georgia","idaho","illinois","indiana","iowa","kansas","kentucky","louisiana","maine","maryland","massachusetts:martha's vineyard","massachusetts:main","massachusetts:nantucket","michigan:north","michigan:south","minnesota","mississippi","missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york:manhattan","new york:main","new york:statenisland","new york:longisland","north carolina:knotts","north carolina:main","north carolina:spit","north dakota","ohio","oklahoma","oregon","pennsylvania","rhode island","south carolina","south dakota","tennessee","texas","utah","vermont","virginia:chesapeake","virginia:chincoteague","virginia:main","washington:san juan island","washington:lopez island","washington:orcas island","washington:whidbey island","washington:main","west virginia","wisconsin","wyoming"))
     MappingDetails = list("worldHires", NULL )
-    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lon'])
-    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lat'])
+    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lon'])
+    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lat'])
     #MapSizeRatio = c("Height(in)"=4,"Width(in)"=3)
     Rotate = 0     # Degrees counter-clockwise
     Cex = 0.60
@@ -140,8 +140,8 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
   if( is.null(PlotDF) ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("worldHires", NULL )
-    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lon'])
-    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(Extrapolation_List[["Area_km2_x"]]>0),'Lat'])
+    Xlim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lon'])
+    Ylim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lat'])
     Rotate = 0
     Cex = 0.1
     Legend = list(use=FALSE,x=c(5,10),y=c(5,45))

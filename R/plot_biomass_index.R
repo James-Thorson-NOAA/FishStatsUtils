@@ -6,15 +6,14 @@
 #' \code{plot_biomass_index} plots an index proportional to population abundance
 #'
 #' @inheritParams plot_maps
-#' @param TmbData Formatted data inputs, from `VAST::Data_Fn(...)`
+#' @param TmbData Formatted data inputs, from \code{\link[VAST]{make_data}}
 #' @param DirName Directory for saving plot and table
 #' @param PlotName Name for plot
 #' @param interval_width width for confidence intervals
 #' @param strata_names names for spatial strata
-#' @param category_names names for categories (if using package `VAST`)
+#' @param category_names names for categories (if using package \code{`VAST`})
 #' @param use_biascorr Boolean, whether to use bias-corrected estimates if available
 #' @param plot_legend Add legend for labelling colors
-#' @param total_area_km2 Total area for calculating a design-based estimator using one design-stratum (only recommended for model exploration)
 #' @param plot_log Boolean, whether to plot y-axis in log-scale
 #' @param width plot width in inches
 #' @param height plot height in inches
@@ -168,6 +167,7 @@ function( TmbData,
       }
     }
   }
+  units(Index_ctl) = units(log_Index_ctl) = units(fit$data_list$b_i / fit$data_list$a_i * fit$extrapolation_list$Area_km2[1])
 
   # Extract biomass ratio Bratio_cty if available (only available if >= V5.3.0 and using spatial Gompertz model features)
   if( "Bratio_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
@@ -181,6 +181,7 @@ function( TmbData,
       message("Not using bias-corrected estimates for biomass ratio (natural-scale)...")
       Bratio_ctl[] = SD[which(rownames(SD)=="Bratio_cyl"),c('Estimate','Std. Error')]
     }
+    units(Bratio_ctl) = unitless
   }else{
     Bratio_ctl = NULL
   }
@@ -209,17 +210,6 @@ function( TmbData,
     Fratio_ct = NULL
   }
 
-  # Calculate design-based
-  if( !is.null(total_area_km2) & TmbData$n_c==1 ){
-    message( "Calculating naive design-based index -- do not use this, its intended only for comparison purposes" )
-    Calc_design = TRUE
-    Design_t = tapply( TmbData$b_i/TmbData$a_i, INDEX=TmbData$t_i, FUN=mean ) * total_area_km2 / 1000 # Convert to tonnes
-    Design_t = cbind( "Estimate"=Design_t, "Std. Error"=sqrt(tapply(TmbData$b_i/TmbData$a_i,INDEX=TmbData$t_i,FUN=var)/tapply(TmbData$b_i/TmbData$a_i,INDEX=TmbData$t_i,FUN=length))*total_area_km2/1000)
-    Design_t = cbind( Design_t, "CV"=Design_t[,'Std. Error'] / Design_t[,'Estimate'] )
-  }else{
-    Calc_design = FALSE
-  }
-
   # Fix at zeros any years-category combinations with no data
   if( treat_missing_as_zero==TRUE ){
     # Determine year-category pairs with no data
@@ -233,27 +223,27 @@ function( TmbData,
   }
 
   # Plot biomass and Bratio
-  Plot_suffix = "Biomass"
+  Plot_suffix = "Index"
   if( !is.null(Bratio_ctl) ) Plot_suffix = c( Plot_suffix, "Bratio" )
   for( plotI in 1:length(Plot_suffix) ){
-    if( Plot_suffix[plotI]=="Biomass" ){ Array_ctl = Index_ctl; log_Array_ctl = log_Index_ctl }
+    if( Plot_suffix[plotI]=="Index" ){ Array_ctl = Index_ctl; log_Array_ctl = log_Index_ctl }
     if( Plot_suffix[plotI]=="Bratio" ){ Array_ctl = Bratio_ctl; log_Array_ctl = log_Bratio_ctl }
-    plot_index( Index_ctl=array(Index_ctl[,,,'Estimate'],dim(Index_ctl)[1:3]),
-                sd_Index_ctl=array(log_Index_ctl[,,,'Std. Error'],dim(log_Index_ctl)[1:3]),
-                year_labels=year_labels,
-                years_to_plot=years_to_plot,
-                strata_names=strata_names,
-                category_names=category_names,
-                DirName=DirName,
-                PlotName=paste0(PlotName,"-",Plot_suffix[plotI],".png"),
-                interval_width=interval_width,
-                width=width,
-                height=height,
-                xlab="Year",
-                ylab="Index",
-                scale="log",
-                plot_args=list("log"=ifelse(plot_log==TRUE,"y","")),
-                Yrange=Yrange )
+    plot_index( Index_ctl = array(Index_ctl[,,,'Estimate'],dim(Index_ctl)[1:3]),
+                sd_Index_ctl = array(log_Index_ctl[,,,'Std. Error'],dim(log_Index_ctl)[1:3]),
+                year_labels = year_labels,
+                years_to_plot = years_to_plot,
+                strata_names = strata_names,
+                category_names = category_names,
+                DirName = DirName,
+                PlotName = paste0(PlotName,"-",Plot_suffix[plotI],".png"),
+                interval_width = interval_width,
+                width = width,
+                height = height,
+                xlab = "Year",
+                ylab = make_unit_label( u = units(Array_ctl), lab = "Index", parse = TRUE ),
+                scale = "log",
+                plot_args = list("log" = ifelse(plot_log==TRUE,"y","")),
+                Yrange = Yrange )
   }
 
   # Plot
@@ -309,12 +299,12 @@ function( TmbData,
   # Write to file
   Table = NULL
   for( cI in 1:TmbData$n_c ){
-    Tmp = data.frame( "Year"=year_labels, "Unit"=1, "Fleet"=rep(strata_names,each=TmbData$n_t), "Estimate_metric_tons"=as.vector(Index_ctl[cI,,,'Estimate']), "SD_log"=as.vector(log_Index_ctl[cI,,,'Std. Error']), "SD_mt"=as.vector(Index_ctl[cI,,,'Std. Error']) )
+    index_units = make_unit_label( u=units(Index_ctl), lab="", parse=FALSE )
+    Tmp = data.frame( "Year"=year_labels, "Unit"=index_units, "Estimate"=as.vector(Index_ctl[cI,,,'Estimate']), "SD_log"=as.vector(log_Index_ctl[cI,,,'Std. Error']), "SD_mt"=as.vector(Index_ctl[cI,,,'Std. Error']) )
     if( TmbData$n_c>1 ) Tmp = cbind( "Category"=category_names[cI], Tmp)
     Table = rbind( Table, Tmp )
   }
-  if(!is.null(total_area_km2)) Table = cbind(Table, "Naive_design-based_index"=Design_t)
-  write.csv( Table, file=paste0(DirName,"/Table_for_SS3.csv"), row.names=FALSE)
+  write.csv( Table, file=paste0(DirName,"/Index.csv"), row.names=FALSE)
 
   # Return stuff
   Return = list( "Table"=Table, "log_Index_ctl"=log_Index_ctl, "Index_ctl"=Index_ctl )

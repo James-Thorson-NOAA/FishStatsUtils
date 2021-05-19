@@ -45,7 +45,8 @@ Imports:
     DHARMa,
     viridisLite
 Depends:
-    R (>= 3.5.0)
+    R (>= 3.5.0),
+    units
 Suggests:
     testthat
 Remotes: 
