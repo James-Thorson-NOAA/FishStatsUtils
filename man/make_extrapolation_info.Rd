@@ -120,11 +120,11 @@ where \code{backwards_compatible_kmeans==FALSE} breaks backwards compatibility b
 \value{
 Tagged list used in other functions
 \describe{
-  \item{a_el}{The area associated with each extrapolation grid cell (rows) and strata (columns)}
-  \item{Data_Extrap}{A data frame describing the extrapolation grid}
-  \item{zone}{the zone used to convert Lat-Long to UTM by PBSmapping package}
-  \item{flip_around_dateline}{a boolean stating whether the Lat-Long is flipped around the dateline during conversion to UTM}
-  \item{Area_km2_x}{the area associated with each row of Data_Extrap, in units square-kilometers}
+  \item{\code{a_el}}{The area associated with each extrapolation grid cell (rows) and strata (columns)}
+  \item{\code{Data_Extrap}}{A data frame describing the extrapolation grid}
+  \item{\code{zone}}{the zone used to convert Lat-Long to UTM by PBSmapping package}
+  \item{\code{flip_around_dateline}}{a boolean stating whether the Lat-Long is flipped around the dateline during conversion to UTM}
+  \item{\code{Area_km2_x}}{the area associated with each row of Data_Extrap, in units square-kilometers}
 }
 }
 \description{

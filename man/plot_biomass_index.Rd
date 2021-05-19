@@ -26,7 +26,7 @@ plot_biomass_index(
 )
 }
 \arguments{
-\item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
+\item{TmbData}{Formatted data inputs, from \code{\link[VAST]{make_data}}}
 
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
@@ -42,13 +42,11 @@ plot_biomass_index(
 
 \item{strata_names}{names for spatial strata}
 
-\item{category_names}{names for categories (if using package `VAST`)}
+\item{category_names}{names for categories (if using package \code{`VAST`})}
 
 \item{use_biascorr}{Boolean, whether to use bias-corrected estimates if available}
 
 \item{plot_legend}{Add legend for labelling colors}
-
-\item{total_area_km2}{Total area for calculating a design-based estimator using one design-stratum (only recommended for model exploration)}
 
 \item{plot_log}{Boolean, whether to plot y-axis in log-scale}
 

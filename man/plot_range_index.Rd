@@ -47,7 +47,7 @@ plot_range_index(
 
 \item{use_biascorr}{Boolean, whether to use bias-corrected estimates if available}
 
-\item{category_names}{names for categories (if using package `VAST`)}
+\item{category_names}{names for categories (if using package \code{`VAST`})}
 
 \item{interval_width}{width for confidence intervals}
 

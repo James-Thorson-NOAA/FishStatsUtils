@@ -33,7 +33,7 @@ plot_range_edge(
 
 \item{strata_names}{names for spatial strata}
 
-\item{category_names}{names for categories (if using package `VAST`)}
+\item{category_names}{names for categories (if using package \code{`VAST`})}
 
 \item{working_dir}{Directory for plots}
 

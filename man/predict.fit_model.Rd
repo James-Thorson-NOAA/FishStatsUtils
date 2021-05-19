@@ -26,9 +26,12 @@
 
 \item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
 
-\item{a_i}{Numeric vector containing values greater than zero, providing sampled area for each
-observation i;  use \code{a_i=1} for observations without a natural area measurement, while
-noting that resulting densities no longer have interpretable units in that case)}
+\item{a_i}{Vector containing values greater than zero, providing sampled area for each
+observation i, e.g., \code{as_units(x, "km^2")} for area swept in square-kilometers.
+use \code{as_units(1, unitless)} for observations without a natural area measurement, while
+noting that resulting densities no longer have interpretable units in that case),
+or for observations where the response already standardizes for area, e.g.,
+\code{b_i = as_units(x, "kg/km^2")}}
 
 \item{c_iz}{Vector of integers ranging from 0 to the number of variables minus 1, providing the
 category (e.g., species, length-bin) for each observation i}

@@ -25,7 +25,7 @@ calculate_proportion(
 )
 }
 \arguments{
-\item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
+\item{TmbData}{Formatted data inputs, from \code{\link[VAST]{make_data}}}
 
 \item{Index}{output from \code{FishStatsUtils::plot_biomass_index}}
 
@@ -43,7 +43,7 @@ and specifies the category to use for abundance-weighted expansion, where \code{
 
 \item{strata_names}{names for spatial strata}
 
-\item{category_names}{names for categories (if using package `VAST`)}
+\item{category_names}{names for categories (if using package \code{`VAST`})}
 
 \item{plot_legend}{Add legend for labelling colors}
 

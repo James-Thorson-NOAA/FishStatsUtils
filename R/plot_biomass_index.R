@@ -223,11 +223,11 @@ function( TmbData,
   }
 
   # Plot biomass and Bratio
-  Plot_suffix = "Index"
-  if( !is.null(Bratio_ctl) ) Plot_suffix = c( Plot_suffix, "Bratio" )
+  Plot_suffix = ""
+  if( !is.null(Bratio_ctl) ) Plot_suffix = c( Plot_suffix, "-Bratio" )
   for( plotI in 1:length(Plot_suffix) ){
-    if( Plot_suffix[plotI]=="Index" ){ Array_ctl = Index_ctl; log_Array_ctl = log_Index_ctl }
-    if( Plot_suffix[plotI]=="Bratio" ){ Array_ctl = Bratio_ctl; log_Array_ctl = log_Bratio_ctl }
+    if( Plot_suffix[plotI]=="" ){ Array_ctl = Index_ctl; log_Array_ctl = log_Index_ctl }
+    if( Plot_suffix[plotI]=="-Bratio" ){ Array_ctl = Bratio_ctl; log_Array_ctl = log_Bratio_ctl }
     plot_index( Index_ctl = array(Index_ctl[,,,'Estimate'],dim(Index_ctl)[1:3]),
                 sd_Index_ctl = array(log_Index_ctl[,,,'Std. Error'],dim(log_Index_ctl)[1:3]),
                 year_labels = year_labels,
@@ -235,7 +235,7 @@ function( TmbData,
                 strata_names = strata_names,
                 category_names = category_names,
                 DirName = DirName,
-                PlotName = paste0(PlotName,"-",Plot_suffix[plotI],".png"),
+                PlotName = paste0(PlotName,Plot_suffix[plotI],".png"),
                 interval_width = interval_width,
                 width = width,
                 height = height,
