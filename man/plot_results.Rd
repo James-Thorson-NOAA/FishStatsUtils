@@ -11,9 +11,9 @@ plot_results(
   working_dir = paste0(getwd(), "/"),
   year_labels = fit$year_labels,
   years_to_plot = fit$years_to_plot,
+  category_names = fit$category_names,
   use_biascorr = TRUE,
   map_list,
-  category_names,
   check_residuals = TRUE,
   projargs = "+proj=longlat",
   zrange,
@@ -58,13 +58,13 @@ plot_results(
 
 \item{working_dir}{Directory for plots}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
-\item{map_list}{output from \code{\link{make_map_info}}}
+\item{category_names}{character vector specifying names for labeling categories \code{c_i}}
 
-\item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
+\item{map_list}{output from \code{\link{make_map_info}}}
 
 \item{check_residuals}{Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)}
 

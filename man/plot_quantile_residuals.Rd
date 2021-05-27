@@ -27,7 +27,7 @@ to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}. 
 \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 will often need to be modified for a given purpose.}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 

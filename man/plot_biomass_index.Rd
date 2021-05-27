@@ -30,7 +30,7 @@ plot_biomass_index(
 
 \item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 

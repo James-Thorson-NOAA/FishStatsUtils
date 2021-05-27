@@ -62,11 +62,11 @@ plot_maps(
 
 \item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
-\item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
+\item{category_names}{character vector specifying names for labeling categories \code{c_i}}
 
 \item{MapSizeRatio}{Default size for each panel}
 

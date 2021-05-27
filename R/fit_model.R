@@ -39,6 +39,8 @@
 #' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
+#' @param category_names character vector specifying names for labeling categories \code{c_i}
+#' @param year_labels character vector specifying names for labeling times \code{t_i}
 #' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 #' where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
 #' passes named arguments to \code{\link[INLA]{inla.mesh.create}}.
@@ -117,6 +119,8 @@ function( settings,
           build_model = TRUE,
           run_model = TRUE,
           test_fit = TRUE,
+          category_names = NULL,
+          year_labels = NULL,
           ... ){
 
   # Capture extra arguments to function
@@ -130,9 +134,11 @@ function( settings,
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
+
   # Decide which years to plot
-  year_labels = seq( min(t_i), max(t_i) )
-  years_to_plot = which( year_labels %in% t_i )
+  if(is.null(year_labels)) year_labels = paste0( "Time_", seq(min(t_i),max(t_i)) )
+  if(is.null(category_names)) category_names = paste0( "Category_", 1:(max(c_i,na.rm=TRUE)+1) )
+  years_to_plot = which( seq(min(t_i),max(t_i)) %in% t_i )
 
   # Save record
   message("\n### Writing output from `fit_model` in directory: ", working_dir)
@@ -228,6 +234,7 @@ function( settings,
            "tmb_list" = tmb_list,
            "year_labels" = year_labels,
            "years_to_plot" = years_to_plot,
+           "category_names" = category_names,
            "settings" = settings,
            "input_args" = input_args)
     class(Return) = "fit_model"
@@ -297,6 +304,12 @@ function( settings,
   if( "par" %in% names(parameter_estimates2) ){
     Report = tmb_list$Obj$report()
     ParHat = tmb_list$Obj$env$parList( parameter_estimates2$par )
+
+    # Label stuff
+    Report = amend_output( Report = Report,
+                           TmbData = data_list,
+                           year_labels = year_labels,
+                           category_names = category_names )
   }else{
     Report = ParHat = "Model is not converged"
   }
@@ -319,6 +332,7 @@ function( settings,
          "ParHat" = ParHat,
          "year_labels" = year_labels,
          "years_to_plot" = years_to_plot,
+         "category_names" = category_names,
          "settings" = settings,
          "input_args" = input_args,
          "X1config_cp" = X1config_cp,

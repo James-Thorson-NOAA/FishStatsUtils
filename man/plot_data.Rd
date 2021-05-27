@@ -34,7 +34,7 @@ plot_data(
 
 \item{PlotDir}{Directory for plots}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{projargs}{Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
 See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.

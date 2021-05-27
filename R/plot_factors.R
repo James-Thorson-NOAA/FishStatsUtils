@@ -25,7 +25,7 @@ function( fit,
           Obj = fit$tmb_list$Obj,
           SD = fit$parameter_estimates$SD,
           year_labels = fit$year_labels,
-          category_names = NULL,
+          category_names = fit$category_names,
           RotationMethod = "PCA",
           mapdetails_list = NULL,
           Dim_year = NULL,
@@ -239,13 +239,19 @@ function( fit,
         # Plot Epsilon
         # Use plot_maps to automatically make one figure per factor
         if( Par_name %in% c("Epsilon1","Epsilon2") ){
+          factor_setting = Data$FieldConfig['Epsilon',match(Par_name,c("Epsilon1","Epsilon2"))]
+          if( factor_setting==(-3) & dim(Var_rot$Psi_rot)[2]==length(category_names) ){
+            factor_names = category_names
+          }else{
+            factor_names = paste0("Factor_",1:dim(Var_rot$Psi_rot)[2])
+          }
           plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
                      Report=Report2_tmp,
                      PlotDF=mapdetails_list[["PlotDF"]],
                      MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
                      working_dir=plotdir,
                      year_labels=year_labels,
-                     category_names=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+                     category_names=factor_names,
                      legend_x=mapdetails_list[["Legend"]]$x/100,
                      legend_y=mapdetails_list[["Legend"]]$y/100,
                      zlim=zlim,

@@ -29,6 +29,8 @@ fit_model(
   build_model = TRUE,
   run_model = TRUE,
   test_fit = TRUE,
+  category_names = NULL,
+  year_labels = NULL,
   ...
 )
 }
@@ -43,19 +45,22 @@ fit_model(
 
 \item{b_i}{Vector, providing sampled value (biomass, counts, etc.) for each observation i.
 Users should provide values as class \code{\link[units]{units}}, e.g., \code{as_units(x, "kg")} for data in units kilograms,
-\code{as_units(x, "count")} for numbers, or \code{as_units(x, "kg/km^2")}, etc.
+\code{as_units(x, "count")} for numbers, or \code{as_units(x, "kg/km^2")} for area-standarized biomass, etc.
 If units are missing, the default behavior is to coerce the vector to units "kg".
 Units are then used in subsequent plotting.}
 
 \item{a_i}{Vector containing values greater than zero, providing sampled area for each
 observation i, e.g., \code{as_units(x, "km^2")} for area swept in square-kilometers.
-use \code{as_units(1, unitless)} for observations without a natural area measurement, while
-noting that resulting densities no longer have interpretable units in that case),
-or for observations where the response already standardizes for area, e.g.,
+use \code{as_units(1, unitless)} for observations without a natural area measurement
+(noting that resulting densities no longer have interpretable units in that case),
+or for observations where the response \code{b_i} already standardizes for area, e.g.,
 \code{b_i = as_units(x, "kg/km^2")}}
 
 \item{c_iz}{Vector of integers ranging from 0 to the number of variables minus 1, providing the
-category (e.g., species, length-bin) for each observation i}
+category (e.g., species, length-bin) for each observation i.
+This can be specified as a matrix, such that each observation is associated with multiple categories.
+Such specification treats samples as arising from the sum across multiple categories, e.g.,
+to account for unlabeled multispecies data.}
 
 \item{v_i}{Vector of integers ranging from 0 to the number of vessels minus 1,
 providing sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
@@ -107,6 +112,10 @@ when fixed effects are at upper or lower bounds.}
 \item{run_model}{Boolean indicating whether to run the model or simply return the inputs and built TMB object}
 
 \item{test_fit}{Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
+
+\item{category_names}{character vector specifying names for labeling categories \code{c_i}}
+
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}

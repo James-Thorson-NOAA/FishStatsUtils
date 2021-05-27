@@ -7,6 +7,7 @@
 #' @inheritParams plot_variable
 #' @inheritParams sample_variable
 #' @inheritParams rnaturalearth::ne_countries
+#' @inheritParams fit_model
 
 #' @param plot_set integer-vector defining plots to create
 #' \describe{
@@ -37,10 +38,8 @@
 #' @param plot_value either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}
 #' @param Panel Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure
 #' @param MapSizeRatio Default size for each panel
-#' @param year_labels Year names for labeling panels
 #' @param years_to_plot integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)
-#' @param category_names character vector specifying names for different categories (only used for R package \code{VAST})
-#' @param projargs a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude. 
+#' @param projargs a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.
 #' @param country optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
 #' @param ... arguments passed to \code{FishStatsUtils::plot_variable}
 #'
@@ -83,6 +82,7 @@ function( plot_set = 3,
       if( any(dim(Return)!=dim(Report[[variable_name]])) ){
         stop("Check `extract_value(.)` in `plot_maps(.)`")
       }
+      dimnames(Return) = dimnames(Report[[variable_name]])
     }else if( plot_value=="estimate" ){
       Return = Report[[variable_name]]
     }else stop("Check input `plot_value` in `plot_maps(.)`")
@@ -99,72 +99,8 @@ function( plot_set = 3,
   }
 
   # Fill in missing inputs
-  if( "D_xt" %in% names(Report)){
-    # SpatialDeltaGLMM
-    if( is.null(year_labels) ) year_labels = 1:ncol(Report$D_xt)
-    if( is.null(years_to_plot) ) years_to_plot = 1:ncol(Report$D_xt)
-    category_names = "singlespecies"
-    Ncategories = length(category_names)
-    Nyears = dim(Report$D_xt)[2]
-  }
-  if( "D_xct" %in% names(Report)){
-    # VAST Version < 2.0.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xct)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_xct)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_xct)[2]
-    Ncategories = dim(Report$D_xct)[2]
-    Nyears = dim(Report$D_xct)[3]
-  }
-  if( "D_xcy" %in% names(Report)){
-    # VAST Version >= 2.0.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xcy)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_xcy)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
-    Ncategories = dim(Report$D_xcy)[2]
-    Nyears = dim(Report$D_xcy)[3]
-  }
-  if( "D_gcy" %in% names(Report)){
-    # VAST Version 8.0.0 through 9.3.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gcy)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_gcy)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
-    Ncategories = dim(Report$D_gcy)[2]
-    Nyears = dim(Report$D_gcy)[3]
-  }
-  if( "D_gct" %in% names(Report)){
-    # VAST Version >= 6.4.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gct)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_gct)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_gct)[2]
-    Ncategories = dim(Report$D_gct)[2]
-    Nyears = dim(Report$D_gct)[3]
-  }
-  if("dhat_ktp" %in% names(Report)){
-    # MIST Version <= 14
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$dhat_ktp)[2]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$dhat_ktp)[2]
-    if( is.null(category_names) ) category_names = 1:dim(Report$dhat_ktp)[3]
-    Ncategories = dim(Report$dhat_ktp)[3]
-    Nyears = dim(Report$dhat_ktp)[2]
-  }
-  if("dpred_ktp" %in% names(Report)){
-    # MIST Version >= 15
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$dpred_ktp)[2]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$dpred_ktp)[2]
-    if( is.null(category_names) ) category_names = 1:dim(Report$dpred_ktp)[3]
-    Ncategories = dim(Report$dpred_ktp)[3]
-    Nyears = dim(Report$dpred_ktp)[2]
-  }
   if( missing(MapSizeRatio) ){
     MapSizeRatio = c(3, 3)
-  }
-
-  # Errors
-  if( Nyears != length(year_labels) ){
-    stop("Problem with `year_labels`")
-  }
-  if( Ncategories != length(category_names) ){
-    stop("Problem with `category_names`")
   }
 
   # Loop through plots
@@ -388,11 +324,23 @@ function( plot_set = 3,
       if("dpred_ktp" %in% names(Report)) stop()
       Array_xct = aperm( Array_xct %o% 1, c(1,3,2) )
     }
+
+    # Check for issues
     if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
-    if( any(abs(Array_xct)==Inf) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
+    Bad_xct = ifelse( is.na(Array_xct), FALSE, abs(Array_xct)==Inf )
+    if( any(Bad_xct) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
     if( !all(years_to_plot %in% 1:dim(Array_xct)[3]) ){
       years_to_plot = 1:dim(Array_xct)[3]
     }
+
+    # Get defaults
+    Ncategories = dim(Array_xct)[2]
+    Nyears = dim(Array_xct)[3]
+    if( is.null(years_to_plot) ) years_to_plot = 1:(dim(Array_xct)[3])
+    if( is.null(year_labels) ) year_labels = dimnames(Array_xct)[[3]]
+    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Array_xct)[3] )
+    if( is.null(category_names) ) category_names = dimnames(Array_xct)[[2]]
+    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Array_xct)[2] )
 
     # Plot for each category
     if( tolower(Panel)=="category" ){

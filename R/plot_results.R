@@ -41,9 +41,9 @@ function( fit,
           working_dir = paste0(getwd(),"/"),
           year_labels = fit$year_labels,
           years_to_plot = fit$years_to_plot,
+          category_names = fit$category_names,
           use_biascorr = TRUE,
           map_list,
-          category_names,
           check_residuals = TRUE,
           #projargs = fit$extrapolation_list$projargs,
           projargs = '+proj=longlat',
@@ -58,7 +58,7 @@ function( fit,
 
   # Check for known issues
   if( is.null(fit$Report)) stop("`fit$Report` is missing, please check inputs")
-  if( missing(category_names)) category_names = 1:fit$data_list$n_c
+  if( is.null(category_names)) category_names = paste0( "Category_", 1:fit$data_list$n_c )
 
   # Make directory
   dir.create(working_dir, showWarnings=FALSE, recursive=TRUE)

@@ -124,7 +124,8 @@ see \code{\link[TMB]{sdreport}} and \code{\link[TMBhelper]{fit_tmb}}for details}
 
 \item{vars_to_correct}{a character-vector listing which parameters to include for bias-correction, as passed to \code{\link[TMBhelper]{fit_tmb}}}
 
-\item{Version}{Which CPP version to use.  If missing, defaults to latest version using \code{\link[FishStatsUtils]{get_latest_version}}.
+\item{Version}{Which CPP version to use.  If missing, defaults to latest version
+using \code{\link[FishStatsUtils]{get_latest_version}}.
 Can be used to specify using an older CPP, to maintain backwards compatibility.}
 
 \item{treat_nonencounter_as_zero}{Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates}

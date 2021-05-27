@@ -33,6 +33,7 @@ plot_variable(
   fun = mean,
   format = "raster",
   cex.points = 1,
+  legend_digits = 1,
   ...
 )
 }
@@ -85,6 +86,8 @@ You can also pass multiple functions using a statement like \code{fun=function(x
 \item{format}{Character specifying whether to plot maps as a raster (the default), \code{format="raster"}, or as points \code{format="points"}}
 
 \item{cex.points}{Numeric specifying the size of bullets when \code{format="points"}}
+
+\item{legend_digits}{number of digits (i.e., value passed to \code{round}) when creating labels for colorbar legend}
 
 \item{...}{arguments passed to \code{par}}
 }
