@@ -35,6 +35,7 @@ function( fit,
           land_color = "grey",
           zlim = NA,
           testcutoff = 1e-4,
+          plot_value = "estimate",
           ... ){
 
   #
@@ -257,6 +258,7 @@ function( fit,
                      zlim=zlim,
                      land_color=land_color,
                      projargs=projargs,
+                     plot_value = "estimate",
                      ...)
         }  #
 
@@ -294,6 +296,7 @@ function( fit,
                      zlim=zlim,
                      land_color=land_color,
                      projargs=projargs,
+                     plot_value = "estimate",
                      ...)
         }  #
       }

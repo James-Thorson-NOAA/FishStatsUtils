@@ -266,7 +266,7 @@ function( plot_set = 3,
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
-      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = Report$Omega1_gc %o% 1
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Omega1_gc") %o% 1
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
@@ -276,7 +276,7 @@ function( plot_set = 3,
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
-      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = Report$Omega2_gc %o% 1
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Omega2_gc") %o% 1
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }

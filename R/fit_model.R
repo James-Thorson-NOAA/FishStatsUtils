@@ -137,7 +137,7 @@ function( settings,
 
   # Decide which years to plot
   if(is.null(year_labels)) year_labels = paste0( "Time_", seq(min(t_i),max(t_i)) )
-  if(is.null(category_names)) category_names = paste0( "Category_", 1:(max(c_i,na.rm=TRUE)+1) )
+  if(is.null(category_names)) category_names = paste0( "Category_", 1:(max(c_iz,na.rm=TRUE)+1) )
   years_to_plot = which( seq(min(t_i),max(t_i)) %in% t_i )
 
   # Save record
