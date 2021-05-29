@@ -136,8 +136,8 @@ function( settings,
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
 
   # Decide which years to plot
-  if(is.null(year_labels)) year_labels = paste0( "Time_", seq(min(t_i),max(t_i)) )
-  if(is.null(category_names)) category_names = paste0( "Category_", 1:(max(c_iz,na.rm=TRUE)+1) )
+  if(is.null(year_labels)) year_labels = paste0( seq(min(t_i),max(t_i)) )
+  if(is.null(category_names)) category_names = paste0( 1:(max(c_iz,na.rm=TRUE)+1) )
   years_to_plot = which( seq(min(t_i),max(t_i)) %in% t_i )
 
   # Save record

@@ -67,9 +67,7 @@ function( TmbData,
   }
 
   # Determine year-category pairs with no data
-  Num_ct = tapply( TmbData$b_i, INDEX=list(factor(TmbData$c_i,levels=1:TmbData$n_c-1),factor(TmbData$t_i,levels=1:TmbData$n_t-1)), FUN=function(vec){sum(!is.na(vec))} )
-  Num_ct = ifelse( is.na(Num_ct), 0, Num_ct )
-  Num_gct = rep(1,TmbData$n_g) %o% Num_ct
+  Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
   # Drop from maps
   if( treat_missing_as_zero==TRUE ){
     Report$D_gct = ifelse(Num_gct==0, 0, Report$D_gct)
@@ -80,13 +78,13 @@ function( TmbData,
   # Add labels
   Report = add_dimnames( Report = Report,
                          report_names = c("R1_gct","R2_gct","D_gct","Epsilon1_gct","Epsilon2_gct","eta1_gct","eta2_gct"),
-                         dimnames = list(NULL,category_names,year_labels) )
+                         dimnames = list(NULL, "Category"=category_names, "Time"=year_labels) )
   Report = add_dimnames( Report = Report,
                          report_names = c("Omega1_gc","Omega2_gc"),
-                         dimnames = list(NULL,category_names) )
+                         dimnames = list(NULL, "Category"=category_names) )
   Report = add_dimnames( Report = Report,
                          report_names = c("Xi1_gcp","Xi2_gcp"),
-                         dimnames = list(NULL,category_names,NULL) )
+                         dimnames = list(NULL, "Category"=category_names, NULL) )
 
   # Not used yet
   if( !is.null(Sdreport) ){

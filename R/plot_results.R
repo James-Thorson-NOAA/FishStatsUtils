@@ -9,7 +9,7 @@
 #' @inheritParams fit_model
 #' @inheritParams plot_maps
 #' @inheritParams plot_variable
-#' @inheritParams plot_residuals
+#' @inheritParams plot_quantile_residuals
 #' @inheritParams plot_range_edge
 #' @inheritParams simulate_data
 #' @inheritParams plot_factors
@@ -52,6 +52,7 @@ function( fit,
           calculate_relative_to_average = FALSE,
           type = 1,
           n_cells = NULL,
+          n_cells_residuals = NULL,
           RotationMethod = "PCA",
           quantiles = c(0.05,0.5,0.95),
           ... ){
@@ -188,12 +189,12 @@ function( fit,
 
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")
-    plot_quantile_residuals( dharmaRes=dharmaRes,
-                             fit=fit,
-                             working_dir=working_dir,
-                             year_labels=year_labels,
-                             years_to_plot=years_to_plot,
-                             n_cells=n_cells,
+    plot_quantile_residuals( dharmaRes = dharmaRes,
+                             fit = fit,
+                             working_dir = working_dir,
+                             year_labels = year_labels,
+                             years_to_plot = years_to_plot,
+                             n_cells_residuals = n_cells_residuals,
                              ... )
   }else{
     #Q = "Not run"
