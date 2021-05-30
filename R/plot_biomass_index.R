@@ -54,25 +54,15 @@ function( TmbData,
   if(!is.null(strata_names) && length(strata_names)!=TmbData$n_l ) stop("`strata_names` must have same length as `TmbData$n_l`")
 
   # Which parameters
-  if( "ln_Index_tl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-    # SpatialDeltaGLMM
-    ParName = "Index_tl"
-    TmbData[['n_c']] = 1
-  }
   if( "ln_Index_ctl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
     # VAST Version < 2.0.0
     ParName = "Index_ctl"
-  }
-  if( "ln_Index_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
+  }else if( "ln_Index_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
     # VAST Version >= 2.0.0
     ParName = "Index_cyl"
     TmbData[["n_t"]] = nrow(TmbData[["t_yz"]])
-  }
-  if( "Index_tp" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-    # SpatialVAM
-    ParName = "Index_tp"
-    TmbData[["n_l"]] = 1
-    TmbData[["n_c"]] = TmbData[["n_p"]]
+  }else{
+    stop("`plot_biomass_index` is not compatible with your version")
   }
 
   # Add t_i if missing (e.g., from VAST V2.8.0 through V9.3.0)
@@ -213,13 +203,12 @@ function( TmbData,
   # Fix at zeros any years-category combinations with no data
   if( treat_missing_as_zero==TRUE ){
     # Determine year-category pairs with no data
-    Num_ct = tapply( TmbData$b_i, INDEX=list(factor(TmbData$c_i,levels=1:TmbData$n_c-1),factor(TmbData$t_i,levels=1:TmbData$n_t-1)), FUN=function(vec){sum(!is.na(vec))} )
-    Num_ct = ifelse( is.na(Num_ct), 0, Num_ct )
+    Num_ctl = abind::adrop(DataList$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
     # Replace values with 0 (estimate) and NA (standard error)
-    Index_ctl[,,,'Estimate'] = ifelse(Num_ct%o%rep(1,TmbData$n_l)==0, 0, Index_ctl[,,,'Estimate'])
-    Index_ctl[,,,'Std. Error'] = ifelse(Num_ct%o%rep(1,TmbData$n_l)==0, NA, Index_ctl[,,,'Std. Error'])
-    log_Index_ctl[,,,'Estimate'] = ifelse(Num_ct%o%rep(1,TmbData$n_l)==0, -Inf, log_Index_ctl[,,,'Estimate'])
-    log_Index_ctl[,,,'Std. Error'] = ifelse(Num_ct%o%rep(1,TmbData$n_l)==0, NA, log_Index_ctl[,,,'Std. Error'])
+    Index_ctl[,,,'Estimate'] = ifelse(Num_ctl==0, 0, Index_ctl[,,,'Estimate'])
+    Index_ctl[,,,'Std. Error'] = ifelse(Num_ctl==0, NA, Index_ctl[,,,'Std. Error'])
+    log_Index_ctl[,,,'Estimate'] = ifelse(Num_ctl==0, -Inf, log_Index_ctl[,,,'Estimate'])
+    log_Index_ctl[,,,'Std. Error'] = ifelse(Num_ctl==0, NA, log_Index_ctl[,,,'Std. Error'])
   }
 
   # Plot biomass and Bratio
