@@ -7,7 +7,7 @@
 #'
 #' Simulate new data given various potential procedures to propagate uncertainty about parameters.
 #'
-#' @param fit output form \code{fit_model(.)}
+#' @param fit output from \code{\link{fit_model}}
 #' @param type integer stating what type of simulation to use from the following options:
 #' \itemize{
 #' \item \code{type=1} is a "measurement error" or "conditional" simulator that simulates new data conditional upon estimated fixed and random effects.

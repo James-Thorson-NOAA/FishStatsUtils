@@ -203,7 +203,7 @@ function( TmbData,
   # Fix at zeros any years-category combinations with no data
   if( treat_missing_as_zero==TRUE ){
     # Determine year-category pairs with no data
-    Num_ctl = abind::adrop(DataList$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
+    Num_ctl = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
     # Replace values with 0 (estimate) and NA (standard error)
     Index_ctl[,,,'Estimate'] = ifelse(Num_ctl==0, 0, Index_ctl[,,,'Estimate'])
     Index_ctl[,,,'Std. Error'] = ifelse(Num_ctl==0, NA, Index_ctl[,,,'Std. Error'])
