@@ -469,6 +469,7 @@ summary.fit_model <- function(x,
                   n_samples=250,
                   working_dir=NULL,
                   type=1,
+                  random_seed = NULL,
                   ...)
 {
   ans = NULL
@@ -520,19 +521,32 @@ summary.fit_model <- function(x,
         if( zI%%max(1,floor(n_samples/10)) == 0 ){
           message( "  Finished sample ", zI, " of ",n_samples )
         }
-        b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type )$b_i
+        b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type, random_seed=list(random_seed+zI,NULL)[[1+is.null(random_seed)]] )$b_i
       }
       if( any(is.na(b_iz)) ){
         stop("Check simulated residuals for NA values")
       }
 
       # Run DHARMa
-      # Using method="traditional" because DHARMa version 0.3.2.0 throws error sometimes when method="PIT"
-      dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz), # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
-        observedResponse=strip_units(x$data_list$b_i),
+      # Adding jitters because DHARMa version 0.3.2.0 sometimes still throws an error method="traditional" and integer=FALSE without jitters
+      dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz) + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
+        observedResponse=strip_units(x$data_list$b_i) + 1e-10*rnorm(length(x$data_list$b_i)),
         fittedPredictedResponse=strip_units(x$Report$D_i),
-        integer=FALSE,
-        method="traditional")
+        integer=FALSE)
+      #dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz),
+      #  observedResponse=strip_units(x$data_list$b_i),
+      #  fittedPredictedResponse=strip_units(x$Report$D_i),
+      #  method="PIT")
+
+      # Save to report error
+      if( FALSE ){
+        all = list( simulatedResponse=strip_units(b_iz), observedResponse=strip_units(x$data_list$b_i), fittedPredictedResponse=strip_units(x$Report$D_i) )
+        #save(all, file=paste0(root_dir,"all.RData") )
+        dharmaRes = DHARMa::createDHARMa(simulatedResponse=all$simulatedResponse + rep(1,nrow(all$simulatedResponse))%o%c(0.001*rnorm(1),rep(0,ncol(all$simulatedResponse)-1)),
+          observedResponse=all$observedResponse,
+          fittedPredictedResponse=all$fittedPredictedResponse,
+          method="PIT")
+      }
 
       # Calculate probability-integral-transform (PIT) residuals
       message( "Substituting probability-integral-transform (PIT) residuals for DHARMa-calculated residuals" )
