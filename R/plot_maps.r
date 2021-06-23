@@ -329,18 +329,21 @@ function( plot_set = 3,
     if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
     Bad_xct = ifelse( is.na(Array_xct), FALSE, abs(Array_xct)==Inf )
     if( any(Bad_xct) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
-    if( !all(years_to_plot %in% 1:dim(Array_xct)[3]) ){
-      years_to_plot = 1:dim(Array_xct)[3]
-    }
 
-    # Get defaults
+    # Get defaults ... must remake for each plot_num
     Ncategories = dim(Array_xct)[2]
     Nyears = dim(Array_xct)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:(dim(Array_xct)[3])
-    if( is.null(year_labels) ) year_labels = dimnames(Array_xct)[[3]]
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Array_xct)[3] )
-    if( is.null(category_names) ) category_names = dimnames(Array_xct)[[2]]
-    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Array_xct)[2] )
+    years_to_plot_modified = years_to_plot
+    year_labels_modified = year_labels
+    category_names_modified = category_names
+    if( is.null(years_to_plot_modified) ) years_to_plot_modified = 1:(dim(Array_xct)[3])
+    if( is.null(year_labels_modified) ) year_labels_modified = dimnames(Array_xct)[[3]]
+    if( is.null(year_labels_modified) ) year_labels_modified = paste0( "Time_", 1:dim(Array_xct)[3] )
+    if( is.null(category_names_modified) ) category_names_modified = dimnames(Array_xct)[[2]]
+    if( is.null(category_names_modified) ) category_names_modified = paste0( "Category_", 1:dim(Array_xct)[2] )
+    if( !all(years_to_plot_modified %in% 1:dim(Array_xct)[3]) ){
+      years_to_plot_modified = 1:dim(Array_xct)[3]
+    }
 
     # Plot for each category
     if( tolower(Panel)=="category" ){
@@ -349,31 +352,31 @@ function( plot_set = 3,
       for( cI in 1:Nplot){
         if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
         if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
-        if( ncol(Mat_xt[,years_to_plot,drop=FALSE]) == length(year_labels[years_to_plot]) ){
-          panel_labels = year_labels[years_to_plot]
+        if( ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]) == length(year_labels_modified[years_to_plot_modified]) ){
+          panel_labels = year_labels_modified[years_to_plot_modified]
         }else{
-          panel_labels = rep("", ncol(Mat_xt[,years_to_plot,drop=FALSE]))
+          panel_labels = rep("", ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]))
         }
 
-        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
-        plot_args = plot_variable( Y_gt=Mat_xt[,years_to_plot,drop=FALSE],
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names_modified[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
+        plot_args = plot_variable( Y_gt=Mat_xt[,years_to_plot_modified,drop=FALSE],
           map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
           panel_labels=panel_labels, file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
       }
     }
     # Plot for each year
     if( tolower(Panel)=="year" ){
-      Nplot = length(years_to_plot)
+      Nplot = length(years_to_plot_modified)
       for( tI in 1:Nplot){
-        if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,years_to_plot[tI],drop=TRUE]
-        if(length(dim(Array_xct))==3) Mat_xc = Array_xct[,,years_to_plot[tI],drop=TRUE]
+        if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,years_to_plot_modified[tI],drop=TRUE]
+        if(length(dim(Array_xct))==3) Mat_xc = Array_xct[,,years_to_plot_modified[tI],drop=TRUE]
         Return = Mat_xc = array( as.vector(Mat_xc), dim=c(dim(Array_xct)[1],Ncategories)) # Reformat to make sure it has same format for everything
 
         # Do plot
-        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",year_labels[years_to_plot][tI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",year_labels_modified[years_to_plot_modified][tI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
         plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio),
           projargs=projargs, working_dir=working_dir,
-          panel_labels=category_names, file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
+          panel_labels=category_names_modified, file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
       }
     }
   }

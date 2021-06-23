@@ -64,8 +64,6 @@ function( Sdreport,
     TmbData[["n_t"]] = nrow(TmbData[["t_yz"]])
   }
 
-
-
   # Default inputs
   if( is.null(year_labels)) year_labels = 1:TmbData$n_t
   if( is.null(years_to_plot) ) years_to_plot = 1:TmbData$n_t
@@ -160,12 +158,22 @@ function( Sdreport,
     }
 
     # Plot area
-    plot_index( Index_ctl=array(SD_log_effective_area_ctl[,,,'Estimate'],dim(SD_log_effective_area_ctl)[1:3]),
-      sd_Index_ctl=array(SD_log_effective_area_ctl[,,,'Std. Error'],dim(SD_log_effective_area_ctl)[1:3]),
-      year_labels=year_labels, years_to_plot=years_to_plot, strata_names=strata_names, category_names=category_names,
-      DirName="", PlotName=FileName_EffArea, scale="uniform",
-      interval_width=interval_width, xlab="Year", ylab="Effective area occupied, ln(km^2)", Yrange=c(NA,NA),
-      width=ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))*4, height=ceiling(sqrt(TmbData$n_c))*4 )
+    plot_index( Index_ctl = exp(abind::adrop(SD_log_effective_area_ctl[,,,'Estimate',drop=FALSE], drop = 4)),
+                sd_Index_ctl = abind::adrop(SD_log_effective_area_ctl[,,,'Std. Error',drop=FALSE], drop = 4),
+                year_labels = year_labels,
+                years_to_plot = years_to_plot,
+                strata_names = strata_names,
+                category_names = category_names,
+                DirName = "",
+                PlotName = FileName_EffArea,
+                scale = "log",
+                interval_width = interval_width,
+                xlab = "Year",
+                ylab = "Effective area occupied [km^2]",
+                Yrange = c(NA,NA),
+                width = ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))*4,
+                #plot_args = list(log="y"),
+                height = ceiling(sqrt(TmbData$n_c))*4 )
     #png( file=FileName_EffArea, width=ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))*2.5, height=ceiling(sqrt(TmbData$n_c))*2.5, res=200, units="in")
     #  par( mfrow=c(1,1), mar=c(2,2,1,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(1,1,1,0), mfrow=c(ceiling(sqrt(TmbData$n_c)),ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))))
     #  for( cI in 1:TmbData$n_c ){
