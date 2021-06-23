@@ -4,7 +4,7 @@
 #'
 #' \code{make_covariates} uses a formula interface to generate covariates
 #'
-#' This function generates 3D arrays \code{Cov_gtp}, \code{Cov_itp}, and  \code{Cov_stp} as
+#' This function generates 3D arrays \code{Cov_gtp}, \code{Cov_ip}, and  \code{Cov_stp} as
 #' required by \code{VAST::make_data} to incorporate density covariates.
 #' The user must supply a data frame \code{covariate_data} of covariate values, with columns named \code{Lat}, \code{Lon}, and \code{Year},
 #' as well as values for all covariates as additional named columns.
@@ -40,7 +40,7 @@
 #' @return Tagged list of useful output
 #' \describe{
 #'   \item{\code{Cov_gtp}}{3-dimensional array for use in \code{VAST::make_data}}
-#'   \item{\code{Cov_itp}}{3-dimensional array for use in \code{VAST::make_data}}
+#'   \item{\code{Cov_ip}}{2-dimensional array for use in \code{VAST::make_data}}
 #'   \item{\code{Cov_stp}}{3-dimensional array for use in \code{VAST::make_data}}
 #' }
 
@@ -127,22 +127,19 @@ function( formula,
     X_stp[,tI,] = tmp_X[ NN$nn.idx[,1], , drop=FALSE ]
   }
 
-  # Make X_itp
-  X_itp = aperm( X_ip %o% rep(1,length(Year_Set)), perm=c(1,3,2) )
-
   # Check for obvious problems
-  if( any(is.na(X_itp)) ) stop("Problem with `X_itp` in `make_covariates(.)")
+  if( any(is.na(X_ip)) ) stop("Problem with `X_ip` in `make_covariates(.)")
   if( any(is.na(X_gtp)) ) stop("Problem with `X_gtp` in `make_covariates(.)")
   if( any(is.na(X_stp)) ) stop("Problem with `X_stp` in `make_covariates(.)")
 
   # warnings
-  if( any(apply(X_gtp, MARGIN=2:3, FUN=sd)>10 | apply(X_itp, MARGIN=2:3, FUN=sd)>10) ){
+  if( any(apply(X_gtp, MARGIN=2:3, FUN=sd)>10 | apply(X_ip, MARGIN=2, FUN=sd)>10) ){
     warning("The package author recommends that you rescale covariates in `covariate_data` to have mean 0 and standard deviation 1.0")
   }
 
   # return stuff
   Return = list( "X_gtp" = X_gtp,
-           "X_itp" = X_itp,
+           "X_ip" = X_ip,
            "X_stp" = X_stp,
            "coefficient_names" = coefficient_names )
   return( Return )
