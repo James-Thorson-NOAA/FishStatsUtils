@@ -325,9 +325,12 @@ function( plot_set = 3,
       Array_xct = aperm( Array_xct %o% 1, c(1,3,2) )
     }
 
+    # Replace -Inf e.g. from log(Density) = 0 with NA
+    Array_xct = ifelse( Array_xct == -Inf, NA, Array_xct )
+
     # Check for issues
     if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
-    Bad_xct = ifelse( is.na(Array_xct), FALSE, abs(Array_xct)==Inf )
+    Bad_xct = ifelse( is.na(Array_xct), FALSE, Array_xct==Inf )
     if( any(Bad_xct) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
 
     # Get defaults ... must remake for each plot_num
