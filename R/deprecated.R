@@ -1559,7 +1559,7 @@ plot_quantile_diagnostic <- function(TmbData,
       }
 
       # Find where b_i > 0 within category i_e
-      Which = which(TmbData$b_i > 0 & e_i == (i_e-1))
+      Which = which(strip_units(TmbData$b_i) > 0 & e_i == (i_e-1))
       Q = rep(NA, length(Which)) # vector to track quantiles for each observation
       y = array(NA, dim=c(length(Which),1000)) # matrix to store samples
       pred_y = var_y = rep(NA, length(Which) ) # vector to track quantiles for each observation
@@ -1592,12 +1592,12 @@ plot_quantile_diagnostic <- function(TmbData,
       for(ObsI in 1:length(Which)){
         if(ObsModel_ez[i_e,1]==1){
           y[ObsI,] = rlnorm(n=ncol(y), meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])   # Plotting in log-space
-          Q[ObsI] = plnorm(q=TmbData$b_i[Which[ObsI]], meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])
+          Q[ObsI] = plnorm(q=strip_units(TmbData$b_i[Which[ObsI]]), meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])
         }
         if(ObsModel_ez[i_e,1]==2){
           b = pow(sigmaM[i_e, 1],2) * pred_y[ObsI];
           y[ObsI,] = rgamma(n=ncol(y), shape=1/pow(sigmaM[i_e,1],2), scale=b)
-          Q[ObsI] = pgamma(q=TmbData$b_i[Which[ObsI]], shape=1/pow(sigmaM[i_e,1],2), scale=b)
+          Q[ObsI] = pgamma(q=strip_units(TmbData$b_i[Which[ObsI]]), shape=1/pow(sigmaM[i_e,1],2), scale=b)
         }
       }
 
@@ -1612,7 +1612,7 @@ plot_quantile_diagnostic <- function(TmbData,
         Quantiles = quantile(y[ObsI,],prob=c(0.025,0.25,0.75,0.975))
         lines(x=c(ObsI,ObsI), y=Quantiles[2:3], lwd=2)
         lines(x=c(ObsI,ObsI), y=Quantiles[c(1,4)], lwd=1,lty="dotted")
-        if(TmbData$b_i[Which[ObsI]]>max(Quantiles) | TmbData$b_i[Which[ObsI]]<min(Quantiles)){
+        if( strip_units(TmbData$b_i[Which[ObsI]])>max(Quantiles) | strip_units(TmbData$b_i[Which[ObsI]])<min(Quantiles)){
           points(x=ObsI,y=TmbData$b_i[Which[ObsI]],pch=4,col="red",cex=2)
         }
       }
@@ -1696,8 +1696,8 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
     which_i_in_y = which( apply(which_i_in_y,MARGIN=1,FUN=all) )
     if( length(which_i_in_y)>0 ){
       exp_rate_xy[,yI] = tapply( Report$R1_i[which_i_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
-      obs_rate_xy[,yI] = tapply( TmbData$b_i[which_i_in_y]>0, INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
-      total_num_xy[,yI] = tapply( TmbData$b_i[which_i_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=length )
+      obs_rate_xy[,yI] = tapply( strip_units(TmbData$b_i[which_i_in_y])>0, INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
+      total_num_xy[,yI] = tapply( strip_units(TmbData$b_i[which_i_in_y]), INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=length )
     }else{
       total_num_xy[,yI] = 0
     }
@@ -1722,7 +1722,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
 
   # Extract quantile for positive catch rates
   #Q_i = Q[["Q"]]
-  which_pos = which(TmbData$b_i>0)
+  which_pos = which( strip_units(TmbData$b_i)>0 )
   bvar_ipos = bpred_ipos = NULL
   # Univariate Q interface
   if( all(c("var_y","pred_y") %in% names(Q)) ){
@@ -1763,7 +1763,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
     which_ipos_in_y = ( TmbData$t_iz[which_pos,] == outer(rep(1,length(which_pos)),TmbData$t_yz[yI,]) )
     which_ipos_in_y = which( apply(which_ipos_in_y,MARGIN=1,FUN=all) )
     if( length(which_i_in_y_and_pos)>0 ){
-      sum_obs_xy[,yI] = tapply( TmbData$b_i[which_i_in_y_and_pos], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
+      sum_obs_xy[,yI] = tapply( strip_units(TmbData$b_i[which_i_in_y_and_pos]), INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
       sum_exp_xy[,yI] = tapply( bpred_ipos[which_ipos_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
       var_exp_xy[,yI] = tapply( bvar_ipos[which_ipos_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
     }
