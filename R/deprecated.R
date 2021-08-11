@@ -755,12 +755,12 @@ Plot_range_quantiles = function( Data_Extrap, Report, TmbData, a_xl, NN_Extrap, 
   }
 
   # Extrapolation locations
-  Data_Extrap_Range = cbind( Data_Extrap[,c('Lat','Lon','N_km','E_km')], 'Include'=ifelse(Data_Extrap[,'Area_km2']>0, TRUE, FALSE) )
+  Data_Extrap_Range = cbind( Data_Extrap[,c('Lat','Lon','N_km','E_km')], 'Include'=ifelse(strip_units(Data_Extrap[,'Area_km2'])>0, TRUE, FALSE) )
   # Add and rescale density
   for(t in 1:length(Year_Set)){
-    Data_Extrap_Range = cbind( Data_Extrap_Range, Report$Index_xtl[NN_Extrap$nn.idx,t,1] * (Data_Extrap[,'Area_km2'] / a_xl[NN_Extrap$nn.idx,1]) )
+    Data_Extrap_Range = cbind( Data_Extrap_Range, Report$Index_xtl[NN_Extrap$nn.idx,t,1] * (strip_units(Data_Extrap[,'Area_km2']) / a_xl[NN_Extrap$nn.idx,1]) )
     colnames( Data_Extrap_Range )[ncol(Data_Extrap_Range)] = paste0("Year_",Year_Set[t])
-    Data_Extrap_Range[,paste0("Year_",Year_Set[t])] = ifelse( Data_Extrap[,'Area_km2']==0 & a_xl[NN_Extrap$nn.idx,1]==0, 0, Data_Extrap_Range[,paste0("Year_",Year_Set[t])])
+    Data_Extrap_Range[,paste0("Year_",Year_Set[t])] = ifelse( strip_units(Data_Extrap[,'Area_km2'])==0 & a_xl[NN_Extrap$nn.idx,1]==0, 0, Data_Extrap_Range[,paste0("Year_",Year_Set[t])])
   }
 
   # Plot
@@ -1794,7 +1794,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
       # Spatial information
       # Aggregate residual-values to knots regardless of value for fine_scale
       x2i = spatial_list$NN_Extrap$nn.idx[,1]
-      Include = extrapolation_list[["Area_km2_x"]]>0 & extrapolation_list[["a_el"]][,1]>0
+      Include = strip_units(extrapolation_list[["Area_km2_x"]])>0 & strip_units(extrapolation_list[["a_el"]][,1])>0
       DF = cbind( extrapolation_list$Data_Extrap[,c('Lon','Lat')], "x2i"=x2i, "Include"=Include )
 
       # Fill in labels
