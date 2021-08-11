@@ -36,8 +36,8 @@
 #' @export
 make_settings <-
 function( n_x,
-          Region,
           purpose = "index",
+          Region,
           fine_scale = TRUE,
           strata.limits = data.frame('STRATA'="All_areas"),
           zone=NA,

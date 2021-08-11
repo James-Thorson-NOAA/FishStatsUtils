@@ -6,8 +6,8 @@
 \usage{
 make_settings(
   n_x,
-  Region,
   purpose = "index",
+  Region,
   fine_scale = TRUE,
   strata.limits = data.frame(STRATA = "All_areas"),
   zone = NA,
@@ -30,6 +30,18 @@ make_settings(
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when \code{Method="Mesh"})}
 
+\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Many of these have examples at the VAST wiki https://github.com/James-Thorson-NOAA/VAST/wiki. Only currently implemented for:
+\describe{
+\item{\code{purpose="index"}}{Index of abundance calculated summing across space to get annual abundance values for each category}
+\item{\code{purpose="index2"}}{The same as "index" except uses gamma distribution for positive catches, restricts \code{max_cells} to 2000, and uses bias correction. This is currently recommended over "index".}
+\item{\code{purpose="condition_and_density"}}{Jointly estimate density (numbers per area) and fish condition (relative weight given length, used to predict density-weighted average condition}
+\item{\code{purpose="MICE"}}{Model of intermediate complexity to estimate species interactions spatially}
+\item{\code{purpose="ordination"}}{Multivariate ordination to identify similar species by estimating a reduced set of axes that collectively explain variability}
+\item{\code{purpose="EOF"}}{An empirical orthogonal function analysis to ordinate on years instead of categories as in "ordination". Deprecated, use "EOF2" instead.}
+\item{\code{purpose="EOF2"}}{Same as "EOF" but uses improved settings that match updates to the package.}
+\item{\code{purpose="EOF3"}}{Same as "EOF2" but ensures that spatio-temporal factors are zero-centered, such that estimated Omega represents distribution in the "average" year.}
+}}
+
 \item{Region}{a character vector, where each element is matched against potential values to create the extrapolation grid, where densities are
        then predicted at the midpoint of each grid cell when calculating derived quantities or visualizing model outputs.
        Users will typically supply a single character-string, representing the footprint of a single survey.
@@ -38,7 +50,7 @@ make_settings(
        Current options are:
 \describe{
   \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
-  \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
+  \item{the path and name for a shapefile, i.e., \code{paste0(shapedir,"Shape.shp")}}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
   \item{\code{"california_current"}}{The spatial fooprint of the bottom trawl surveys operated by AFSC/NWFSC, including the AFSC triennial from 1977-2004 and the NWFSC combined shelf-slope survey from 2003 onward (as identified by B. Feist and C. Whitmire); specify subsets via \code{surveyname}}
   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC (as identified by J. Harms)}
   \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS (as identified by N. Olsen); see \code{strata_to_use} for further specification}
@@ -64,18 +76,6 @@ make_settings(
   \item{\code{"ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC"}}{ICES survey domains as defined by shapefiles provided by M. Lindegren as originated by ICES Secretariat}
   \item{\code{"stream_network"}}{Specifying a stream network for use when \code{Method="Stream_network"}}
   \item{\code{"other"}}{Automated creation of an extrapolation-grid by padding an area around observations (not recommended for operational use)}
-}}
-
-\item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Many of these have examples at the VAST wiki https://github.com/James-Thorson-NOAA/VAST/wiki. Only currently implemented for:
-\describe{
-\item{\code{purpose="index"}}{Index of abundance calculated summing across space to get annual abundance values for each category}
-\item{\code{purpose="index2"}}{The same as "index" except uses gamma distribution for positive catches, restricts \code{max_cells} to 2000, and uses bias correction. This is currently recommended over "index".}
-\item{\code{purpose="condition_and_density"}}{Jointly estimate density (numbers per area) and fish condition (relative weight given length, used to predict density-weighted average condition}
-\item{\code{purpose="MICE"}}{Model of intermediate complexity to estimate species interactions spatially}
-\item{\code{purpose="ordination"}}{Multivariate ordination to identify similar species by estimating a reduced set of axes that collectively explain variability}
-\item{\code{purpose="EOF"}}{An empirical orthogonal function analysis to ordinate on years instead of categories as in "ordination". Deprecated, use "EOF2" instead.}
-\item{\code{purpose="EOF2"}}{Same as "EOF" but uses improved settings that match updates to the package.}
-\item{\code{purpose="EOF3"}}{Same as "EOF2" but ensures that spatio-temporal factors are zero-centered, such that estimated Omega represents distribution in the "average" year.}
 }}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}

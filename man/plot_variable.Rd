@@ -38,9 +38,9 @@ plot_variable(
 )
 }
 \arguments{
-\item{Y_gt}{matrix where values for every column are plotted as a map}
+\item{Y_gt}{matrix where values for every column are plotted as a map in a panel-figure with one panel per column}
 
-\item{map_list}{output from \code{\link{make_map_info}}}
+\item{map_list}{output from \code{\link{make_map_info}}, which is included in output of \code{\link{plot_results}}}
 
 \item{panel_labels}{vector defining titles to use for each panel; defaults to blank}
 

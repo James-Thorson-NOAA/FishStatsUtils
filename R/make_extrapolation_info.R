@@ -30,7 +30,7 @@
 #'        Current options are:
 #' \describe{
 #'   \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
-#'   \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
+#'   \item{the path and name for a shapefile, i.e., \code{paste0(shapedir,"Shape.shp")}}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
 #'   \item{\code{"california_current"}}{The spatial fooprint of the bottom trawl surveys operated by AFSC/NWFSC, including the AFSC triennial from 1977-2004 and the NWFSC combined shelf-slope survey from 2003 onward (as identified by B. Feist and C. Whitmire); specify subsets via \code{surveyname}}
 #'   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC (as identified by J. Harms)}
 #'   \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS (as identified by N. Olsen); see \code{strata_to_use} for further specification}

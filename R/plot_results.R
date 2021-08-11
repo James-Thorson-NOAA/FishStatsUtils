@@ -6,6 +6,8 @@
 #' This function takes a fitted VAST model and generates a standard set of diagnostic and visualization plots.
 #' It does this by calling a series of mid-level plotting functions; see list of functions in Value section of documentation.
 #'
+#' In particular, for making customized maps of output please see \code{\link{plot_variable}}
+#'
 #' @inheritParams fit_model
 #' @inheritParams plot_maps
 #' @inheritParams plot_variable

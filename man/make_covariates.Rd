@@ -28,7 +28,7 @@ make_covariates(
 Tagged list of useful output
 \describe{
   \item{\code{Cov_gtp}}{3-dimensional array for use in \code{VAST::make_data}}
-  \item{\code{Cov_itp}}{3-dimensional array for use in \code{VAST::make_data}}
+  \item{\code{Cov_ip}}{2-dimensional array for use in \code{VAST::make_data}}
   \item{\code{Cov_stp}}{3-dimensional array for use in \code{VAST::make_data}}
 }
 }
@@ -36,11 +36,15 @@ Tagged list of useful output
 \code{make_covariates} uses a formula interface to generate covariates
 }
 \details{
-This function generates 3D arrays \code{Cov_gtp}, \code{Cov_itp}, and  \code{Cov_stp} as
+This function generates 3D arrays \code{Cov_gtp}, \code{Cov_ip}, and  \code{Cov_stp} as
 required by \code{VAST::make_data} to incorporate density covariates.
 The user must supply a data frame \code{covariate_data} of covariate values, with columns named \code{Lat}, \code{Lon}, and \code{Year},
 as well as values for all covariates as additional named columns.
 This data frame is then used as a "look-up table", and is matched against variables listed in \code{formula}.
+
+Covariates then affect the linear predictor via coefficients that are estimated separately for every category.
+Therefore, in a multivariate model the formula specifies the structure of covariates that is applied separately
+to each category.
 
 Specifically,
 \enumerate{

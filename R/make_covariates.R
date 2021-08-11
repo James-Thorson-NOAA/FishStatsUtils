@@ -10,6 +10,10 @@
 #' as well as values for all covariates as additional named columns.
 #' This data frame is then used as a "look-up table", and is matched against variables listed in \code{formula}.
 #'
+#' Covariates then affect the linear predictor via coefficients that are estimated separately for every category.
+#' Therefore, in a multivariate model the formula specifies the structure of covariates that is applied separately
+#' to each category.
+#'
 #' Specifically,
 #' \enumerate{
 #' \item for every observation \code{i} at location \code{Lat_i[i]} and \code{Lon_i[i]} in year \code{t_i[t]}, the nearest

@@ -14,7 +14,7 @@
 #' @inheritParams rnaturalearth::ne_countries
 #' @inheritParams raster::rasterize
 #'
-#' @param Y_gt matrix where values for every column are plotted as a map
+#' @param Y_gt matrix where values for every column are plotted as a map in a panel-figure with one panel per column
 #' @param projargs Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
 #'        See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
 #'        As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
@@ -28,7 +28,7 @@
 #' @param legend_x two numeric values (generally between 0 and 1, but slightly lower/higher values
 #'        generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend
 #' @param legend_y two numeric values (see description for legend_x) giving bottom and top location of color legend
-#' @param map_list output from \code{\link{make_map_info}}
+#' @param map_list output from \code{\link{make_map_info}}, which is included in output of \code{\link{plot_results}}
 #' @param zlim two numeric values, specifying range for defining bounds of color scale.
 #'        If \code{zlim=NULL}, then a constant scale is inferred
 #'        from the range of the plotted variable and a color-legend is plotted in the last panel.

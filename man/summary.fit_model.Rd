@@ -10,6 +10,7 @@
   n_samples = 250,
   working_dir = NULL,
   type = 1,
+  random_seed = NULL,
   ...
 )
 }
@@ -29,6 +30,8 @@
 \item \code{type=4} simulates new random effects from the internal Hessian matrix evaluated at the MLE (i.e., conditional on fixed effects estimates and the original data),
 and new data conditional upon these values.
 }}
+
+\item{random_seed}{integer passed to \code{set.seed}, where the default value \code{random_seed=NULL} resets the random-number seed.}
 
 \item{...}{additional arguments passed to \code{\link[DHARMa]{plotResiduals}} when \code{what="residuals"}}
 }

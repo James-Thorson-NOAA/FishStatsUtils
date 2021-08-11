@@ -7,7 +7,7 @@
 simulate_data(fit, type = 1, random_seed = NULL)
 }
 \arguments{
-\item{fit}{output form \code{fit_model(.)}}
+\item{fit}{output from \code{\link{fit_model}}}
 
 \item{type}{integer stating what type of simulation to use from the following options:
 \itemize{
