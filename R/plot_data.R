@@ -63,14 +63,22 @@ function( Extrapolation_List,
 
   # Data for mapping
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
-  map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
+  map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
+
+  # project Lat_i/Lon_i
+  sample_data = sp::SpatialPoints( coords=cbind(Lon_i,Lat_i), proj4string=sp::CRS('+proj=longlat') )
+  sample_proj = sp::spTransform(lonlat_i, CRSobj=CRS_proj)
+
+  # Project extrapolation grid
+  grid_data = sp::SpatialPoints( coords=Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], proj4string=sp::CRS('+proj=longlat') )
+  grid_proj = sp::spTransform(lonlat_g, CRSobj=CRS_proj)
 
   # Plot data and grid
   if( !missing(Extrapolation_List) & !missing(Spatial_List) ){
     png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
       par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
       which_rows = which( strip_units(Extrapolation_List[["Area_km2_x"]])>0 & strip_units(rowSums(Extrapolation_List[["a_el"]]))>0 )
-      plot( Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
+      plot( grid_data@coords, cex=0.01, main="Extrapolation (Lat-Lon)" )
       sp::plot( map_data, col=land_color, add=TRUE )
       if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){
         plot( Extrapolation_List$Data_Extrap[which_rows,c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
@@ -88,11 +96,11 @@ function( Extrapolation_List,
   if(!is.null(Plot2_name)) png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(year_labels) ){
-      plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i), main=year_labels[t], xaxt="n", yaxt="n" )
-      sp::plot( map_data, col=land_color, add=TRUE )
+      plot( 1, type="n", xlim=range(sample_proj@coords[,1]), ylim=range(sample_proj@coords[,2]), main=year_labels[t], xaxt="n", yaxt="n" )
+      sp::plot( map_proj, col=land_color, add=TRUE )
       Which = which( Year_i == year_labels[t] )
       if( length(Which)>0 ){
-        points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
+        points( x=sample_proj@coords[Which,1], y=sample_proj@coords[Which,2], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
       }
       if( t>(length(year_labels)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)

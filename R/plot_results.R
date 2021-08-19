@@ -71,14 +71,14 @@ function( fit,
   message("\n### Making plots of data availability and knots")
   plot_data_args = list(...)
   plot_data_args = combine_lists( "input"=plot_data_args, "args_to_use"=formalArgs(plot_data),
-    "default" = list(Extrapolation_List=fit$extrapolation_list,
-                Spatial_List=fit$spatial_list,
-                Lat_i=fit$data_frame[,'Lat_i'],
-                Lon_i=fit$data_frame[,'Lon_i'],
-                Year_i=fit$data_frame[,'t_i'],
-                PlotDir=working_dir,
-                year_labels=year_labels,
-                projargs=projargs) )
+    "default" = list( Extrapolation_List = fit$extrapolation_list,
+                      Spatial_List = fit$spatial_list,
+                      Lat_i = fit$data_frame[,'Lat_i'],
+                      Lon_i = fit$data_frame[,'Lon_i'],
+                      Year_i = fit$data_frame[,'t_i'],
+                      PlotDir = working_dir,
+                      year_labels = year_labels,
+                      projargs = projargs) )
   do.call( what=plot_data, args=plot_data_args )
 
   # PLot settings
@@ -152,11 +152,21 @@ function( fit,
   # Not restricting to named arguments using args_to_use so that ... passes settings to plot_variable even that aren't formal arguments to plot_maps
   plot_maps_args = list(...)
   plot_maps_args = combine_lists( "input"=plot_maps_args, # "args_to_use"=formalArgs(plot_maps)
-    "default" = list(plot_set=plot_set, category_names=category_names, TmbData=fit$data_list,
-                Report=fit$Report, Sdreport=fit$parameter_estimates$SD, PlotDF=map_list[["PlotDF"]], MapSizeRatio=map_list[["MapSizeRatio"]],
-                working_dir=working_dir, year_labels=year_labels, years_to_plot=years_to_plot,
-                legend_x=map_list[["Legend"]]$x/100, legend_y=map_list[["Legend"]]$y/100,
-                Obj=fit$tmb_list$Obj, projargs=projargs, n_cells=n_cells) )
+    "default" = list( plot_set = plot_set,
+                      category_names = category_names,
+                      TmbData = fit$data_list,
+                      Report = fit$Report,
+                      Sdreport = fit$parameter_estimates$SD,
+                      PlotDF = map_list[["PlotDF"]],
+                      MapSizeRatio = map_list[["MapSizeRatio"]],
+                      working_dir = working_dir,
+                      year_labels = year_labels,
+                      years_to_plot = years_to_plot,
+                      legend_x = map_list[["Legend"]]$x/100,
+                      legend_y = map_list[["Legend"]]$y/100,
+                      Obj = fit$tmb_list$Obj,
+                      projargs = projargs,
+                      n_cells = n_cells) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
 
   # Plot factors
@@ -164,8 +174,12 @@ function( fit,
   # Not restricting to named arguments using args_to_use so that ... and n_cells pass to plot_variable
   plot_factors_args = list(...)
   plot_factors_args = combine_lists( "input"=plot_factors_args, # "args_to_use"=formalArgs(plot_factors),
-    "default" = list(fit=fit, mapdetails_list=map_list, projargs=projargs, n_cells=n_cells,
-                RotationMethod=RotationMethod, plotdir=working_dir) )
+    "default" = list( fit = fit,
+                      mapdetails_list = map_list,
+                      projargs = projargs,
+                      n_cells = n_cells,
+                      RotationMethod = RotationMethod,
+                      plotdir = working_dir) )
   Factors = do.call( what=plot_factors, args=plot_factors_args )
 
   # Plot quantile-quantile plot
@@ -197,6 +211,7 @@ function( fit,
                              year_labels = year_labels,
                              years_to_plot = years_to_plot,
                              n_cells_residuals = n_cells_residuals,
+                             projargs = projargs,
                              ... )
   }else{
     #Q = "Not run"

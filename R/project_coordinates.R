@@ -17,7 +17,13 @@
 
 #' @export
 project_coordinates <-
-function( X, Y, projargs=NA, origargs="+proj=longlat +datum=WGS84", zone=NA, flip_around_dateline=FALSE, silent=FALSE ){
+function( X,
+          Y,
+          projargs = NA,
+          origargs = "+proj = longlat +datum = WGS84",
+          zone = NA,
+          flip_around_dateline = FALSE,
+          silent = FALSE ){
 
   # Original projection
   origCRS = sp::CRS(origargs)

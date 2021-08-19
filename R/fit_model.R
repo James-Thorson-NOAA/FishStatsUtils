@@ -523,6 +523,16 @@ summary.fit_model <- function(x,
         }
         b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type, random_seed=list(random_seed+zI,NULL)[[1+is.null(random_seed)]] )$b_i
       }
+      #if( any(is.na(x$data_list$b_i)) ){
+      #  stop("dharmaRes not designed to work when any observations have b_i=NA")
+      #}
+      # Substitute any observation where b_i = NA with all zeros, which will then have a uniform PIT
+      which_na = which(is.na(x$data_list$b_i))
+      if( length(which_na) > 0 ){
+        x$data_list$b_i[which_na] = 0
+        b_iz[which_na,] = 0
+        warning("When calculating DHARMa residuals, replacing instances where b_i=NA with a uniform PIT residual")
+      }
       if( any(is.na(b_iz)) ){
         stop("Check simulated residuals for NA values")
       }
