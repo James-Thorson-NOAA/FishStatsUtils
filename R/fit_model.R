@@ -596,10 +596,10 @@ summary.fit_model <- function(x,
 
     # do plot
     if( is.null(working_dir) ){
-      plot(dharmaRes, ...)
+      plot_dharma(dharmaRes, ...)
     }else if(!is.na(working_dir) ){
       png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
-        plot(dharmaRes, ...)
+        plot_dharma(dharmaRes, ...)
       dev.off()
     }
 
