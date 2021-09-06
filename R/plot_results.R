@@ -97,13 +97,12 @@ function( fit,
     message("\n### Making plot of abundance index")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
     plot_biomass_index_args = combine_lists( "input"=plot_biomass_index_args, "args_to_use"=formalArgs(plot_biomass_index),
-      "default" = list(DirName=working_dir,
-                  TmbData=fit$data_list,
-                  Sdreport=fit$parameter_estimates$SD,
-                  year_labels=year_labels,
-                  years_to_plot=years_to_plot,
-                  use_biascorr=use_biascorr,
-                  category_names=category_names) )
+      "default" = list(DirName = working_dir,
+                  fit = fit,
+                  year_labels = year_labels,
+                  years_to_plot = years_to_plot,
+                  use_biascorr = use_biascorr,
+                  category_names = category_names) )
     Index = do.call( what=plot_biomass_index, args=plot_biomass_index_args )
   }else{
     Index = "Not run"

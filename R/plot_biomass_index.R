@@ -6,7 +6,6 @@
 #' \code{plot_biomass_index} plots an index proportional to population abundance
 #'
 #' @inheritParams plot_maps
-#' @param TmbData Formatted data inputs, from \code{\link[VAST]{make_data}}
 #' @param DirName Directory for saving plot and table
 #' @param PlotName Name for plot
 #' @param interval_width width for confidence intervals
@@ -17,6 +16,7 @@
 #' @param plot_log Boolean, whether to plot y-axis in log-scale
 #' @param width plot width in inches
 #' @param height plot height in inches
+#' @param TmbData Formatted data inputs, from \code{\link[VAST]{make_data}}
 #' @param ... Other inputs to `par()`
 #'
 #' @return Return Tagged list of output
@@ -28,8 +28,7 @@
 #' @references For details regarding fishing mortality and biomass reference points in models generating those, see \url{https://doi.org/10.1111/faf.12398}
 #' @export
 plot_biomass_index <-
-function( TmbData,
-          Sdreport,
+function( fit,
           year_labels = NULL,
           years_to_plot = NULL,
           DirName = paste0(getwd(),"/"),
@@ -45,6 +44,9 @@ function( TmbData,
           height = NULL,
           create_covariance_table = FALSE,
           Yrange = c(ifelse(plot_log==TRUE,NA,0),NA),
+          TmbData = fit$data_list,
+          Sdreport = fit$parameter_estimates$SD,
+          extrapolation_list = fit$extrapolation_list,
           ... ){
 
   # Informative errors
@@ -157,7 +159,7 @@ function( TmbData,
       }
     }
   }
-  units(Index_ctl) = units(log_Index_ctl) = units(fit$data_list$b_i / fit$data_list$a_i * fit$extrapolation_list$Area_km2[1])
+  units(Index_ctl) = units(log_Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
 
   # Extract biomass ratio Bratio_cty if available (only available if >= V5.3.0 and using spatial Gompertz model features)
   if( "Bratio_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
