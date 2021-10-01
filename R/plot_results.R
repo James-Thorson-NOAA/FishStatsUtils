@@ -84,12 +84,15 @@ function( fit,
   # PLot settings
   if( missing(map_list) ){
     message("\n### Obtaining default settings for plotting maps")
-    map_list = make_map_info( "Region"=settings$Region, "spatial_list"=fit$spatial_list, "Extrapolation_List"=fit$extrapolation_list )
+    map_list = make_map_info( Region = settings$Region,
+                              spatial_list = fit$spatial_list,
+                              Extrapolation_List = fit$extrapolation_list )
   }
 
   # Plot anisotropy
   message("\n### Making plot of anisotropy")
-  plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"), Obj=fit$tmb_list$Obj )
+  plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"),
+                   Obj=fit$tmb_list$Obj )
 
   # Plot index
   plot_biomass_index_args = list(...)
@@ -113,8 +116,13 @@ function( fit,
   if( !is.null(fit$parameter_estimates$SD) & fit$data_list$n_c>1 ){
     message("\n### Making plot of composition data")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
-    Proportions = calculate_proportion( TmbData=fit$data_list, Index=Index, year_labels=year_labels,
-      years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names, DirName=working_dir )
+    Proportions = calculate_proportion( TmbData = fit$data_list,
+                                        Index = Index,
+                                        year_labels = year_labels,
+                                        years_to_plot = years_to_plot,
+                                        use_biascorr = use_biascorr,
+                                        category_names = category_names,
+                                        DirName = working_dir )
     #Compositions = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, year_labels=year_labels,
     #  years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
@@ -126,8 +134,15 @@ function( fit,
   if( !is.null(fit$parameter_estimates$SD) ){
     message("\n### Making plot of spatial indices")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_range_index` isn't built to handle non-numeric `year_labels`")
-    Range = plot_range_index(Report=fit$Report, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, Znames=colnames(fit$data_list$Z_xm),
-      PlotDir=working_dir, year_labels=year_labels, years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
+    Range = plot_range_index( Report = fit$Report,
+                              TmbData = fit$data_list,
+                              Sdreport = fit$parameter_estimates$SD,
+                              Znames = colnames(fit$data_list$Z_xm),
+                              PlotDir = working_dir,
+                              year_labels = year_labels,
+                              years_to_plot = years_to_plot,
+                              use_biascorr = use_biascorr,
+                              category_names = category_names )
   }else{
     Range = "Not run"
     message("\n### Skipping plot of spatial indices; must re-run with standard errors to plot")
@@ -136,10 +151,15 @@ function( fit,
   # Plot range edges
   if( "jointPrecision"%in%names(fit$parameter_estimates$SD) & n_samples>0 & fit$data_list$Options_list$Options['Calculate_Range']==TRUE ){
     message("\n### Making plot of range edges")
-    Edge = plot_range_edge( Obj=fit$tmb_list$Obj, Sdreport=fit$parameter_estimates$SD,
-      working_dir=working_dir, year_labels=year_labels, years_to_plot=years_to_plot,
-      category_names=category_names, n_samples=n_samples, quantiles=quantiles,
-      calculate_relative_to_average=calculate_relative_to_average )
+    Edge = plot_range_edge( Obj = fit$tmb_list$Obj,
+                            Sdreport = fit$parameter_estimates$SD,
+                            working_dir = working_dir,
+                            year_labels = year_labels,
+                            years_to_plot = years_to_plot,
+                            category_names = category_names,
+                            n_samples = n_samples,
+                            quantiles = quantiles,
+                            calculate_relative_to_average = calculate_relative_to_average )
   }else{
     Edge = "Not run"
     message("\n### Skipping plot of range edge; only possible if `getJointPrecision=TRUE`, `Options['Calculate_Range']=TRUE`, and `n_samples`>0")
