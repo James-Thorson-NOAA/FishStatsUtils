@@ -9,7 +9,8 @@ amend_output(
   Report,
   Sdreport = NULL,
   year_labels = NULL,
-  category_names = NULL
+  category_names = NULL,
+  strata_names = NULL
 )
 }
 \description{

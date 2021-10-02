@@ -5,8 +5,7 @@
 \title{Plot index of abundance}
 \usage{
 plot_biomass_index(
-  TmbData,
-  Sdreport,
+  fit,
   year_labels = NULL,
   years_to_plot = NULL,
   DirName = paste0(getwd(), "/"),
@@ -22,14 +21,13 @@ plot_biomass_index(
   height = NULL,
   create_covariance_table = FALSE,
   Yrange = c(ifelse(plot_log == TRUE, NA, 0), NA),
+  TmbData = fit$data_list,
+  Sdreport = fit$parameter_estimates$SD,
+  extrapolation_list = fit$extrapolation_list,
   ...
 )
 }
 \arguments{
-\item{TmbData}{Formatted data inputs, from \code{\link[VAST]{make_data}}}
-
-\item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
-
 \item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
@@ -53,6 +51,10 @@ plot_biomass_index(
 \item{width}{plot width in inches}
 
 \item{height}{plot height in inches}
+
+\item{TmbData}{Formatted data inputs, from \code{\link[VAST]{make_data}}}
+
+\item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
 \item{...}{Other inputs to `par()`}
 }
