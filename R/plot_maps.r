@@ -226,13 +226,13 @@ function( plot_set = 3,
       if("X_gtp"%in%names(TmbData)) Array_xct = aperm( TmbData$X_gtp, perm=c(1,3,2) )
       if("X_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X_gctp[,1,,],dim(TmbData$X_gctp)[c(1,3,4)]), perm=c(1,3,2) )
       if("X1_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X1_gctp[,1,,],dim(TmbData$X1_gctp)[c(1,3,4)]), perm=c(1,3,2) )
-      category_names = 1:dim(Array_xct)[2]
+      category_names = seq_len(dim(Array_xct)[2])
     }
     if(plot_num==12){
       if( quiet==FALSE ) message(" # plot_num ",plot_num,": Plotting covariates for 2nd linear predictor")
       if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
       if("X2_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X2_gctp[,1,,],dim(TmbData$X2_gctp)[c(1,3,4)]), perm=c(1,3,2) )
-      category_names = 1:dim(Array_xct)[2]
+      category_names = seq_len(dim(Array_xct)[2])
     }
     if(plot_num==13){
       # Total density ("Dens")
@@ -333,6 +333,8 @@ function( plot_set = 3,
 
     # Replace -Inf e.g. from log(Density) = 0 with NA
     Array_xct = ifelse( Array_xct == -Inf, NA, Array_xct )
+    Ncategories = dim(Array_xct)[2]
+    Nyears = dim(Array_xct)[3]
 
     # Check for issues
     if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
@@ -340,13 +342,14 @@ function( plot_set = 3,
     if( any(Bad_xct) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
 
     # Get default years_to_plot_modified ... must remake for each plot_num
-    Ncategories = dim(Array_xct)[2]
-    Nyears = dim(Array_xct)[3]
     years_to_plot_modified = years_to_plot
-    if( !all(years_to_plot_modified %in% 1:dim(Array_xct)[3]) ){
+    if( names(dimnames(fit$Report$D_gct))[3] != "Time" ){
       years_to_plot_modified = NULL
     }
-    if( is.null(years_to_plot_modified) ) years_to_plot_modified = 1:(dim(Array_xct)[3])
+    if( !all(years_to_plot_modified %in% seq_len(dim(Array_xct)[3])) ){
+      years_to_plot_modified = NULL
+    }
+    if( is.null(years_to_plot_modified) ) years_to_plot_modified = seq_len(dim(Array_xct)[3])
 
     # Get default year_labels_modified & category_names_modified ... must remake for each plot_num
     year_labels_modified = dimnames(Array_xct)[[3]]
@@ -359,17 +362,18 @@ function( plot_set = 3,
     #if( is.null(category_names_modified) ) category_names_modified = paste0( "Category_", 1:dim(Array_xct)[2] )
 
     # Plot for each category
-    if( tolower(Panel)=="category" ){
+    if( tolower(Panel)=="category" & all(dim(Array_xct)>0) ){
       if(length(dim(Array_xct))==2) Nplot = 1
       if(length(dim(Array_xct))==3) Nplot = dim(Array_xct)[2]
       for( cI in 1:Nplot){
         if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
         if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
-        if( ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]) == length(year_labels_modified[years_to_plot_modified]) ){
-          panel_labels = year_labels_modified[years_to_plot_modified]
-        }else{
-          panel_labels = rep("", ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]))
-        }
+        panel_labels = year_labels_modified[years_to_plot_modified]
+        #if( ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]) == length(year_labels_modified[years_to_plot_modified]) ){
+        #  panel_labels = year_labels_modified[years_to_plot_modified]
+        #}else{
+        #  panel_labels = rep("", ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]))
+        #}
 
         file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names_modified[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
         plot_args = plot_variable( Y_gt = Mat_xt[,years_to_plot_modified,drop=FALSE],
@@ -385,7 +389,7 @@ function( plot_set = 3,
       }
     }
     # Plot for each year
-    if( tolower(Panel)=="year" ){
+    if( tolower(Panel)=="year" & all(dim(Array_xct)>0) ){
       Nplot = length(years_to_plot_modified)
       for( tI in 1:Nplot){
         if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,years_to_plot_modified[tI],drop=TRUE]
@@ -407,7 +411,7 @@ function( plot_set = 3,
       }
     }
   }
-  if( is.null(Return) & quiet==FALSE ) message(" # No plots selected in `plot_set`")
+  if( is.null(Return) & quiet==FALSE ) message(" # No available plots selected in `plot_set`")
 
   return( invisible(Return) )
 }
