@@ -63,6 +63,12 @@ function( Extrapolation_List,
 
   # Data for mapping
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
+  # Fix based somewhat on: https://rdrr.io/cran/rgdal/src/R/project.R
+  # See `plot_data` for more details
+  comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
+  # slot(map_data,"proj4string")
+  # comment(slot(map_data, "proj4string")) = comment(CRS_proj)
+  # comment(slot(map_data, "proj4string")) = comment(slot(map_data,"proj4string"))
   map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   # project Lat_i/Lon_i

@@ -126,8 +126,11 @@ function( Y_gt,
   CRS_proj = sp::CRS( projargs )
 
   # Data for mapping
-  #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))# , continent="america")
+  #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), continent="america")
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
+  # Fix based somewhat on: https://rdrr.io/cran/rgdal/src/R/project.R
+  # See `plot_data` for more details
+  comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
   map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   ###################
