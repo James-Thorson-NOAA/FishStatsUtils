@@ -100,7 +100,7 @@ function( Y_gt,
     mfrow = ceiling(sqrt(ncol(Y_gt)))
     mfrow = c( mfrow, ceiling(ncol(Y_gt)/mfrow) )
   }
-  if( missing(panel_labels) ){
+  if( missing(panel_labels) | is.null(panel_labels) ){
     panel_labels = rep("", ncol(Y_gt))
   }
   if( length(panel_labels) != ncol(Y_gt) ){
@@ -128,9 +128,10 @@ function( Y_gt,
   # Data for mapping
   #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), continent="america")
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
-  # Fix based somewhat on: https://rdrr.io/cran/rgdal/src/R/project.R
-  # See `plot_data` for more details
-  comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
+  # Fix warning messages from projecting rnaturalearth object
+  # Solution: Recreate SpatialPolygonsDataFrame from output
+  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
+  # comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
   map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   ###################
