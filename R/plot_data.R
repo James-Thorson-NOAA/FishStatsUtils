@@ -71,14 +71,14 @@ function( Extrapolation_List,
   map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   # project Lat_i/Lon_i
-  sample_data = sp::SpatialPoints( coords=cbind(Lon_i,Lat_i), proj4string=sp::CRS('+proj=longlat') )
+  sample_data = sp::SpatialPoints( coords=cbind(Lon_i,Lat_i), proj4string=CRS_orig )
   sample_proj = sp::spTransform( sample_data, CRSobj=CRS_proj)
 
   # Plot data and grid
   if( !missing(Extrapolation_List) & !missing(Spatial_List) ){
     # Project extrapolation grid
     which_rows = which( strip_units(Extrapolation_List[["Area_km2_x"]])>0 & strip_units(rowSums(Extrapolation_List[["a_el"]]))>0 )
-    grid_data = sp::SpatialPoints( coords=Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], proj4string=sp::CRS('+proj=longlat') )
+    grid_data = sp::SpatialPoints( coords=Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], proj4string=CRS_orig )
     grid_proj = sp::spTransform( grid_data, CRSobj=CRS_proj)
 
     png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")

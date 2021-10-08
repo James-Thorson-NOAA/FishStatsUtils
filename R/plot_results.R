@@ -198,7 +198,8 @@ function( fit,
                       projargs = projargs,
                       n_cells = n_cells,
                       RotationMethod = RotationMethod,
-                      plotdir = working_dir) )
+                      plotdir = working_dir,
+                      category_names = category_names ) )
   Factors = do.call( what=plot_factors, args=plot_factors_args )
 
   # Plot quantile-quantile plot

@@ -307,6 +307,9 @@ plot.make_extrapolation_info <- function(x, cex=0.01, land_color="grey", map_res
 
   # Data for mapping
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))
+  # Fix warning messages from projecting rnaturalearth object
+  # Solution: Recreate SpatialPolygonsDataFrame from output
+  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
 
   # Plot #1 -- Latitude
   plot( x$Data_Extrap[which(strip_units(x$Area_km2_x)>0),c('Lon','Lat')], cex=cex, main="Extrapolation (Lat-Lon)", ... )

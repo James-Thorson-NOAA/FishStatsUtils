@@ -188,6 +188,10 @@ function( Y_gt,
         Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
         plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], type="n", xaxt="n", yaxt="n", xlim=xlim, ylim=ylim, xlab="", ylab="" )
         image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
+        # Add contour lines
+        if( contour_nlevels > 0 ){
+          contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
+        }
       }
     }else if( format=="points" ){
       # Plot points
@@ -202,11 +206,6 @@ function( Y_gt,
     # Title and box
     title( panel_labels[tI], line=0.1, cex.main=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main), cex=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main) )
     box()
-
-    # Add contour lines
-    if( contour_nlevels > 0 ){
-      contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
-    }
 
     # Include legend
     if( !any(is.na(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
