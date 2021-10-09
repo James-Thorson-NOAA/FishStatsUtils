@@ -27,7 +27,7 @@ function( Extrapolation_List,
           Plot1_name = "Data_and_knots.png",
           Plot2_name = "Data_by_year.png",
           col = "red",
-          cex = 0.01,
+          cex = 0.1,
           pch = 19,
           year_labels,
           projargs = '+proj=longlat',
@@ -52,7 +52,9 @@ function( Extrapolation_List,
   }else{
     if(length(pch)!=length(Year_i)) stop("input `pch` has wrong length")
   }
-  if( length(col) == 1 ){
+  if( is.function(col) ){
+    col = col(length(Year_i))
+  }else if( length(col) == 1 ){
     col = rep( col, length(Year_i) )
   }else{
     if(length(col)!=length(Year_i)) stop("input `col` has wrong length")
