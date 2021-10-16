@@ -28,7 +28,7 @@ Imports:
     devtools,
     mixtools,
     sp,
-    plotKML,
+    raster,
     plotrix,
     TMB,
     MatrixModels,

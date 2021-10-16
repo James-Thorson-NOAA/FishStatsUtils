@@ -183,9 +183,15 @@ function( Y_gt,
         # Empty plot if no data
         plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], type="n", xaxt="n", yaxt="n", xlim=xlim, ylim=ylim, xlab="", ylab="" )
       }else{
-        # Interpolate and plot as raster
-        cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
-        Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
+        # Experimental
+        if( TRUE ){
+          Raster_layer = raster::raster( Points_proj, crs=CRS_proj, nrows=floor(sqrt(n_cells)), ncols=floor(sqrt(n_cells)) )
+          Raster_proj = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
+        }else{
+          # Interpolate and plot as raster
+          cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
+          Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
+        }
         plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], type="n", xaxt="n", yaxt="n", xlim=xlim, ylim=ylim, xlab="", ylab="" )
         image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
         # Add contour lines
