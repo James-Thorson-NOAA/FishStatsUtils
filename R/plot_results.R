@@ -44,6 +44,7 @@ function( fit,
           year_labels = fit$year_labels,
           years_to_plot = fit$years_to_plot,
           category_names = fit$category_names,
+          strata_names = fit$strata_names,
           use_biascorr = TRUE,
           map_list,
           check_residuals = TRUE,
@@ -105,7 +106,8 @@ function( fit,
                   year_labels = year_labels,
                   years_to_plot = years_to_plot,
                   use_biascorr = use_biascorr,
-                  category_names = category_names) )
+                  category_names = category_names,
+                  strata_names = strata_names) )
     Index = do.call( what=plot_biomass_index, args=plot_biomass_index_args )
   }else{
     Index = "Not run"

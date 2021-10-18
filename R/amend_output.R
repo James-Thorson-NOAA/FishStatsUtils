@@ -1,8 +1,9 @@
 
 
-#' Format density covariate matrix
+#' Amend output from VAST for user convenience
 #'
-#' \code{amend_output} uses a formula interface to generate covariates
+#' \code{amend_output} add labels, units, and performs logical operations,
+#' e.g., adds zeros as needed, to simplify user and downstream interpretation.
 #'
 #' @export
 amend_output <-
@@ -30,43 +31,53 @@ function( TmbData,
     treat_missing_as_zero = FALSE
   }
 
+  # Local function
+  process_labels = function( labels, prefix, length ){
+    if(is.null(labels)){
+      labels = paste0( prefix, "_", seq_len(length) )
+    }else{
+      if(length(labels)!=length) stop("Check labels")
+    }
+    return(labels)
+  }
+
   # Fill in missing inputs
   if( "D_xt" %in% names(Report)){
     # SpatialDeltaGLMM
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:ncol(Report$D_xt) )
+    year_labels = process_labels( year_labels, "Time", ncol(Report$D_xt) )
     category_names = "singlespecies"
   }
   if( "D_xct" %in% names(Report)){
     # VAST Version < 2.0.0
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Report$D_xct)[3] )
-    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Report$D_xct)[2] )
+    year_labels = process_labels( year_labels, "Time", dim(Report$D_xct)[3] )
+    category_names = process_labels( category_names, "Category", dim(Report$D_xct)[2] )
   }
   if( "D_xcy" %in% names(Report)){
     # VAST Version >= 2.0.0
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Report$D_xcy)[3] )
-    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Report$D_xcy)[2] )
+    year_labels = process_labels( year_labels, "Time", dim(Report$D_xcy)[3] )
+    category_names = process_labels( category_names, "Category_", dim(Report$D_xcy)[2] )
   }
   if( "D_gcy" %in% names(Report)){
     # VAST Version 8.0.0 through 9.3.0
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Report$D_gcy)[3] )
-    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Report$D_gcy)[2] )
+    year_labels = process_labels( year_labels, "Time", dim(Report$D_gcy)[3] )
+    category_names = process_labels( category_names, "Category", dim(Report$D_gcy)[2] )
   }
   if( "D_gct" %in% names(Report)){
     # VAST Version >= 9.4.0
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Report$D_gct)[3] )
-    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Report$D_gct)[2] )
+    year_labels = process_labels( year_labels, "Time", dim(Report$D_gct)[3] )
+    category_names = process_labels( category_names, "Category", dim(Report$D_gct)[2] )
   }
   if("dhat_ktp" %in% names(Report)){
     # MIST Version <= 14
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Report$dhat_ktp)[2] )
-    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Report$dhat_ktp)[3] )
+    year_labels = process_labels( year_labels, "Time", dim(Report$dhat_ktp)[2] )
+    category_names = process_labels( category_names, "Category", dim(Report$dhat_ktp)[3] )
   }
   if("dpred_ktp" %in% names(Report)){
     # MIST Version >= 15
-    if( is.null(year_labels) ) year_labels = paste0( "Time_", 1:dim(Report$dpred_ktp)[2] )
-    if( is.null(category_names) ) category_names = paste0( "Category_", 1:dim(Report$dpred_ktp)[3] )
+    year_labels = process_labels( year_labels, "Time", dim(Report$dpred_ktp)[2] )
+    category_names = process_labels( category_names, "Category", dim(Report$dpred_ktp)[3] )
   }
-  if( is.null(strata_names) ) strata_names = paste0( "Stratum_", 1:dim(Report$Index_ctl)[3] )
+  strata_names = process_labels( strata_names, "Stratum", dim(Report$Index_ctl)[3] )
 
   # Determine year-category pairs with no data
   Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
@@ -102,11 +113,15 @@ function( TmbData,
                          report_names = c("Index_ctl","effective_area_ctl","mean_D_ctl"),
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
 
-  # Not used yet
+  # Modify Sdreport
   if( !is.null(Sdreport) ){
-    SD_stderr = TMB:::as.list.sdreport( Sdreport, what="Std. Error", report=TRUE )
-    SD_estimate = TMB:::as.list.sdreport( Sdreport, what="Estimate", report=TRUE )
+    # See plot_biomass_index for how to efficiently extra SEs
   }
+
+  # Add units
+  units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
+  units(Report$D_gct) = units(TmbData$b_i)
+  units(Report$mean_D_ctl) = units(TmbData$b_i)
 
   # Check for bad entries
   return( Report )

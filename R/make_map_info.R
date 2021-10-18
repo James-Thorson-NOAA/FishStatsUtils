@@ -3,8 +3,13 @@
 #' Function provides information to be used when plotting results
 #'
 #' @export
-make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extrap=spatial_list$PolygonList$NN_Extrap,
-  fine_scale=spatial_list$fine_scale, Include ){
+make_map_info <-
+function( Region,
+          Extrapolation_List,
+          spatial_list = NULL,
+          NN_Extrap = spatial_list$PolygonList$NN_Extrap,
+          fine_scale = spatial_list$fine_scale,
+          Include ){
 
   # Fix defaults
   if( is.null(fine_scale) ) fine_scale = FALSE
@@ -23,7 +28,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
   PlotDF = NULL
 
   # Loop through regions
-  if( tolower(Region) == "california_current" ){
+  if( tolower(Region)[1]== "california_current" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include)
     MappingDetails = list("state", c("alabama","arizona","arkansas","california","colorado","connecticut","delaware","district of columbia","florida","georgia","idaho","illinois","indiana","iowa","kansas","kentucky","louisiana","maine","maryland","massachusetts:martha's vineyard","massachusetts:main","massachusetts:nantucket","michigan:north","michigan:south","minnesota","mississippi","missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york:manhattan","new york:main","new york:statenisland","new york:longisland","north carolina:knotts","north carolina:main","north carolina:spit","north dakota","ohio","oklahoma","oregon","pennsylvania","rhode island","south carolina","south dakota","tennessee","texas","utah","vermont","virginia:chesapeake","virginia:chincoteague","virginia:main","washington:san juan island","washington:lopez island","washington:orcas island","washington:whidbey island","washington:main","west virginia","wisconsin","wyoming"))
     Xlim=c(-126,-117)
@@ -33,7 +38,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.01
     Legend = list(use=TRUE, x=c(65,75), y=c(35,65))
   }
-  if( tolower(Region) == "british_columbia" ){
+  if( tolower(Region)[1] == "british_columbia" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("worldHires", NULL)
     Xlim=c(-133,-126)
@@ -43,7 +48,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.1
     Legend = list(use=FALSE,x=c(5,10),y=c(5,45))
   }
-  if( tolower(Region) == "eastern_bering_sea" ){
+  if( tolower(Region)[1] == "eastern_bering_sea" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("worldHires", NULL)
     Xlim = c(-180,-158)
@@ -53,7 +58,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.01
     Legend = list(use=TRUE,x=c(81,86),y=c(48,88))
   }
-  if( tolower(Region) == "aleutian_islands" ){
+  if( tolower(Region)[1] == "aleutian_islands" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     PlotDF[,'Lon'] = PlotDF[,'Lon'] %% 360 # Change units to match world2Hires
     MappingDetails = list("world2Hires", NULL)
@@ -64,7 +69,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.2
     Legend = list(use=FALSE,x=c(5,10),y=c(5,45))
   }
-  if( tolower(Region) == "gulf_of_alaska" ){
+  if( tolower(Region)[1] == "gulf_of_alaska" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("world", NULL)
     Xlim = c(-171,-132)
@@ -74,7 +79,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.01
     Legend = list(use=TRUE,x=c(5,10),y=c(30,65))
   }
-  if( tolower(Region) == "northwest_atlantic" ){
+  if( tolower(Region)[1] == "northwest_atlantic" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     #MappingDetails = list("world", NULL)
     MappingDetails = list("state", c("alabama","arizona","arkansas","california","colorado","connecticut","delaware","district of columbia","florida","georgia","idaho","illinois","indiana","iowa","kansas","kentucky","louisiana","maine","maryland","massachusetts:martha's vineyard","massachusetts:main","massachusetts:nantucket","michigan:north","michigan:south","minnesota","mississippi","missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york:manhattan","new york:main","new york:statenisland","new york:longisland","north carolina:knotts","north carolina:main","north carolina:spit","north dakota","ohio","oklahoma","oregon","pennsylvania","rhode island","south carolina","south dakota","tennessee","texas","utah","vermont","virginia:chesapeake","virginia:chincoteague","virginia:main","washington:san juan island","washington:lopez island","washington:orcas island","washington:whidbey island","washington:main","west virginia","wisconsin","wyoming"))
@@ -85,7 +90,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.01
     Legend = list(use=TRUE,x=c(75,80),y=c(5,35))
   }
-  if( tolower(Region) == "south_africa" ){
+  if( tolower(Region)[1] == "south_africa" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("worldHires", NULL )
     Xlim = c(14,26)
@@ -95,7 +100,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.1
     Legend = list(use=FALSE,x=c(5,10),y=c(4,45))
   }
-  if( tolower(Region) == "gulf_of_st_lawrence" ){
+  if( tolower(Region)[1] == "gulf_of_st_lawrence" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("worldHires", "Canada" )
     Xlim = range(Extrapolation_List[["Data_Extrap"]][which(strip_units(Extrapolation_List[["Area_km2_x"]])>0),'Lon'])
@@ -105,7 +110,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 1.0
     Legend = list(use=FALSE,x=c(5,10),y=c(4,45))
   }
-  if( tolower(Region) == "new_zealand" ){
+  if( tolower(Region)[1] == "new_zealand" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include )
     MappingDetails = list("worldHires", NULL )
     Xlim=c(172,187)
@@ -115,7 +120,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.01
     Legend = list(use=FALSE,x=c(5,10),y=c(5,45))
   }
-  if( tolower(Region) == "habcam" ){
+  if( tolower(Region)[1] == "habcam" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include)
     #MappingDetails = list("state", c("alabama","arizona","arkansas","california","colorado","connecticut","delaware","district of columbia","florida","georgia","idaho","illinois","indiana","iowa","kansas","kentucky","louisiana","maine","maryland","massachusetts:martha's vineyard","massachusetts:main","massachusetts:nantucket","michigan:north","michigan:south","minnesota","mississippi","missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york:manhattan","new york:main","new york:statenisland","new york:longisland","north carolina:knotts","north carolina:main","north carolina:spit","north dakota","ohio","oklahoma","oregon","pennsylvania","rhode island","south carolina","south dakota","tennessee","texas","utah","vermont","virginia:chesapeake","virginia:chincoteague","virginia:main","washington:san juan island","washington:lopez island","washington:orcas island","washington:whidbey island","washington:main","west virginia","wisconsin","wyoming"))
     MappingDetails = list("worldHires", NULL )
@@ -126,7 +131,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
     Cex = 0.01
     Legend = list(use=TRUE,x=c(70,90),y=c(5,35))
   }
-  if( tolower(Region) == "gulf_of_mexico" ){
+  if( tolower(Region)[1] == "gulf_of_mexico" ){
     PlotDF = cbind( Extrapolation_List[["Data_Extrap"]][,c('Lat','Lon')], 'x2i'=NA, 'Include'=Include)
     #MappingDetails = list("state", c("alabama","arizona","arkansas","california","colorado","connecticut","delaware","district of columbia","florida","georgia","idaho","illinois","indiana","iowa","kansas","kentucky","louisiana","maine","maryland","massachusetts:martha's vineyard","massachusetts:main","massachusetts:nantucket","michigan:north","michigan:south","minnesota","mississippi","missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york:manhattan","new york:main","new york:statenisland","new york:longisland","north carolina:knotts","north carolina:main","north carolina:spit","north dakota","ohio","oklahoma","oregon","pennsylvania","rhode island","south carolina","south dakota","tennessee","texas","utah","vermont","virginia:chesapeake","virginia:chincoteague","virginia:main","washington:san juan island","washington:lopez island","washington:orcas island","washington:whidbey island","washington:main","west virginia","wisconsin","wyoming"))
     MappingDetails = list("worldHires", NULL )
@@ -155,7 +160,7 @@ make_map_info = function( Region, Extrapolation_List, spatial_list=NULL, NN_Extr
   #  PlotDF[,'x2i'] = NN_Extrap$nn.idx[,1]
   #}
   ## Exceptions
-  #if( tolower(Region) == "eastern_bering_sea" ){
+  #if( tolower(Region)[1] == "eastern_bering_sea" ){
   #  PlotDF = PlotDF[which(PlotDF[,'Lon']<0),]
   #}
   PlotDF[,'x2i'] = spatial_list$g_e
