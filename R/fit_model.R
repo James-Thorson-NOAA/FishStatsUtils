@@ -309,7 +309,8 @@ function( settings,
     Report = amend_output( Report = Report,
                            TmbData = data_list,
                            year_labels = year_labels,
-                           category_names = category_names )
+                           category_names = category_names,
+                           extrapolation_list = extrapolation_list )
   }else{
     Report = ParHat = "Model is not converged"
   }

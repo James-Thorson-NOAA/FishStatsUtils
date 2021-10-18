@@ -51,6 +51,7 @@ plot_maps <-
 function( plot_set = 3,
           Obj = NULL,
           PlotDF,
+          extrapolation_list,
           Sdreport = NULL,
           projargs = '+proj=longlat',
           Panel = "Category",
@@ -93,7 +94,6 @@ function( plot_set = 3,
   # Extract stuff
   if( !is.null(Obj) ){
     if(missing(Report)) Report = Obj$report()
-    TmbData = Obj$env$data
   }else{
     if(plot_value!="estimate") stop("Must provide `Obj` to `plot_maps` when using function for `plot_value`")
   }
@@ -107,7 +107,8 @@ function( plot_set = 3,
   Report = amend_output( Report = Report,
                          TmbData = TmbData,
                          year_labels = year_labels,
-                         category_names = category_names )
+                         category_names = category_names,
+                         extrapolation_list = extrapolation_list )
 
   # Loop through plots
   Return = NULL
@@ -330,6 +331,9 @@ function( plot_set = 3,
       if("dpred_ktp" %in% names(Report)) stop()
       Array_xct = aperm( Array_xct %o% 1, c(1,3,2) )
     }
+
+    # For now, avoid units in plots ... could add units to colorbar in future
+    Array_xct = strip_units( Array_xct )
 
     # Replace -Inf e.g. from log(Density) = 0 with NA
     Array_xct = ifelse( Array_xct == -Inf, NA, Array_xct )

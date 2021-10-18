@@ -70,11 +70,12 @@ function( fit,
 
   # Check and implement units and labels
   fit$Report = amend_output( TmbData = TmbData,
-                Report = fit$Report,
-                Sdreport = Sdreport,
-                year_labels = year_labels,
-                category_names = category_names,
-                strata_names = strata_names )
+                             Report = fit$Report,
+                             Sdreport = Sdreport,
+                             year_labels = year_labels,
+                             category_names = category_names,
+                             strata_names = strata_names,
+                             extrapolation_list = extrapolation_list )
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
@@ -232,7 +233,7 @@ function( fit,
 
   # Plot biomass and Bratio
   Plot_suffix = ""
-  if( "Bratio_cyl" %in% names(SD_estimate) ) Plot_suffix = c( Plot_suffix, "-Bratio" )
+  if( "Bratio_cyl" %in% names(par_hat) ) Plot_suffix = c( Plot_suffix, "-Bratio" )
   for( plotI in 1:length(Plot_suffix) ){
     if( Plot_suffix[plotI]=="" ){
       Array_ctl = par_hat[[index_name]]
@@ -254,14 +255,14 @@ function( fit,
                 width = width,
                 height = height,
                 xlab = "Year",
-                ylab = make_unit_label( u = units(Array_ctl), lab = "Index", parse = TRUE ),
+#                ylab = make_unit_label( u = units(Array_ctl), lab = "Index", parse = TRUE ),
                 scale = "log",
                 plot_args = list("log" = ifelse(plot_log==TRUE,"y","")),
                 Yrange = Yrange )
   }
 
   # Plot
-  if( "Fratio_ct" %in% names(SD_estimate) ){
+  if( "Fratio_ct" %in% names(par_hat) ){
     Array_ct = par_hat[["Fratio_ct"]]
       Array_ct = ifelse( Array_ct==0, NA, Array_ct )
     plot_index( Index_ctl = Array_ct,
@@ -281,7 +282,7 @@ function( fit,
   }
 
   # Plot stock status
-  if( all(c("Fratio_ct","Bratio_cyl") %in% names(SD_estimate)) ){
+  if( all(c("Fratio_ct","Bratio_cyl") %in% names(par_hat)) ){
     Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(1,2,0,0), mfrow=mfrow, ... )
     Col = colorRampPalette(colors=c("blue","purple","red"))
     png( file=paste0(DirName,"/",PlotName,"-Status.png"), width=width, height=height, res=200, units="in")
@@ -309,41 +310,41 @@ function( fit,
     dev.off()
   }
 
-  # Write to file
-  Table = cbind( expand.grid(dimnames(par_hat[[index_name]])),
-    "Units" = make_unit_label( u=units(par_hat[[index_name]]), lab="", parse=FALSE ),
-    "Estimate" = as.vector(par_hat[[index_name]]),
-    "Std. Error for Estimate" = as.vector(par_SE[[index_name]]),
-    "Std. Error for ln(Estimate)" = as.vector(par_SE[[log_index_name]]) )
-  #for( cI in 1:TmbData$n_c ){
-  #  index_units = make_unit_label( u=units(Index_ctl), lab="", parse=FALSE )
-  #  Tmp = data.frame( "Year"=year_labels, "Unit"=index_units, "Estimate"=as.vector(Index_ctl[cI,,,'Estimate']), "SD_log"=as.vector(log_Index_ctl[cI,,,'Std. Error']), "SD_mt"=as.vector(Index_ctl[cI,,,'Std. Error']) )
-  #  if( TmbData$n_c>1 ) Tmp = cbind( "Category"=category_names[cI], Tmp)
-  #  Table = rbind( Table, Tmp )
-  #}
-  write.csv( Table, file=paste0(DirName,"/Index.csv"), row.names=FALSE)
-
-  # Return stuff
-  Return = list( "Table"=Table ) # , "log_Index_ctl"=log_Index_ctl, "Index_ctl"=Index_ctl )
-
-  # Extract and save covariance
-  if( "cov"%in%names(Sdreport) & create_covariance_table==TRUE ){
-    DF = expand.grid(dimnames(par_hat[[index_name]]))
-    Which = which( names(Sdreport$value)==index_name )
-    Cov = Sdreport$cov[Which,Which]
-    Corr = cov2cor(Cov) - diag(nrow(Cov))
-    rowcolDF = cbind( "RowNum"=row(Corr)[lower.tri(Corr,diag=TRUE)], "ColNum"=col(Corr)[lower.tri(Corr,diag=TRUE)] )
-    Table = cbind( DF[rowcolDF[,'ColNum'],], DF[rowcolDF[,'RowNum'],] )
-    colnames(Table) = paste0(colnames(Table), rep(c(1,2),each=3))
-    Table = cbind( Table, "Correlation"=cov2cor(Cov)[lower.tri(Corr,diag=TRUE)], "Covariance"=Cov[lower.tri(Corr,diag=TRUE)] )
-    Table = cbind( Table, "Index1"=Index_ctl[as.matrix(cbind(DF[rowcolDF[,'ColNum'],],1))], "Index2"=Index_ctl[as.matrix(cbind(DF[rowcolDF[,'RowNum'],],1))] )
-    WhichZero = which( (Table[,'Index1']*Table[,'Index2']) == 0 )
-    Table[WhichZero,c('Correlation','Covariance')] = 0
-    Return = c( Return, "Table_of_estimated_covariance"=Table )
-  }
-  #if( !is.null(Bratio_ctl)) Return = c( Return, list("Bratio_ctl"=Bratio_ctl) )
-  #if( !is.null(log_Bratio_ctl)) Return = c( Return, list("log_Bratio_ctl"=log_Bratio_ctl) )
-  #if( !is.null(Fratio_ct)) Return = c( Return, list("Fratio_ct"=Fratio_ct) )
-
-  return( invisible(Return) )
+#  # Write to file
+#  Table = cbind( expand.grid(dimnames(par_hat[[index_name]])),
+#    "Units" = make_unit_label( u=units(par_hat[[index_name]]), lab="", parse=FALSE ),
+#    "Estimate" = as.vector(par_hat[[index_name]]),
+#    "Std. Error for Estimate" = as.vector(par_SE[[index_name]]),
+#    "Std. Error for ln(Estimate)" = as.vector(par_SE[[log_index_name]]) )
+#  #for( cI in 1:TmbData$n_c ){
+#  #  index_units = make_unit_label( u=units(Index_ctl), lab="", parse=FALSE )
+#  #  Tmp = data.frame( "Year"=year_labels, "Unit"=index_units, "Estimate"=as.vector(Index_ctl[cI,,,'Estimate']), "SD_log"=as.vector(log_Index_ctl[cI,,,'Std. Error']), "SD_mt"=as.vector(Index_ctl[cI,,,'Std. Error']) )
+#  #  if( TmbData$n_c>1 ) Tmp = cbind( "Category"=category_names[cI], Tmp)
+#  #  Table = rbind( Table, Tmp )
+#  #}
+#  write.csv( Table, file=paste0(DirName,"/Index.csv"), row.names=FALSE)
+#
+#  # Return stuff
+#  Return = list( "Table"=Table ) # , "log_Index_ctl"=log_Index_ctl, "Index_ctl"=Index_ctl )
+#
+#  # Extract and save covariance
+#  if( "cov"%in%names(Sdreport) & create_covariance_table==TRUE ){
+#    DF = expand.grid(dimnames(par_hat[[index_name]]))
+#    Which = which( names(Sdreport$value)==index_name )
+#    Cov = Sdreport$cov[Which,Which]
+#    Corr = cov2cor(Cov) - diag(nrow(Cov))
+#    rowcolDF = cbind( "RowNum"=row(Corr)[lower.tri(Corr,diag=TRUE)], "ColNum"=col(Corr)[lower.tri(Corr,diag=TRUE)] )
+#    Table = cbind( DF[rowcolDF[,'ColNum'],], DF[rowcolDF[,'RowNum'],] )
+#    colnames(Table) = paste0(colnames(Table), rep(c(1,2),each=3))
+#    Table = cbind( Table, "Correlation"=cov2cor(Cov)[lower.tri(Corr,diag=TRUE)], "Covariance"=Cov[lower.tri(Corr,diag=TRUE)] )
+#    Table = cbind( Table, "Index1"=Index_ctl[as.matrix(cbind(DF[rowcolDF[,'ColNum'],],1))], "Index2"=Index_ctl[as.matrix(cbind(DF[rowcolDF[,'RowNum'],],1))] )
+#    WhichZero = which( (Table[,'Index1']*Table[,'Index2']) == 0 )
+#    Table[WhichZero,c('Correlation','Covariance')] = 0
+#    Return = c( Return, "Table_of_estimated_covariance"=Table )
+#  }
+#  #if( !is.null(Bratio_ctl)) Return = c( Return, list("Bratio_ctl"=Bratio_ctl) )
+#  #if( !is.null(log_Bratio_ctl)) Return = c( Return, list("log_Bratio_ctl"=log_Bratio_ctl) )
+#  #if( !is.null(Fratio_ct)) Return = c( Return, list("Fratio_ct"=Fratio_ct) )
+#
+#  return( invisible(Return) )
 }

@@ -9,6 +9,7 @@
 amend_output <-
 function( TmbData,
           Report,
+          extrapolation_list,
           Sdreport = NULL,
           year_labels = NULL,
           category_names = NULL,
