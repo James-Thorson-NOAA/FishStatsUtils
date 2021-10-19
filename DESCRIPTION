@@ -28,6 +28,7 @@ Imports:
     devtools,
     mixtools,
     sp,
+    sf,
     raster,
     plotrix,
     TMB,

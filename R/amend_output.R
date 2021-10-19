@@ -116,13 +116,18 @@ function( TmbData,
 
   # Modify Sdreport
   if( !is.null(Sdreport) ){
-    # See plot_biomass_index for how to efficiently extra SEs
+    # See plot_biomass_index for how to efficiently use and combine SEs
   }
 
   # Add units
   units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
   units(Report$D_gct) = units(TmbData$b_i)
   units(Report$mean_D_ctl) = units(TmbData$b_i)
+
+  # Add units for COG, see: https://github.com/r-quantities/units/issues/291
+  if( "mean_Z_ctm" %in% names(Report) ){
+    units(Report$mean_Z_ctm) = sf::st_crs( extrapolation_list$projargs )$units
+  }
 
   # Check for bad entries
   return( Report )
