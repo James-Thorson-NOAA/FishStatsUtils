@@ -308,6 +308,8 @@ function( settings,
     # Label stuff
     Report = amend_output( Report = Report,
                            TmbData = data_list,
+                           Map = tmb_list$Map,
+                           Sdreport = parameter_estimates2$SD,
                            year_labels = year_labels,
                            category_names = category_names,
                            extrapolation_list = extrapolation_list )

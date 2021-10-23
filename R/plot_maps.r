@@ -49,10 +49,8 @@
 #' @export
 plot_maps <-
 function( plot_set = 3,
-          Obj = NULL,
+          fit,
           PlotDF,
-          extrapolation_list,
-          Sdreport = NULL,
           projargs = '+proj=longlat',
           Panel = "Category",
           year_labels = NULL,
@@ -64,11 +62,15 @@ function( plot_set = 3,
           n_cells,
           plot_value = "estimate",
           n_samples = 100,
-          Report,
-          TmbData,
-          zlim = NULL,
           country = NULL,
           sample_fixed = TRUE,
+          Report = fit$Report,
+          TmbData = fit$data_list,
+          Obj = fit$tmb_list$Obj,
+          extrapolation_list = fit$extrapolation_list,
+          Sdreport = fit$parameter_estimates$par,
+          Map = fit$tmb_list$Map,
+          zlim = NULL,
           ...){
 
   # Local functions
@@ -106,6 +108,7 @@ function( plot_set = 3,
   # Overwrite labels using run-time user inputs if provided
   Report = amend_output( Report = Report,
                          TmbData = TmbData,
+                         Map = Map,
                          year_labels = year_labels,
                          category_names = category_names,
                          extrapolation_list = extrapolation_list )

@@ -7,13 +7,15 @@
 #'
 #' @export
 amend_output <-
-function( TmbData,
-          Report,
-          extrapolation_list,
-          Sdreport = NULL,
-          year_labels = NULL,
-          category_names = NULL,
-          strata_names = NULL ){
+function( fit = NULL,
+          TmbData = fit$data_list,
+          Report = fit$Report,
+          extrapolation_list = fit$extrapolation_list,
+          Map = fit$tmb_list$Map,
+          Sdreport = fit$parameter_estimates$SD,
+          year_labels = fit$year_labels,
+          category_names = fit$category_names,
+          strata_names = fit$strata_names ){
 
   # Local functions
   add_dimnames = function( Report, report_names, dimnames ){
@@ -82,12 +84,26 @@ function( TmbData,
 
   # Determine year-category pairs with no data
   Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
-  # Drop from maps
+  Num_ctl = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
+  Num_ctm = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_m)
   if( treat_missing_as_zero==TRUE ){
+    # if treat_missing_as_zero==TRUE, then switch density from year-categories with no data to zero
     Report$D_gct = ifelse(Num_gct==0, 0, Report$D_gct)
+    Report$Index_ctl = ifelse(Num_ctl==0, 0, Report$Index_ctl)
   }else{
-    Report$D_gct = ifelse(Num_gct==0, NA, Report$D_gct)
+    # If some intercepts are mapped off, then switch density from year-categories with no data to NA
+    if( any(is.na(Map$beta2_ft)) | any(is.na(Map$beta2_ft)) ){
+      Report$D_gct = ifelse(Num_gct==0, NA, Report$D_gct)
+      Report$Index_ctl = ifelse(Num_ctl==0, NA, Report$Index_ctl)
+    }
   }
+
+  # No need to map off spatial statistics mean_Z_ctm or effective_area_ctl in any years
+  # These are valid when betas are mapped off, or even when epsilons are mapped off given the potential covariates
+  #if( any(is.na(Map$beta2_ft)) | any(is.na(Map$beta2_ft)) ){
+  #  if("mean_Z_ctm" %in% names(Report)) Report$mean_Z_ctm = ifelse(Num_ctm==0, NA, Report$mean_Z_ctm)
+  #  if("effective_area_ctl" %in% names(Report)) Report$effective_area_ctl = ifelse(Num_ctl==0, NA, Report$effective_area_ctl)
+  #}
 
   # Add labels for all variables plotted using `plot_maps`
   Report = add_dimnames( Report = Report,
@@ -113,6 +129,9 @@ function( TmbData,
   Report = add_dimnames( Report = Report,
                          report_names = c("Index_ctl","effective_area_ctl","mean_D_ctl"),
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
+  Report = add_dimnames( Report = Report,
+                         report_names = "mean_Z_ctm",
+                         dimnames = list("Category"=category_names, "Time"=year_labels, colnames(TmbData$Z_gm)) )
 
   # Modify Sdreport
   if( !is.null(Sdreport) ){
@@ -125,8 +144,13 @@ function( TmbData,
   units(Report$mean_D_ctl) = units(TmbData$b_i)
 
   # Add units for COG, see: https://github.com/r-quantities/units/issues/291
+  # In case of re-running amend_output on objects with existing units
   if( "mean_Z_ctm" %in% names(Report) ){
-    units(Report$mean_Z_ctm) = sf::st_crs( extrapolation_list$projargs )$units
+    units(Report$mean_Z_ctm) = as_units("km")
+  }
+  if( "effective_area_ctl" %in% names(Report) ){
+    #units(Report$effective_area_ctl) = paste0( sf::st_crs( extrapolation_list$projargs )$units, "^2" )
+    units(Report$effective_area_ctl) = as_units("km^2")
   }
 
   # Check for bad entries

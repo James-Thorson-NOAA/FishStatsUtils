@@ -98,12 +98,24 @@ function( Sdreport,
       for( mI in 1:dim(SD_mean_Z_ctm)[[3]]){
         Ybounds = (SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate']%o%rep(interval_width,2) + SD_mean_Z_ctm[cI,years_to_plot,mI,'Std. Error']%o%c(-interval_width,interval_width))
         Ylim = range(Ybounds,na.rm=TRUE)
-        plot_lines(x=year_labels[years_to_plot], y=SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate'], ybounds=Ybounds, col_bounds=rgb(1,0,0,0.2), fn=plot,
-          type="l", lwd=2, col="red", bounds_type="shading", ylim=Ylim, xlab="", ylab="", main="")
+        plot_lines( x = year_labels[years_to_plot],
+                    y = SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate'],
+                    ybounds = Ybounds,
+                    col_bounds = rgb(1,0,0,0.2),
+                    fn = plot,
+                    type = "l",
+                    lwd = 2,
+                    col = "red",
+                    bounds_type = "shading",
+                    ylim = Ylim,
+                    xlab = "",
+                    ylab = "",
+                    main = "" )
         if( cI==1 ) mtext(side=3, text=Znames[mI], outer=FALSE )
         if( mI==dim(SD_mean_Z_ctm)[[3]] & TmbData$n_c>1 ) mtext(side=4, text=category_names[cI], outer=FALSE, line=0.5)
       }}
-      mtext( side=1:2, text=c("Year","Location"), outer=TRUE, line=c(0,0) )
+      mtext( side=1, text="Year", outer=TRUE, line=c(0,0) )
+      mtext( side=2, text=make_unit_label(u=units(Report$mean_Z_ctm),lab="Location",parse=FALSE), outer=TRUE, line=c(0,0) )
     dev.off()
 
     # Write to file
@@ -169,7 +181,7 @@ function( Sdreport,
                 scale = "log",
                 interval_width = interval_width,
                 xlab = "Year",
-                ylab = "Effective area occupied [km^2]",
+                ylab = make_unit_label( u = units(Report$effective_area_ctl), lab = "Effective area occupied", parse = FALSE ), # "Effective area occupied [km^2]",
                 Yrange = c(NA,NA),
                 width = ceiling(TmbData$n_c/ceiling(sqrt(TmbData$n_c)))*4,
                 #plot_args = list(log="y"),

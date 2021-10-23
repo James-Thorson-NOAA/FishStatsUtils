@@ -173,12 +173,9 @@ function( fit,
   # Not restricting to named arguments using args_to_use so that ... passes settings to plot_variable even that aren't formal arguments to plot_maps
   plot_maps_args = list(...)
   plot_maps_args = combine_lists( "input"=plot_maps_args, # "args_to_use"=formalArgs(plot_maps)
-    "default" = list( plot_set = plot_set,
+    "default" = list( fit = fit,
+                      plot_set = plot_set,
                       category_names = category_names,
-                      TmbData = fit$data_list,
-                      Report = fit$Report,
-                      Sdreport = fit$parameter_estimates$SD,
-                      extrapolation_list = fit$extrapolation_list,
                       PlotDF = map_list[["PlotDF"]],
                       MapSizeRatio = map_list[["MapSizeRatio"]],
                       working_dir = working_dir,
@@ -186,7 +183,6 @@ function( fit,
                       years_to_plot = years_to_plot,
                       legend_x = map_list[["Legend"]]$x/100,
                       legend_y = map_list[["Legend"]]$y/100,
-                      Obj = fit$tmb_list$Obj,
                       projargs = projargs,
                       n_cells = n_cells) )
   Dens_xt = do.call( what=plot_maps, args=plot_maps_args )
