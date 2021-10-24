@@ -68,7 +68,7 @@ function( plot_set = 3,
           TmbData = fit$data_list,
           Obj = fit$tmb_list$Obj,
           extrapolation_list = fit$extrapolation_list,
-          Sdreport = fit$parameter_estimates$par,
+          Sdreport = fit$parameter_estimates$SD,
           Map = fit$tmb_list$Map,
           zlim = NULL,
           ...){
