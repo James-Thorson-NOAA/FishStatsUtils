@@ -2,17 +2,21 @@
 % Please edit documentation in R/amend_output.R
 \name{amend_output}
 \alias{amend_output}
-\title{Format density covariate matrix}
+\title{Amend output from VAST for user convenience}
 \usage{
 amend_output(
-  TmbData,
-  Report,
-  Sdreport = NULL,
-  year_labels = NULL,
-  category_names = NULL,
-  strata_names = NULL
+  fit = NULL,
+  TmbData = fit$data_list,
+  Report = fit$Report,
+  extrapolation_list = fit$extrapolation_list,
+  Map = fit$tmb_list$Map,
+  Sdreport = fit$parameter_estimates$SD,
+  year_labels = fit$year_labels,
+  category_names = fit$category_names,
+  strata_names = fit$strata_names
 )
 }
 \description{
-\code{amend_output} uses a formula interface to generate covariates
+\code{amend_output} add labels, units, and performs logical operations,
+e.g., adds zeros as needed, to simplify user and downstream interpretation.
 }

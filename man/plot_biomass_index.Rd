@@ -6,13 +6,13 @@
 \usage{
 plot_biomass_index(
   fit,
-  year_labels = NULL,
-  years_to_plot = NULL,
   DirName = paste0(getwd(), "/"),
   PlotName = "Index",
   interval_width = 1,
-  strata_names = NULL,
+  years_to_plot = NULL,
   category_names = NULL,
+  year_labels = NULL,
+  strata_names = NULL,
   use_biascorr = TRUE,
   plot_legend = TRUE,
   total_area_km2 = NULL,
@@ -28,19 +28,19 @@ plot_biomass_index(
 )
 }
 \arguments{
-\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
-
-\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
-
 \item{DirName}{Directory for saving plot and table}
 
 \item{PlotName}{Name for plot}
 
 \item{interval_width}{width for confidence intervals}
 
-\item{strata_names}{names for spatial strata}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{category_names}{names for categories (if using package \code{`VAST`})}
+
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
+
+\item{strata_names}{names for spatial strata}
 
 \item{use_biascorr}{Boolean, whether to use bias-corrected estimates if available}
 

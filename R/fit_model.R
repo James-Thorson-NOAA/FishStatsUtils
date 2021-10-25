@@ -251,7 +251,7 @@ function( settings,
       message("\n")
       stop("Please check model structure; some parameter has a gradient of zero at starting values\n", call.=FALSE)
     }else{
-      message("Looks good: All fixed effects have a nonzero gradient")
+      message("No problem detected: All fixed effects have a nonzero gradient")
     }
   }
 

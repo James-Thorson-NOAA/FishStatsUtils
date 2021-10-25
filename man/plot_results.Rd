@@ -12,6 +12,7 @@ plot_results(
   year_labels = fit$year_labels,
   years_to_plot = fit$years_to_plot,
   category_names = fit$category_names,
+  strata_names = fit$strata_names,
   use_biascorr = TRUE,
   map_list,
   check_residuals = TRUE,
@@ -64,6 +65,8 @@ plot_results(
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{category_names}{character vector specifying names for labeling categories \code{c_i}}
+
+\item{strata_names}{names for spatial strata}
 
 \item{map_list}{output from \code{\link{make_map_info}}, which is included in output of \code{\link{plot_results}}}
 

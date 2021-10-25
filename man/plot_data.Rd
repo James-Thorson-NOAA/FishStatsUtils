@@ -15,7 +15,7 @@ plot_data(
   Plot1_name = "Data_and_knots.png",
   Plot2_name = "Data_by_year.png",
   col = "red",
-  cex = 0.01,
+  cex = 0.1,
   pch = 19,
   year_labels,
   projargs = "+proj=longlat",
