@@ -29,6 +29,8 @@ fit_model(
   build_model = TRUE,
   run_model = TRUE,
   test_fit = TRUE,
+  category_names = NULL,
+  year_labels = NULL,
   ...
 )
 }
@@ -39,16 +41,29 @@ fit_model(
 
 \item{Lon_i}{Numeric vector, providing longitude for each sample}
 
-\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
+\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i.
+The first modeled interval will be \code{min(t_i)}, and last will be \code{max(t_i)},
+and every interval corresponding to integers between \code{min(t_i)} and \code{max(t_i)} will also be modeled.}
 
-\item{b_i}{Numeric vector, providing sampled value (biomass, counts, etc.) for each observation i}
+\item{b_i}{Vector, providing sampled value (biomass, counts, etc.) for each observation i.
+Users should provide values as class \code{\link[units]{units}}, e.g., \code{as_units(x, "kg")} for data in units kilograms,
+\code{as_units(x, "count")} for numbers, or \code{as_units(x, "kg/km^2")} for area-standarized biomass, etc.
+If units are missing, the default behavior is to coerce the vector to units "kg".
+Units are then used in subsequent plotting. Users can also specify \code{b_i=NA} for some observations,
+e.g., when seeking to ensure that the model includes hindcast/forecast years that do not otherwise have sampling data}
 
-\item{a_i}{Numeric vector containing values greater than zero, providing sampled area for each
-observation i;  use \code{a_i=1} for observations without a natural area measurement, while
-noting that resulting densities no longer have interpretable units in that case)}
+\item{a_i}{Vector containing values greater than zero, providing sampled area for each
+observation i, e.g., \code{as_units(x, "km^2")} for area swept in square-kilometers.
+use \code{as_units(1, unitless)} for observations without a natural area measurement
+(noting that resulting densities no longer have interpretable units in that case),
+or for observations where the response \code{b_i} already standardizes for area, e.g.,
+\code{b_i = as_units(x, "kg/km^2")}}
 
 \item{c_iz}{Vector of integers ranging from 0 to the number of variables minus 1, providing the
-category (e.g., species, length-bin) for each observation i}
+category (e.g., species, length-bin) for each observation i.
+This can be specified as a matrix, such that each observation is associated with multiple categories.
+Such specification treats samples as arising from the sum across multiple categories, e.g.,
+to account for unlabeled multispecies data.}
 
 \item{v_i}{Vector of integers ranging from 0 to the number of vessels minus 1,
 providing sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
@@ -61,6 +76,9 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
   \item{\code{X1config_cp[c,p]=1}}{\code{X_ip[,p]} has a linear effect on 1st linear predictor for category c}
   \item{\code{X1config_cp[c,p]=2}}{\code{X_ip[,p]} has a spatially varying, zero-centered linear effect on 1st linear predictor for category c}
   \item{\code{X1config_cp[c,p]=3}}{\code{X_ip[,p]} has a spatially varying linear effect on 1st linear predictor for category c}
+  \item{\code{X1config_cp[c,p]=4}}{Replaces covariate \code{X_ip[,p]} with \code{beta1_tc[,c]+beta2_tc[,c]} for the corresponding
+                                            year and category, which has a zero-centered spatially varying effect on 1st linear predictor.
+                                            This then represents a density-dependent effect on distribution. (NOTE: still in beta testing)}
   \item{\code{X1config_cp[c,p]=-1}}{\code{X1config_cp[c,p]=-1} is the same as \code{X1config_cp[c,p]=2}, but without including the log-likelihood term; this is useful in special cases when carefully mirroring spatially varying coefficients, e.g., to use cohort effects in a age-structured spatio-temporal model}
 }}
 
@@ -68,10 +86,17 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
 
 \item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)}
 
-\item{X1_formula}{right-sided formula affecting the 1st linear predictor for density, e.g.,
-\code{X1_formula=~BOT_DEPTH+BOT_DEPTH^2} for a quadratic effect of variable \code{BOT_DEPTH}}
+\item{X1_formula}{right-sided formula affecting the 1st linear predictor
+which is then estimated independently for each model category \code{c_i}, e.g.,
+use \code{X1_formula=~BOT_DEPTH+BOT_DEPTH^2} for a quadratic effect of variable \code{BOT_DEPTH}
+that is estimated independently for each category.
+The effect of an estimated effect also used upon when predicting the value for each location
+in the extrapolation-grid.  Therefore, \code{X1_formula} is interepreted as affecting the "true"
+underlying value of each variable, and it affects both samples and extrapolated values.
+It is allowed to include \code{Year} in the formula, although please check whether it is
+interpreted as numeric or factor-valued.}
 
-\item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for density}
+\item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor.}
 
 \item{Q1config_k}{Same as argument \code{X1config_cp} but affecting affecting the 1st linear predictor for catchability,
 and note that it is a vector (instead of matrix) given that catchability responses do not vary among variables \code{c}
@@ -81,9 +106,18 @@ by default (but can be specified to do so when an appropriate `formula` is suppl
 
 \item{catchability_data}{data-frame of covariates for use when specifying \code{Q1_formula} and \code{Q2_formula}}
 
-\item{Q1_formula}{same as \code{X1_formula} but affecting the 1st linear predictor for catchability (a.k.a. detectability)}
+\item{Q1_formula}{Similar to \code{X1_formula}, \code{Q1_formula} affects the 1st linear predictor for samples.
+However, the effect of \code{Q1_formula} is not used when predicting values at extrapolation-grid locations.
+Therefore, the \code{Q1_formula} is interpreted as affecting "catchability" (a.k.a. "detectabiility"), and it represents
+processes that affect the outcome of sampling but not the "true" underlying value of a variable being sampled.
+For example, a factor representing gear-type might be included to estimate the relative performacne of each gear type
+(relative to the base level of that factor).
+Note that \code{Q1_formula} defines a relationship that is applied to all samples (regardless of category \code{c_i}),
+whereas \code{X1_formula} defines a relationship that is estimated independently for each category.
+For a catchability covariate that varies by category, please include the category as factor in \code{catchability_data}
+and then include an interaction with category in \code{Q1_formula} for any variable which has an effect that varies among categories.}
 
-\item{Q2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for catchability (a.k.a. detectability)}
+\item{Q2_formula}{same as \code{Q2_formula} but affecting the 2nd linear predictor.}
 
 \item{newtonsteps}{Integer specifying the number of extra newton steps to take
 after optimization (alternative to \code{loopnum}).
@@ -100,6 +134,10 @@ when fixed effects are at upper or lower bounds.}
 \item{run_model}{Boolean indicating whether to run the model or simply return the inputs and built TMB object}
 
 \item{test_fit}{Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
+
+\item{category_names}{character vector specifying names for labeling categories \code{c_i}}
+
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}

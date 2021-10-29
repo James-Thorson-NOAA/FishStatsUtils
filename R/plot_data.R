@@ -27,7 +27,7 @@ function( Extrapolation_List,
           Plot1_name = "Data_and_knots.png",
           Plot2_name = "Data_by_year.png",
           col = "red",
-          cex = 0.01,
+          cex = 0.1,
           pch = 19,
           year_labels,
           projargs = '+proj=longlat',
@@ -52,25 +52,40 @@ function( Extrapolation_List,
   }else{
     if(length(pch)!=length(Year_i)) stop("input `pch` has wrong length")
   }
-  if( length(col) == 1 ){
+  if( is.function(col) ){
+    col = col(length(Year_i))
+  }else if( length(col) == 1 ){
     col = rep( col, length(Year_i) )
   }else{
     if(length(col)!=length(Year_i)) stop("input `col` has wrong length")
   }
 
   # CRS for original and new projections
+  CRS_orig = sp::CRS( '+proj=longlat' )
   CRS_proj = sp::CRS( projargs )
 
   # Data for mapping
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
-  map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
+  # Fix warning messages from projecting rnaturalearth object
+  # Solution: Recreate SpatialPolygonsDataFrame from output
+  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
+  # comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
+  map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
+
+  # project Lat_i/Lon_i
+  sample_data = sp::SpatialPoints( coords=cbind(Lon_i,Lat_i), proj4string=CRS_orig )
+  sample_proj = sp::spTransform( sample_data, CRSobj=CRS_proj)
 
   # Plot data and grid
   if( !missing(Extrapolation_List) & !missing(Spatial_List) ){
+    # Project extrapolation grid
+    which_rows = which( strip_units(Extrapolation_List[["Area_km2_x"]])>0 & strip_units(rowSums(Extrapolation_List[["a_el"]]))>0 )
+    grid_data = sp::SpatialPoints( coords=Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], proj4string=CRS_orig )
+    grid_proj = sp::spTransform( grid_data, CRSobj=CRS_proj)
+
     png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
       par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
-      which_rows = which( Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
-      plot( Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], cex=0.01, main="Extrapolation (Lat-Lon)" )
+      plot( grid_data@coords, cex=0.01, main="Extrapolation (Lat-Lon)" )
       sp::plot( map_data, col=land_color, add=TRUE )
       if( !any(is.na(Extrapolation_List$Data_Extrap[,c('E_km','N_km')])) ){
         plot( Extrapolation_List$Data_Extrap[which_rows,c('E_km','N_km')], cex=0.01, main="Extrapolation (North-East)" )
@@ -88,11 +103,11 @@ function( Extrapolation_List,
   if(!is.null(Plot2_name)) png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(year_labels) ){
-      plot( 1, type="n", xlim=range(Lon_i), ylim=range(Lat_i), main=year_labels[t], xaxt="n", yaxt="n" )
-      sp::plot( map_data, col=land_color, add=TRUE )
+      plot( 1, type="n", xlim=range(sample_proj@coords[,1]), ylim=range(sample_proj@coords[,2]), main=year_labels[t], xaxt="n", yaxt="n" )
+      sp::plot( map_proj, col=land_color, add=TRUE )
       Which = which( Year_i == year_labels[t] )
       if( length(Which)>0 ){
-        points( x=Lon_i[Which], y=Lat_i[Which], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
+        points( x=sample_proj@coords[Which,1], y=sample_proj@coords[Which,2], cex=cex[Which], col=col[Which], pch=pch[Which], ... )
       }
       if( t>(length(year_labels)-Ncol) ) axis(1)
       if( t%%Ncol == 1 ) axis(2)

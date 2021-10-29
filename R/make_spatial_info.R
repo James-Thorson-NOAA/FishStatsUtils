@@ -93,7 +93,7 @@ make_spatial_info = function( n_x,
       LAT_intensity = Lat_i
     }
     if( knot_method=="grid" ){
-      which_rows = which( Extrapolation_List$Data_Extrap[,'Include']==TRUE & Extrapolation_List[["Area_km2_x"]]>0 & rowSums(Extrapolation_List[["a_el"]])>0 )
+      which_rows = which( Extrapolation_List$Data_Extrap[,'Include']==TRUE & strip_units(Extrapolation_List[["Area_km2_x"]])>0 & strip_units(rowSums(Extrapolation_List[["a_el"]]))>0 )
       LON_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lon']
       LAT_intensity = Extrapolation_List$Data_Extrap[ which_rows, 'Lat']
     }
@@ -112,7 +112,7 @@ make_spatial_info = function( n_x,
 
     # Calculate grid for 2D AR1 process
     loc_grid = expand.grid( 'Lon'=seq(Grid_bounds[1,1],Grid_bounds[2,1],by=grid_size_LL), 'Lat'=seq(Grid_bounds[1,2],Grid_bounds[2,2],by=grid_size_LL) )
-    Which = sort(unique(RANN::nn2(data=loc_grid, query=Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('Lon','Lat')], k=1)$nn.idx[,1]))
+    Which = sort(unique(RANN::nn2(data=loc_grid, query=Extrapolation_List$Data_Extrap[which(strip_units(Extrapolation_List$Area_km2_x)>0),c('Lon','Lat')], k=1)$nn.idx[,1]))
     loc_grid = loc_grid[Which,]
     grid_num = RANN::nn2( data=loc_grid, query=loc_i, k=1)$nn.idx[,1]
   }
@@ -130,7 +130,7 @@ make_spatial_info = function( n_x,
 
     # Calculate grid for 2D AR1 process
     loc_grid = expand.grid( 'E_km'=seq(Grid_bounds[1,1],Grid_bounds[2,1],by=grid_size_km), 'N_km'=seq(Grid_bounds[1,2],Grid_bounds[2,2],by=grid_size_km) )
-    Which = sort(unique(RANN::nn2(data=loc_grid, query=Extrapolation_List$Data_Extrap[which(Extrapolation_List$Area_km2_x>0),c('E_km','N_km')], k=1)$nn.idx[,1]))
+    Which = sort(unique(RANN::nn2(data=loc_grid, query=Extrapolation_List$Data_Extrap[which(strip_units(Extrapolation_List$Area_km2_x)>0),c('E_km','N_km')], k=1)$nn.idx[,1]))
     loc_grid = loc_grid[Which,]
     grid_num = RANN::nn2( data=loc_grid, query=loc_i, k=1)$nn.idx[,1]
   }
@@ -155,7 +155,7 @@ make_spatial_info = function( n_x,
     loc_g = loc_x
   }
   if( fine_scale==TRUE ){
-    loc_g = Extrapolation_List$Data_Extrap[ which(Extrapolation_List$Area_km2_x>0), c('E_km','N_km') ]
+    loc_g = Extrapolation_List$Data_Extrap[ which(strip_units(Extrapolation_List$Area_km2_x)>0), c('E_km','N_km') ]
   }
 
   # Convert loc_x back to location in lat-long coordinates latlon_x
@@ -180,8 +180,35 @@ make_spatial_info = function( n_x,
     MeshList = make_mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
       fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
   }
-  n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x),
-    "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x), "barrier"=MeshList$anisotropic_spde$n.spde,  )
+
+  # Deal with loc_s and latlon_s
+  if( tolower(Method)=="mesh"){
+    n_s = MeshList$anisotropic_spde$n.spde
+    loc_s = MeshList$anisotropic_spde$mesh$loc[,1:2]
+  }
+  if( tolower(Method)=="grid"){
+    n_s = nrow(loc_x)
+    loc_s = loc_x
+  }
+  if( tolower(Method)=="spherical_mesh"){
+    n_s = MeshList$isotropic_spde$n.spde
+    loc_s = NA
+  }
+  if( tolower(Method)=="stream_network"){
+    n_s = nrow(loc_x)
+    loc_s = loc_x
+  }
+  if( tolower(Method)=="barrier"){
+    n_s = MeshList$anisotropic_spde$n.spde
+    loc_s = MeshList$anisotropic_spde$mesh$loc[,1:2]
+  }
+  if(is.na(as.vector(loc_s)[1])){
+    latlon_s = NA
+  }else{
+    colnames(loc_s) = c("E_km", "N_km")
+    latlon_s = project_coordinates( X=loc_s[,"E_km"], Y=loc_s[,"N_km"], projargs=origargs, origargs=Extrapolation_List$projargs )[,c("Y","X")]
+    colnames(latlon_s) = c("Lat", "Lon")
+  }
 
   # Make matrices for 2D AR1 process
   Dist_grid = dist(loc_grid, diag=TRUE, upper=TRUE)
@@ -219,7 +246,7 @@ make_spatial_info = function( n_x,
       a_gl = PolygonList[["a_xl"]]
     }
     if( fine_scale==TRUE ){
-      a_gl = as.matrix(Extrapolation_List[["a_el"]][ which(Extrapolation_List$Area_km2_x>0), ])
+      a_gl = as.matrix(Extrapolation_List[["a_el"]][ which(strip_units(Extrapolation_List$Area_km2_x)>0), ])
     }
   }else{
     PolygonList = NULL
@@ -231,18 +258,18 @@ make_spatial_info = function( n_x,
   # Moving
   if( fine_scale==TRUE | Method=="Stream_network" ){
     g_e = rep(NA, length(Extrapolation_List[["Area_km2_x"]]))
-    g_e[ which(Extrapolation_List[["Area_km2_x"]]>0) ] = 1:length(which(Extrapolation_List[["Area_km2_x"]]>0))
+    g_e[ which(strip_units(Extrapolation_List[["Area_km2_x"]])>0) ] = 1:length(which(strip_units(Extrapolation_List[["Area_km2_x"]])>0))
   }else{
     g_e = PolygonList$NN_Extrap$nn.idx[,1]
-    g_e[ which(Extrapolation_List[["Area_km2_x"]]==0) ] = NA
+    g_e[ which(strip_units(Extrapolation_List[["Area_km2_x"]])==0) ] = NA
   }
 
   # Return
   Return = list( "fine_scale"=fine_scale, "A_is"=A_is, "A_gs"=A_gs, "n_x"=n_x, "n_s"=n_s, "n_g"=nrow(a_gl), "n_i"=nrow(loc_i),
     "MeshList"=MeshList, "GridList"=GridList, "a_gl"=a_gl, "a_xl"=a_gl, "Kmeans"=Kmeans, "knot_i"=knot_i,
-    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g), "g_e"=g_e,
+    "loc_i"=as.matrix(loc_i), "loc_x"=as.matrix(loc_x), "loc_g"=as.matrix(loc_g), "loc_s"=as.matrix(loc_s), "g_e"=g_e,
     "Method"=Method, "PolygonList"=PolygonList, "NN_Extrap"=PolygonList$NN_Extrap, "knot_method"=knot_method,
-    "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i )
+    "latlon_x"=latlon_x, "latlon_g"=latlon_g, "latlon_i"=latlon_i, "latlon_s"=latlon_s )
   class(Return) = "make_spatial_info"
   return( Return )
 }

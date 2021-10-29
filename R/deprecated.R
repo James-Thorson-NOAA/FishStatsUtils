@@ -755,12 +755,12 @@ Plot_range_quantiles = function( Data_Extrap, Report, TmbData, a_xl, NN_Extrap, 
   }
 
   # Extrapolation locations
-  Data_Extrap_Range = cbind( Data_Extrap[,c('Lat','Lon','N_km','E_km')], 'Include'=ifelse(Data_Extrap[,'Area_km2']>0, TRUE, FALSE) )
+  Data_Extrap_Range = cbind( Data_Extrap[,c('Lat','Lon','N_km','E_km')], 'Include'=ifelse(strip_units(Data_Extrap[,'Area_km2'])>0, TRUE, FALSE) )
   # Add and rescale density
   for(t in 1:length(Year_Set)){
-    Data_Extrap_Range = cbind( Data_Extrap_Range, Report$Index_xtl[NN_Extrap$nn.idx,t,1] * (Data_Extrap[,'Area_km2'] / a_xl[NN_Extrap$nn.idx,1]) )
+    Data_Extrap_Range = cbind( Data_Extrap_Range, Report$Index_xtl[NN_Extrap$nn.idx,t,1] * (strip_units(Data_Extrap[,'Area_km2']) / a_xl[NN_Extrap$nn.idx,1]) )
     colnames( Data_Extrap_Range )[ncol(Data_Extrap_Range)] = paste0("Year_",Year_Set[t])
-    Data_Extrap_Range[,paste0("Year_",Year_Set[t])] = ifelse( Data_Extrap[,'Area_km2']==0 & a_xl[NN_Extrap$nn.idx,1]==0, 0, Data_Extrap_Range[,paste0("Year_",Year_Set[t])])
+    Data_Extrap_Range[,paste0("Year_",Year_Set[t])] = ifelse( strip_units(Data_Extrap[,'Area_km2'])==0 & a_xl[NN_Extrap$nn.idx,1]==0, 0, Data_Extrap_Range[,paste0("Year_",Year_Set[t])])
   }
 
   # Plot
@@ -1559,7 +1559,7 @@ plot_quantile_diagnostic <- function(TmbData,
       }
 
       # Find where b_i > 0 within category i_e
-      Which = which(TmbData$b_i > 0 & e_i == (i_e-1))
+      Which = which(strip_units(TmbData$b_i) > 0 & e_i == (i_e-1))
       Q = rep(NA, length(Which)) # vector to track quantiles for each observation
       y = array(NA, dim=c(length(Which),1000)) # matrix to store samples
       pred_y = var_y = rep(NA, length(Which) ) # vector to track quantiles for each observation
@@ -1577,14 +1577,14 @@ plot_quantile_diagnostic <- function(TmbData,
       }
       if( length(ObsModel_ez[i_e,])==1 || ObsModel_ez[i_e,2]%in%c(0,3) ){
         for(ObsI in 1:length(Which)){
-          pred_y[ObsI] = TmbData$a_i[Which[ObsI]] * exp(Report$P2_i[Which[ObsI]])
+          pred_y[ObsI] = strip_units(TmbData$a_i[Which[ObsI]]) * exp(Report$P2_i[Which[ObsI]])
         }
       }
       if( length(ObsModel_ez[i_e,])>=2 && ObsModel_ez[i_e,2]%in%c(1,4) ){
         for(ObsI in 1:length(Which)){
           if(sigmaM[e_i[Which[ObsI]]+1,3]!=1) stop("`QQ_Fn` will not work with Poisson-link delta model across all VAST versions given values for turned-off parameters")
-          R1_i = 1 - exp( -1 * sigmaM[e_i[Which[ObsI]]+1,3] * TmbData$a_i[Which[ObsI]] * exp(Report$P1_i[Which[ObsI]]) )
-          pred_y[ObsI] = TmbData$a_i[Which[ObsI]] * exp(Report$P1_i[Which[ObsI]]) / R1_i * exp(Report$P2_i[Which[ObsI]]);
+          R1_i = 1 - exp( -1 * sigmaM[e_i[Which[ObsI]]+1,3] * strip_units(TmbData$a_i[Which[ObsI]]) * exp(Report$P1_i[Which[ObsI]]) )
+          pred_y[ObsI] = strip_units(TmbData$a_i[Which[ObsI]]) * exp(Report$P1_i[Which[ObsI]]) / R1_i * exp(Report$P2_i[Which[ObsI]]);
         }
       }
 
@@ -1592,12 +1592,12 @@ plot_quantile_diagnostic <- function(TmbData,
       for(ObsI in 1:length(Which)){
         if(ObsModel_ez[i_e,1]==1){
           y[ObsI,] = rlnorm(n=ncol(y), meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])   # Plotting in log-space
-          Q[ObsI] = plnorm(q=TmbData$b_i[Which[ObsI]], meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])
+          Q[ObsI] = plnorm(q=strip_units(TmbData$b_i[Which[ObsI]]), meanlog=log(pred_y[ObsI])-pow(sigmaM[i_e,1],2)/2, sdlog=sigmaM[i_e,1])
         }
         if(ObsModel_ez[i_e,1]==2){
           b = pow(sigmaM[i_e, 1],2) * pred_y[ObsI];
           y[ObsI,] = rgamma(n=ncol(y), shape=1/pow(sigmaM[i_e,1],2), scale=b)
-          Q[ObsI] = pgamma(q=TmbData$b_i[Which[ObsI]], shape=1/pow(sigmaM[i_e,1],2), scale=b)
+          Q[ObsI] = pgamma(q=strip_units(TmbData$b_i[Which[ObsI]]), shape=1/pow(sigmaM[i_e,1],2), scale=b)
         }
       }
 
@@ -1612,7 +1612,7 @@ plot_quantile_diagnostic <- function(TmbData,
         Quantiles = quantile(y[ObsI,],prob=c(0.025,0.25,0.75,0.975))
         lines(x=c(ObsI,ObsI), y=Quantiles[2:3], lwd=2)
         lines(x=c(ObsI,ObsI), y=Quantiles[c(1,4)], lwd=1,lty="dotted")
-        if(TmbData$b_i[Which[ObsI]]>max(Quantiles) | TmbData$b_i[Which[ObsI]]<min(Quantiles)){
+        if( strip_units(TmbData$b_i[Which[ObsI]])>max(Quantiles) | strip_units(TmbData$b_i[Which[ObsI]])<min(Quantiles)){
           points(x=ObsI,y=TmbData$b_i[Which[ObsI]],pch=4,col="red",cex=2)
         }
       }
@@ -1696,8 +1696,8 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
     which_i_in_y = which( apply(which_i_in_y,MARGIN=1,FUN=all) )
     if( length(which_i_in_y)>0 ){
       exp_rate_xy[,yI] = tapply( Report$R1_i[which_i_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
-      obs_rate_xy[,yI] = tapply( TmbData$b_i[which_i_in_y]>0, INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
-      total_num_xy[,yI] = tapply( TmbData$b_i[which_i_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=length )
+      obs_rate_xy[,yI] = tapply( strip_units(TmbData$b_i[which_i_in_y])>0, INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=mean )
+      total_num_xy[,yI] = tapply( strip_units(TmbData$b_i[which_i_in_y]), INDEX=factor(spatial_list$knot_i[which_i_in_y],levels=1:spatial_list$n_x), FUN=length )
     }else{
       total_num_xy[,yI] = 0
     }
@@ -1722,7 +1722,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
 
   # Extract quantile for positive catch rates
   #Q_i = Q[["Q"]]
-  which_pos = which(TmbData$b_i>0)
+  which_pos = which( strip_units(TmbData$b_i)>0 )
   bvar_ipos = bpred_ipos = NULL
   # Univariate Q interface
   if( all(c("var_y","pred_y") %in% names(Q)) ){
@@ -1763,7 +1763,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
     which_ipos_in_y = ( TmbData$t_iz[which_pos,] == outer(rep(1,length(which_pos)),TmbData$t_yz[yI,]) )
     which_ipos_in_y = which( apply(which_ipos_in_y,MARGIN=1,FUN=all) )
     if( length(which_i_in_y_and_pos)>0 ){
-      sum_obs_xy[,yI] = tapply( TmbData$b_i[which_i_in_y_and_pos], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
+      sum_obs_xy[,yI] = tapply( strip_units(TmbData$b_i[which_i_in_y_and_pos]), INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
       sum_exp_xy[,yI] = tapply( bpred_ipos[which_ipos_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
       var_exp_xy[,yI] = tapply( bvar_ipos[which_ipos_in_y], INDEX=factor(spatial_list$knot_i[which_i_in_y_and_pos],levels=1:spatial_list$n_x), FUN=sum )
     }
@@ -1794,7 +1794,7 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
       # Spatial information
       # Aggregate residual-values to knots regardless of value for fine_scale
       x2i = spatial_list$NN_Extrap$nn.idx[,1]
-      Include = extrapolation_list[["Area_km2_x"]]>0 & extrapolation_list[["a_el"]][,1]>0
+      Include = strip_units(extrapolation_list[["Area_km2_x"]])>0 & strip_units(extrapolation_list[["a_el"]][,1])>0
       DF = cbind( extrapolation_list$Data_Extrap[,c('Lon','Lat')], "x2i"=x2i, "Include"=Include )
 
       # Fill in labels

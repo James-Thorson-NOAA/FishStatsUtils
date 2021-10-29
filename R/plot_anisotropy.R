@@ -33,7 +33,7 @@ plot_anisotropy = function( Obj,
   Map = Obj$env$map
   Params = Obj$env$last.par.best
 
-  if( Options_vec['Aniso']!=1 ){
+  if( Options_vec['Aniso']!=1 | all(c("logkappa1","logkappa2") %in% names(Map)) ){
     message("Skipping plot of geometric anisotropy because it has been turned off")
   }else{
     # Decomposition

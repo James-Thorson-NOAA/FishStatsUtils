@@ -5,15 +5,14 @@
 \title{Plot index of abundance}
 \usage{
 plot_biomass_index(
-  TmbData,
-  Sdreport,
-  year_labels = NULL,
-  years_to_plot = NULL,
+  fit,
   DirName = paste0(getwd(), "/"),
   PlotName = "Index",
   interval_width = 1,
-  strata_names = NULL,
+  years_to_plot = NULL,
   category_names = NULL,
+  year_labels = NULL,
+  strata_names = NULL,
   use_biascorr = TRUE,
   plot_legend = TRUE,
   total_area_km2 = NULL,
@@ -22,39 +21,40 @@ plot_biomass_index(
   height = NULL,
   create_covariance_table = FALSE,
   Yrange = c(ifelse(plot_log == TRUE, NA, 0), NA),
+  TmbData = fit$data_list,
+  Sdreport = fit$parameter_estimates$SD,
+  extrapolation_list = fit$extrapolation_list,
   ...
 )
 }
 \arguments{
-\item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
-
-\item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
-
-\item{year_labels}{Year names for labeling panels}
-
-\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
-
 \item{DirName}{Directory for saving plot and table}
 
 \item{PlotName}{Name for plot}
 
 \item{interval_width}{width for confidence intervals}
 
-\item{strata_names}{names for spatial strata}
+\item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
-\item{category_names}{names for categories (if using package `VAST`)}
+\item{category_names}{names for categories (if using package \code{`VAST`})}
+
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
+
+\item{strata_names}{names for spatial strata}
 
 \item{use_biascorr}{Boolean, whether to use bias-corrected estimates if available}
 
 \item{plot_legend}{Add legend for labelling colors}
-
-\item{total_area_km2}{Total area for calculating a design-based estimator using one design-stratum (only recommended for model exploration)}
 
 \item{plot_log}{Boolean, whether to plot y-axis in log-scale}
 
 \item{width}{plot width in inches}
 
 \item{height}{plot height in inches}
+
+\item{TmbData}{Formatted data inputs, from \code{\link[VAST]{make_data}}}
+
+\item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
 \item{...}{Other inputs to `par()`}
 }

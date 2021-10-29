@@ -3,9 +3,13 @@
 #'
 #' \code{rotate_factors} rotates results from a factor model
 #'
-#' @param Cov_jj Covariance calculated from loadings matrix
-#' @param L_pj Loadings matrix for `p` categories and `j` factors (calculated from \code{Cov_jj} if it is provided)
+#' @param L_pj Loadings matrix for `p` categories and `j` factors (calculated from \code{Cov_pp} if it is provided)
 #' @param Psi_sjt Array of factors (1st dimension: spatial knots;  2nd dimension: factors;  3rd dimension:  time)
+#' @param Cov_pp Covariance calculated from loadings matrix.
+#'        if \code{Cov_pp} is provided and \code{L_pj=NULL}, then \code{L_pj} is calculated from \code{Cov_pp}
+#' @param Psi_spt Array of projected factors (1st dimension: spatial knots;  2nd dimension: categories;  3rd dimension:  time)
+#'        if \code{Psi_spt} is provided and \code{Psi_sjt=NULL}, then \code{Psi_sjt} is calculated from
+#'        \code{Psi_spt} and \code{L_pj}
 #' @param RotationMethod Method used for rotation when visualing factor decomposition results,
 #'        Options: "PCA" (recommended) or "Varimax"
 #' @param testcutoff tolerance for numerical rounding when confirming that rotation doesn't effect results
@@ -20,43 +24,74 @@
 
 #' @export
 rotate_factors <-
-function( Cov_jj = NULL,
-          L_pj = NULL,
+function( L_pj = NULL,
           Psi_sjt = NULL,
+          Cov_pp = NULL,
+          Psi_spt = NULL,
           RotationMethod = "PCA",
           testcutoff = 1e-10,
-          quiet = FALSE ){
+          quiet = FALSE,
+          ... ){
+
+  # Deprecated inputs
+  deprecated_inputs = list(...)
+  if( "Cov_jj" %in% names(deprecated_inputs) ){
+    Cov_pp = deprecated_inputs$Cov_jj
+    warning("argument `Cov_jj` in `rotate_factors` has been renamed `Cov_pp` for naming consistency")
+    print(Cov_pp)
+  }
 
   # If missing time, add a third dimension
   if( length(dim(Psi_sjt))==2 ){
     Psi_sjt = array( Psi_sjt, dim=c(dim(Psi_sjt),1) )
   }
+  if( length(dim(Psi_spt))==2 ){
+    Psi_spt = array( Psi_spt, dim=c(dim(Psi_spt),1) )
+  }
 
   # Local functions
   approx_equal = function(m1,m2,denominator=mean(m1+m2),d=1e-10) (2*abs(m1-m2)/denominator) < d
   trunc_machineprec = function(n) ifelse(n<1e-10,0,n)
-  Nknots = dim(Psi_sjt)[1]
   #Nyears = nrow(L_pj)
 
-  # Optional inputs
-  if( !is.null(Cov_jj) ){
-    if(quiet==FALSE) message( "Re-calculating L_pj from Cov_jj")
-    if( any(abs(Cov_jj-t(Cov_jj))>1e-6) ) stop("Cov_jj does not appear to be symmetric")
-    Nfactors = sum(abs(eigen(Cov_jj)$values)>1e-6)
-    #if( sum(eigen(Cov_jj)$values>testcutoff)<ncol(Cov_jj) ){
-    #  stop("Calculating L_pj from Cov_jj in 'Rotate_Fn' only works well when Cov_jj is full rank")
-    #}
-    #L_pj = t(chol(Cov_jj))[,1:Nfactors]
-    SVD = svd(V_cc)    # SVD$u %*% diag(SVD$d) %*% t(SVD$v) AND SVD$u == t(SVD$v) for a diagonal V_cc
-    L_pj = SVD$u %*% diag(sqrt(SVD$d))[,1:Nfactors,drop=FALSE]
-  }else{
+  # Default option: Use L_pj and Psi_sjt
+  if( !is.null(L_pj) ){
+    #if(quiet==FALSE) message("Using `L_pj` for loadings matrix")
     Nfactors = ncol(L_pj)
-    if( !is.null(L_pj) ){
-      if(quiet==FALSE) message("Using L_pj for loadings matrix")
+    # Drop singular factors
+    #Cov_pp = L_pj %*% t(L_pj)
+    #Nfactors = sum(abs(eigen(Cov_pp)$values)>1e-6)
+    #L_pj = L_pj[,1:Nfactors,drop=FALSE]
+    #Psi_sjt = Psi_sjt[,1:Nfactors,,drop=FALSE]
+  }else{
+    # Backup:  Calculate L_pj from Cov_pp, and Psi_sjt from Psi_spt
+    if( !is.null(Cov_pp) ){
+      if(quiet==FALSE) message( "Re-calculating `L_pj` from `Cov_pp`")
     }else{
-      stop( "Must provide either L_pj or Cov_jj" )
+      stop( "Must provide either `L_pj` or `Cov_pp`" )
+    }
+    if( any(abs(Cov_pp-t(Cov_pp))>1e-6) ) stop("`Cov_pp` does not appear to be symmetric")
+    Nfactors = sum(abs(eigen(Cov_pp)$values)>1e-6)
+    #Nfactors = nrow(Cov_pp)
+    SVD = svd(Cov_pp)    # SVD$u %*% diag(SVD$d) %*% t(SVD$v) AND SVD$u == t(SVD$v) for a diagonal Cov_pp
+    L_pj = SVD$u %*% diag(sqrt(SVD$d))[,1:Nfactors,drop=FALSE]
+
+    # Default option: Use Psi_sjt
+      # Backup:  Calculate Psi_sjt from Psi_spt
+    if( !is.null(Psi_sjt) ){
+      stop("Cannot supply `Cov_pp` and `Psi_sjt` to `rotate_factors`")
+    }else{
+      if( !is.null(Psi_spt) ){
+        if(quiet==FALSE) message( "Re-calculating `Psi_sjt` from `Psi_spt` and `L_pj`")
+        Psi_sjt = array(NA,dim=c(dim(Psi_spt)[1],Nfactors,dim(Psi_spt)[3]))
+        for( tI in 1:dim(Psi_spt)[3] ){
+          tmp = Psi_spt[,,tI] %*% SVD$u %*% diag(1/sqrt(SVD$d))
+          Psi_sjt[,,tI] = tmp[,1:Nfactors,drop=FALSE]
+        }
+      }
     }
   }
+  Nknots = dim(Psi_sjt)[1]
 
   # Varimax
   if( RotationMethod=="Varimax" ){
@@ -126,9 +161,11 @@ function( Cov_jj = NULL,
       # Should be orthogonal (R %*% transpose = identity matrix) with determinant one
       # Doesn't have det(R) = 1; determinant(Hinv$rotmat)!=1 ||
     Diag = Hinv$rotmat %*% t(Hinv$rotmat)
-    diag(Diag) = ifelse( diag(Diag)==0,1,diag(Diag) )
-    if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff)) ){
-      stop("Rotation matrix is not a rotation")
+    diag(Diag) = ifelse( abs(diag(Diag))<testcutoff, 1, diag(Diag) )
+    if( !all(approx_equal(Diag,diag(Nfactors), d=testcutoff, denominator=1)) ){
+      message("Rotation Hinv times its transpose:")
+      print( Diag )
+      stop("Error: Rotation matrix is not a rotation")
     }
   }
 

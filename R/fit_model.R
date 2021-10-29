@@ -39,6 +39,8 @@
 #' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
+#' @param category_names character vector specifying names for labeling categories \code{c_i}
+#' @param year_labels character vector specifying names for labeling times \code{t_i}
 #' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 #' where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
 #' passes named arguments to \code{\link[INLA]{inla.mesh.create}}.
@@ -117,6 +119,8 @@ function( settings,
           build_model = TRUE,
           run_model = TRUE,
           test_fit = TRUE,
+          category_names = NULL,
+          year_labels = NULL,
           ... ){
 
   # Capture extra arguments to function
@@ -130,9 +134,11 @@ function( settings,
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
+
   # Decide which years to plot
-  year_labels = seq( min(t_i), max(t_i) )
-  years_to_plot = which( year_labels %in% t_i )
+  if(is.null(year_labels)) year_labels = paste0( seq(min(t_i),max(t_i)) )
+  if(is.null(category_names)) category_names = paste0( 1:(max(c_iz,na.rm=TRUE)+1) )
+  years_to_plot = which( seq(min(t_i),max(t_i)) %in% t_i )
 
   # Save record
   message("\n### Writing output from `fit_model` in directory: ", working_dir)
@@ -228,6 +234,7 @@ function( settings,
            "tmb_list" = tmb_list,
            "year_labels" = year_labels,
            "years_to_plot" = years_to_plot,
+           "category_names" = category_names,
            "settings" = settings,
            "input_args" = input_args)
     class(Return) = "fit_model"
@@ -244,7 +251,7 @@ function( settings,
       message("\n")
       stop("Please check model structure; some parameter has a gradient of zero at starting values\n", call.=FALSE)
     }else{
-      message("Looks good: All fixed effects have a nonzero gradient")
+      message("No problem detected: All fixed effects have a nonzero gradient")
     }
   }
 
@@ -265,11 +272,11 @@ function( settings,
                        getsd = FALSE )
   # combine
   optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1, args_to_use=formalArgs(TMBhelper::fit_tmb) )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
+  parameter_estimates1 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
   if(exists("check_fit") & test_fit==TRUE ){
-    problem_found = VAST::check_fit( parameter_estimates )
+    problem_found = VAST::check_fit( parameter_estimates1 )
     if( problem_found==TRUE ){
       message("\n")
       stop("Please change model structure to avoid problems with parameter estimates and then re-try; see details in `?check_fit`\n", call.=FALSE)
@@ -290,13 +297,22 @@ function( settings,
   # combine while over-riding defaults using user inputs
   optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # over-ride inputs to start from previous MLE
-  optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates$par), default=optimize_args_input2 )
-  parameter_estimates = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
+  optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates1$par), default=optimize_args_input2 )
+  parameter_estimates2 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 
   # Extract standard outputs
-  if( "par" %in% names(parameter_estimates) ){
+  if( "par" %in% names(parameter_estimates2) ){
     Report = tmb_list$Obj$report()
-    ParHat = tmb_list$Obj$env$parList( parameter_estimates$par )
+    ParHat = tmb_list$Obj$env$parList( parameter_estimates2$par )
+
+    # Label stuff
+    Report = amend_output( Report = Report,
+                           TmbData = data_list,
+                           Map = tmb_list$Map,
+                           Sdreport = parameter_estimates2$SD,
+                           year_labels = year_labels,
+                           category_names = category_names,
+                           extrapolation_list = extrapolation_list )
   }else{
     Report = ParHat = "Model is not converged"
   }
@@ -314,11 +330,12 @@ function( settings,
          "spatial_list" = spatial_list,
          "data_list" = data_list,
          "tmb_list" = tmb_list,
-         "parameter_estimates" = parameter_estimates,
+         "parameter_estimates" = parameter_estimates2,
          "Report" = Report,
          "ParHat" = ParHat,
          "year_labels" = year_labels,
          "years_to_plot" = years_to_plot,
+         "category_names" = category_names,
          "settings" = settings,
          "input_args" = input_args,
          "X1config_cp" = X1config_cp,
@@ -455,6 +472,7 @@ summary.fit_model <- function(x,
                   n_samples=250,
                   working_dir=NULL,
                   type=1,
+                  random_seed = NULL,
                   ...)
 {
   ans = NULL
@@ -506,17 +524,42 @@ summary.fit_model <- function(x,
         if( zI%%max(1,floor(n_samples/10)) == 0 ){
           message( "  Finished sample ", zI, " of ",n_samples )
         }
-        b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type )$b_i
+        b_iz[,zI] = simulate_data( fit=list(tmb_list=list(Obj=Obj)), type=type, random_seed=list(random_seed+zI,NULL)[[1+is.null(random_seed)]] )$b_i
+      }
+      #if( any(is.na(x$data_list$b_i)) ){
+      #  stop("dharmaRes not designed to work when any observations have b_i=NA")
+      #}
+      # Substitute any observation where b_i = NA with all zeros, which will then have a uniform PIT
+      which_na = which(is.na(x$data_list$b_i))
+      if( length(which_na) > 0 ){
+        x$data_list$b_i[which_na] = 0
+        b_iz[which_na,] = 0
+        warning("When calculating DHARMa residuals, replacing instances where b_i=NA with a uniform PIT residual")
       }
       if( any(is.na(b_iz)) ){
         stop("Check simulated residuals for NA values")
       }
 
       # Run DHARMa
-      dharmaRes = DHARMa::createDHARMa(simulatedResponse=b_iz, # + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
-        observedResponse=x$data_list$b_i,
-        fittedPredictedResponse=fit$Report$D_i,
+      # Adding jitters because DHARMa version 0.3.2.0 sometimes still throws an error method="traditional" and integer=FALSE without jitters
+      dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz) + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
+        observedResponse=strip_units(x$data_list$b_i) + 1e-10*rnorm(length(x$data_list$b_i)),
+        fittedPredictedResponse=strip_units(x$Report$D_i),
         integer=FALSE)
+      #dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz),
+      #  observedResponse=strip_units(x$data_list$b_i),
+      #  fittedPredictedResponse=strip_units(x$Report$D_i),
+      #  method="PIT")
+
+      # Save to report error
+      if( FALSE ){
+        all = list( simulatedResponse=strip_units(b_iz), observedResponse=strip_units(x$data_list$b_i), fittedPredictedResponse=strip_units(x$Report$D_i) )
+        #save(all, file=paste0(root_dir,"all.RData") )
+        dharmaRes = DHARMa::createDHARMa(simulatedResponse=all$simulatedResponse + rep(1,nrow(all$simulatedResponse))%o%c(0.001*rnorm(1),rep(0,ncol(all$simulatedResponse)-1)),
+          observedResponse=all$observedResponse,
+          fittedPredictedResponse=all$fittedPredictedResponse,
+          method="PIT")
+      }
 
       # Calculate probability-integral-transform (PIT) residuals
       message( "Substituting probability-integral-transform (PIT) residuals for DHARMa-calculated residuals" )
@@ -537,7 +580,7 @@ summary.fit_model <- function(x,
 
       # Run OSA
       message( "Running oneStepPredict_deltaModel for each observation, to then load them into DHARMa object for plotting" )
-      osa = TMBhelper::oneStepPredict_deltaModel( obj = fit$tmb_list$Obj,
+      osa = TMBhelper::oneStepPredict_deltaModel( obj = x$tmb_list$Obj,
         observation.name = "b_i",
         method = "cdf",
         data.term.indicator = "keep",
@@ -547,7 +590,7 @@ summary.fit_model <- function(x,
       # Build DHARMa object on fake inputs and load OSA into DHARMa object
       dharmaRes = DHARMa::createDHARMa(simulatedResponse=matrix(rnorm(x$data_list$n_i*10,mean=x$data_list$b_i),ncol=10),
         observedResponse=x$data_list$b_i,
-        fittedPredictedResponse=fit$Report$D_i,
+        fittedPredictedResponse=x$Report$D_i,
         integer=FALSE)
       dharmaRes$scaledResiduals = pnorm(osa$residual)
     }else{
@@ -556,10 +599,10 @@ summary.fit_model <- function(x,
 
     # do plot
     if( is.null(working_dir) ){
-      plot(dharmaRes, ...)
+      plot_dharma(dharmaRes, ...)
     }else if(!is.na(working_dir) ){
       png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
-        plot(dharmaRes, ...)
+        plot_dharma(dharmaRes, ...)
       dev.off()
     }
 

@@ -27,13 +27,13 @@ plot_range_edge(
 
 \item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{strata_names}{names for spatial strata}
 
-\item{category_names}{names for categories (if using package `VAST`)}
+\item{category_names}{names for categories (if using package \code{`VAST`})}
 
 \item{working_dir}{Directory for plots}
 

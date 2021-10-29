@@ -6,9 +6,8 @@
 \usage{
 plot_maps(
   plot_set = 3,
-  Obj = NULL,
+  fit,
   PlotDF,
-  Sdreport = NULL,
   projargs = "+proj=longlat",
   Panel = "Category",
   year_labels = NULL,
@@ -20,11 +19,15 @@ plot_maps(
   n_cells,
   plot_value = "estimate",
   n_samples = 100,
-  Report,
-  TmbData,
-  zlim = NULL,
   country = NULL,
   sample_fixed = TRUE,
+  Report = fit$Report,
+  TmbData = fit$data_list,
+  Obj = fit$tmb_list$Obj,
+  extrapolation_list = fit$extrapolation_list,
+  Sdreport = fit$parameter_estimates$SD,
+  Map = fit$tmb_list$Map,
+  zlim = NULL,
   ...
 )
 }
@@ -50,21 +53,19 @@ plot_maps(
   \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
   \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
   \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
+  \item{plot_set=20}{Spatially-varying response for catchability covariates in 1st linear predictor (Phi1)}
+  \item{plot_set=21}{Spatially-varying response for catchability covariates in 2nd linear predictor (Phi2)}
 }}
-
-\item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
-
-\item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
 \item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
 
 \item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
-\item{category_names}{character vector specifying names for different categories (only used for R package \code{VAST})}
+\item{category_names}{character vector specifying names for labeling categories \code{c_i}}
 
 \item{MapSizeRatio}{Default size for each panel}
 
@@ -78,16 +79,20 @@ will often need to be modified for a given purpose.}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 
+\item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
+
+\item{sample_fixed}{whether to sample fixed and random effects, \code{sample_fixed=TRUE} as by default, or just sample random effects, \code{sample_fixed=FALSE}}
+
 \item{Report}{tagged list of outputs from TMB model via \code{Obj$report()}}
+
+\item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
+
+\item{Sdreport}{Standard deviation outputs from TMB model via \code{sdreport(Obj)}}
 
 \item{zlim}{two numeric values, specifying range for defining bounds of color scale.
 If \code{zlim=NULL}, then a constant scale is inferred
 from the range of the plotted variable and a color-legend is plotted in the last panel.
 If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
-
-\item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
-
-\item{sample_fixed}{whether to sample fixed and random effects, \code{sample_fixed=TRUE} as by default, or just sample random effects, \code{sample_fixed=FALSE}}
 
 \item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
 }

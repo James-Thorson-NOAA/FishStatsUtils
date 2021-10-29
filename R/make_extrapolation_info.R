@@ -30,16 +30,16 @@
 #'        Current options are:
 #' \describe{
 #'   \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
-#'   \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
-#'   \item{\code{"california_current"}}{The spatial fooprint of the stratified-random shelf-slope bottom trawl operated by NWFSC from 2003 onward; specify subsets via \code{surveyname}}
-#'   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC}
-#'   \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS; see \code{strata_to_use} for further specification}
-#'   \item{\code{"eastern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the eastern Bering Sea}
-#'   \item{\code{"northern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the northern Bering Sea}
-#'   \item{\code{"bering_sea_slope"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Bering Sea slope}
+#'   \item{the path and name for a shapefile, i.e., \code{paste0(shapedir,"Shape.shp")}}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile, using \code{grid_dim_km} to determine grid resolution}
+#'   \item{\code{"california_current"}}{The spatial fooprint of the bottom trawl surveys operated by AFSC/NWFSC, including the AFSC triennial from 1977-2004 and the NWFSC combined shelf-slope survey from 2003 onward (as identified by B. Feist and C. Whitmire); specify subsets via \code{surveyname}}
+#'   \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC (as identified by J. Harms)}
+#'   \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS (as identified by N. Olsen); see \code{strata_to_use} for further specification}
+#'   \item{\code{"eastern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the eastern Bering Sea (as identified by A. Greig)}
+#'   \item{\code{"northern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the northern Bering Sea (as identified by J. Conner)}
+#'   \item{\code{"bering_sea_slope"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Bering Sea slope (as identified by A. Greig)}
 #'   \item{\code{"st_matthews_island"}}{The spatial fooprint of the survey area defined around St. Matthews Island, representing regular and corner stations from the eastern Bering Sea bottom trawl survey}
-#'   \item{\code{"aleutian_islands"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Aleutian Islands}
-#'   \item{\code{"gulf_of_alaska"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Gulf of Alaska and containing shallow and deep stations (where the latter are not consistently sampled in later years)}
+#'   \item{\code{"aleutian_islands"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Aleutian Islands (as identified by A. Greig)}
+#'   \item{\code{"gulf_of_alaska"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Gulf of Alaska and containing shallow and deep stations, where the latter are not consistently sampled in later years (as identified by A. Greig)}
 #'   \item{\code{"BFISH_MHI"}}{The spatial fooprint of the visual sampling of reef fishes in the main Hawaiian Islands (as provided by B. Richards)}
 #'   \item{\code{"CalCOFI-IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
 #'   \item{\code{"CalCOFI_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI, in a typical year during Winter and Spring months (as identified by A. Thompson)}
@@ -47,11 +47,11 @@
 #'   \item{\code{"CalCOFI-IMECOCAL_Summer"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Summer months (as identified by A. Thompson)}
 #'   \item{\code{"rockfish_recruitment_coastwide"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC across its expanded spatial extent that is sampled during recent years (as identified by J. Field)}
 #'   \item{\code{"rockfish_recruitment_core"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC within its core spatial extent that is sampled consistently throughout its entire operations (as identified by J. Field)}
-#'   \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic;  see \code{epu_to_use} for further subdivisions}
+#'   \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic (as identified by D. Chevrier);  see \code{epu_to_use} for further subdivisions}
 #'   \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa (as identified by H. Winker); see \code{region} to select between South and West Coast surveys}
-#'   \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence}
-#'   \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise}
-#'   \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC}
+#'   \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence (as identified by H. Benoit)}
+#'   \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise (as identified by V. McGregor)}
+#'   \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC (as identified by D. Hart)}
 #'   \item{\code{"gulf_of_mexico"}}{The US Gulf of Mexico, surveyed by various fishery-independent surveys; using a definition provided by A. Gruss}
 #'   \item{\code{"ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC"}}{ICES survey domains as defined by shapefiles provided by M. Lindegren as originated by ICES Secretariat}
 #'   \item{\code{"stream_network"}}{Specifying a stream network for use when \code{Method="Stream_network"}}
@@ -81,11 +81,11 @@
 
 #' @return Tagged list used in other functions
 #' \describe{
-#'   \item{a_el}{The area associated with each extrapolation grid cell (rows) and strata (columns)}
-#'   \item{Data_Extrap}{A data frame describing the extrapolation grid}
-#'   \item{zone}{the zone used to convert Lat-Long to UTM by PBSmapping package}
-#'   \item{flip_around_dateline}{a boolean stating whether the Lat-Long is flipped around the dateline during conversion to UTM}
-#'   \item{Area_km2_x}{the area associated with each row of Data_Extrap, in units square-kilometers}
+#'   \item{\code{a_el}}{The area associated with each extrapolation grid cell (rows) and strata (columns)}
+#'   \item{\code{Data_Extrap}}{A data frame describing the extrapolation grid}
+#'   \item{\code{zone}}{the zone used to convert Lat-Long to UTM by PBSmapping package}
+#'   \item{\code{flip_around_dateline}}{a boolean stating whether the Lat-Long is flipped around the dateline during conversion to UTM}
+#'   \item{\code{Area_km2_x}}{the area associated with each row of Data_Extrap, in units square-kilometers}
 #' }
 
 #' @export
@@ -240,11 +240,11 @@ make_extrapolation_info = function( Region,
   }
 
   # Optionally reduce number of extrapolation-grid cells
-  if( max_cells < nrow(Return$Data_Extrap) ){
+  # Run K-means only on grid-cells with nonzero area
+  loc_orig = Return$Data_Extrap[,c("E_km","N_km")]
+    loc_orig = loc_orig[ which(Return$Area_km2_x>0), ]
+  if( max_cells < nrow(loc_orig) ){
     message( "# Reducing extrapolation-grid from ",nrow(Return$Data_Extrap)," to ",max_cells," cells for Region(s): ",paste(Region,collapse=", ") )
-    # Run K-means only on grid-cells with nonzero area
-    loc_orig = Return$Data_Extrap[,c("E_km","N_km")]
-      loc_orig = loc_orig[ which(Return$Area_km2_x>0), ]
     Kmeans = make_kmeans( n_x=max_cells, loc_orig=loc_orig, nstart=nstart,
       randomseed=1, iter.max=1000, DirPath=DirPath, Save_Results=TRUE, kmeans_purpose='extrapolation',
       backwards_compatible_kmeans=backwards_compatible_kmeans )
@@ -269,12 +269,18 @@ make_extrapolation_info = function( Region,
     # Assemble
     Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=Return$zone, "projargs"=Return$projargs,
       "flip_around_dateline"=Return$flip_around_dateline, "Area_km2_x"=Area_km2_x )
+  }else{
+    Return$a_el = as.matrix( Return$a_el )
   }
 
   # Add total across regions if requested
   if( length(Region)>1 & create_strata_per_region==TRUE ){
     Return$a_el = cbind( "Total"=rowSums(Return$a_el), Return$a_el )
   }
+
+  # Add units
+  units(Return$a_el) = "km^2"
+  units(Return$Area_km2_x) = "km^2"
 
   # Return
   class(Return) = "make_extrapolation_info"
@@ -301,15 +307,18 @@ plot.make_extrapolation_info <- function(x, cex=0.01, land_color="grey", map_res
 
   # Data for mapping
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))
+  # Fix warning messages from projecting rnaturalearth object
+  # Solution: Recreate SpatialPolygonsDataFrame from output
+  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
 
   # Plot #1 -- Latitude
-  plot( x$Data_Extrap[which(x$Area_km2_x>0),c('Lon','Lat')], cex=cex, main="Extrapolation (Lat-Lon)", ... )
+  plot( x$Data_Extrap[which(strip_units(x$Area_km2_x)>0),c('Lon','Lat')], cex=cex, main="Extrapolation (Lat-Lon)", ... )
   map_data_orig = sp::spTransform(map_data, CRSobj=CRS_orig)
   sp::plot( map_data_orig, col=land_color, add=TRUE )
 
   # Plot #2 -- Projection coordinates
   if( !any(is.na(x$Data_Extrap[,c('E_km','N_km')])) ){
-    plot( x$Data_Extrap[which(x$Area_km2_x>0),c('E_km','N_km')], cex=cex, main="Extrapolation (North-East)", ... )
+    plot( x$Data_Extrap[which(strip_units(x$Area_km2_x)>0),c('E_km','N_km')], cex=cex, main="Extrapolation (North-East)", ... )
     #map_data_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
     #sp::plot( map_data_proj, col=land_color, add=TRUE )
   }
@@ -328,7 +337,7 @@ plot.make_extrapolation_info <- function(x, cex=0.01, land_color="grey", map_res
 #' @export
 print.make_extrapolation_info <- function(x, quiet=FALSE, ...)
 {
-  loc_gz = cbind( x$Data_Extrap[,c('Lon','Lat')], "Area_km2"=x$Area_km2_x )[ which(x$Area_km2_x>0), ]
+  loc_gz = cbind( x$Data_Extrap[,c('Lon','Lat')], "Area_km2"=x$Area_km2_x )[ which(strip_units(x$Area_km2_x)>0), ]
   rownames(loc_gz) = paste0("Grid_",1:nrow(loc_gz))
   #ans = c( x[c('zone','flip_around_dateline')], list("extrapolation_grid"=loc_gz) )
 

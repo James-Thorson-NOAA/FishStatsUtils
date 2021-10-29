@@ -27,7 +27,7 @@ sample_variable(
 \item{seed}{integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}}
 }
 \description{
-\code{sample_variable} samples from the joint distribution of random effects to approximate the predictive distribution for a variable
+\code{sample_variable} samples from the joint distribution of random and fixed effects to approximate the predictive distribution for a variable
 
 Exploratory testing suggests that calling \code{Obj$report(newvalues)} within a function like \code{sample_variable(.)} doesn't affect the results of subsequent calls of \code{Obj$report()} so this function does not appear to change anything in the global environment
 }

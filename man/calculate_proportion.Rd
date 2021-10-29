@@ -25,7 +25,7 @@ calculate_proportion(
 )
 }
 \arguments{
-\item{TmbData}{Formatted data inputs, from `VAST::Data_Fn(...)`}
+\item{TmbData}{Formatted data inputs, from \code{\link[VAST]{make_data}}}
 
 \item{Index}{output from \code{FishStatsUtils::plot_biomass_index}}
 
@@ -37,13 +37,13 @@ or the index is calculated as the weighted average of density weighted by the ex
 ("abundance weighted-average expansion" \code{Expansion[c1,1]=2}).  The 2nd column is only used when \code{Expansion[c1,1]=1} or \code{Expansion[c1,1]=2},
 and specifies the category to use for abundance-weighted expansion, where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{years_to_plot}{integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)}
 
 \item{strata_names}{names for spatial strata}
 
-\item{category_names}{names for categories (if using package `VAST`)}
+\item{category_names}{names for categories (if using package \code{`VAST`})}
 
 \item{plot_legend}{Add legend for labelling colors}
 

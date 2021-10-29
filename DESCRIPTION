@@ -1,8 +1,8 @@
 Package: FishStatsUtils
 Type: Package
 Title: Utilities (shared code and data) for FishStats spatio-temporal modeling toolbox
-Version: 2.9.1
-Date: 2021-03-16
+Version: 2.10.0
+Date: 2021-10-29
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -28,7 +28,8 @@ Imports:
     devtools,
     mixtools,
     sp,
-    plotKML,
+    sf,
+    raster,
     plotrix,
     TMB,
     MatrixModels,
@@ -45,7 +46,8 @@ Imports:
     DHARMa,
     viridisLite
 Depends:
-    R (>= 3.5.0)
+    R (>= 3.5.0),
+    units
 Suggests:
     testthat
 Remotes: 
@@ -56,5 +58,5 @@ LazyData: yes
 BuildVignettes: yes
 Encoding: UTF-8
 RoxygenNote: 7.1.1
-URL: http://github.com/james-thorson/FishStatsUtils
-BugReports: http://github.com/james-thorson/FishStatsUtils/issues
+URL: http://github.com/james-thorson-NOAA/FishStatsUtils
+BugReports: http://github.com/james-thorson-NOAA/FishStatsUtils/issues

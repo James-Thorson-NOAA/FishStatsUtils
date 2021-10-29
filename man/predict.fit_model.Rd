@@ -24,14 +24,22 @@
 
 \item{what}{Which output from \code{fit$Report} should be extracted; default is predicted density}
 
-\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
+\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i.
+The first modeled interval will be \code{min(t_i)}, and last will be \code{max(t_i)},
+and every interval corresponding to integers between \code{min(t_i)} and \code{max(t_i)} will also be modeled.}
 
-\item{a_i}{Numeric vector containing values greater than zero, providing sampled area for each
-observation i;  use \code{a_i=1} for observations without a natural area measurement, while
-noting that resulting densities no longer have interpretable units in that case)}
+\item{a_i}{Vector containing values greater than zero, providing sampled area for each
+observation i, e.g., \code{as_units(x, "km^2")} for area swept in square-kilometers.
+use \code{as_units(1, unitless)} for observations without a natural area measurement
+(noting that resulting densities no longer have interpretable units in that case),
+or for observations where the response \code{b_i} already standardizes for area, e.g.,
+\code{b_i = as_units(x, "kg/km^2")}}
 
 \item{c_iz}{Vector of integers ranging from 0 to the number of variables minus 1, providing the
-category (e.g., species, length-bin) for each observation i}
+category (e.g., species, length-bin) for each observation i.
+This can be specified as a matrix, such that each observation is associated with multiple categories.
+Such specification treats samples as arising from the sum across multiple categories, e.g.,
+to account for unlabeled multispecies data.}
 
 \item{v_i}{Vector of integers ranging from 0 to the number of vessels minus 1,
 providing sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i

@@ -12,16 +12,17 @@ plot_factors(
   Obj = fit$tmb_list$Obj,
   SD = fit$parameter_estimates$SD,
   year_labels = fit$year_labels,
-  category_names = NULL,
+  category_names = fit$category_names,
   RotationMethod = "PCA",
   mapdetails_list = NULL,
   Dim_year = NULL,
   Dim_species = NULL,
-  projargs = fit$extrapolation_list$projargs,
+  projargs = "+proj=longlat",
   plotdir = paste0(getwd(), "/"),
   land_color = "grey",
   zlim = NA,
   testcutoff = 1e-04,
+  plot_value = "estimate",
   ...
 )
 }
@@ -36,7 +37,7 @@ plot_factors(
 
 \item{SD}{standard deviation report, e.g., from \code{SD <- sdreport( obj )}}
 
-\item{year_labels}{Year names for labeling panels}
+\item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
 \item{category_names}{character-vector listing name for each category}
 
@@ -61,6 +62,8 @@ from the range of the plotted variable and a color-legend is plotted in the last
 If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
 \item{testcutoff}{tolerance for numerical rounding when confirming that rotation doesn't effect results}
+
+\item{plot_value}{either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}}
 
 \item{...}{additional arguments passed to \code{\link{plot_maps}} and/or \code{\link{plot_variable}} when plotting factor-values on a map}
 }

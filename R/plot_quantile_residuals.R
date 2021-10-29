@@ -11,6 +11,7 @@
 #' @inheritParams plot_variable
 #' @inheritParams plot_maps
 #' @param output from \code{summary.fit_model(x,what="residuals")}
+#' @param n_cells_residuals number of raster cells to use when plotting quantile residuals
 #'
 #' @param x Output from \code{\link{fit_model}}
 #' @param ... arguments passed to \code{\link{plot_variable}}
@@ -21,9 +22,9 @@ function( dharmaRes,
           fit,
           file_name = "quantile_residuals_on_map",
           zlim = NULL,
-          year_labels = NULL,
-          years_to_plot = NULL,
-          n_cells = NULL,
+          n_cells_residuals = NULL,
+          year_labels = fit$year_labels,
+          years_to_plot = fit$years_to_plot,
           ... ){
 
   # labels
@@ -34,6 +35,9 @@ function( dharmaRes,
   if(missing(dharmaRes)){
     dharmaRes = summary( fit, what="residuals", working_dir=NA )
   }
+
+  # Defaults
+  if( is.null(n_cells_residuals)) n_cells_residuals = ceiling(fit$data_list$n_s) * 4
 
   # Aggregate quantile residuals
   # See Eq. 1 here: https://www.researchgate.net/publication/259073068_Giants'_shoulders_15_years_later_Lessons_challenges_and_guidelines_in_fisheries_meta-analysis
@@ -59,7 +63,7 @@ function( dharmaRes,
     col = col_function,
     panel_labels = year_labels[years_to_plot],
     zlim = zlim,
-    n_cells = n_cells,
+    n_cells = n_cells_residuals,
     ... )
 
   return( NULL )

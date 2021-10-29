@@ -6,8 +6,8 @@
 \usage{
 make_settings(
   n_x,
-  Region,
   purpose = "index",
+  Region,
   fine_scale = TRUE,
   strata.limits = data.frame(STRATA = "All_areas"),
   zone = NA,
@@ -30,42 +30,6 @@ make_settings(
 \arguments{
 \item{n_x}{the number of vertices in the SPDE mesh (determines the spatial resolution when \code{Method="Mesh"})}
 
-\item{Region}{a character vector, where each element is matched against potential values to create the extrapolation grid, where densities are
-       then predicted at the midpoint of each grid cell when calculating derived quantities or visualizing model outputs.
-       Users will typically supply a single character-string, representing the footprint of a single survey.
-       However, it is also possible to provide a character-vector, where the extrapolation-grid will be created for each string, and then combined together;
-       this is then helpful when extrapolating densities across multiple survey domains.
-       Current options are:
-\describe{
-  \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
-  \item{a directory containing a shapefile (i.e., containing a file *.shp)}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile}
-  \item{\code{"california_current"}}{The spatial fooprint of the stratified-random shelf-slope bottom trawl operated by NWFSC from 2003 onward; specify subsets via \code{surveyname}}
-  \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC}
-  \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS; see \code{strata_to_use} for further specification}
-  \item{\code{"eastern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the eastern Bering Sea}
-  \item{\code{"northern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the northern Bering Sea}
-  \item{\code{"bering_sea_slope"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Bering Sea slope}
-  \item{\code{"st_matthews_island"}}{The spatial fooprint of the survey area defined around St. Matthews Island, representing regular and corner stations from the eastern Bering Sea bottom trawl survey}
-  \item{\code{"aleutian_islands"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Aleutian Islands}
-  \item{\code{"gulf_of_alaska"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Gulf of Alaska and containing shallow and deep stations (where the latter are not consistently sampled in later years)}
-  \item{\code{"BFISH_MHI"}}{The spatial fooprint of the visual sampling of reef fishes in the main Hawaiian Islands (as provided by B. Richards)}
-  \item{\code{"CalCOFI-IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
-  \item{\code{"CalCOFI_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI, in a typical year during Winter and Spring months (as identified by A. Thompson)}
-  \item{\code{"IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
-  \item{\code{"CalCOFI-IMECOCAL_Summer"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Summer months (as identified by A. Thompson)}
-  \item{\code{"rockfish_recruitment_coastwide"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC across its expanded spatial extent that is sampled during recent years (as identified by J. Field)}
-  \item{\code{"rockfish_recruitment_core"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC within its core spatial extent that is sampled consistently throughout its entire operations (as identified by J. Field)}
-  \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic;  see \code{epu_to_use} for further subdivisions}
-  \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa (as identified by H. Winker); see \code{region} to select between South and West Coast surveys}
-  \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence}
-  \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise}
-  \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC}
-  \item{\code{"gulf_of_mexico"}}{The US Gulf of Mexico, surveyed by various fishery-independent surveys; using a definition provided by A. Gruss}
-  \item{\code{"ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC"}}{ICES survey domains as defined by shapefiles provided by M. Lindegren as originated by ICES Secretariat}
-  \item{\code{"stream_network"}}{Specifying a stream network for use when \code{Method="Stream_network"}}
-  \item{\code{"other"}}{Automated creation of an extrapolation-grid by padding an area around observations (not recommended for operational use)}
-}}
-
 \item{purpose}{character indicating what purpose is intended for the model, and therefore what default settings are perhaps appropriate. Many of these have examples at the VAST wiki https://github.com/James-Thorson-NOAA/VAST/wiki. Only currently implemented for:
 \describe{
 \item{\code{purpose="index"}}{Index of abundance calculated summing across space to get annual abundance values for each category}
@@ -76,6 +40,42 @@ make_settings(
 \item{\code{purpose="EOF"}}{An empirical orthogonal function analysis to ordinate on years instead of categories as in "ordination". Deprecated, use "EOF2" instead.}
 \item{\code{purpose="EOF2"}}{Same as "EOF" but uses improved settings that match updates to the package.}
 \item{\code{purpose="EOF3"}}{Same as "EOF2" but ensures that spatio-temporal factors are zero-centered, such that estimated Omega represents distribution in the "average" year.}
+}}
+
+\item{Region}{a character vector, where each element is matched against potential values to create the extrapolation grid, where densities are
+       then predicted at the midpoint of each grid cell when calculating derived quantities or visualizing model outputs.
+       Users will typically supply a single character-string, representing the footprint of a single survey.
+       However, it is also possible to provide a character-vector, where the extrapolation-grid will be created for each string, and then combined together;
+       this is then helpful when extrapolating densities across multiple survey domains.
+       Current options are:
+\describe{
+  \item{\code{"user"}}{User defined extrapolation-grid; also requires input \code{input_grid}. Example of building from points or shapefile can be found at https://github.com/James-Thorson-NOAA/VAST/wiki/Creating-an-extrapolation-grid}
+  \item{the path and name for a shapefile, i.e., \code{paste0(shapedir,"Shape.shp")}}{Create an extrapolation-grid upon runtime by creating a grid within a user-supplied shapefile, using \code{grid_dim_km} to determine grid resolution}
+  \item{\code{"california_current"}}{The spatial fooprint of the bottom trawl surveys operated by AFSC/NWFSC, including the AFSC triennial from 1977-2004 and the NWFSC combined shelf-slope survey from 2003 onward (as identified by B. Feist and C. Whitmire); specify subsets via \code{surveyname}}
+  \item{\code{"west_coast_hook_and_line"}}{The spatial fooprint of the fixed-station hook-and-line survey in the California Bight operated by NWFSC (as identified by J. Harms)}
+  \item{\code{"british_columbia"}}{The spatial fooprint of the various stratified-random bottom trawl surveys operated by PBS (as identified by N. Olsen); see \code{strata_to_use} for further specification}
+  \item{\code{"eastern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the eastern Bering Sea (as identified by A. Greig)}
+  \item{\code{"northern_bering_sea"}}{The spatial fooprint of the fixed station bottom trawl survey operated by AFSC in the northern Bering Sea (as identified by J. Conner)}
+  \item{\code{"bering_sea_slope"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Bering Sea slope (as identified by A. Greig)}
+  \item{\code{"st_matthews_island"}}{The spatial fooprint of the survey area defined around St. Matthews Island, representing regular and corner stations from the eastern Bering Sea bottom trawl survey}
+  \item{\code{"aleutian_islands"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Aleutian Islands (as identified by A. Greig)}
+  \item{\code{"gulf_of_alaska"}}{The spatial fooprint of the stratified random bottom trawl survey operated by AFSC in the Gulf of Alaska and containing shallow and deep stations, where the latter are not consistently sampled in later years (as identified by A. Greig)}
+  \item{\code{"BFISH_MHI"}}{The spatial fooprint of the visual sampling of reef fishes in the main Hawaiian Islands (as provided by B. Richards)}
+  \item{\code{"CalCOFI-IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
+  \item{\code{"CalCOFI_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI, in a typical year during Winter and Spring months (as identified by A. Thompson)}
+  \item{\code{"IMECOCAL_Winter-Spring"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by IMECOCAL, in a typical year during Winter and Spring months (as identified by A. Thompson)}
+  \item{\code{"CalCOFI-IMECOCAL_Summer"}}{The spatial fooprint of the fixed station ichthyoplankton sampling design operated by CalCOFI and IMECOCAL, in a typical year during Summer months (as identified by A. Thompson)}
+  \item{\code{"rockfish_recruitment_coastwide"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC across its expanded spatial extent that is sampled during recent years (as identified by J. Field)}
+  \item{\code{"rockfish_recruitment_core"}}{The spatial fooprint of the fixed station juvenile rockfish survey operated by SWFSC within its core spatial extent that is sampled consistently throughout its entire operations (as identified by J. Field)}
+  \item{\code{"northwest_atlantic"}}{The spatial fooprint of the stratified random bottom trawl survey operated by NEFSC in the Northwest Altantic (as identified by D. Chevrier);  see \code{epu_to_use} for further subdivisions}
+  \item{\code{"south_africa"}}{The spatial fooprint of the stratified random bottom trawl survey operated by DAFF in the West or South Coast of South Africa (as identified by H. Winker); see \code{region} to select between South and West Coast surveys}
+  \item{\code{"gulf_of_st_lawrence"}}{The spatial fooprint of the survey operated by DFO in Gulf of St. Lawrence (as identified by H. Benoit)}
+  \item{\code{"new_zealand"}}{The spatial fooprint of the bottom trawl survey operated by NIWA in Chatham Rise (as identified by V. McGregor)}
+  \item{\code{"habcam"}}{The spatial fooprint of the visual trawl survey for scallops operated by NEFSC (as identified by D. Hart)}
+  \item{\code{"gulf_of_mexico"}}{The US Gulf of Mexico, surveyed by various fishery-independent surveys; using a definition provided by A. Gruss}
+  \item{\code{"ATL-IBTS-Q1", "ATL-IBTS-Q4", "BITS", "BTS", "BTS-VIIA", "EVHOE", "IE-IGFS", "NIGFS", "NS_IBTS", "PT-IBTS", "SP-ARSA", "SP-NORTH", "SP-PORC"}}{ICES survey domains as defined by shapefiles provided by M. Lindegren as originated by ICES Secretariat}
+  \item{\code{"stream_network"}}{Specifying a stream network for use when \code{Method="Stream_network"}}
+  \item{\code{"other"}}{Automated creation of an extrapolation-grid by padding an area around observations (not recommended for operational use)}
 }}
 
 \item{fine_scale}{a Boolean indicating whether to ignore (\code{fine_scale=FALSE}) or account for (\code{fine_scale=TRUE}) fine-scale spatial heterogeneity;  See details for more informatino}
@@ -111,7 +111,6 @@ see \code{\link[TMB]{sdreport}} and \code{\link[TMBhelper]{fit_tmb}}for details}
 \item{Options}{a tagged-vector that is empty by default, \code{Options=c()}, but where the following slots might be helpful to add,
        either by passing \code{Options} to \code{\link[FishStatsUtils]{make_settings}}, or editing after a call to that function:
 \describe{
-  \item{\code{Options["SD_site_logdensity"]=TRUE}}{Turns on standard error calculation for local log-density (which is very slow to calculate!)}
   \item{\code{Options["Calculate_Range"]=TRUE}}{Turns on internal calculation and SE for center-of-gravity}
   \item{\code{Options["Calculate_effective_area"]=TRUE}}{Turns on internal calculation and SE for effective area occupied measuring range expansion/contraction}
   \item{\code{Options["Calculate_Cov_SE"]=TRUE}}{Turns on internal calculation and SE for covariance among categories (i.e. in factor model)}
@@ -124,7 +123,8 @@ see \code{\link[TMB]{sdreport}} and \code{\link[TMBhelper]{fit_tmb}}for details}
 
 \item{vars_to_correct}{a character-vector listing which parameters to include for bias-correction, as passed to \code{\link[TMBhelper]{fit_tmb}}}
 
-\item{Version}{Which CPP version to use.  If missing, defaults to latest version using \code{\link[FishStatsUtils]{get_latest_version}}.
+\item{Version}{Which CPP version to use.  If missing, defaults to latest version
+using \code{\link[FishStatsUtils]{get_latest_version}}.
 Can be used to specify using an older CPP, to maintain backwards compatibility.}
 
 \item{treat_nonencounter_as_zero}{Boolean indicating whether to treat any year-category combination as having zero biomass when generating abundance indices and resulting compositional estimates}

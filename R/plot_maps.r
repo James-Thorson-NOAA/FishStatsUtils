@@ -7,6 +7,7 @@
 #' @inheritParams plot_variable
 #' @inheritParams sample_variable
 #' @inheritParams rnaturalearth::ne_countries
+#' @inheritParams fit_model
 
 #' @param plot_set integer-vector defining plots to create
 #' \describe{
@@ -29,16 +30,16 @@
 #'   \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
 #'   \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
 #'   \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
+#'   \item{plot_set=20}{Spatially-varying response for catchability covariates in 1st linear predictor (Phi1)}
+#'   \item{plot_set=21}{Spatially-varying response for catchability covariates in 2nd linear predictor (Phi2)}
 #' }
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
 #' @param plot_value either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}
 #' @param Panel Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure
 #' @param MapSizeRatio Default size for each panel
-#' @param year_labels Year names for labeling panels
 #' @param years_to_plot integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)
-#' @param category_names character vector specifying names for different categories (only used for R package \code{VAST})
-#' @param projargs a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude. 
+#' @param projargs a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.
 #' @param country optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
 #' @param ... arguments passed to \code{FishStatsUtils::plot_variable}
 #'
@@ -48,9 +49,8 @@
 #' @export
 plot_maps <-
 function( plot_set = 3,
-          Obj = NULL,
+          fit,
           PlotDF,
-          Sdreport = NULL,
           projargs = '+proj=longlat',
           Panel = "Category",
           year_labels = NULL,
@@ -62,11 +62,15 @@ function( plot_set = 3,
           n_cells,
           plot_value = "estimate",
           n_samples = 100,
-          Report,
-          TmbData,
-          zlim = NULL,
           country = NULL,
           sample_fixed = TRUE,
+          Report = fit$Report,
+          TmbData = fit$data_list,
+          Obj = fit$tmb_list$Obj,
+          extrapolation_list = fit$extrapolation_list,
+          Sdreport = fit$parameter_estimates$SD,
+          Map = fit$tmb_list$Map,
+          zlim = NULL,
           ...){
 
   # Local functions
@@ -81,6 +85,7 @@ function( plot_set = 3,
       if( any(dim(Return)!=dim(Report[[variable_name]])) ){
         stop("Check `extract_value(.)` in `plot_maps(.)`")
       }
+      dimnames(Return) = dimnames(Report[[variable_name]])
     }else if( plot_value=="estimate" ){
       Return = Report[[variable_name]]
     }else stop("Check input `plot_value` in `plot_maps(.)`")
@@ -91,79 +96,22 @@ function( plot_set = 3,
   # Extract stuff
   if( !is.null(Obj) ){
     if(missing(Report)) Report = Obj$report()
-    TmbData = Obj$env$data
   }else{
     if(plot_value!="estimate") stop("Must provide `Obj` to `plot_maps` when using function for `plot_value`")
   }
 
   # Fill in missing inputs
-  if( "D_xt" %in% names(Report)){
-    # SpatialDeltaGLMM
-    if( is.null(year_labels) ) year_labels = 1:ncol(Report$D_xt)
-    if( is.null(years_to_plot) ) years_to_plot = 1:ncol(Report$D_xt)
-    category_names = "singlespecies"
-    Ncategories = length(category_names)
-    Nyears = dim(Report$D_xt)[2]
-  }
-  if( "D_xct" %in% names(Report)){
-    # VAST Version < 2.0.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xct)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_xct)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_xct)[2]
-    Ncategories = dim(Report$D_xct)[2]
-    Nyears = dim(Report$D_xct)[3]
-  }
-  if( "D_xcy" %in% names(Report)){
-    # VAST Version >= 2.0.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xcy)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_xcy)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
-    Ncategories = dim(Report$D_xcy)[2]
-    Nyears = dim(Report$D_xcy)[3]
-  }
-  if( "D_gcy" %in% names(Report)){
-    # VAST Version 8.0.0 through 9.3.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gcy)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_gcy)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
-    Ncategories = dim(Report$D_gcy)[2]
-    Nyears = dim(Report$D_gcy)[3]
-  }
-  if( "D_gct" %in% names(Report)){
-    # VAST Version >= 6.4.0
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gct)[3]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$D_gct)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_gct)[2]
-    Ncategories = dim(Report$D_gct)[2]
-    Nyears = dim(Report$D_gct)[3]
-  }
-  if("dhat_ktp" %in% names(Report)){
-    # MIST Version <= 14
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$dhat_ktp)[2]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$dhat_ktp)[2]
-    if( is.null(category_names) ) category_names = 1:dim(Report$dhat_ktp)[3]
-    Ncategories = dim(Report$dhat_ktp)[3]
-    Nyears = dim(Report$dhat_ktp)[2]
-  }
-  if("dpred_ktp" %in% names(Report)){
-    # MIST Version >= 15
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$dpred_ktp)[2]
-    if( is.null(years_to_plot) ) years_to_plot = 1:dim(Report$dpred_ktp)[2]
-    if( is.null(category_names) ) category_names = 1:dim(Report$dpred_ktp)[3]
-    Ncategories = dim(Report$dpred_ktp)[3]
-    Nyears = dim(Report$dpred_ktp)[2]
-  }
   if( missing(MapSizeRatio) ){
     MapSizeRatio = c(3, 3)
   }
 
-  # Errors
-  if( Nyears != length(year_labels) ){
-    stop("Problem with `year_labels`")
-  }
-  if( Ncategories != length(category_names) ){
-    stop("Problem with `category_names`")
-  }
+  # Overwrite labels using run-time user inputs if provided
+  Report = amend_output( Report = Report,
+                         TmbData = TmbData,
+                         Map = Map,
+                         year_labels = year_labels,
+                         category_names = category_names,
+                         extrapolation_list = extrapolation_list )
 
   # Loop through plots
   Return = NULL
@@ -173,7 +121,7 @@ function( plot_set = 3,
     Array_xct = NULL
     plot_code <- c("encounter_prob", "pos_catch", "ln_density", "", "", "epsilon_1", "epsilon_2",
       "linear_predictor_1", "linear_predictor_2", "density_CV", "covariates_1", "covariates_2", "total_density",
-      "covariate_effects_1", "covariate_effects_2", "omega_1", "omega_2")[plot_num]
+      "covariate_effects_1", "covariate_effects_2", "omega_1", "omega_2", "xi_1", "xi_2", "phi_1", "phi_2")[plot_num]
 
     # Extract matrix to plot
     if(plot_num==1){
@@ -282,13 +230,13 @@ function( plot_set = 3,
       if("X_gtp"%in%names(TmbData)) Array_xct = aperm( TmbData$X_gtp, perm=c(1,3,2) )
       if("X_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X_gctp[,1,,],dim(TmbData$X_gctp)[c(1,3,4)]), perm=c(1,3,2) )
       if("X1_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X1_gctp[,1,,],dim(TmbData$X1_gctp)[c(1,3,4)]), perm=c(1,3,2) )
-      category_names = 1:dim(Array_xct)[2]
+      category_names = seq_len(dim(Array_xct)[2])
     }
     if(plot_num==12){
       if( quiet==FALSE ) message(" # plot_num ",plot_num,": Plotting covariates for 2nd linear predictor")
       if(is.null(TmbData)) stop( "Must provide `TmbData` to plot covariates" )
       if("X2_gctp"%in%names(TmbData)) Array_xct = aperm( array(TmbData$X2_gctp[,1,,],dim(TmbData$X2_gctp)[c(1,3,4)]), perm=c(1,3,2) )
-      category_names = 1:dim(Array_xct)[2]
+      category_names = seq_len(dim(Array_xct)[2])
     }
     if(plot_num==13){
       # Total density ("Dens")
@@ -328,7 +276,7 @@ function( plot_set = 3,
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega1_sc %o% 1
-      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = Report$Omega1_gc %o% 1
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Omega1_gc") %o% 1
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
@@ -338,7 +286,7 @@ function( plot_set = 3,
       if("D_xt"%in%names(Report)) stop()
       if("D_xct"%in%names(Report)) stop()
       if("D_xcy"%in%names(Report)) Array_xct = Report$Omega2_sc %o% 1
-      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = Report$Omega2_gc %o% 1
+      if(any(c("D_gcy","D_gct")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Omega2_gc") %o% 1
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
@@ -362,43 +310,115 @@ function( plot_set = 3,
       if("dhat_ktp" %in% names(Report)) stop()
       if("dpred_ktp" %in% names(Report)) stop()
     }
-    if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
-    if( any(abs(Array_xct)==Inf) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
-    if( !all(years_to_plot %in% 1:dim(Array_xct)[3]) ){
-      years_to_plot = 1:dim(Array_xct)[3]
+    if(plot_num==20){
+      # Spatially-varying response for catchability covariates in 1st linear predictor
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatially-varying response to catchability covariates (Phi) for 1st linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) stop()
+      if(any(c("Phi1_gk")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Phi1_gk")
+      #if(any(c("D_gcy","D_gct")%in%names(Report))) stop("not yet implemented")
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+      Array_xct = aperm( Array_xct %o% 1, c(1,3,2) )
+    }
+    if(plot_num==21){
+      # Spatially-varying response for catchability covariates in 1st linear predictor
+      if( quiet==FALSE ) message(" # plot_num ",plot_num,": plotting spatially-varying response to catchability covariates (Phi) for 2nd linear predictor")
+      if("D_xt"%in%names(Report)) stop()
+      if("D_xct"%in%names(Report)) stop()
+      if("D_xcy"%in%names(Report)) stop()
+      if(any(c("Phi2_gk")%in%names(Report))) Array_xct = extract_value(Sdreport=Sdreport, Report=Report, Obj=Obj, plot_value=plot_value, sample_fixed=sample_fixed, n_samples=n_samples, variable_name="Phi2_gk")
+      #if(any(c("D_gcy","D_gct")%in%names(Report))) stop("not yet implemented")
+      if("dhat_ktp" %in% names(Report)) stop()
+      if("dpred_ktp" %in% names(Report)) stop()
+      Array_xct = aperm( Array_xct %o% 1, c(1,3,2) )
     }
 
+    # For now, avoid units in plots ... could add units to colorbar in future
+    Array_xct = strip_units( Array_xct )
+
+    # Replace -Inf e.g. from log(Density) = 0 with NA
+    Array_xct = ifelse( Array_xct == -Inf, NA, Array_xct )
+    Ncategories = dim(Array_xct)[2]
+    Nyears = dim(Array_xct)[3]
+
+    # Check for issues
+    if( is.null(Array_xct)) stop("Problem with `plot_num` in `plot_maps(.)")
+    Bad_xct = ifelse( is.na(Array_xct), FALSE, Array_xct==Inf )
+    if( any(Bad_xct) ) stop("plot_maps(.) has some element of output that is Inf or -Inf, please check results")
+
+    # Get default years_to_plot_modified ... must remake for each plot_num
+    years_to_plot_modified = years_to_plot
+    if( names(dimnames(fit$Report$D_gct))[3] != "Time" ){
+      years_to_plot_modified = NULL
+    }
+    if( !all(years_to_plot_modified %in% seq_len(dim(Array_xct)[3])) ){
+      years_to_plot_modified = NULL
+    }
+    if( is.null(years_to_plot_modified) ) years_to_plot_modified = seq_len(dim(Array_xct)[3])
+
+    # Get default year_labels_modified & category_names_modified ... must remake for each plot_num
+    year_labels_modified = dimnames(Array_xct)[[3]]
+    category_names_modified = dimnames(Array_xct)[[2]]
+    #year_labels_modified = year_labels
+    #category_names_modified = category_names
+    #if( is.null(year_labels_modified) ) year_labels_modified = dimnames(Array_xct)[[3]]
+    #if( is.null(year_labels_modified) ) year_labels_modified = paste0( "Time_", 1:dim(Array_xct)[3] )
+    #if( is.null(category_names_modified) ) category_names_modified = dimnames(Array_xct)[[2]]
+    #if( is.null(category_names_modified) ) category_names_modified = paste0( "Category_", 1:dim(Array_xct)[2] )
+
     # Plot for each category
-    if( tolower(Panel)=="category" ){
+    if( tolower(Panel)=="category" & all(dim(Array_xct)>0) ){
       if(length(dim(Array_xct))==2) Nplot = 1
       if(length(dim(Array_xct))==3) Nplot = dim(Array_xct)[2]
       for( cI in 1:Nplot){
         if(length(dim(Array_xct))==2) Return = Mat_xt = Array_xct
         if(length(dim(Array_xct))==3) Return = Mat_xt = array(as.vector(Array_xct[,cI,]),dim=dim(Array_xct)[c(1,3)])
+        panel_labels = year_labels_modified[years_to_plot_modified]
+        #if( ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]) == length(year_labels_modified[years_to_plot_modified]) ){
+        #  panel_labels = year_labels_modified[years_to_plot_modified]
+        #}else{
+        #  panel_labels = rep("", ncol(Mat_xt[,years_to_plot_modified,drop=FALSE]))
+        #}
 
-        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
-        plot_args = plot_variable( Y_gt=Mat_xt[,years_to_plot,drop=FALSE],
-          map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio), projargs=projargs, working_dir=working_dir,
-          panel_labels=year_labels[years_to_plot], file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",category_names_modified[cI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
+        plot_args = plot_variable( Y_gt = Mat_xt[,years_to_plot_modified,drop=FALSE],
+                                   map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio),
+                                   projargs = projargs,
+                                   working_dir = working_dir,
+                                   panel_labels = panel_labels,
+                                   file_name = file_name,
+                                   n_cells = n_cells,
+                                   zlim = zlim,
+                                   country = country,
+                                   ... )
       }
     }
     # Plot for each year
-    if( tolower(Panel)=="year" ){
-      Nplot = length(years_to_plot)
+    if( tolower(Panel)=="year" & all(dim(Array_xct)>0) ){
+      Nplot = length(years_to_plot_modified)
       for( tI in 1:Nplot){
-        if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,years_to_plot[tI],drop=TRUE]
-        if(length(dim(Array_xct))==3) Mat_xc = Array_xct[,,years_to_plot[tI],drop=TRUE]
+        if(length(dim(Array_xct))==2) Mat_xc = Array_xct[,years_to_plot_modified[tI],drop=TRUE]
+        if(length(dim(Array_xct))==3) Mat_xc = Array_xct[,,years_to_plot_modified[tI],drop=TRUE]
         Return = Mat_xc = array( as.vector(Mat_xc), dim=c(dim(Array_xct)[1],Ncategories)) # Reformat to make sure it has same format for everything
 
         # Do plot
-        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",year_labels[years_to_plot][tI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
-        plot_args = plot_variable( Y_gt=Mat_xc, map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio),
-          projargs=projargs, working_dir=working_dir,
-          panel_labels=category_names, file_name=file_name, n_cells=n_cells, zlim=zlim, country=country, ... )
+        file_name = paste0(plot_code, ifelse(Nplot>1, paste0("--",year_labels_modified[years_to_plot_modified][tI]), ""), ifelse(is.function(plot_value),"-transformed","-predicted") )
+        plot_args = plot_variable( Y_gt = Mat_xc,
+                                   map_list=list("PlotDF"=PlotDF, "MapSizeRatio"=MapSizeRatio),
+                                   projargs = projargs,
+                                   working_dir = working_dir,
+                                   panel_labels = category_names_modified,
+                                   file_name = file_name,
+                                   n_cells = n_cells,
+                                   zlim = zlim,
+                                   country = country,
+                                   ... )
       }
     }
   }
-  if( is.null(Return) & quiet==FALSE ) message(" # No plots selected in `plot_set`")
+  if( is.null(Return) & quiet==FALSE ) message(" # No available plots selected in `plot_set`")
 
   return( invisible(Return) )
 }

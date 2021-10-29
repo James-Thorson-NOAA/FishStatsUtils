@@ -14,7 +14,7 @@
 #' @inheritParams rnaturalearth::ne_countries
 #' @inheritParams raster::rasterize
 #'
-#' @param Y_gt matrix where values for every column are plotted as a map
+#' @param Y_gt matrix where values for every column are plotted as a map in a panel-figure with one panel per column
 #' @param projargs Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
 #'        See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
 #'        As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
@@ -28,7 +28,7 @@
 #' @param legend_x two numeric values (generally between 0 and 1, but slightly lower/higher values
 #'        generate colorbars that are just outside the plotting window) giving left and right-hand location of color legend
 #' @param legend_y two numeric values (see description for legend_x) giving bottom and top location of color legend
-#' @param map_list output from \code{\link{make_map_info}}
+#' @param map_list output from \code{\link{make_map_info}}, which is included in output of \code{\link{plot_results}}
 #' @param zlim two numeric values, specifying range for defining bounds of color scale.
 #'        If \code{zlim=NULL}, then a constant scale is inferred
 #'        from the range of the plotted variable and a color-legend is plotted in the last panel.
@@ -39,6 +39,7 @@
 #' @param contour_nlevels number of levels used when adding contour lines, passed to \code{\link[graphics]{contour}} as argument \code{nlevels}
 #' @param format Character specifying whether to plot maps as a raster (the default), \code{format="raster"}, or as points \code{format="points"}
 #' @param cex.points Numeric specifying the size of bullets when \code{format="points"}
+#' @param legend_digits number of digits (i.e., value passed to \code{round}) when creating labels for colorbar legend
 #'
 #' @param ... arguments passed to \code{par}
 #'
@@ -73,6 +74,7 @@ function( Y_gt,
           fun = mean,
           format = "raster",
           cex.points = 1,
+          legend_digits = 1,
           ...){
 
   ###################
@@ -98,14 +100,14 @@ function( Y_gt,
     mfrow = ceiling(sqrt(ncol(Y_gt)))
     mfrow = c( mfrow, ceiling(ncol(Y_gt)/mfrow) )
   }
-  if( missing(panel_labels) ){
+  if( missing(panel_labels) | is.null(panel_labels) ){
     panel_labels = rep("", ncol(Y_gt))
   }
   if( length(panel_labels) != ncol(Y_gt) ){
     warning( "panel_labels and `ncol(Y_gt)` don't match: Changing panel_labels'")
     panel_labels = 1:ncol(Y_gt)
   }
-  if( missing(col)){
+  if( is.null(col)){
     col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
   }
   if( is.function(col)){
@@ -124,9 +126,13 @@ function( Y_gt,
   CRS_proj = sp::CRS( projargs )
 
   # Data for mapping
-  #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))# , continent="america")
+  #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), continent="america")
   map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
-  map_data = sp::spTransform(map_data, CRSobj=CRS_proj)
+  # Fix warning messages from projecting rnaturalearth object
+  # Solution: Recreate SpatialPolygonsDataFrame from output
+  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
+  # comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
+  map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
 
   ###################
   # Make panel figure
@@ -165,33 +171,48 @@ function( Y_gt,
     # Re-project to plotting CRS
     Points_proj = sp::spTransform( Points_orig, CRS_proj )
 
-    # Interpolate to raster
+    # Get Zlim
     Zlim = zlim
     if(is.na(Zlim[1])) Zlim = range(Y_gt[,tI],na.rm=TRUE)
-    cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
-    Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
-    if(missing(xlim)) xlim = Raster_proj@bbox[1,]
-    if(missing(ylim)) ylim = Raster_proj@bbox[2,]
+    if(missing(xlim)) xlim = Points_proj@bbox[1,]
+    if(missing(ylim)) ylim = Points_proj@bbox[2,]
 
     # Do plot
-    if( format=="raster" ){
-      image( Raster_proj, col=col, zlim=Zlim, xlim=xlim, ylim=ylim )
+    if( format=="raster"  ){
+      if( all(is.na(Y_gt[,tI])) ){
+        # Empty plot if no data
+        plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], type="n", xaxt="n", yaxt="n", xlim=xlim, ylim=ylim, xlab="", ylab="" )
+      }else{
+        plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], type="n", xaxt="n", yaxt="n", xlim=xlim, ylim=ylim, xlab="", ylab="" )
+        cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
+        # Experimental
+        if( TRUE ){
+          Raster_layer = raster::raster( Points_proj, crs=CRS_proj, nrows=floor(sqrt(n_cells)), ncols=floor(sqrt(n_cells)) )
+          Raster_proj = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
+          raster::image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
+        }else{
+          # Interpolate and plot as raster
+          Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
+          image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
+        }
+        # Add contour lines
+        if( contour_nlevels > 0 ){
+          contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
+        }
+      }
     }else if( format=="points" ){
+      # Plot points
       Points_col = col[cut(Y_gt[,tI],breaks=seq(Zlim[1],Zlim[2],length=length(col)),include.lowest=TRUE)]
-      plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], col=Points_col, pch=20, cex=cex.points )
+      points( x=Points_proj@coords[,1], y=Points_proj@coords[,2], col=Points_col, pch=20, cex=cex.points, xaxt="n", yaxt="n" )
     }
 
     # Plot maps using rnaturalearth
-    sp::plot( map_data, col=land_color, add=TRUE )
+    # Make plot after adding raster or points, to overwrite land
+    sp::plot( map_proj, col=land_color, add=TRUE )
 
     # Title and box
     title( panel_labels[tI], line=0.1, cex.main=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main), cex=ifelse(is.null(Par$cex.main), 1.5, Par$cex.main) )
     box()
-
-    # Add contour lines
-    if( contour_nlevels > 0 ){
-      contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
-    }
 
     # Include legend
     if( !any(is.na(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
@@ -206,7 +227,7 @@ function( Y_gt,
         align = c("lt","rb")[1]
         gradient = c("x","y")[1]
       }
-      plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),1), rect.col=col, cex=cex.legend, align=align, gradient=gradient)
+      plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),legend_digits), rect.col=col, cex=cex.legend, align=align, gradient=gradient)
     }
   }
 

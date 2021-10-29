@@ -33,13 +33,14 @@ plot_variable(
   fun = mean,
   format = "raster",
   cex.points = 1,
+  legend_digits = 1,
   ...
 )
 }
 \arguments{
-\item{Y_gt}{matrix where values for every column are plotted as a map}
+\item{Y_gt}{matrix where values for every column are plotted as a map in a panel-figure with one panel per column}
 
-\item{map_list}{output from \code{\link{make_map_info}}}
+\item{map_list}{output from \code{\link{make_map_info}}, which is included in output of \code{\link{plot_results}}}
 
 \item{panel_labels}{vector defining titles to use for each panel; defaults to blank}
 
@@ -85,6 +86,8 @@ You can also pass multiple functions using a statement like \code{fun=function(x
 \item{format}{Character specifying whether to plot maps as a raster (the default), \code{format="raster"}, or as points \code{format="points"}}
 
 \item{cex.points}{Numeric specifying the size of bullets when \code{format="points"}}
+
+\item{legend_digits}{number of digits (i.e., value passed to \code{round}) when creating labels for colorbar legend}
 
 \item{...}{arguments passed to \code{par}}
 }
