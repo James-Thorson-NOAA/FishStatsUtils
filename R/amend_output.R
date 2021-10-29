@@ -141,12 +141,14 @@ function( fit = NULL,
   # Add units
   units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
   units(Report$D_gct) = units(TmbData$b_i)
-  units(Report$mean_D_ctl) = units(TmbData$b_i)
 
   # Add units for COG, see: https://github.com/r-quantities/units/issues/291
   # In case of re-running amend_output on objects with existing units
   if( "mean_Z_ctm" %in% names(Report) ){
     units(Report$mean_Z_ctm) = as_units("km")
+  }
+  if( "mean_D_ctl" %in% names(Report) ){
+    units(Report$mean_D_ctl) = units(TmbData$b_i)
   }
   if( "effective_area_ctl" %in% names(Report) ){
     #units(Report$effective_area_ctl) = paste0( sf::st_crs( extrapolation_list$projargs )$units, "^2" )
