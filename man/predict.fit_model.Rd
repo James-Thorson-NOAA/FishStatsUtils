@@ -24,7 +24,9 @@
 
 \item{what}{Which output from \code{fit$Report} should be extracted; default is predicted density}
 
-\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
+\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i.
+The first modeled interval will be \code{min(t_i)}, and last will be \code{max(t_i)},
+and every interval corresponding to integers between \code{min(t_i)} and \code{max(t_i)} will also be modeled.}
 
 \item{a_i}{Vector containing values greater than zero, providing sampled area for each
 observation i, e.g., \code{as_units(x, "km^2")} for area swept in square-kilometers.

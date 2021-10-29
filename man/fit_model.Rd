@@ -41,7 +41,9 @@ fit_model(
 
 \item{Lon_i}{Numeric vector, providing longitude for each sample}
 
-\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i}
+\item{t_i}{Vector of integers, providing the time (e.g., calendar year) for each observation i.
+The first modeled interval will be \code{min(t_i)}, and last will be \code{max(t_i)},
+and every interval corresponding to integers between \code{min(t_i)} and \code{max(t_i)} will also be modeled.}
 
 \item{b_i}{Vector, providing sampled value (biomass, counts, etc.) for each observation i.
 Users should provide values as class \code{\link[units]{units}}, e.g., \code{as_units(x, "kg")} for data in units kilograms,
@@ -84,12 +86,17 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
 
 \item{covariate_data}{data frame of covariate values with columns \code{Lat}, \code{Lon}, and \code{Year}, and other columns matching names in \code{formula}; \code{Year=NA} can be used for covariates that do not change among years (e.g., depth)}
 
-\item{X1_formula}{right-sided formula affecting the 1st linear predictor for density, e.g.,
-\code{X1_formula=~BOT_DEPTH+BOT_DEPTH^2} for a quadratic effect of variable \code{BOT_DEPTH}.
+\item{X1_formula}{right-sided formula affecting the 1st linear predictor
+which is then estimated independently for each model category \code{c_i}, e.g.,
+use \code{X1_formula=~BOT_DEPTH+BOT_DEPTH^2} for a quadratic effect of variable \code{BOT_DEPTH}
+that is estimated independently for each category.
+The effect of an estimated effect also used upon when predicting the value for each location
+in the extrapolation-grid.  Therefore, \code{X1_formula} is interepreted as affecting the "true"
+underlying value of each variable, and it affects both samples and extrapolated values.
 It is allowed to include \code{Year} in the formula, although please check whether it is
 interpreted as numeric or factor-valued.}
 
-\item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for density}
+\item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor.}
 
 \item{Q1config_k}{Same as argument \code{X1config_cp} but affecting affecting the 1st linear predictor for catchability,
 and note that it is a vector (instead of matrix) given that catchability responses do not vary among variables \code{c}
@@ -99,9 +106,18 @@ by default (but can be specified to do so when an appropriate `formula` is suppl
 
 \item{catchability_data}{data-frame of covariates for use when specifying \code{Q1_formula} and \code{Q2_formula}}
 
-\item{Q1_formula}{same as \code{X1_formula} but affecting the 1st linear predictor for catchability (a.k.a. detectability)}
+\item{Q1_formula}{Similar to \code{X1_formula}, \code{Q1_formula} affects the 1st linear predictor for samples.
+However, the effect of \code{Q1_formula} is not used when predicting values at extrapolation-grid locations.
+Therefore, the \code{Q1_formula} is interpreted as affecting "catchability" (a.k.a. "detectabiility"), and it represents
+processes that affect the outcome of sampling but not the "true" underlying value of a variable being sampled.
+For example, a factor representing gear-type might be included to estimate the relative performacne of each gear type
+(relative to the base level of that factor).
+Note that \code{Q1_formula} defines a relationship that is applied to all samples (regardless of category \code{c_i}),
+whereas \code{X1_formula} defines a relationship that is estimated independently for each category.
+For a catchability covariate that varies by category, please include the category as factor in \code{catchability_data}
+and then include an interaction with category in \code{Q1_formula} for any variable which has an effect that varies among categories.}
 
-\item{Q2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor for catchability (a.k.a. detectability)}
+\item{Q2_formula}{same as \code{Q2_formula} but affecting the 2nd linear predictor.}
 
 \item{newtonsteps}{Integer specifying the number of extra newton steps to take
 after optimization (alternative to \code{loopnum}).
