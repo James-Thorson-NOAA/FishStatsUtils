@@ -68,9 +68,9 @@ function( fit,
   dimnames(Data$FieldConfig) = list( c("Omega","Epsilon","Beta","Epsilon_time"), c("Component_1","Component_2") )
 
   # Fill in missing inputs
-  if( "D_xct" %in% names(Report) ){
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xct)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_xct)[2]
+  if( "D_gct" %in% names(Report) ){
+    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gct)[3]
+    if( is.null(category_names) ) category_names = 1:dim(Report$D_gct)[2]
   }
   if( "D_xcy" %in% names(Report) ){
     if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xcy)[3]
@@ -152,7 +152,7 @@ function( fit,
       if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
         Var_rot$Psi_rot = aperm( Var_rot$Psi_rot, c(1,3,2) )
       }
-      Report_tmp = list("D_xct"=Var_rot$Psi_rot, "Epsilon1_sct"=Var_rot$Psi_rot, "Epsilon2_sct"=Var_rot$Psi_rot)
+      Report_tmp = list("D_gct"=Var_rot$Psi_rot, "Epsilon1_gct"=Var_rot$Psi_rot, "Epsilon2_gct"=Var_rot$Psi_rot)
       Lprime_list[[i]] = Var_rot$L_pj_rot
       if( !Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
         rownames(Lprime_list[[i]]) = category_names
@@ -199,7 +199,7 @@ function( fit,
         if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
           Var2_rot$Psi_rot = aperm( Var2_rot$Psi_rot, c(1,3,2) )
         }
-        Report2_tmp = list("D_xct"=Var2_rot$Psi_rot, "Epsilon1_sct"=Var2_rot$Psi_rot, "Epsilon2_sct"=Var2_rot$Psi_rot)
+        Report2_tmp = list("D_gct"=Var2_rot$Psi_rot, "Epsilon1_gct"=Var2_rot$Psi_rot, "Epsilon2_gct"=Var2_rot$Psi_rot)
         Psi2prime_list[[i]] = Var2_rot$Psi_rot
       }else{
         Report2_tmp = NULL
@@ -247,6 +247,7 @@ function( fit,
             factor_names = paste0("Factor_",1:dim(Var_rot$Psi_rot)[2])
           }
           plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
+                     fit = fit,
                      Report=Report2_tmp,
                      PlotDF=mapdetails_list[["PlotDF"]],
                      MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
@@ -265,7 +266,7 @@ function( fit,
         # Plot Omega
         # Use plot_variable to plot all factors on single figure
         if( Par_name %in% c("Omega1", "Omega2")){
-          plot_variable( Y_gt=array(Report2_tmp$D_xct[,,1],dim=dim(Report2_tmp$D_xct)[1:2]),
+          plot_variable( Y_gt=array(Report2_tmp$D_gct[,,1],dim=dim(Report2_tmp$D_gct)[1:2]),
                          map_list=mapdetails_list,
                          working_dir=plotdir,
                          panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
@@ -285,6 +286,7 @@ function( fit,
             factor_names = paste0("Factor_",1:dim(Var_rot$Psi_rot)[2])
           }
           plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
+                     fit = fit,
                      Report=Report2_tmp,
                      PlotDF=mapdetails_list[["PlotDF"]],
                      MapSizeRatio=mapdetails_list[["MapSizeRatio"]],

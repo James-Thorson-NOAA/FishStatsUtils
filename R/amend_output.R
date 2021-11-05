@@ -80,7 +80,9 @@ function( fit = NULL,
     year_labels = process_labels( year_labels, "Time", dim(Report$dpred_ktp)[2] )
     category_names = process_labels( category_names, "Category", dim(Report$dpred_ktp)[3] )
   }
-  strata_names = process_labels( strata_names, "Stratum", dim(Report$Index_ctl)[3] )
+  if("Index_ctl" %in% names(Report)){
+    strata_names = process_labels( strata_names, "Stratum", dim(Report$Index_ctl)[3] )
+  }
 
   # Determine year-category pairs with no data
   Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
@@ -139,21 +141,14 @@ function( fit = NULL,
   }
 
   # Add units
-  units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
-  units(Report$D_gct) = units(TmbData$b_i)
+  if("Index_ctl" %in% names(Report)) units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
+  if("D_gct" %in% names(Report)) units(Report$D_gct) = units(TmbData$b_i / TmbData$a_i)
 
   # Add units for COG, see: https://github.com/r-quantities/units/issues/291
   # In case of re-running amend_output on objects with existing units
-  if( "mean_Z_ctm" %in% names(Report) ){
-    units(Report$mean_Z_ctm) = as_units("km")
-  }
-  if( "mean_D_ctl" %in% names(Report) ){
-    units(Report$mean_D_ctl) = units(TmbData$b_i)
-  }
-  if( "effective_area_ctl" %in% names(Report) ){
-    #units(Report$effective_area_ctl) = paste0( sf::st_crs( extrapolation_list$projargs )$units, "^2" )
-    units(Report$effective_area_ctl) = as_units("km^2")
-  }
+  if("mean_Z_ctm" %in% names(Report)) units(Report$mean_Z_ctm) = as_units("km")
+  if("mean_D_ctl" %in% names(Report)) units(Report$mean_D_ctl) = units(TmbData$b_i)
+  if("effective_area_ctl" %in% names(Report)) units(Report$effective_area_ctl) = as_units("km^2") #  = paste0( sf::st_crs( extrapolation_list$projargs )$units, "^2" )
 
   # Check for bad entries
   return( Report )

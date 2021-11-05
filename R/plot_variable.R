@@ -48,7 +48,7 @@
 plot_variable <-
 function( Y_gt,
           map_list,
-          panel_labels,
+          panel_labels = NULL,
           projargs = '+proj=longlat',
           map_resolution = "medium",
           file_name = "density",
@@ -82,7 +82,8 @@ function( Y_gt,
   ###################
 
   # Check for problems and fill in missing stuff
-  if( is.vector(Y_gt)){
+  if( !is.matrix(Y_gt) ){
+    # as.numeric needed to strip units for is.vector to work
     Y_gt = matrix(Y_gt, ncol=1)
   }
   if( is.null(zlim)){
@@ -100,12 +101,12 @@ function( Y_gt,
     mfrow = ceiling(sqrt(ncol(Y_gt)))
     mfrow = c( mfrow, ceiling(ncol(Y_gt)/mfrow) )
   }
-  if( missing(panel_labels) | is.null(panel_labels) ){
+  if( is.null(panel_labels) ){
     panel_labels = rep("", ncol(Y_gt))
   }
   if( length(panel_labels) != ncol(Y_gt) ){
     warning( "panel_labels and `ncol(Y_gt)` don't match: Changing panel_labels'")
-    panel_labels = 1:ncol(Y_gt)
+    panel_labels = rep("", ncol(Y_gt))
   }
   if( is.null(col)){
     col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
