@@ -126,14 +126,26 @@ function( fit = NULL,
   Report = add_dimnames( Report = Report,
                          report_names = "Phi2_gk",
                          dimnames = list(NULL, "Covariate"=colnames(TmbData$Q2_ik)) )
+  Report = add_dimnames( Report = Report,
+                         report_names = c("L_omega1_cf","L_omega2_cf","L_beta1_cf","L_beta2_cf","L_epsilon1_cf","L_epsilon2_cf"),
+                         dimnames = list("Category"=category_names, NULL) )
+  Report = add_dimnames( Report = Report,
+                         report_names = c("Ltime_epsilon2_tf","Ltime_epsilon2_tf"),
+                         dimnames = list("Time"=year_labels, NULL) )
+  Report = add_dimnames( Report = Report,
+                         report_names = c("beta1_tc","beta2_tc"),
+                         dimnames = list("Time"=year_labels, "Category"=category_names) )
 
   # Add labels for other useful variables
   Report = add_dimnames( Report = Report,
                          report_names = c("Index_ctl","effective_area_ctl","mean_D_ctl"),
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
   Report = add_dimnames( Report = Report,
+                         report_names = c("Index_gctl"),
+                         dimnames = list(NULL, "Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
+  Report = add_dimnames( Report = Report,
                          report_names = "mean_Z_ctm",
-                         dimnames = list("Category"=category_names, "Time"=year_labels, colnames(TmbData$Z_gm)) )
+                         dimnames = list("Category"=category_names, "Time"=year_labels, "Spatial_axis"=colnames(TmbData$Z_gm)) )
 
   # Modify Sdreport
   if( !is.null(Sdreport) ){
