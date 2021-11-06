@@ -130,7 +130,7 @@ function( fit,
     par_SE[[log_index_name]] = ifelse(Num_ctl==0, 0, par_SE[[log_index_name]])
   }
 
-  # Assign units after fixing values to zer0
+  # Assign units after fixing values to zero
   for( int in seq_len(length(par_hat)) ){
     if( names(par_hat)[int] %in% names(fit$Report) ){
       dimnames(par_SE[[int]]) = dimnames(par_hat[[int]]) = dimnames(fit$Report[[names(par_hat)[int]]])
@@ -140,102 +140,6 @@ function( fit,
   if( any(is.na(par_hat)) | any(is.na(par_SE)) ){
     stop( "Problem: Standard errors contain NAs")
   }
-
-  ## Extract index (using bias-correctino if available and requested)
-  #if( index_name %in% c("Index_tl","Index_ctl","Index_cyl")){
-  #  Index_ctl = log_Index_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,year_labels,strata_names,c('Estimate','Std. Error')) )
-  #  # Index
-  #  if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
-  #    Index_ctl[] = SD[which(rownames(SD)==index_name),c('Est. (bias.correct)','Std. Error')]
-  #  }
-  #  if( !any(is.na(Index_ctl)) ){
-  #    message("Using bias-corrected estimates for abundance index (natural-scale)...")
-  #  }else{
-  #    message("Not using bias-corrected estimates for abundance index (natural-scale)...")
-  #    Index_ctl[] = SD[which(rownames(SD)==index_name),c('Estimate','Std. Error')]
-  #  }
-  #  # Log-Index
-  #  if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
-  #    log_Index_ctl[] = SD[which(rownames(SD)==paste0("ln_",index_name)),c('Est. (bias.correct)','Std. Error')]
-  #  }
-  #  if( !any(is.na(log_Index_ctl)) ){
-  #    message("Using bias-corrected estimates for abundance index (log-scale)...")
-  #  }else{
-  #    message("Not using bias-corrected estimates for abundance index (log-scale)...")
-  #    log_Index_ctl[] = SD[which(rownames(SD)==paste0("ln_",index_name)),c('Estimate','Std. Error')]
-  #  }
-  #}
-  #if( index_name %in% c("Index_tp")){
-  #  if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
-  #    Index_ctl = aperm( array( c(Sdreport$unbiased$value[which(names(Sdreport$value)==index_name)],TMB::summary.sdreport(Sdreport)[which(rownames(TMB::summary.sdreport(Sdreport))==index_name),'Std. Error']), dim=c(unlist(TmbData[c('n_t','n_c','n_l')]),2), dimnames=list(NULL,NULL,NULL,c('Estimate','Std. Error')) ), perm=c(2,1,3))
-  #    if( "ln_Index_tp" %in% rownames(TMB::summary.sdreport(Sdreport))){
-  #      log_Index_ctl = aperm( array( c(Sdreport$unbiased$value[which(names(Sdreport$value)==paste0("ln_",index_name))],TMB::summary.sdreport(Sdreport)[which(rownames(TMB::summary.sdreport(Sdreport))==paste0("ln_",index_name)),'Std. Error']), dim=c(unlist(TmbData[c('n_t','n_c','n_l')]),2), dimnames=list(NULL,NULL,NULL,c('Estimate','Std. Error')) ), perm=c(2,1,3))
-  #    }else{
-  #      log_Index_ctl = log( Index_ctl )
-  #      log_Index_ctl[,,,'Std. Error'] = log_Index_ctl[,,,'Std. Error'] / log_Index_ctl[,,,'Estimate']
-  #      warning( "Using kludge for log-standard errors of index, to be replaced in later versions of 'MIST'" )
-  #    }
-  #  }else{
-  #    Index_ctl = aperm( array( TMB::summary.sdreport(Sdreport)[which(rownames(TMB::summary.sdreport(Sdreport))==index_name),], dim=c(unlist(TmbData[c('n_t','n_c','n_l')]),2), dimnames=list(NULL,NULL,NULL,c('Estimate','Std. Error')) ), perm=c(2,1,3,4))
-  #    if( "ln_Index_tp" %in% rownames(TMB::summary.sdreport(Sdreport))){
-  #      log_Index_ctl = aperm( array( TMB::summary.sdreport(Sdreport)[which(rownames(TMB::summary.sdreport(Sdreport))==paste0("ln_",index_name)),], dim=c(unlist(TmbData[c('n_t','n_c','n_l')]),2), dimnames=list(NULL,NULL,NULL,c('Estimate','Std. Error')) ), perm=c(2,1,3,4))
-  #    }else{
-  #      log_Index_ctl = log( Index_ctl )
-  #      log_Index_ctl[,,,'Std. Error'] = log_Index_ctl[,,,'Std. Error'] / log_Index_ctl[,,,'Estimate']
-  #      warning( "Using kludge for log-standard errors of index, to be replaced in later versions of 'MIST'" )
-  #    }
-  #  }
-  #}
-  #units(Index_ctl) = units(log_Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
-
-  # Extract biomass ratio Bratio_cty if available (only available if >= V5.3.0 and using spatial Gompertz model features)
-  #if( "Bratio_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-  #  Bratio_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,year_labels,strata_names,c('Estimate','Std. Error')) )
-  #  if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
-  #    Bratio_ctl[] = SD[which(rownames(SD)=="Bratio_cyl"),c('Est. (bias.correct)','Std. Error')]
-  #  }
-  #  if( !any(is.na(Bratio_ctl)) ){
-  #    message("Using bias-corrected estimates for biomass ratio (natural-scale)...")
-  #  }else{
-  #    message("Not using bias-corrected estimates for biomass ratio (natural-scale)...")
-  #    Bratio_ctl[] = SD[which(rownames(SD)=="Bratio_cyl"),c('Estimate','Std. Error')]
-  #  }
-  #  units(Bratio_ctl) = unitless
-  #}else{
-  #  Bratio_ctl = NULL
-  #}
-  #if( "ln_Bratio_cyl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-  #  log_Bratio_ctl = array( NA, dim=c(unlist(TmbData[c('n_c','n_t','n_l')]),2), dimnames=list(category_names,year_labels,strata_names,c('Estimate','Std. Error')) )
-  #  if( use_biascorr==TRUE && "unbiased"%in%names(Sdreport) ){
-  #    log_Bratio_ctl[] = SD[which(rownames(SD)=="ln_Bratio_cyl"),c('Est. (bias.correct)','Std. Error')]
-  #  }
-  #  if( !any(is.na(log_Bratio_ctl)) ){
-  #    message("Using bias-corrected estimates for biomass ratio (log-scale)...")
-  #  }else{
-  #    message("Not using bias-corrected estimates for biomass ratio (log-scale)...")
-  #    log_Bratio_ctl[] = SD[which(rownames(SD)=="ln_Bratio_cyl"),c('Estimate','Std. Error')]
-  #  }
-  #}else{
-  #  log_Bratio_ctl = NULL
-  #}
-  #
-  ## Extract Fratio
-  #if( "Fratio_ct" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
-  #  Fratio_ct = array( NA, dim=c(unlist(TmbData[c('n_c','n_t')]),2), dimnames=list(category_names,year_labels,c('Estimate','Std. Error')) )
-  #  Fratio_ct[] = SD[which(rownames(SD)=="Fratio_ct"),c('Estimate','Std. Error')]
-  #}else{
-  #  Fratio_ct = NULL
-  #}
-  #
-  #if( treat_missing_as_zero==TRUE ){
-  #  # Determine year-category pairs with no data
-  #  Num_ctl = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
-  #  # Replace values with 0 (estimate) and NA (standard error)
-  #  Index_ctl[,,,'Estimate'] = ifelse(Num_ctl==0, 0, Index_ctl[,,,'Estimate'])
-  #  Index_ctl[,,,'Std. Error'] = ifelse(Num_ctl==0, NA, Index_ctl[,,,'Std. Error'])
-  #  log_Index_ctl[,,,'Estimate'] = ifelse(Num_ctl==0, -Inf, log_Index_ctl[,,,'Estimate'])
-  #  log_Index_ctl[,,,'Std. Error'] = ifelse(Num_ctl==0, NA, log_Index_ctl[,,,'Std. Error'])
-  #}
 
   # Plot biomass and Bratio
   Plot_suffix = ""
@@ -322,16 +226,13 @@ function( fit,
     "Estimate" = as.vector(par_hat[[index_name]]),
     "Std. Error for Estimate" = as.vector(par_SE[[index_name]]),
     "Std. Error for ln(Estimate)" = as.vector(par_SE[[log_index_name]]) )
-  #for( cI in 1:TmbData$n_c ){
-  #  index_units = make_unit_label( u=units(Index_ctl), lab="", parse=FALSE )
-  #  Tmp = data.frame( "Year"=year_labels, "Unit"=index_units, "Estimate"=as.vector(Index_ctl[cI,,,'Estimate']), "SD_log"=as.vector(log_Index_ctl[cI,,,'Std. Error']), "SD_mt"=as.vector(Index_ctl[cI,,,'Std. Error']) )
-  #  if( TmbData$n_c>1 ) Tmp = cbind( "Category"=category_names[cI], Tmp)
-  #  Table = rbind( Table, Tmp )
-  #}
   write.csv( Table, file=paste0(DirName,"/Index.csv"), row.names=FALSE)
 
   # Return stuff
-  Return = list( "Table"=Table ) # , "log_Index_ctl"=log_Index_ctl, "Index_ctl"=Index_ctl )
+    # Necessary to provide "log_Index_ctl" and "Index_ctl" for use in calculate_proportion, which has been fixed for zeros here
+  Return = list( "Table"=Table,
+    "log_Index_ctl" = abind::abind("Estimate"=par_hat[[log_index_name]], "Std. Error"=par_SE[[log_index_name]], along=4),
+    "Index_ctl" = abind::abind("Estimate"=par_hat[[index_name]], "Std. Error"=par_SE[[index_name]], along=4) )
 
   # Extract and save covariance
   if( "cov"%in%names(Sdreport) & create_covariance_table==TRUE ){
