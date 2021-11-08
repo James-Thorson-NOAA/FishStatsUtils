@@ -7,7 +7,7 @@
 plot_variable(
   Y_gt,
   map_list,
-  panel_labels,
+  panel_labels = NULL,
   projargs = "+proj=longlat",
   map_resolution = "medium",
   file_name = "density",
