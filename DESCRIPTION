@@ -1,7 +1,7 @@
 Package: FishStatsUtils
 Type: Package
 Title: Utilities (shared code and data) for FishStats spatio-temporal modeling toolbox
-Version: 2.10.2
+Version: 2.11.0
 Date: 2021-11-08
 Authors@R: 
     c(person(given = "James",
@@ -38,13 +38,16 @@ Imports:
     TMBhelper,
     abind,
     corpcor,
+    corrplot,
     pander,
     rnaturalearth,
     rnaturalearthdata,
     formatR,
     splancs,
     DHARMa,
-    viridisLite
+    viridisLite,
+    reshape2,
+    fastcluster
 Depends:
     R (>= 3.5.0),
     units

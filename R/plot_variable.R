@@ -20,7 +20,7 @@
 #'        As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
 #'        where argument \code{+lon_0} allows the user to center eastings on a specified longitude.
 #' @param n_cells Integer used to determine the argument \code{cell.size} passed
-#'        to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+#'        to \code{\link[raster]{rasterize}} when converting output at extrapolation-grid cells
 #'        to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
 #'        \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 #'        will often need to be modified for a given purpose.

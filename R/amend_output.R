@@ -110,27 +110,27 @@ function( fit = NULL,
   # Add labels for all variables plotted using `plot_maps`
   Report = add_dimnames( Report = Report,
                          report_names = c("P1_gct","P2_gct","R1_gct","R2_gct","D_gct","Epsilon1_gct","Epsilon2_gct","eta1_gct","eta2_gct"),
-                         dimnames = list(NULL, "Category"=category_names, "Time"=year_labels) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Time"=year_labels) )
   Report = add_dimnames( Report = Report,
                          report_names = c("Omega1_gc","Omega2_gc"),
-                         dimnames = list(NULL, "Category"=category_names) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names) )
   Report = add_dimnames( Report = Report,
                          report_names = "Xi1_gcp",
-                         dimnames = list(NULL, "Category"=category_names, "Covariate"=colnames(TmbData$X1_ip)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Covariate"=colnames(TmbData$X1_ip)) )
   Report = add_dimnames( Report = Report,
                          report_names = "Xi2_gcp",
-                         dimnames = list(NULL, "Category"=category_names, "Covariate"=colnames(TmbData$X2_ip)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Covariate"=colnames(TmbData$X2_ip)) )
   Report = add_dimnames( Report = Report,
                          report_names = "Phi1_gk",
-                         dimnames = list(NULL, "Covariate"=colnames(TmbData$Q1_ik)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Covariate"=colnames(TmbData$Q1_ik)) )
   Report = add_dimnames( Report = Report,
                          report_names = "Phi2_gk",
-                         dimnames = list(NULL, "Covariate"=colnames(TmbData$Q2_ik)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Covariate"=colnames(TmbData$Q2_ik)) )
   Report = add_dimnames( Report = Report,
                          report_names = c("L_omega1_cf","L_omega2_cf","L_beta1_cf","L_beta2_cf","L_epsilon1_cf","L_epsilon2_cf"),
                          dimnames = list("Category"=category_names, NULL) )
   Report = add_dimnames( Report = Report,
-                         report_names = c("Ltime_epsilon2_tf","Ltime_epsilon2_tf"),
+                         report_names = c("Ltime_epsilon1_tf","Ltime_epsilon2_tf"),
                          dimnames = list("Time"=year_labels, NULL) )
   Report = add_dimnames( Report = Report,
                          report_names = c("beta1_tc","beta2_tc"),
@@ -142,7 +142,7 @@ function( fit = NULL,
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
   Report = add_dimnames( Report = Report,
                          report_names = c("Index_gctl"),
-                         dimnames = list(NULL, "Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
   Report = add_dimnames( Report = Report,
                          report_names = "mean_Z_ctm",
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Spatial_axis"=colnames(TmbData$Z_gm)) )

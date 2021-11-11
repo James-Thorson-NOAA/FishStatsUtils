@@ -25,6 +25,7 @@ plot_results(
   n_cells_residuals = NULL,
   RotationMethod = "PCA",
   quantiles = c(0.05, 0.5, 0.95),
+  similarity_metric = c("hclust", "Correlation", "Dissimilarity", "Covariance")[1],
   ...
 )
 }
@@ -44,7 +45,6 @@ plot_results(
   \item{plot_set=7}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model)}
   \item{plot_set=8}{Linear predictor for encounter probability}
   \item{plot_set=9}{Linear predictor for positive catch rates}
-  \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
   \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
   \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
   \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
@@ -72,7 +72,10 @@ plot_results(
 
 \item{check_residuals}{Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)}
 
-\item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
+\item{projargs}{Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
+where argument \code{+lon_0} allows the user to center eastings on a specified longitude.}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 
@@ -92,7 +95,7 @@ and new data conditional upon these values.
 }}
 
 \item{n_cells}{Integer used to determine the argument \code{cell.size} passed
-to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to \code{\link[raster]{rasterize}} when converting output at extrapolation-grid cells
 to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
 \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 will often need to be modified for a given purpose.}
@@ -103,6 +106,8 @@ will often need to be modified for a given purpose.}
 Options: "PCA" (recommended) or "Varimax"}
 
 \item{quantiles}{vector specifying quantiles to use for calculating range edges}
+
+\item{similarity_metric}{function used for plotting covariance}
 
 \item{...}{additional settings to pass to \code{\link{plot_maps}}}
 }

@@ -20,7 +20,6 @@
 #'   \item{plot_set=7}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model)}
 #'   \item{plot_set=8}{Linear predictor for encounter probability}
 #'   \item{plot_set=9}{Linear predictor for positive catch rates}
-#'   \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
 #'   \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
 #'   \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
 #'   \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
@@ -36,14 +35,13 @@
 #' @param Report tagged list of outputs from TMB model via \code{Obj$report()}
 #' @param Sdreport Standard deviation outputs from TMB model via \code{sdreport(Obj)}
 #' @param plot_value either \code{plot_value="estimate"} (the default), or a user-specified function that is applied to \code{n_samples} samples from the joint predictive distribution, e.g., to visualize the standard error of a variable by specifying \code{plot_value=sd}
-#' @param Panel Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure
+#' @param Panel Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year (\code{Panel="Year"})  in each panel figure
 #' @param MapSizeRatio Default size for each panel
 #' @param years_to_plot integer vector, specifying positions of \code{year_labels} for plotting (used to avoid plotting years with no data, etc.)
-#' @param projargs a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.
-#' @param country optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
+#' @param country optional list of countries to display, e.g. \code{country = c("united states of america", "canada")}. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.
 #' @param ... arguments passed to \code{FishStatsUtils::plot_variable}
 #'
-#' @return Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}
+#' @return \code{Mat_xt} a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}
 #'
 
 #' @export

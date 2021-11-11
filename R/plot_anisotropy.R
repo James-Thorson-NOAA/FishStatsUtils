@@ -12,12 +12,13 @@
 #' both linear predictors, which share the same \code{H} estimate but differ in their overall estimated decorrelation rate.
 #'
 #' @export
-plot_anisotropy = function( Obj,
-  FileName,
-  ControlList = list("Width"=4, "Height"=5, "Res"=200, "Units"='in'),
-  type = "ellipse",
-  Report = Obj$report(),
-  TmbData = Obj$env$data ){
+plot_anisotropy <-
+function( Obj,
+          FileName,
+          ControlList = list("Width"=4, "Height"=5, "Res"=200, "Units"='in'),
+          type = "ellipse",
+          Report = Obj$report(),
+          TmbData = Obj$env$data ){
 
   # Extract Options and Options_vec (depends upon version)
   if( all(c("Options","Options_vec") %in% names(TmbData)) ){

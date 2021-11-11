@@ -15,6 +15,7 @@
 #' @inheritParams plot_range_edge
 #' @inheritParams simulate_data
 #' @inheritParams plot_factors
+#' @inheritParams plot_similarity
 #'
 #' @param fit Output from \code{fit_model}
 #' @param check_residuals Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)
@@ -58,6 +59,7 @@ function( fit,
           n_cells_residuals = NULL,
           RotationMethod = "PCA",
           quantiles = c(0.05,0.5,0.95),
+          similarity_metric = c("hclust", "Correlation", "Dissimilarity", "Covariance")[1],
           ... ){
 
   # Check for known issues
@@ -113,6 +115,18 @@ function( fit,
     Index = "Not run"
     message("\n### Skipping plot of abundance index; must re-run with standard errors to plot")
   }
+
+  # Plot covariance/dissimilarity matrices
+  plot_similarity_args = list(...)
+  message("\n### Making plot of covariance/dissimilarity matrices")
+  #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
+  plot_similarity_args = combine_lists( "input"=plot_similarity_args, "args_to_use"=formalArgs(plot_similarity),
+    "default" = list(fit = fit,
+          year_labels = year_labels,
+          category_names = category_names,
+          similarity_metric = similarity_metric,
+          working_dir = paste0(getwd(),"/")) )
+  do.call( what=plot_similarity, args=plot_similarity_args )
 
   # Plot comps
   if( !is.null(fit$parameter_estimates$SD) & fit$data_list$n_c>1 ){
