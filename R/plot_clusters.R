@@ -45,8 +45,15 @@ function( fit,
   # Change shape
   Y_z = reshape2:::melt.array( data=Y_gct, varnames=names(dimnames(Y_gct)) )
   Y_zc = reshape2::acast(Y_z, formula = Time + Site ~ Category )
+
+  # Warnings
+  if( nrow(Y_zc) > 100000 ){
+    warning("`plot_clusters` will likely not work due to large size")
+    return( list("Y_zc"=Y_zc) )
+  }
   if( nrow(Y_zc) > 10000 ) warning("`plot_clusters` will go slowly due to large size")
 
+  # Apply clustering
   if( method == "bcdist" ){
     # Option 1 -- breaks with large sample size
     Dist_zz = ecodist::bcdist(Y_zc)  # dist or ecodist::bcdist
@@ -72,4 +79,8 @@ function( fit,
     #format = format,
     ...
   )
+
+  # Return stuff
+  Return = list("Y_zc"=Y_zc, "Class_gt"=Class_gt)
+  return(Return)
 }
