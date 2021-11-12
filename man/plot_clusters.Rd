@@ -13,6 +13,7 @@ plot_clusters(
   method = "ward",
   working_dir = paste0(getwd(), "/"),
   format = "points",
+  file_name = paste0("Class-", var_name),
   ...
 )
 }

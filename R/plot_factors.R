@@ -83,12 +83,11 @@ function( fit,
   #}
   # Overwrite labels using run-time user inputs if provided
   Report = amend_output( fit = fit,
+                         TmbData = Data,
                          Report = Report,
-                         ParHat = ParHat,
-                         Data = Data,
-                         Obj = Obj,
-                         SD = SD,
-                         year_labels = year_labels )
+                         Sdreport = SD,
+                         year_labels = year_labels,
+                         category_names = category_names )
 
   # Dimensions for plotting
   Dim = function( num ) c(ceiling(sqrt(num)), ceiling(num/ceiling(sqrt(num))) )

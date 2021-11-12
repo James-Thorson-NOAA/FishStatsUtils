@@ -19,6 +19,7 @@ function( fit,
           method = "ward",
           working_dir = paste0(getwd(),"/"),
           format = "points",
+          file_name = paste0("Class-",var_name),
           ... ){
 
   # Informative error
@@ -74,13 +75,14 @@ function( fit,
   plot_variable(
     Y_gt = Class_gt,
     map_list = map_list,
-    file_name = "Class-Density",
+    file_name = file_name,
     working_dir = run_dir,
     #format = format,
+    panel_labels = colnames(Class_gt),
     ...
   )
 
   # Return stuff
   Return = list("Y_zc"=Y_zc, "Class_gt"=Class_gt)
-  return(Return)
+  return( invisible(Return) )
 }

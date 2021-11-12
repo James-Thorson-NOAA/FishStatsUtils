@@ -26,45 +26,18 @@
 
 
 
-#' Copy of FishStatsUtils::plot_loadings
-#'
-#' Included for continuity when using old scripts
-#'
-#' Please use \code{?FishStatsUtils::plot_loadings} to see list of arguments and usage
-#' @export
 PlotLoadings = function( ... ){
   .Deprecated( new="FishStatsUtils::plot_loadings" )
   FishStatsUtils::plot_loadings( ... )
 }
-
-#' Copy of FishStatsUtils::Rotate_Fn
-#'
-#' Included for continuity when using old scripts
-#'
-#' Please use \code{?FishStatsUtils::rotate_factors} to see list of arguments and usage
-#' @export
 Rotate_Fn = function( ... ){
   .Deprecated( new="FishStatsUtils::rotate_factors" )
   FishStatsUtils::rotate_factors( ... )
 }
-
-#' Copy of FishStatsUtils::make_mesh
-#'
-#' Included for continuity when using old scripts
-#'
-#' Please use \code{?FishStatsUtils::make_mesh} to see list of arguments and usage
-#' @export
 Calc_Anisotropic_Mesh = function( ... ){
   .Deprecated( new="FishStatsUtils::make_mesh" )
   FishStatsUtils::make_mesh( ... )
 }
-
-#' Copy of FishStatsUtils::make_kmeans
-#'
-#' Included for continuity when using old scripts
-#'
-#' Please use \code{?FishStatsUtils::make_kmeans} to see list of arguments and usage
-#' @export
 Calc_Kmeans = function( ... ){
   .Deprecated( new="FishStatsUtils::make_kmeans" )
   FishStatsUtils::make_kmeans( ... )
