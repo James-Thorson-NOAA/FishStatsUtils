@@ -6,21 +6,37 @@
 \usage{
 plot_clusters(
   fit,
-  map_list = NULL,
   var_name = "D_gct",
   transform_var = log,
   k = 4,
   method = "ward",
-  working_dir = paste0(getwd(), "/"),
-  format = "points",
+  year_labels = fit$year_labels,
+  map_list = NULL,
+  working_dir = paste0(plotdirgetwd(), "/"),
   file_name = paste0("Class-", var_name),
+  replace_Inf_with_NA = TRUE,
   ...
 )
 }
 \arguments{
+\item{var_name}{Name of object from \code{fit$Report} that is used.  Only
+implemented options are \code{"D_gct","Omega1_gc","Omega2_gc","Epsilon1_gct","Epsilon2_gct"}.}
+
+\item{transform_var}{function to apply to \code{fit$Report[[var_name]]} prior to clustering.
+I recommend using log-transform for density, and otherwise using \code{transform_var=identity}.}
+
+\item{k}{an integer scalar or vector with the desired number of groups}
+
 \item{method}{Distance metric. Default \code{method="ward"} is very fast,
-but can instead use \code{method="bcdist"} for small problems
-\code{\link[ecodist]{bcdist}}}
+but can instead use \code{method="bcdist"} for small problems which calculates
+Bray-Curtist dissimilarity using \code{\link[ecodist]{bcdist}} and then applies
+Ward clustering}
+
+\item{map_list}{output from \code{\link{make_map_info output}}}
+
+\item{replace_Inf_with_NA}{Boolean whether to replace \code{Inf} or \code{-Inf} values
+with \code{NA} prior to clustering, as useful sometimes when \code{var_name="D_gct"},
+\code{transform_var=log} and replacing nonencounters with zero.}
 }
 \description{
 \code{plot_clusters} plots the clusters on a map

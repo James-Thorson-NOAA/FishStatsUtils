@@ -4,7 +4,9 @@
 #' \code{plot_similarity} plots metrics of similarity derived from estimated covariance matrices
 #'
 #' @param fit output from \code{fit_model}
-#' @param similarity_metric function used for plotting covariance
+#' @param similarity_metric approach used to visualize similarity among years/categories
+#'        resulting from estimated loadings matrices.  Available options include
+#'        \code{"hclust", "Correlation", "Dissimilarity", "Covariance"}
 
 #' @export
 plot_similarity <-

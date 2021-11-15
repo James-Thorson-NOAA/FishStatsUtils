@@ -5,21 +5,34 @@
 #'
 #' Code to plot clusters to look for biogeographic shifts
 #'
+#' @inheritParams fastcluster::hclust.vector
+#' @inheritParams stats::cutree
+#'
+#' @param var_name Name of object from \code{fit$Report} that is used.  Only
+#'        implemented options are \code{"D_gct","Omega1_gc","Omega2_gc","Epsilon1_gct","Epsilon2_gct"}.
+#' @param transform_var function to apply to \code{fit$Report[[var_name]]} prior to clustering.
+#'        I recommend using log-transform for density, and otherwise using \code{transform_var=identity}.
 #' @param method Distance metric. Default \code{method="ward"} is very fast,
-#'        but can instead use \code{method="bcdist"} for small problems
-#'        \code{\link[ecodist]{bcdist}}
+#'        but can instead use \code{method="bcdist"} for small problems which calculates
+#'        Bray-Curtist dissimilarity using \code{\link[ecodist]{bcdist}} and then applies
+#'        Ward clustering
+#' @param replace_Inf_with_NA Boolean whether to replace \code{Inf} or \code{-Inf} values
+#'        with \code{NA} prior to clustering, as useful sometimes when \code{var_name="D_gct"},
+#'        \code{transform_var=log} and replacing nonencounters with zero.
+#' @param map_list output from \code{\link{make_map_info output}}
 #'
 #' @export
 plot_clusters <-
 function( fit,
-          map_list = NULL,
           var_name = "D_gct",
           transform_var = log,
           k = 4,
           method = "ward",
-          working_dir = paste0(getwd(),"/"),
-          format = "points",
+          year_labels = fit$year_labels,
+          map_list = NULL,
+          working_dir = paste0(plotdirgetwd(),"/"),
           file_name = paste0("Class-",var_name),
+          replace_Inf_with_NA = TRUE,
           ... ){
 
   # Informative error
@@ -28,7 +41,8 @@ function( fit,
   }
 
   # Change labels
-  fit$Report = amend_output(fit)
+  fit$Report = amend_output( fit,
+                             year_labels = year_labels )
 
   # Make map_list if necessary
   if( missing(map_list) ){
@@ -38,9 +52,14 @@ function( fit,
   }
 
   # Extract object
-  Y_gct = transform_var( fit$Report[[var_name]] )
+  Y_gct = transform_var( strip_units(fit$Report[[var_name]]) )
   if( length(dim(Y_gct))==2 ){
     Y_gct = Y_gct %o% array(1,dimnames=list("Time"=1))
+  }
+
+  #
+  if( replace_Inf_with_NA==TRUE ){
+    Y_gct = ifelse( abs(Y_gct)==Inf, NA, Y_gct )
   }
 
   # Change shape
@@ -76,7 +95,7 @@ function( fit,
     Y_gt = Class_gt,
     map_list = map_list,
     file_name = file_name,
-    working_dir = run_dir,
+    working_dir = working_dir,
     #format = format,
     panel_labels = colnames(Class_gt),
     ...

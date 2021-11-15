@@ -19,7 +19,9 @@ plot_similarity(
 \arguments{
 \item{fit}{output from \code{fit_model}}
 
-\item{similarity_metric}{function used for plotting covariance}
+\item{similarity_metric}{approach used to visualize similarity among years/categories
+resulting from estimated loadings matrices.  Available options include
+\code{"hclust", "Correlation", "Dissimilarity", "Covariance"}}
 }
 \description{
 \code{plot_similarity} plots metrics of similarity derived from estimated covariance matrices
