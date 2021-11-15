@@ -84,7 +84,7 @@ function( fit,
           corrplot::corrplot.mixed( Cor, tl.pos="lt" )
         } else
         if( tolower(similarity_metric) %in% c("cov","covariance") ){
-          corrplot::corrplot( Cov, is.corr=FALSE, tl.pos="lt" )
+          corrplot::corrplot( Cov, is.corr=FALSE, tl.pos="lt", cl.lim = range(Cov) )
         } else
         if( tolower(similarity_metric) == "hclust" ){
           Hclust = hclust( Dist )
@@ -96,7 +96,7 @@ function( fit,
           Dist2 = as.matrix(Dist2)
           #Dist2 = Dist2 / max(abs(Dist))
           #gclus::plotcolors(dmat.color(Dist2, viridisLite::viridis(4)), rlabels=rownames(as.matrix(Dist2)) )
-          corrplot::corrplot( Dist2, is.corr=FALSE, tl.pos="lt" )
+          corrplot::corrplot( Dist2, is.corr=FALSE, tl.pos="lt", cl.lim = range(Dist2) )
         } else { stop("Check `similarity_metric`") }
         #if( tolower(similarity_metric) == "correlation" ) corrplot::corrplot( cov2cor(Cov), method="pie", type="lower" )
         #if( tolower(similarity_metric) == "dissimilarity" ) plot( as.matrix(Dist) )
