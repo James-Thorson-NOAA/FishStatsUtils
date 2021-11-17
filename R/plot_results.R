@@ -130,7 +130,7 @@ function( fit,
           year_labels = year_labels,
           category_names = category_names,
           similarity_metric = similarity_metric,
-          working_dir = paste0(getwd(),"/")) )
+          working_dir = working_dir) )
   do.call( what=plot_similarity, args=plot_similarity_args )
 
   # Plot comps
@@ -224,7 +224,7 @@ function( fit,
   if( cluster_results == TRUE ){
     message("\n### Making plots for spatial cluster analysis")
     plot_clusters_args = list(...)
-    plot_clusters_args = combine_lists( "input"=plot_clusters_args, "args_to_use"=c(formalArgs(plot_factors),formalArgs(plot_variable)),
+    plot_clusters_args = combine_lists( "input"=plot_clusters_args, "args_to_use"=c(formalArgs(plot_clusters),formalArgs(plot_variable)),
       "default" = list( fit = fit,
                         year_labels = year_labels,
                         map_list = map_list,

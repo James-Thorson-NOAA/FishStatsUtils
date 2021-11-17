@@ -73,7 +73,7 @@ function( fit,
       if( (ncol(fit$Report[[L_name]])==0) || all(Cov==diag(ncol(Cov))) ){
         diag(Cov) = 0
         Dist[] = 0
-        Cor[] = 1
+        Cor = array(1, dim=dim(Cov))
       }else{
         Cor = cov2cor(Cov)
       }
