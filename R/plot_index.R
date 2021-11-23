@@ -43,7 +43,35 @@ function( Index_ctl,
           SampleSize_ctz = NULL,
           Y2range = c(0,NA),
           y2lab = "",
+          add = FALSE,
           ... ){
+
+  # Local function
+  plot_lines <-
+  function( x,
+            y,
+            ybounds,
+            fn = lines,
+            col_bounds = "black",
+            bounds_type = "whiskers",
+            border = NA,
+            border_lty = "solid",
+            lwd_bounds = 1,
+            ... ){
+
+    # Function still used in plot_index
+    #warning( "`plot_lines` is soft-deprecated" )
+
+    fn( y=y, x=x, ... )
+    if( bounds_type=="whiskers" ){
+      for(t in 1:length(y)){
+        lines( x=rep(x[t],2), y=ybounds[t,], col=col_bounds, lty=border_lty, lwd=lwd_bounds)
+      }
+    }
+    if( bounds_type=="shading" ){
+      polygon( x=c(x,rev(x)), y=c(ybounds[,1],rev(ybounds[,2])), col=col_bounds, border=border, lty=border_lty)
+    }
+  }
 
   # Change inputs
   if( length(dim(Index_ctl))==length(dim(sd_Index_ctl)) ){
@@ -101,7 +129,7 @@ function( Index_ctl,
     png( file=paste0(DirName,PlotName), width=width, height=height, res=200, units="in")  # paste0(DirName,ifelse(DirName=="","","/"),PlotName)
     on.exit( dev.off() )
   }
-  par( Par )
+  if(add==FALSE) par( Par )
   for( z1 in 1:n_categories ){
     # Calculate y-axis limits
     if(scale=="uniform") Ylim = range(Index_ctl[z1,years_to_plot,]%o%c(1,1) + sd_Index_ctl[z1,years_to_plot,]%o%c(-interval_width,interval_width)*1.05, na.rm=TRUE)

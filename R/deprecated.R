@@ -1172,23 +1172,6 @@ function( colvec, heatrange, textmargin=NULL, labeltransform="uniform", dopar=TR
 }
 
 
-plot_lines = function( x, y, ybounds, fn=lines, col_bounds="black", bounds_type="whiskers", border=NA,
-  border_lty="solid", lwd_bounds=1, ... ){
-
-  # Function still used in plot_index
-  #warning( "`plot_lines` is soft-deprecated" )
-
-  fn( y=y, x=x, ... )
-  if( bounds_type=="whiskers" ){
-    for(t in 1:length(y)){
-      lines( x=rep(x[t],2), y=ybounds[t,], col=col_bounds, lty=border_lty, lwd=lwd_bounds)
-    }
-  }
-  if( bounds_type=="shading" ){
-    polygon( x=c(x,rev(x)), y=c(ybounds[,1],rev(ybounds[,2])), col=col_bounds, border=border, lty=border_lty)
-  }
-}
-
 #' Inset small plot within figure
 #'
 #' Inset plot with margins, background and border (based on: https://github.com/cran/berryFunctions/blob/master/R/smallPlot.R)

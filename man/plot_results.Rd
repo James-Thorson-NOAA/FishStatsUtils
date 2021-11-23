@@ -37,24 +37,24 @@ plot_results(
 
 \item{plot_set}{integer-vector defining plots to create
 \describe{
-  \item{plot_set=1}{Link-transformed 1st linear predictor, \code{R1_gct}}
-  \item{plot_set=2}{Link-transformed 2nd linear predictor, \code{R2_gct}}
-  \item{plot_set=3}{Log-predicted density, derived from link-transform of both linear predictors, \code{D_gct}}
-  \item{plot_set=6}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model), \code{Epsilon1_gct}}
-  \item{plot_set=7}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model), \code{Epsilon2_gct}}
-  \item{plot_set=8}{1st linear predictor, \code{P1_gct}}
-  \item{plot_set=9}{2nd linear predictor, \code{P2_gct}}
-  \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor, \code{X1_gcp}}
-  \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor, \code{X2_gcp}}
-  \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
-  \item{plot_set=14}{Covariate effects on 1st linear predictor, \code{eta1_gct}}
-  \item{plot_set=15}{Covariate effects on 2nd linear predictor, \code{eta2_gct}}
-  \item{plot_set=16}{Spatial variation for 1st linear predictor, \code{Omega1_gc}}
-  \item{plot_set=17}{Spatial variation for 2nd linear predictor, \code{Omega2_gc}}
-  \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor, \code{Xi1_gcp}}
-  \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor, \code{Xi2_gcp}}
-  \item{plot_set=20}{Spatially-varying response for catchability covariates in 1st linear predictor, \code{Phi1_gk}}
-  \item{plot_set=21}{Spatially-varying response for catchability covariates in 2nd linear predictor, \code{Phi2_gk}}
+  \item{\code{plot_set=1}}{Link-transformed 1st linear predictor, \code{Report$R1_gct}}
+  \item{\code{plot_set=2}}{Link-transformed 2nd linear predictor, logged for interpretable plotting scale, \code{log(Report$R2_gct)}}
+  \item{\code{plot_set=3}}{Log-predicted density, derived from link-transform of both linear predictors, \code{log(Report$D_gct)}}
+  \item{\code{plot_set=6}}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model), \code{Report$Epsilon1_gct}}
+  \item{\code{plot_set=7}}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model), \code{Report$Epsilon2_gct}}
+  \item{\code{plot_set=8}}{1st linear predictor, \code{Report$P1_gct}}
+  \item{\code{plot_set=9}}{2nd linear predictor, \code{Report$P2_gct}}
+  \item{\code{plot_set=11}}{Covariates that are included in the model for the 1st linear predictor, \code{Report$X1_gcp}}
+  \item{\code{plot_set=12}}{Covariates that are included in the model for the 2nd linear predictor, \code{Report$X2_gcp}}
+  \item{\code{plot_set=13}}{Total biomass across all categories (only useful in a multivariate model)}
+  \item{\code{plot_set=14}}{Covariate effects on 1st linear predictor, \code{Report$eta1_gct}}
+  \item{\code{plot_set=15}}{Covariate effects on 2nd linear predictor, \code{Report$eta2_gct}}
+  \item{\code{plot_set=16}}{Spatial variation for 1st linear predictor, \code{Report$Omega1_gc}}
+  \item{\code{plot_set=17}}{Spatial variation for 2nd linear predictor, \code{Report$Omega2_gc}}
+  \item{\code{plot_set=18}}{Spatially-varying response for density covariates in 1st linear predictor, \code{Report$Xi1_gcp}}
+  \item{\code{plot_set=19}}{Spatially-varying response for density covariates in 2nd linear predictor, \code{Report$Xi2_gcp}}
+  \item{\code{plot_set=20}}{Spatially-varying response for catchability covariates in 1st linear predictor, \code{Report$Phi1_gk}}
+  \item{\code{plot_set=21}}{Spatially-varying response for catchability covariates in 2nd linear predictor, \code{Report$Phi2_gk}}
 }}
 
 \item{working_dir}{Directory for plots}

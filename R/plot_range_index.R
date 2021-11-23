@@ -96,21 +96,35 @@ function( Sdreport,
       par( mar=c(2,2,1,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(1,1,0,1.5), mfrow=c(TmbData$n_c,dim(SD_mean_Z_ctm)[[3]]), ... )  #
       for( cI in 1:TmbData$n_c ){
       for( mI in 1:dim(SD_mean_Z_ctm)[[3]]){
-        Ybounds = (SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate']%o%rep(interval_width,2) + SD_mean_Z_ctm[cI,years_to_plot,mI,'Std. Error']%o%c(-interval_width,interval_width))
-        Ylim = range(Ybounds,na.rm=TRUE)
-        plot_lines( x = year_labels[years_to_plot],
-                    y = SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate'],
-                    ybounds = Ybounds,
+        #Ybounds = (SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate']%o%rep(interval_width,2) + SD_mean_Z_ctm[cI,years_to_plot,mI,'Std. Error']%o%c(-interval_width,interval_width))
+        #Ylim = range(Ybounds,na.rm=TRUE)
+        #plot_lines( x = year_labels[years_to_plot],
+        #            y = SD_mean_Z_ctm[cI,years_to_plot,mI,'Estimate'],
+        #            ybounds = Ybounds,
+        #            col_bounds = rgb(1,0,0,0.2),
+        #            fn = plot,
+        #            type = "l",
+        #            lwd = 2,
+        #            col = "red",
+        #            bounds_type = "shading",
+        #            ylim = Ylim,
+        #            xlab = "",
+        #            ylab = "",
+        #            main = "" )
+        plot_index( Index_ctl = matrix(SD_mean_Z_ctm[cI,,mI,'Estimate'],nrow=1),
+                    sd_Index_ctl = matrix(SD_mean_Z_ctm[cI,,mI,'Std. Error'],nrow=1),
+                    year_labels = year_labels,
+                    years_to_plot = years_to_plot,
                     col_bounds = rgb(1,0,0,0.2),
-                    fn = plot,
                     type = "l",
                     lwd = 2,
                     col = "red",
                     bounds_type = "shading",
-                    ylim = Ylim,
+                    PlotName = NA,
+                    Yrange = c(NA,NA),
                     xlab = "",
                     ylab = "",
-                    main = "" )
+                    add = TRUE )
         if( cI==1 ) mtext(side=3, text=Znames[mI], outer=FALSE )
         if( mI==dim(SD_mean_Z_ctm)[[3]] & TmbData$n_c>1 ) mtext(side=4, text=category_names[cI], outer=FALSE, line=0.5)
       }}
