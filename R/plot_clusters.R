@@ -57,7 +57,7 @@ function( fit,
     Y_gct = Y_gct %o% array(1,dimnames=list("Time"=1))
   }
 
-  #
+  # Change Inf e.g., from log(0) to NA
   if( replace_Inf_with_NA==TRUE ){
     Y_gct = ifelse( abs(Y_gct)==Inf, NA, Y_gct )
   }
@@ -66,27 +66,39 @@ function( fit,
   Y_z = reshape2:::melt.array( data=Y_gct, varnames=names(dimnames(Y_gct)) )
   Y_zc = reshape2::acast(Y_z, formula = Time + Site ~ Category )
 
+  # Remove NAs prior to clustering
+  which_NA = which( apply(Y_zc,MARGIN=1,FUN=function(vec){any(is.na(vec))}) )
+  which_notNA = setdiff( 1:nrow(Y_zc), which_NA )
+  Yprime_zc = Y_zc[ which_notNA,,drop=FALSE ]
+
   # Warnings
-  if( nrow(Y_zc) > 100000 ){
+  if( nrow(Yprime_zc) > 100000 ){
     warning("`plot_clusters` will likely not work due to large size")
     return( list("Y_zc"=Y_zc) )
   }
-  if( nrow(Y_zc) > 10000 ) warning("`plot_clusters` will go slowly due to large size")
+  if( nrow(Yprime_zc) > 10000 ) warning("`plot_clusters` will go slowly due to large size")
 
   # Apply clustering
   if( method == "bcdist" ){
     # Option 1 -- breaks with large sample size
-    Dist_zz = ecodist::bcdist(Y_zc)  # dist or ecodist::bcdist
+    Dist_zz = ecodist::bcdist(Yprime_zc)  # dist or ecodist::bcdist
+    # Dist_zz = dist(Y_zc)
     Hclust = hclust(Dist_zz, method="ward.D2" )
     # Option 2 -- memory issues
     #cluster::agnes( Y_zc )
   }else{
     # Option 3 -- faster and lower memory
-    Hclust = fastcluster::hclust.vector( Y_zc, method=method )
+    Hclust = fastcluster::hclust.vector( Yprime_zc, method=method )
   }
 
   # Cut and convert shape
-  Class_z = cutree( Hclust, k = k )
+  Classprime_z = cutree( Hclust, k = k )
+
+  # Add back to NAs
+  Class_z = rep(NA, nrow(Y_zc))
+  Class_z[which_notNA] = Classprime_z
+
+  # back-transform shape
   if( prod(dim(Y_gct)[c(1,3)]) != length(Class_z) ) stop("Check `plot_clusters`")
   Class_gt = array(Class_z, dim=dim(Y_gct)[c(1,3)], dimnames=dimnames(Y_gct)[c(1,3)])
 
