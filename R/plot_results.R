@@ -228,7 +228,9 @@ function( fit,
       "default" = list( fit = fit,
                         year_labels = year_labels,
                         map_list = map_list,
-                        working_dir = working_dir ) )
+                        working_dir = working_dir,
+                        n_cells = n_cells,
+                        projargs = projargs ) )
     Clusters = do.call( what=plot_clusters, args=plot_clusters_args )
   }else{
     Clusters = NULL
