@@ -14,43 +14,34 @@ Description: FishStatsUtils contains utilities (shared code and data) used by mu
   packages (VAST, SpatialDeltaGLMM, MIST, Spatial_FA, SpatialDFA, surplus_production, EOFR) that are designed
   for spatio-temporal analysis of ecological data.  
 Imports:
-    graphics,
-    utils,
-    mapproj,
-    maptools,
-    deldir,
-    RANN,
-    stats,
-    colorspace,
-    RandomFields,
-    RandomFieldsUtils,
-    shape,
-    devtools,
-    mixtools,
-    sp,
-    sf,
-    raster,
-    plotrix,
-    TMB,
-    MatrixModels,
-    rgdal,
-    ThorsonUtilities,
-    TMBhelper,
     abind,
+    alphahull,
     corpcor,
     corrplot,
-    pander,
+    devtools,
+    DHARMa,
+    ecodist,
+    fastcluster,
+    plotrix,
+    RANN,
+    raster,
+    reshape2,
+    rgdal,
     rnaturalearth,
     rnaturalearthdata,
-    formatR,
-    splancs,
-    DHARMa,
-    viridisLite,
-    reshape2,
-    fastcluster
+    seriation,
+    shape,
+    sp,
+    stats,
+    TMB,
+    TMBhelper,
+    utils,
+    viridisLite
 Depends:
     R (>= 3.5.0),
     units
+Enhances:
+    tidyr
 Suggests:
     testthat
 Remotes: 

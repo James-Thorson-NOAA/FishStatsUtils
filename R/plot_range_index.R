@@ -36,7 +36,7 @@ function( Sdreport,
           FileName_COG = paste0(PlotDir,"/center_of_gravity.png"),
           FileName_Area = paste0(PlotDir,"/Area.png"),
           FileName_EffArea = paste0(PlotDir,"/Effective_Area.png"),
-          Znames = rep("",ncol(TmbData$Z_xm)),
+          Znames = rep("",ncol(TmbData$Z_gm)),
           use_biascorr = TRUE,
           category_names = NULL,
           interval_width = 1,
@@ -44,6 +44,11 @@ function( Sdreport,
 
   # Informative errors
   if(is.null(Sdreport)) stop("Sdreport is NULL; please provide Sdreport")
+
+  # Warnings
+  if( !is.null(TmbData$Options_list$Expansion_cz) ){
+    if(any(TmbData$Options_list$Expansion_cz!=0)) warning("`Nonstandard `Expansion_cz` being used, so `plot_range_index` will have nonstandard output")
+  }
 
   # Which parameters
   if( "ln_Index_tl" %in% rownames(TMB::summary.sdreport(Sdreport)) ){
