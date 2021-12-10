@@ -32,6 +32,9 @@ function( Report,
           oma = c(0,5,2,0),
           ...){
 
+  #
+  .Deprecated( new="FishStatsUtils::plot_similarities" )
+
   # Adds intercept defaults to FieldConfig if missing
   if( is.vector(Data[["FieldConfig"]]) && length(Data[["FieldConfig"]])==4 ){
     Data[["FieldConfig"]] = rbind( matrix(Data[["FieldConfig"]],ncol=2,dimnames=list(c("Omega","Epsilon"),c("Component_1","Component_2"))), "Beta"=c("Beta1"=-2,"Beta2"=-2) )
