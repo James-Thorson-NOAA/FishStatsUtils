@@ -22,6 +22,7 @@ Imports:
     DHARMa,
     ecodist,
     fastcluster,
+    INLA,
     plotrix,
     RANN,
     raster,
@@ -47,6 +48,7 @@ Suggests:
 Remotes: 
     james-thorson/utilities,
     kaskr/TMB_contrib_R/TMBhelper
+Additional_repositories: https://inla.r-inla-download.org/R/stable
 License: GPL-3
 LazyData: yes
 BuildVignettes: yes
