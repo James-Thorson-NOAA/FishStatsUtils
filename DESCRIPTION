@@ -46,7 +46,6 @@ Enhances:
 Suggests:
     testthat
 Remotes: 
-    james-thorson/utilities,
     kaskr/TMB_contrib_R/TMBhelper
 Additional_repositories: https://inla.r-inla-download.org/R/stable
 License: GPL-3

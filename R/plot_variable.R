@@ -186,16 +186,13 @@ function( Y_gt,
       }else{
         plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], type="n", xaxt="n", yaxt="n", xlim=xlim, ylim=ylim, xlab="", ylab="" )
         cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
-        # Experimental
-        if( TRUE ){
-          Raster_layer = raster::raster( Points_proj, crs=CRS_proj, nrows=floor(sqrt(n_cells)), ncols=floor(sqrt(n_cells)) )
-          Raster_proj = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
-          raster::image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
-        }else{
-          # Interpolate and plot as raster
-          Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
-          image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
-        }
+        # plot using raster
+        Raster_layer = raster::raster( Points_proj, crs=CRS_proj, nrows=floor(sqrt(n_cells)), ncols=floor(sqrt(n_cells)) )
+        Raster_proj = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
+        raster::image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
+        # Interpolate and plot as raster
+        #Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
+        #image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
         # Add contour lines
         if( contour_nlevels > 0 ){
           contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
