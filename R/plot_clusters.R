@@ -30,7 +30,7 @@ function( fit,
           method = "ward",
           year_labels = fit$year_labels,
           map_list = NULL,
-          working_dir = paste0(plotdirgetwd(),"/"),
+          working_dir = paste0(getwd(),"/"),
           file_name = paste0("Class-",var_name),
           replace_Inf_with_NA = TRUE,
           ... ){
@@ -73,7 +73,7 @@ function( fit,
 
   # Warnings
   if( nrow(Yprime_zc) > 100000 ){
-    warning("`plot_clusters` will likely not work due to large size")
+    warning("Skipping `plot_clusters` ... it will likely not work due to large size")
     return( list("Y_zc"=Y_zc) )
   }
   if( nrow(Yprime_zc) > 10000 ) warning("`plot_clusters` will go slowly due to large size")

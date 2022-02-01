@@ -18,7 +18,6 @@ Imports:
     alphahull,
     corpcor,
     corrplot,
-    devtools,
     DHARMa,
     ecodist,
     fastcluster,
