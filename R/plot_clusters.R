@@ -21,6 +21,7 @@
 #'        \code{transform_var=log} and replacing nonencounters with zero.
 #' @param map_list output from \code{\link{make_map_info output}}
 #'
+#' @references For details regarding spatial clustering see \url{https://doi.org/10.1093/icesjms/fsac007}
 #' @export
 plot_clusters <-
 function( fit,
