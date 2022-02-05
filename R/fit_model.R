@@ -131,6 +131,7 @@ function( settings,
              extra_args$spatial_args,
              extra_args$optimize_args,
              extra_args$model_args )
+  start_time = Sys.time()
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
@@ -299,10 +300,16 @@ function( settings,
   # over-ride inputs to start from previous MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates1$par), default=optimize_args_input2 )
   parameter_estimates2 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
+  parameter_estimates2$time_for_run = parameter_estimates1$time_to_run + parameter_estimates2$time_to_run # Replace default calculation to deal with multiple rounds
+  #return( tmb_list$Obj )
 
   # Extract standard outputs
   if( "par" %in% names(parameter_estimates2) ){
-    Report = tmb_list$Obj$report()
+    if( tmb_list$Obj$env$intern == TRUE ){
+      Report = as.list(tmb_list$Obj$env$reportenv)
+    }else{
+      Report = tmb_list$Obj$report()
+    }
     ParHat = tmb_list$Obj$env$parList( parameter_estimates2$par )
 
     # Label stuff
@@ -347,7 +354,8 @@ function( settings,
          "Q2config_k" = Q1config_k,
          "catchability_data" = catchability_data,
          "Q1_formula" = Q1_formula,
-         "Q2_formula" = Q2_formula)
+         "Q2_formula" = Q2_formula,
+         "total_time" = Sys.time() - start_time )
 
   # Add stuff for effects package
   Return$effects = list()
