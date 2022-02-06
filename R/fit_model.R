@@ -294,13 +294,14 @@ function( settings,
                          bias.correct.control = list(sd = FALSE, split = NULL, nsplit = 1, vars_to_correct = settings$vars_to_correct),
                          control = list(eval.max = 10000, iter.max = 10000, trace = 1),
                          loopnum = 1,
-                         getJointPrecision = TRUE)
+                         getJointPrecision = TRUE,
+                         start_time_elapsed = parameter_estimates1$time_for_run )
   # combine while over-riding defaults using user inputs
   optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # over-ride inputs to start from previous MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates1$par), default=optimize_args_input2 )
   parameter_estimates2 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
-  parameter_estimates2$time_for_run = parameter_estimates1$time_to_run + parameter_estimates2$time_to_run # Replace default calculation to deal with multiple rounds
+  #parameter_estimates2$time_for_run = parameter_estimates1$time_for_run + parameter_estimates2$time_for_run # Replace default calculation to deal with multiple rounds
   #return( tmb_list$Obj )
 
   # Extract standard outputs

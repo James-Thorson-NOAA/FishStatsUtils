@@ -34,7 +34,7 @@ Imports:
     sp,
     stats,
     TMB,
-    TMBhelper,
+    TMBhelper (>= 1.4.0),
     utils,
     viridisLite
 Depends:
