@@ -306,7 +306,7 @@ function( settings,
 
   # Extract standard outputs
   if( "par" %in% names(parameter_estimates2) ){
-    if( tmb_list$Obj$env$intern == TRUE ){
+    if( !is.null(tmb_list$Obj$env$intern) && tmb_list$Obj$env$intern==TRUE ){
       Report = as.list(tmb_list$Obj$env$reportenv)
     }else{
       Report = tmb_list$Obj$report()
