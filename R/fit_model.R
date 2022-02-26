@@ -245,14 +245,14 @@ function( settings,
 
   # Check for obvious problems with model
   if( test_fit==TRUE ){
-    message("\n### Testing model at initial values")
+    message("\n### Checking model at initial values")
     LogLike0 = tmb_list$Obj$fn( tmb_list$Obj$par )
     Gradient0 = tmb_list$Obj$gr( tmb_list$Obj$par )
     if( any( Gradient0==0 ) ){
       message("\n")
       stop("Please check model structure; some parameter has a gradient of zero at starting values\n", call.=FALSE)
     }else{
-      message("No problem detected: All fixed effects have a nonzero gradient")
+      message("All fixed effects have a nonzero gradient")
     }
   }
 
