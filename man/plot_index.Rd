@@ -30,6 +30,7 @@ plot_index(
   SampleSize_ctz = NULL,
   Y2range = c(0, NA),
   y2lab = "",
+  add = FALSE,
   ...
 )
 }

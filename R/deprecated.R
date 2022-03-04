@@ -2,6 +2,32 @@
 
 
 
+#' Copy of FishStatsUtils::calculate_knot_areas
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::calculate_knot_areas} to see list of arguments
+#' and usage
+#' @param ... Arguments to be passed to \code{calculate_knot_areas}
+#' @export
+Calc_Polygon_Areas_and_Polygons_Fn = function( ... ){
+  .Deprecated( new="FishStatsUtils::calculate_knot_areas" )
+  calculate_knot_areas( ... )
+}
+
+#' Copy of FishStatsUtils::make_mesh
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::make_mesh} to see list of arguments
+#' and usage
+#' @param ... Arguments to be passed to \code{make_mesh}
+#' @export
+Calc_Anisotropic_Mesh = function( ... ){
+  .Deprecated( new="FishStatsUtils::make_mesh" )
+  make_mesh( ... )
+}
+
 #' Plot variance of GMRF knots
 #'
 #' \code{map_hypervariance} Plot variance of GMRF knots

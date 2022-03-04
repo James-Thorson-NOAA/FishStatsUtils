@@ -12,7 +12,14 @@
 
 #' @export
 make_mesh <-
-function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL, fine_scale=FALSE, ...){
+function( loc_x,
+          loc_g,
+          loc_i,
+          Method,
+          Extrapolation_List,
+          anisotropic_mesh = NULL,
+          fine_scale = FALSE,
+          ...){
 
   #######################
   # Create the anisotropic SPDE mesh using 2D coordinates

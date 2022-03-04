@@ -12,7 +12,7 @@ plot_clusters(
   method = "ward",
   year_labels = fit$year_labels,
   map_list = NULL,
-  working_dir = paste0(plotdirgetwd(), "/"),
+  working_dir = paste0(getwd(), "/"),
   file_name = paste0("Class-", var_name),
   replace_Inf_with_NA = TRUE,
   ...
@@ -43,4 +43,7 @@ with \code{NA} prior to clustering, as useful sometimes when \code{var_name="D_g
 }
 \details{
 Code to plot clusters to look for biogeographic shifts
+}
+\references{
+For details regarding spatial clustering see \url{https://doi.org/10.1093/icesjms/fsac007}
 }
