@@ -68,7 +68,7 @@ function( fit,
       if(Par_name == "EpsilonTime2"){ Var_name = "Epsiloninput2_sff"; Var2_name = "Epsiloninput2_gff"; L_name = "Ltime_epsilon2_tf" }
 
       Cov = fit$Report[[L_name]] %*% t(fit$Report[[L_name]])
-      Dist = dist(fit$Report[[L_name]])     # , diag=TRUE, upper=TRUE
+      Dist = dist(fit$Report[[L_name]], diag=TRUE, upper=TRUE)     #
       # equivalent to: sqrt(outer( diag(Cov), diag(Cov), "+" ) - 2*Cov)
       if( (ncol(fit$Report[[L_name]])==0) || all(Cov==diag(ncol(Cov))) ){
         diag(Cov) = 0
@@ -89,8 +89,13 @@ function( fit,
           corrplot::corrplot( Cov, is.corr=FALSE, tl.pos="lt", cl.lim = range(Cov) )
         } else
         if( tolower(similarity_metric) == "hclust" ){
-          Hclust = hclust( Dist )
-          plot(Hclust, main="", ylab="")
+          # Throws error with two groups
+          if( all((Cov-diag(diag(Cov))) == 0) | (nrow(Cov)<=2) ){
+            plot.new()
+          }else{
+            Hclust = hclust( Dist )
+            plot(Hclust, main="", ylab="")
+          }
         } else
         if( tolower(similarity_metric) == "dissimilarity" ){
           Order = seriation::seriate( Dist )
