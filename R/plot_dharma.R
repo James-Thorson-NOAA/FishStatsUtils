@@ -1,7 +1,18 @@
 
+#' Plot DHARMa residuals
+#'
+#' @inheritParams DHARMa::plotResiduals
+#'
+#' @param dharmaRes Output from \code{\link{plot}} using slot \code{$dharmaRes}
+#'
 #' @author Zach Oyafuso
 #' @export
-plot_dharma <- function( dharmaRes, ... ){
+plot_dharma <-
+function( dharmaRes,
+          form = NULL,
+          rank = TRUE,
+          ... ){
+
   par( mfrow=c(1,2), mgp=c(2,0.5,0), tck=-0.02, mar=c(4,3,2,0), yaxs="r", xaxs="r" )
   #gap::qqunif(dharmaRes$scaledResiduals,
   #            pch = 2,
@@ -26,10 +37,11 @@ plot_dharma <- function( dharmaRes, ... ){
   box()
 
   DHARMa::plotResiduals(dharmaRes,
-                        rank = TRUE,
+                        rank = rank,
                         ann = FALSE,
                         xlim = c(0, 1),
-                        cex = 1.5)
+                        cex = 1.5,
+                        form = form )
   mtext(side = 1, line = 2.5, text = "Rank-Transformed\nModel Predictions")
   mtext(side = 2, line = 1.5, text = "Standardized Residual")
   #box(which = "figure")

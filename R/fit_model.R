@@ -466,6 +466,7 @@ plot.fit_model <- function(x, what="results", ...)
 #' to other methods.
 #'
 #' @inheritParams simulate_data
+#' @inheritParams DHARMa::plotResiduals
 #'
 #' @param x Output from \code{\link{fit_model}}
 #' @param what String indicating what to summarize; options are `density` or `residuals`
@@ -482,6 +483,7 @@ summary.fit_model <- function(x,
                   working_dir=NULL,
                   type=1,
                   random_seed = NULL,
+                  form = NULL,
                   ...)
 {
   ans = NULL
@@ -611,7 +613,7 @@ summary.fit_model <- function(x,
       plot_dharma(dharmaRes, ...)
     }else if(!is.na(working_dir) ){
       png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
-        plot_dharma(dharmaRes, ...)
+        plot_dharma(dharmaRes, form=form, ...)
       dev.off()
     }
 
