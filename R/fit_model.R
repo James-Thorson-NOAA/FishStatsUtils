@@ -477,16 +477,24 @@ plot.fit_model <- function(x, what="results", ...)
 #' @seealso \code{\link{plot_quantile_residuals}} to plot output of \code{summary.fit_model(x,what="residuals")}
 #' @method summary fit_model
 #' @export
-summary.fit_model <- function(x,
-                  what="density",
-                  n_samples=250,
-                  working_dir=NULL,
-                  type=1,
-                  random_seed = NULL,
-                  form = NULL,
-                  ...)
+summary.fit_model <-
+function( x,
+          what = "density",
+          n_samples = 250,
+          working_dir = NULL,
+          type = 1,
+          random_seed = NULL,
+          form = NULL,
+          category_names = x$category_names,
+          year_labels = x$year_labels,
+          ...)
 {
   ans = NULL
+
+  # Check and implement units and labels
+  x$Report = amend_output( fit = fit,
+                           year_labels = year_labels,
+                           category_names = category_names )
 
   if( tolower(what) == "density" ){
     # Load location of extrapolation-grid
@@ -501,14 +509,16 @@ summary.fit_model <- function(x,
         index_tmp = x$spatial_list$NN_Extrap$nn.idx[ which(x$extrapolation_list[["Area_km2_x"]]>0), 1 ]
         ans[["Density_array"]] = ans[["Density_array"]][ index_tmp,,,drop=FALSE]
       }
-      dimnames(ans[["Density_array"]]) = list( rownames(ans[["extrapolation_grid"]]), paste0("Category_",1:dim(ans[["Density_array"]])[[2]]), x$year_labels )
+      if( any(sapply(dimnames(ans[["Density_array"]]),FUN=is.null)) ){
+        dimnames(ans[["Density_array"]]) = list( rownames(ans[["extrapolation_grid"]]), paste0("Category_",1:dim(ans[["Density_array"]])[[2]]), x$year_labels )
+      }
       # Expand as grid
       Density_dataframe = expand.grid("Grid"=1:dim(ans[["Density_array"]])[[1]], "Category"=dimnames(ans[["Density_array"]])[[2]], "Year"=dimnames(ans[["Density_array"]])[[3]])
       Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Grid'],], "Density"=as.vector(ans[["Density_array"]]) )
       ans[["Density_dataframe"]] = Density_dataframe
       ans[['year_labels']] = x[['year_labels']]
       rownames(Density_dataframe) = NULL
-      cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object")
+      cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object\n")
       print(head(Density_dataframe))
       print(tail(Density_dataframe))
     }else{

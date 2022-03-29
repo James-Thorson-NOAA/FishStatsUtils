@@ -3,7 +3,9 @@
 #'
 #' \code{plot_clusters} plots the clusters on a map
 #'
-#' Code to plot clusters to look for biogeographic shifts
+#' Code to plot clusters to look for biogeographic shifts, as well as plotting
+#'      averages across all sites-times assigned to a each cluster, for use when
+#'      interpreting each cluster.
 #'
 #' @inheritParams fastcluster::hclust.vector
 #' @inheritParams stats::cutree
@@ -30,10 +32,15 @@ function( fit,
           k = 4,
           method = "ward",
           year_labels = fit$year_labels,
+          category_names = fit$category_names,
           map_list = NULL,
           working_dir = paste0(getwd(),"/"),
           file_name = paste0("Class-",var_name),
+          file_name2 = paste0("Class-",var_name,"-averages"),
           replace_Inf_with_NA = TRUE,
+          size_threshold = 100000,
+          col = viridisLite::viridis,
+          yaxis_log = TRUE,
           ... ){
 
   # Informative error
@@ -43,7 +50,8 @@ function( fit,
 
   # Change labels
   fit$Report = amend_output( fit,
-                             year_labels = year_labels )
+                             year_labels = year_labels,
+                             category_names = category_names )
 
   # Make map_list if necessary
   if( missing(map_list) ){
@@ -73,11 +81,11 @@ function( fit,
   Yprime_zc = Y_zc[ which_notNA,,drop=FALSE ]
 
   # Warnings
-  if( nrow(Yprime_zc) > 100000 ){
+  if( nrow(Yprime_zc) > size_threshold ){
     warning("Skipping `plot_clusters` ... it will likely not work due to large size")
     return( list("Y_zc"=Y_zc) )
   }
-  if( nrow(Yprime_zc) > 10000 ) warning("`plot_clusters` will go slowly due to large size")
+  if( nrow(Yprime_zc) > (size_threshold/10) ) warning("`plot_clusters` will go slowly due to large size")
 
   # Apply clustering
   if( method == "bcdist" ){
@@ -111,10 +119,34 @@ function( fit,
     working_dir = working_dir,
     #format = format,
     panel_labels = colnames(Class_gt),
+    col = col,
     ...
   )
 
+  # Plot cluster memberships
+  Ybar_kc = apply( Y_zc, MARGIN=2, FUN=function(y_z,class_z){tapply(y_z,INDEX=class_z,FUN=mean)}, class_z=Class_z )
+  ThorsonUtilities::save_fig
+  if(yaxis_log==TRUE){f=exp}else{f=identity}
+  png( file=paste0(working_dir,file_name2,".png"), width=6, height=6, units="in", res=200 )
+    par( mar=c(7,3,1,1), mgp=c(2,0.5,0), tck=-0.02 )
+    matplot( y = f(t(Ybar_kc)),
+             #x = factor(colnames(Ybar_kc)),
+             #las = 2,
+             xaxt = "n",
+             col = col(k),
+             type = "l",
+             lwd = 2,
+             xlab = "",
+             ylab = "Cluster average",
+             lty = "solid",
+             log = ifelse(yaxis_log==TRUE,"y","") )
+    axis( side = 1,
+          at = seq_len(ncol(Ybar_kc)),
+          labels = colnames(Ybar_kc),
+          las = 2 )
+  dev.off()
+
   # Return stuff
-  Return = list("Y_zc"=Y_zc, "Class_gt"=Class_gt)
+  Return = list("Y_zc"=Y_zc, "Class_gt"=Class_gt, "Ybar_kc"=Ybar_kc)
   return( invisible(Return) )
 }
