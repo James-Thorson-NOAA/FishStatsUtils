@@ -11,10 +11,15 @@ plot_clusters(
   k = 4,
   method = "ward",
   year_labels = fit$year_labels,
+  category_names = fit$category_names,
   map_list = NULL,
   working_dir = paste0(getwd(), "/"),
   file_name = paste0("Class-", var_name),
+  file_name2 = paste0("Class-", var_name, "-averages"),
   replace_Inf_with_NA = TRUE,
+  size_threshold = 1e+05,
+  col = viridisLite::viridis,
+  yaxis_log = TRUE,
   ...
 )
 }
@@ -42,7 +47,9 @@ with \code{NA} prior to clustering, as useful sometimes when \code{var_name="D_g
 \code{plot_clusters} plots the clusters on a map
 }
 \details{
-Code to plot clusters to look for biogeographic shifts
+Code to plot clusters to look for biogeographic shifts, as well as plotting
+     averages across all sites-times assigned to a each cluster, for use when
+     interpreting each cluster.
 }
 \references{
 For details regarding spatial clustering see \url{https://doi.org/10.1093/icesjms/fsac007}

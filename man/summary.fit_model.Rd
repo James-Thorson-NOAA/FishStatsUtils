@@ -12,6 +12,8 @@
   type = 1,
   random_seed = NULL,
   form = NULL,
+  category_names = x$category_names,
+  year_labels = x$year_labels,
   ...
 )
 }
