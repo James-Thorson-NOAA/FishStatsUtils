@@ -90,7 +90,8 @@ function( fit,
         } else
         if( tolower(similarity_metric) == "hclust" ){
           # Throws error with two groups
-          if( all((Cov-diag(diag(Cov))) == 0) | (nrow(Cov)<=2) ){
+          offdiag = Cov - diag(as.matrix(diag(Cov))) # as.matrix(diag(X)) to avoid error when Cov is 1-by-1 matrix with value 0
+          if( all(offdiag==0) | (nrow(Cov)<=2) ){
             plot.new()
           }else{
             Hclust = hclust( Dist )
