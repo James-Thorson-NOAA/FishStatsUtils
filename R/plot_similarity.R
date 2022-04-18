@@ -78,10 +78,10 @@ function( fit,
         Cor = cov2cor(Cov)
       }
 
-      #if( all((Cov-diag(diag(Cov))) == 0) & (tolower(similarity_metric) %in% c("hclust")) ){
-      #  plot.new()
-      #  legend( "center", bty="n", legend = "Skipped: covariance is diagonal")
-      #}else{
+      if( nrow(Cov) <= 2 ) ){
+        plot.new()
+        #legend( "center", bty="n", legend = "Skipped: covariance is diagonal")
+      }else{
         if( tolower(similarity_metric) %in% c("cor","correlation") ){
           corrplot::corrplot.mixed( Cor, tl.pos="lt" )
         } else
@@ -90,8 +90,9 @@ function( fit,
         } else
         if( tolower(similarity_metric) == "hclust" ){
           # Throws error with two groups
-          offdiag = Cov - diag(as.matrix(diag(Cov))) # as.matrix(diag(X)) to avoid error when Cov is 1-by-1 matrix with value 0
-          if( all(offdiag==0) | (nrow(Cov)<=2) ){
+          # X - diag(diag(X)) throws error when Cov is 1-by-1 matrix with value 0
+          offdiag = Cov - diag(diag(Cov))
+          if( all( offdiag==0 ) ){
             plot.new()
           }else{
             Hclust = hclust( Dist )
