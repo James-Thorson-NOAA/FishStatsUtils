@@ -82,6 +82,10 @@ function( Y_gt,
   ###################
 
   # Check for problems and fill in missing stuff
+  if( is.data.frame(Y_gt) ){
+    warning("`Y_gt` is a data.frame in `plot_variable`")
+    Y_gt = as.matrix(Y_gt)
+  }
   if( !is.matrix(Y_gt) ){
     # as.numeric needed to strip units for is.vector to work
     Y_gt = matrix(Y_gt, ncol=1)
