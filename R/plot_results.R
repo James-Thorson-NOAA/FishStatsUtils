@@ -260,25 +260,42 @@ function( fit,
 
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")
-    plot_quantile_residuals( dharmaRes = dharmaRes,
-                             fit = fit,
-                             working_dir = working_dir,
-                             year_labels = year_labels,
-                             years_to_plot = years_to_plot,
-                             n_cells_residuals = n_cells_residuals,
-                             projargs = projargs,
-                             ... )
+    dharma_raster = plot_quantile_residuals( dharmaRes = dharmaRes,
+                                             fit = fit,
+                                             working_dir = working_dir,
+                                             year_labels = year_labels,
+                                             years_to_plot = years_to_plot,
+                                             n_cells_residuals = n_cells_residuals,
+                                             projargs = projargs,
+                                             ... )
+
+    # Semivariance for quantile residuals
+    if( fit$data_list$n_t > 1 ){
+      message("\n### Plotting semivariance for normal-transformed quantile residuals ")
+      residual_semivariance = plot_residual_semivariance( fit = fit,
+                                                          dharma_raster = dharma_raster,
+                                                          dharmaRes = dharmaRes,
+                                                          working_dir = working_dir )
+     }else{
+       message("\n### Skipping plot of semivariance for normal-transformed quantile residuals")
+       residual_semivariance = NULL
+     }
   }else{
     #Q = "Not run"
     #message("\n### Skipping Q-Q plot")
     #message("\n### Skipping plot of Pearson residuals")
     message("\n### Skipping quantile residuals using conditional simulation and package DHARMa")
     message("\n### Skipping plot of quantile residuals ")
+    message("\n### Skipping plot of semivariance for normal-transformed quantile residuals")
     dharmaRes = NULL
+    dharma_raster = NULL
+    residual_semivariance = NULL
   }
 
   # return
   Return = list( "dharmaRes" = dharmaRes,
+                 "dharma_raster" = dharma_raster,
+                 "residual_semivariance" = residual_semivariance,
                  "Index" = Index,
                  "Proportions" = Proportions,
                  "Range" = Range,

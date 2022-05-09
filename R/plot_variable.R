@@ -166,6 +166,7 @@ function( Y_gt,
   if(add==FALSE) par( Par )
 
   # Loop across columns (years)
+  Raster_proj = vector("list", length=ncol(Y_gt))
   for( tI in 1:ncol(Y_gt) ){
     # Read extrapolation grid
     Points_orig = sp::SpatialPointsDataFrame( coords=loc_g, data=data.frame("y"=Y_gt[,tI]), proj4string=CRS_orig )
@@ -192,14 +193,14 @@ function( Y_gt,
         cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
         # plot using raster
         Raster_layer = raster::raster( Points_proj, crs=CRS_proj, nrows=floor(sqrt(n_cells)), ncols=floor(sqrt(n_cells)) )
-        Raster_proj = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
-        raster::image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
+        Raster_proj[[tI]] = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
+        raster::image( Raster_proj[[tI]], col=col, zlim=Zlim, add=TRUE )
         # Interpolate and plot as raster
         #Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
         #image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
         # Add contour lines
         if( contour_nlevels > 0 ){
-          contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
+          contour( Raster_proj[[tI]], add=TRUE, nlevels=contour_nlevels )
         }
       }
     }else if( format=="points" ){
@@ -238,5 +239,5 @@ function( Y_gt,
   if(add==FALSE) mtext(side=2, outer=TRUE, outermargintext[2], cex=1.75, line=par()$oma[2]/2)
 
   # return stuff as necessary
-  return( invisible(list("Par"=Par, "cell.size"=cell.size, "n_cells"=n_cells, "xlim"=xlim, "ylim"=ylim)) )
+  return( invisible(list("Raster_proj"=Raster_proj, "Par"=Par, "cell.size"=cell.size, "n_cells"=n_cells, "xlim"=xlim, "ylim"=ylim)) )
 }

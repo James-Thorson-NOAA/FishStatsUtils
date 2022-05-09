@@ -78,7 +78,7 @@ function( fit,
         Cor = cov2cor(Cov)
       }
 
-      if( nrow(Cov) <= 2 ) ){
+      if( nrow(Cov) <= 2 ){
         plot.new()
         #legend( "center", bty="n", legend = "Skipped: covariance is diagonal")
       }else{
@@ -110,7 +110,7 @@ function( fit,
         #if( tolower(similarity_metric) == "correlation" ) corrplot::corrplot( cov2cor(Cov), method="pie", type="lower" )
         #if( tolower(similarity_metric) == "dissimilarity" ) plot( as.matrix(Dist) )
         #if( tolower(similarity_metric) == "dissimilarity" ) pimage( Dist, order=seriate(Dist), axes="x", newpage=FALSE, pop=FALSE )
-      #}
+      }
       if(Col==1) mtext( side=2, line=1, text=c("Omega","Epsilon","Beta","EpsilonTime")[Row] )
       if(Row==1) mtext( side=3, line=1, text=c("Component 1","Component 2")[Col] )
     }}

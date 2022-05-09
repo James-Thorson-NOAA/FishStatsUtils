@@ -56,7 +56,7 @@ function( dharmaRes,
   Y_gt[ cbind(1:fit$data_list$n_i,fit$data_list$t_i+1) ] = dharmaRes$scaledResiduals
   Y_gt = Y_gt[,years_to_plot,drop=FALSE]
   col_function = colorRampPalette(colors=c("darkblue","lightblue","white","pink","red"))
-  plot_variable( Y_gt = Y_gt,
+  out = plot_variable( Y_gt = Y_gt,
     map_list = list(PlotDF = PlotDF),
     file_name = file_name,
     fun = aggregate_pvalues,
@@ -66,5 +66,5 @@ function( dharmaRes,
     n_cells = n_cells_residuals,
     ... )
 
-  return( NULL )
+  return( invisible(out) )
 }
