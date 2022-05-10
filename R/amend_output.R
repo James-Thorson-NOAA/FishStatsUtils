@@ -85,18 +85,24 @@ function( fit = NULL,
   }
 
   # Determine year-category pairs with no data
-  Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
-  Num_ctl = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
-  Num_ctm = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_m)
-  if( treat_missing_as_zero==TRUE ){
-    # if treat_missing_as_zero==TRUE, then switch density from year-categories with no data to zero
-    Report$D_gct = ifelse(Num_gct==0, 0, Report$D_gct)
-    Report$Index_ctl = ifelse(Num_ctl==0, 0, Report$Index_ctl)
-  }else{
-    # If some intercepts are mapped off, then switch density from year-categories with no data to NA
-    if( any(is.na(Map$beta2_ft)) | any(is.na(Map$beta2_ft)) ){
-      Report$D_gct = ifelse(Num_gct==0, NA, Report$D_gct)
-      Report$Index_ctl = ifelse(Num_ctl==0, NA, Report$Index_ctl)
+  if( "metadata_ctz" %in% names(TmbData$Options_list) ){
+    Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
+    Num_ctl = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
+    Num_ctm = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_m)
+    if( treat_missing_as_zero==TRUE ){
+      # if treat_missing_as_zero==TRUE, then switch density from year-categories with no data to zero
+      if("D_gct"%in%names(Report)) Report$D_gct = ifelse(Num_gct==0, 0, Report$D_gct)
+      if("D_gcy"%in%names(Report)) Report$D_gcy = ifelse(Num_gct==0, 0, Report$D_gcy)
+      if("Index_ctl"%in%names(Report)) Report$Index_ctl = ifelse(Num_ctl==0, 0, Report$Index_ctl)
+      if("Index_cyl"%in%names(Report)) Report$Index_cyl = ifelse(Num_ctl==0, 0, Report$Index_cyl)
+    }else{
+      # If some intercepts are mapped off, then switch density from year-categories with no data to NA
+      if( any(is.na(Map$beta2_ft)) | any(is.na(Map$beta2_ft)) ){
+        if("D_gct"%in%names(Report)) Report$D_gct = ifelse(Num_gct==0, NA, Report$D_gct)
+        if("D_gcy"%in%names(Report)) Report$D_gcy = ifelse(Num_gct==0, NA, Report$D_gcy)
+        if("Index_ctl"%in%names(Report)) Report$Index_ctl = ifelse(Num_ctl==0, NA, Report$Index_ctl)
+        if("Index_cyl"%in%names(Report)) Report$Index_cyl = ifelse(Num_ctl==0, NA, Report$Index_cyl)
+      }
     }
   }
 

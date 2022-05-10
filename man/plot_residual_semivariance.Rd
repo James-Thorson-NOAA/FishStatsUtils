@@ -17,13 +17,4 @@ plot_residual_semivariance(
 
 This function plots takes quantile residuals, converts them to a standard-normal distribution,
      fits the two-dimensional semi-variance in space and time, and plots this.
-     A well-performing model will have a semivariance for standard-normal-transformed
-     quantile residuals of 1.0 for all space and time lags.
-
-A sill (asymptotic variance for large distance or time) less than one implies
-     underdispersion, and greater than one implies overdispersion, and both of
-     these should also be visible in the quantile-quantile plot.
-
-A nugget (variance for small distance or time) less than one implies that the
-     model has some residual spatial or temporal pattern in residuals.
 }

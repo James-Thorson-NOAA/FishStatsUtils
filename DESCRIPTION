@@ -36,7 +36,9 @@ Imports:
     TMB,
     TMBhelper (>= 1.4.0),
     utils,
-    viridisLite
+    viridisLite,
+    spacetime,
+    gstat
 Depends:
     R (>= 3.5.0),
     units
