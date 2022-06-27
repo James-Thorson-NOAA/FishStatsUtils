@@ -148,65 +148,80 @@ function( settings,
   capture.output( settings, file=file.path(working_dir,"settings.txt"))
 
   # Build extrapolation grid
-  message("\n### Making extrapolation-grid")
-  extrapolation_args_default = list(Region = settings$Region,
-                             strata.limits = settings$strata.limits,
-                             zone = settings$zone,
-                             max_cells = settings$max_cells,
-                             DirPath = working_dir)
-  extrapolation_args_input = combine_lists( input = extra_args,
-                           default = extrapolation_args_default,
-                           args_to_use = formalArgs(make_extrapolation_info) )
-  extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
+  if( is.null(extra_args$extrapolation_list) ){
+    message("\n### Making extrapolation-grid")
+    extrapolation_args_default = list(Region = settings$Region,
+                               strata.limits = settings$strata.limits,
+                               zone = settings$zone,
+                               max_cells = settings$max_cells,
+                               DirPath = working_dir)
+    extrapolation_args_input = combine_lists( input = extra_args,
+                             default = extrapolation_args_default,
+                             args_to_use = formalArgs(make_extrapolation_info) )
+    extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
+  }else{
+    extrapolation_args_input = NULL
+    extrapolation_list = extra_args$extrapolation_list
+  }
 
   # Build information regarding spatial location and correlation
-  message("\n### Making spatial information")
-  spatial_args_default = list( grid_size_km = settings$grid_size_km,
-                       n_x = settings$n_x,
-                       Method = settings$Method,
-                       Lon_i = Lon_i,
-                       Lat_i = Lat_i,
-                       Extrapolation_List = extrapolation_list,
-                       DirPath = working_dir,
-                       Save_Results = TRUE,
-                       fine_scale = settings$fine_scale,
-                       knot_method = settings$knot_method)
-  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
-  spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
+  if( is.null(extra_args$spatial_list) ){
+    message("\n### Making spatial information")
+    spatial_args_default = list( grid_size_km = settings$grid_size_km,
+                         n_x = settings$n_x,
+                         Method = settings$Method,
+                         Lon_i = Lon_i,
+                         Lat_i = Lat_i,
+                         Extrapolation_List = extrapolation_list,
+                         DirPath = working_dir,
+                         Save_Results = TRUE,
+                         fine_scale = settings$fine_scale,
+                         knot_method = settings$knot_method)
+    spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
+    spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
+  }else{
+    spatial_args_input = NULL
+    spatial_list = extra_args$spatial_list
+  }
 
   # Build data
   # Do *not* restrict inputs to formalArgs(make_data) because other potential inputs are still parsed by make_data for backwards compatibility
-  message("\n### Making data object") # VAST::
-  if(missing(covariate_data)) covariate_data = NULL
-  if(missing(catchability_data)) catchability_data = NULL
-  data_args_default = list( "Version" = settings$Version,
-                    "FieldConfig" = settings$FieldConfig,
-                    "OverdispersionConfig" = settings$OverdispersionConfig,
-                    "RhoConfig" = settings$RhoConfig,
-                    "VamConfig" = settings$VamConfig,
-                    "ObsModel" = settings$ObsModel,
-                    "c_iz" = c_iz,
-                    "b_i" = b_i,
-                    "a_i" = a_i,
-                    "v_i" = v_i,
-                    "s_i" = spatial_list$knot_i-1,
-                    "t_i" = t_i,
-                    "spatial_list" = spatial_list,
-                    "Options" = settings$Options,
-                    "Aniso" = settings$use_anisotropy,
-                    "X1config_cp" = X1config_cp,
-                    "X2config_cp" = X2config_cp,
-                    "covariate_data" = covariate_data,
-                    "X1_formula" = X1_formula,
-                    "X2_formula" = X2_formula,
-                    "Q1config_k" = Q1config_k,
-                    "Q2config_k" = Q2config_k,
-                    "catchability_data" = catchability_data,
-                    "Q1_formula" = Q1_formula,
-                    "Q2_formula" = Q2_formula )
-  data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
-  data_list = do.call( what=make_data, args=data_args_input )
-  #return(data_list) }
+  if( is.null(extra_args$data_list) ){
+    message("\n### Making data object") # VAST::
+    if(missing(covariate_data)) covariate_data = NULL
+    if(missing(catchability_data)) catchability_data = NULL
+    data_args_default = list( "Version" = settings$Version,
+                      "FieldConfig" = settings$FieldConfig,
+                      "OverdispersionConfig" = settings$OverdispersionConfig,
+                      "RhoConfig" = settings$RhoConfig,
+                      "VamConfig" = settings$VamConfig,
+                      "ObsModel" = settings$ObsModel,
+                      "c_iz" = c_iz,
+                      "b_i" = b_i,
+                      "a_i" = a_i,
+                      "v_i" = v_i,
+                      "s_i" = spatial_list$knot_i-1,
+                      "t_i" = t_i,
+                      "spatial_list" = spatial_list,
+                      "Options" = settings$Options,
+                      "Aniso" = settings$use_anisotropy,
+                      "X1config_cp" = X1config_cp,
+                      "X2config_cp" = X2config_cp,
+                      "covariate_data" = covariate_data,
+                      "X1_formula" = X1_formula,
+                      "X2_formula" = X2_formula,
+                      "Q1config_k" = Q1config_k,
+                      "Q2config_k" = Q2config_k,
+                      "catchability_data" = catchability_data,
+                      "Q1_formula" = Q1_formula,
+                      "Q2_formula" = Q2_formula )
+    data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
+    data_list = do.call( what=make_data, args=data_args_input )
+    #return(data_list) }
+  }else{
+    data_args_input = NULL
+    data_list = extra_args$data_list
+  }
 
   # Build object
   message("\n### Making TMB object")
