@@ -52,8 +52,10 @@ function( loc_x,
   # Pre-processing for barriers
   # Barriers don't affect projection matrix A
   # Obtain polygon for water
-  map_data = rnaturalearth::ne_countries( scale=switch("medium", "low"=110, "medium"=50, "high"=10, 50) )
-  attr(map_data,"proj4string") = sp::CRS("+proj=longlat +datum=WGS84")
+  if( missing(map_data) ){
+    map_data = rnaturalearth::ne_countries( scale=switch("medium", "low"=110, "medium"=50, "high"=10, 50) )
+    attr(map_data,"proj4string") = sp::CRS("+proj=longlat +datum=WGS84")
+  }
 
   # Calculate centroid of each triangle in mesh and convert to SpatialPoints
   n_triangles = length(anisotropic_mesh$graph$tv[,1])

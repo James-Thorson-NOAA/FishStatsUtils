@@ -22,7 +22,7 @@ function( fit,
 
   # Set up
   sp = raster::rasterToPoints(tmp, spatial=TRUE)
-  time = as.POSIXct( paste0(fit$year_labels,"-01-01") )
+  time = as.POSIXct( paste0(fit$year_labels[fit$years_to_plot],"-01-01") )
   mydata = data.frame(values = unlist(sp@data) ) # , ID=IDs)
   if(length(time)==1){
     endTime = time+1
