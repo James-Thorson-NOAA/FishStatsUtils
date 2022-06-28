@@ -19,6 +19,7 @@ function( loc_x,
           Extrapolation_List,
           anisotropic_mesh = NULL,
           fine_scale = FALSE,
+          map_data,
           ...){
 
   #######################
