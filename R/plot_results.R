@@ -137,13 +137,16 @@ function( fit,
   if( !is.null(fit$parameter_estimates$SD) & fit$data_list$n_c>1 ){
     message("\n### Making plot of composition data")
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
-    Proportions = calculate_proportion( TmbData = fit$data_list,
-                                        Index = Index,
-                                        year_labels = year_labels,
-                                        years_to_plot = years_to_plot,
-                                        use_biascorr = use_biascorr,
-                                        category_names = category_names,
-                                        DirName = working_dir )
+    calculate_proportion_args = list(...)
+    calculate_proportion_args = combine_lists( "input"=calculate_proportion_args, "args_to_use"=formalArgs(calculate_proportion),
+      "default" = list( TmbData = fit$data_list,
+                        Index = Index,
+                        year_labels = year_labels,
+                        years_to_plot = years_to_plot,
+                        use_biascorr = use_biascorr,
+                        category_names = category_names,
+                        DirName = working_dir ) )
+    Proportions = do.call( what=calculate_proportion, args=calculate_proportion_args )
     #Compositions = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, year_labels=year_labels,
     #  years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
   }else{
