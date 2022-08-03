@@ -77,6 +77,7 @@ function( Sdreport,
       message( "  Finished sample ", rI, " of ",n_samples )
     }
     Var = Obj$report( par=u_zr[,rI] )[[variable_name]]
+    if(is.vector(Var)) Var = as.array(Var)
     if(rI==1) Var_zr = Var
     if(rI>=2){
       Var_zr = abind::abind( Var_zr, Var, along=length(dim(Var))+1 )

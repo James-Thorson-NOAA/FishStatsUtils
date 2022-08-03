@@ -54,7 +54,7 @@ function( plot_set = 3,
           category_names = NULL,
           quiet = FALSE,
           working_dir = paste0(getwd(),"/"),
-          MapSizeRatio,
+          MapSizeRatio = NULL,
           n_cells,
           plot_value = "estimate",
           n_samples = 100,
@@ -92,13 +92,13 @@ function( plot_set = 3,
 
   # Extract stuff
   if( !is.null(Obj) ){
-    if(missing(Report)) Report = Obj$report()
+    if(is.null(Report)) Report = Obj$report()
   }else{
     if(plot_value!="estimate") stop("Must provide `Obj` to `plot_maps` when using function for `plot_value`")
   }
 
   # Fill in missing inputs
-  if( missing(MapSizeRatio) ){
+  if( is.null(MapSizeRatio) ){
     MapSizeRatio = c(3, 3)
   }
 

@@ -51,7 +51,7 @@ function( fit,
           category_names = fit$category_names,
           strata_names = fit$strata_names,
           use_biascorr = TRUE,
-          map_list,
+          map_list = NULL,
           check_residuals = TRUE,
           cluster_results = TRUE,
           #projargs = fit$extrapolation_list$projargs,
@@ -90,7 +90,7 @@ function( fit,
   do.call( what=plot_data, args=plot_data_args )
 
   # PLot settings
-  if( missing(map_list) ){
+  if( is.null(map_list) ){
     message("\n### Obtaining default settings for plotting maps")
     map_list = make_map_info( Region = settings$Region,
                               spatial_list = fit$spatial_list,
@@ -273,16 +273,17 @@ function( fit,
                                              ... )
 
     # Semivariance for quantile residuals
-    if( fit$data_list$n_t > 1 ){
-      message("\n### Plotting semivariance for normal-transformed quantile residuals ")
-      residual_semivariance = plot_residual_semivariance( fit = fit,
-                                                          dharma_raster = dharma_raster,
-                                                          dharmaRes = dharmaRes,
-                                                          working_dir = working_dir )
-     }else{
+    # Disabled due to problems with raster plots in V >= 4.2.1
+    #if( fit$data_list$n_t > 1 ){
+      #message("\n### Plotting semivariance for normal-transformed quantile residuals ")
+      #residual_semivariance = plot_residual_semivariance( fit = fit,
+      #                                                    dharma_raster = dharma_raster,
+      #                                                    dharmaRes = dharmaRes,
+      #                                                    working_dir = working_dir )
+     #}else{
        message("\n### Skipping plot of semivariance for normal-transformed quantile residuals")
        residual_semivariance = NULL
-     }
+     #}
   }else{
     #Q = "Not run"
     #message("\n### Skipping Q-Q plot")
