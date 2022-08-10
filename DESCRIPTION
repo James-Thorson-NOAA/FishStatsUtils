@@ -33,7 +33,7 @@ Imports:
     shape,
     sp,
     stats,
-    TMB,
+    TMB (>= 1.8.0),
     TMBhelper (>= 1.4.0),
     utils,
     viridisLite,

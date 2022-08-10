@@ -121,6 +121,8 @@ function( settings,
           test_fit = TRUE,
           category_names = NULL,
           year_labels = NULL,
+          framework = "TMBad",
+          use_new_epsilon = TRUE,
           ... ){
 
   # Capture extra arguments to function
@@ -231,7 +233,8 @@ function( settings,
                      "RhoConfig" = settings$RhoConfig,
                      "loc_x" = spatial_list$loc_x,
                      "Method" = spatial_list$Method,
-                     "build_model" = build_model)
+                     "build_model" = build_model,
+                     "framework" = framework )
   model_args_input = combine_lists( input=extra_args, default=model_args_default, args_to_use=formalArgs(make_model) )
   tmb_list = do.call( what=make_model, args=model_args_input )
 
@@ -299,6 +302,16 @@ function( settings,
     }
   }
 
+  # Override default bias-correction
+  if( (use_new_epsilon==TRUE) & (settings$bias.correct==TRUE) & (framework=="TMBad") & ("Index_ctl" %in% settings$vars_to_correct) ){
+    settings$vars_to_correct = setdiff(settings$vars_to_correct, c("Index_ctl","Index_cyl"))
+    # If length(settings$vars_to_correct)==0, then fit_tmb currently bias-corrects all parameters, so fixing that here
+    if( length(settings$vars_to_correct)==0 ){
+      settings$bias.correct = FALSE
+    }
+    settings$vars_to_correct = c( settings$vars_to_correct, "eps_Index_ctl" )
+  }
+
   # Restart estimates after checking parameters
   optimize_args_default2 = list( obj = tmb_list$Obj,
                          lower = tmb_list$Lower,
@@ -316,8 +329,13 @@ function( settings,
   # over-ride inputs to start from previous MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates1$par), default=optimize_args_input2 )
   parameter_estimates2 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
-  #parameter_estimates2$time_for_run = parameter_estimates1$time_for_run + parameter_estimates2$time_for_run # Replace default calculation to deal with multiple rounds
-  #return( tmb_list$Obj )
+
+  # Override default bias-correction
+  if( (use_new_epsilon==TRUE) & (framework=="TMBad") & ("eps_Index_ctl" %in% settings$vars_to_correct) & !is.null(parameter_estimates2$SD) ){
+    message("\n### Applying faster epsilon bias-correction estimator")
+    fit = list( "parameter_estimates"=parameter_estimates2, "tmb_list"=tmb_list, "input_args"=list("model_args_input"=list("framework"=framework)) )
+    parameter_estimates2$SD = apply_epsilon( fit )
+  }
 
   # Extract standard outputs
   if( "par" %in% names(parameter_estimates2) ){
