@@ -52,11 +52,11 @@ function( dharmaRes,
 
   # Make plot using plot_variable
   PlotDF = cbind( "Lat"=fit$data_frame[,'Lat_i'], "Lon"=fit$data_frame[,'Lon_i'], "x2i"=1:fit$data_list$n_i, "Include"=TRUE)
-  Y_gt = matrix(NA, nrow=nrow(fit$data_frame), ncol=fit$data_list$n_t )
-  Y_gt[ cbind(1:fit$data_list$n_i,fit$data_list$t_i+1) ] = dharmaRes$scaledResiduals
-  Y_gt = Y_gt[,years_to_plot,drop=FALSE]
+  Y_it = matrix(NA, nrow=nrow(fit$data_frame), ncol=fit$data_list$n_t )
+  Y_it[ cbind(1:fit$data_list$n_i,fit$data_list$t_i+1) ] = dharmaRes$scaledResiduals
+  Y_it = Y_it[,years_to_plot,drop=FALSE]
   col_function = colorRampPalette(colors=c("darkblue","lightblue","white","pink","red"))
-  out = plot_variable( Y_gt = Y_gt,
+  out = plot_variable( Y_gt = Y_it,
     map_list = list(PlotDF = PlotDF),
     file_name = file_name,
     fun = aggregate_pvalues,

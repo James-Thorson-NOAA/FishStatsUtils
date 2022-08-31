@@ -279,7 +279,7 @@ function( settings,
   # have user override upper, lower, and loopnum
   optimize_args_default1 = list( lower = tmb_list$Lower,
                          upper = tmb_list$Upper,
-                         loopnum = 2)
+                         loopnum = 1)
   optimize_args_default1 = combine_lists( default=optimize_args_default1, input=extra_args, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # auto-override user inputs for optimizer-related inputs for first test run
   optimize_args_input1 = list(obj = tmb_list$Obj,
