@@ -53,6 +53,6 @@ License: GPL-3
 LazyData: yes
 BuildVignettes: yes
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 URL: http://github.com/james-thorson-NOAA/FishStatsUtils
 BugReports: http://github.com/james-thorson-NOAA/FishStatsUtils/issues

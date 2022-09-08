@@ -38,7 +38,7 @@
 #' @inheritParams TMBhelper::fit_tmb
 #' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
-#' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
+#' @param test_fit Boolean indicating whether to apply \code{\link[VAST]{check_fit}} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
 #' @param category_names character vector specifying names for labeling categories \code{c_i}
 #' @param year_labels character vector specifying names for labeling times \code{t_i}
 #' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},

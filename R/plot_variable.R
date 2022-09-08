@@ -210,7 +210,7 @@ function( Y_gt,
       grid = sf::st_make_grid( Points_sf, cellsize=cell.size )
       grid_i = sf::st_intersects( Points_sf, grid )
       grid = sf::st_sf(grid, y=tapply(Points_sf$y, INDEX=factor(as.numeric(grid_i),levels=1:length(grid)), FUN=mean, na.rm=TRUE) )
-      plot( grid, pal=col, border=NA, axes=FALSE, key.pos = NULL, reset=FALSE, breaks=seq(Zlim[1],Zlim[2],length=21) )
+      plot( grid, pal=col, border=NA, axes=FALSE, key.pos = NULL, reset=FALSE, breaks=seq(Zlim[1],Zlim[2],length=21), main=NULL )
     }else if( format=="points" ){
       # Plot points
       Points_col = col(1000)[cut(Y_gt[,tI],breaks=seq(Zlim[1],Zlim[2],length=length(1000)),include.lowest=TRUE)]
