@@ -144,8 +144,11 @@ function( fit = NULL,
 
   # Add labels for other useful variables
   Report = add_dimnames( Report = Report,
-                         report_names = c("Index_ctl","effective_area_ctl","mean_D_ctl"),
+                         report_names = c("Index_ctl","effective_area_ctl","mean_D_ctl","Bratio_ctl"),
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
+  Report = add_dimnames( Report = Report,
+                         report_names = c("Fratio_ct"),
+                         dimnames = list("Category"=category_names, "Time"=year_labels) )
   Report = add_dimnames( Report = Report,
                          report_names = c("Index_gctl"),
                          dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
@@ -160,6 +163,8 @@ function( fit = NULL,
 
   # Add units
   if("Index_ctl" %in% names(Report)) units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
+  if("Fratio_ct" %in% names(Report)) units(Report$Fratio_ct) = units(unitless)
+  if("Bratio_ctl" %in% names(Report)) units(Report$Bratio_ctl) = units(unitless)
   if("D_gct" %in% names(Report)) units(Report$D_gct) = units(TmbData$b_i / TmbData$a_i)
 
   # Add units for COG, see: https://github.com/r-quantities/units/issues/291

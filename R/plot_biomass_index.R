@@ -143,15 +143,15 @@ function( fit,
 
   # Plot biomass and Bratio
   Plot_suffix = ""
-  if( "Bratio_cyl" %in% names(par_hat) ) Plot_suffix = c( Plot_suffix, "-Bratio" )
+  if( "Bratio_ctl" %in% names(par_hat) ) Plot_suffix = c( Plot_suffix, "-Bratio" )
   for( plotI in 1:length(Plot_suffix) ){
     if( Plot_suffix[plotI]=="" ){
       Array_ctl = par_hat[[index_name]]
       log_Array_ctl = par_SE[[log_index_name]]
     }
     if( Plot_suffix[plotI]=="-Bratio" ){
-      Array_ctl = par_hat[["Bratio_cyl"]]
-      log_Array_ctl = par_SE[["log_Bratio_cyl"]]
+      Array_ctl = par_hat[["Bratio_ctl"]]
+      log_Array_ctl = par_SE[["ln_Bratio_ctl"]]
     }
     plot_index( Index_ctl = Array_ctl,
                 sd_Index_ctl = log_Array_ctl,
@@ -174,7 +174,7 @@ function( fit,
   # Plot
   if( "Fratio_ct" %in% names(par_hat) ){
     Array_ct = par_hat[["Fratio_ct"]]
-      Array_ct = ifelse( Array_ct==0, NA, Array_ct )
+      Array_ct = ifelse( strip_units(Array_ct)==0, NA, Array_ct )
     plot_index( Index_ctl = Array_ct,
                 sd_Index_ctl = par_SE[["Fratio_ct"]],
                 years_to_plot = years_to_plot,
@@ -192,12 +192,12 @@ function( fit,
   }
 
   # Plot stock status
-  if( all(c("Fratio_ct","Bratio_cyl") %in% names(par_hat)) ){
+  if( all(c("Fratio_ct","Bratio_ctl") %in% names(par_hat)) ){
     Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(1,2,0,0), mfrow=mfrow, ... )
     Col = colorRampPalette(colors=c("blue","purple","red"))
     png( file=paste0(DirName,"/",PlotName,"-Status.png"), width=width, height=height, res=200, units="in")
       par( Par )
-      Array1_ct = abind::abind( "Estimate"=par_hat[["Bratio_cyl"]][,,1], "Std. Error"=par_SE[["Bratio_cyl"]][,,1], along=3 )
+      Array1_ct = abind::abind( "Estimate"=matrix(par_hat[["Bratio_ctl"]][,,1],nrow=TmbData$n_c,dimnames=dimnames(par_hat[["Bratio_ctl"]])[1:2]), "Std. Error"=matrix(par_SE[["Bratio_ctl"]][,,1],nrow=TmbData$n_c,dimnames=dimnames(par_hat[["Bratio_ctl"]])[1:2]), along=3 )
       Array1_ct = ifelse( Array1_ct==0, NA, Array1_ct )
       Array2_ct = abind::abind( "Estimate"=par_hat[["Fratio_ct"]], "Std. Error"=par_SE[["Fratio_ct"]], along=3 )
       Array2_ct = ifelse( Array2_ct==0, NA, Array2_ct )
@@ -214,7 +214,7 @@ function( fit,
         }
         abline( v=0.4, lty="dotted" )
         abline( h=1, lty="dotted" )
-      }
+      }        
       legend( "topright", bty="n", fill=c(Col(dim(Array1_ct)[2])[years_to_plot[1]],Col(dim(Array1_ct)[2])[rev(years_to_plot)[1]]), legend=c(dimnames(Array1_ct)[[2]][years_to_plot[1]],dimnames(Array1_ct)[[2]][rev(years_to_plot)[1]]) )
       mtext( side=1:2, text=c("Biomass relative to unfished","Fishing relative to F_40%"), outer=TRUE, line=c(0,0) )
     dev.off()
