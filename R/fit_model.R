@@ -286,7 +286,7 @@ function( settings,
                        savedir = NULL,
                        newtonsteps = 0,
                        bias.correct = FALSE,
-                       control = list(eval.max = 10000, iter.max = 10000, trace = 1),
+                       control = list(eval.max = 50000, iter.max = 50000, trace = 1),
                        quiet = TRUE,
                        getsd = FALSE )
   # combine
