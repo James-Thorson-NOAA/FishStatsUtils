@@ -14,7 +14,7 @@ plot_results(
   category_names = fit$category_names,
   strata_names = fit$strata_names,
   use_biascorr = TRUE,
-  map_list,
+  map_list = NULL,
   check_residuals = TRUE,
   cluster_results = TRUE,
   projargs = "+proj=longlat",

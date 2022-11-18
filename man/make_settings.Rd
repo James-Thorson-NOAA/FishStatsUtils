@@ -119,7 +119,7 @@ see \code{\link[TMB]{sdreport}} and \code{\link[TMBhelper]{fit_tmb}}for details}
   \item{\code{Options["Calculate_Synchrony"]=TRUE}}{Turns on internal calculation and SE for Loreau metric of synchrony (a.k.a. portfolio effects)}
   \item{\code{Options["report_additional_variables"]=TRUE}}{Export additional variables to \code{Report} object, to use for diagnostics or additional exploration}
   \item{\code{Options["basin_method"]}}{Controls how the density-dependent index is generated from model variables.  Default \code{Options["basin_method"]=2}) uses annual mean of betas and epsilons as index.  Alternative \code{Options["basin_method"]=4}) uses a Lagrange multiplier to penalize index towards total abundance}
-}}
+  \item{\code{Options["range_fraction"]}}{The decorrelation range when passing over land relative to over water; the default value \code{Options["range_fraction"]=0.2} indicates that the range is shorter over land, i.e., that correlations are strongest via water, while changing to \code{Options["range_fraction"]=5} would represent correlations transfer via land more than water}#' }}
 
 \item{use_anisotropy}{Boolean indicating whether to estimate two additional parameters representing geometric anisotropy}
 

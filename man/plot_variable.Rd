@@ -6,7 +6,7 @@
 \usage{
 plot_variable(
   Y_gt,
-  map_list,
+  map_list = NULL,
   panel_labels = NULL,
   projargs = "+proj=longlat",
   map_resolution = "medium",
@@ -23,15 +23,15 @@ plot_variable(
   legend_x = c(0, 0.05),
   legend_y = c(0.05, 0.45),
   cex.legend = 1,
-  mfrow,
+  mfrow = NULL,
   land_color = "grey",
   n_cells = NULL,
-  xlim,
-  ylim,
+  xlim = NULL,
+  ylim = NULL,
   country = NULL,
   contour_nlevels = 0,
   fun = mean,
-  format = "raster",
+  format = "sf",
   cex.points = 1,
   legend_digits = 1,
   ...

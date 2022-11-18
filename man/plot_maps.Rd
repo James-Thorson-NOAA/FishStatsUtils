@@ -15,7 +15,7 @@ plot_maps(
   category_names = NULL,
   quiet = FALSE,
   working_dir = paste0(getwd(), "/"),
-  MapSizeRatio,
+  MapSizeRatio = NULL,
   n_cells,
   plot_value = "estimate",
   n_samples = 100,
