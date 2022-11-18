@@ -50,7 +50,10 @@ Options: "PCA" (recommended) or "Varimax"}
 
 \item{Dim_species}{Plotting dimension (row,column) for plot of categories (default: square with sufficient size for number of categories)}
 
-\item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
+\item{projargs}{Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
+where argument \code{+lon_0} allows the user to center eastings on a specified longitude.}
 
 \item{plotdir}{directory for saving plots}
 

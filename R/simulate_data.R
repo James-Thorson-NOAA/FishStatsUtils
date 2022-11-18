@@ -7,6 +7,13 @@
 #'
 #' Simulate new data given various potential procedures to propagate uncertainty about parameters.
 #'
+#' Using \code{sample_fixed=TRUE} (the default) in \code{\link{sample_variable}} is similar to using \code{type=3} in \code{\link{simulate_data}}, while
+#'       using \code{sample_fixed=TRUE} in \code{\link{sample_variable}} is similar to using \code{type=4} in \code{\link{simulate_data}}.
+#'       Sampling fixed effects will sometimes cause numerical under- or overflow (i.e., output values of \code{NA}) in cases when
+#'       variance parameters are estimated imprecisely.  In these cases, the multivariate normal approximation being used is a poor
+#'       representation of the tail probabilities, and results in some samples with implausibly high (or negative) variances,
+#'       such that the associated random effects then have implausibly high magnitude.
+#'
 #' @param fit output from \code{\link{fit_model}}
 #' @param type integer stating what type of simulation to use from the following options:
 #' \itemize{

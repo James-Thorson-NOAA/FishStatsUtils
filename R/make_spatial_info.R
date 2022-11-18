@@ -241,7 +241,7 @@ make_spatial_info = function( n_x,
 
   # Calculate areas
   if( Method != "Stream_network" ){
-    PolygonList = Calc_Polygon_Areas_and_Polygons_Fn( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
+    PolygonList = calculate_knot_areas( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
     if( fine_scale==FALSE ){
       a_gl = PolygonList[["a_xl"]]
     }

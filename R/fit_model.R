@@ -38,7 +38,7 @@
 #' @inheritParams TMBhelper::fit_tmb
 #' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
-#' @param test_fit Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
+#' @param test_fit Boolean indicating whether to apply \code{\link[VAST]{check_fit}} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
 #' @param category_names character vector specifying names for labeling categories \code{c_i}
 #' @param year_labels character vector specifying names for labeling times \code{t_i}
 #' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
@@ -58,6 +58,8 @@
 #'
 #' @family wrapper functions
 #' @seealso \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
+#' @seealso VAST wiki \url{https://github.com/James-Thorson-NOAA/VAST/wiki} for examples documenting many different use-cases and features.
+#' @seealso GitHub mainpage \url{https://github.com/James-Thorson-NOAA/VAST#description} for a list of user resources and publications documenting features
 #' @seealso \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities and an explanation of DHARMa Probability-Integral-Transform residuals
 #' @seealso \code{\link{predict.fit_model}} for methods to predict at new locations using existing or updated covariate values
 #'
@@ -121,6 +123,8 @@ function( settings,
           test_fit = TRUE,
           category_names = NULL,
           year_labels = NULL,
+          framework = "TMBad",
+          use_new_epsilon = TRUE,
           ... ){
 
   # Capture extra arguments to function
@@ -131,6 +135,7 @@ function( settings,
              extra_args$spatial_args,
              extra_args$optimize_args,
              extra_args$model_args )
+  start_time = Sys.time()
 
   # Assemble inputs
   data_frame = data.frame( "Lat_i"=Lat_i, "Lon_i"=Lon_i, "a_i"=a_i, "v_i"=v_i, "b_i"=b_i, "t_i"=t_i, "c_iz"=c_iz )
@@ -147,65 +152,80 @@ function( settings,
   capture.output( settings, file=file.path(working_dir,"settings.txt"))
 
   # Build extrapolation grid
-  message("\n### Making extrapolation-grid")
-  extrapolation_args_default = list(Region = settings$Region,
-                             strata.limits = settings$strata.limits,
-                             zone = settings$zone,
-                             max_cells = settings$max_cells,
-                             DirPath = working_dir)
-  extrapolation_args_input = combine_lists( input = extra_args,
-                           default = extrapolation_args_default,
-                           args_to_use = formalArgs(make_extrapolation_info) )
-  extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
+  if( is.null(extra_args$extrapolation_list) ){
+    message("\n### Making extrapolation-grid")
+    extrapolation_args_default = list(Region = settings$Region,
+                               strata.limits = settings$strata.limits,
+                               zone = settings$zone,
+                               max_cells = settings$max_cells,
+                               DirPath = working_dir)
+    extrapolation_args_input = combine_lists( input = extra_args,
+                             default = extrapolation_args_default,
+                             args_to_use = formalArgs(make_extrapolation_info) )
+    extrapolation_list = do.call( what=make_extrapolation_info, args=extrapolation_args_input )
+  }else{
+    extrapolation_args_input = NULL
+    extrapolation_list = extra_args$extrapolation_list
+  }
 
   # Build information regarding spatial location and correlation
-  message("\n### Making spatial information")
-  spatial_args_default = list( grid_size_km = settings$grid_size_km,
-                       n_x = settings$n_x,
-                       Method = settings$Method,
-                       Lon_i = Lon_i,
-                       Lat_i = Lat_i,
-                       Extrapolation_List = extrapolation_list,
-                       DirPath = working_dir,
-                       Save_Results = TRUE,
-                       fine_scale = settings$fine_scale,
-                       knot_method = settings$knot_method)
-  spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
-  spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
+  if( is.null(extra_args$spatial_list) ){
+    message("\n### Making spatial information")
+    spatial_args_default = list( grid_size_km = settings$grid_size_km,
+                         n_x = settings$n_x,
+                         Method = settings$Method,
+                         Lon_i = Lon_i,
+                         Lat_i = Lat_i,
+                         Extrapolation_List = extrapolation_list,
+                         DirPath = working_dir,
+                         Save_Results = TRUE,
+                         fine_scale = settings$fine_scale,
+                         knot_method = settings$knot_method)
+    spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
+    spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
+  }else{
+    spatial_args_input = NULL
+    spatial_list = extra_args$spatial_list
+  }
 
   # Build data
   # Do *not* restrict inputs to formalArgs(make_data) because other potential inputs are still parsed by make_data for backwards compatibility
-  message("\n### Making data object") # VAST::
-  if(missing(covariate_data)) covariate_data = NULL
-  if(missing(catchability_data)) catchability_data = NULL
-  data_args_default = list( "Version" = settings$Version,
-                    "FieldConfig" = settings$FieldConfig,
-                    "OverdispersionConfig" = settings$OverdispersionConfig,
-                    "RhoConfig" = settings$RhoConfig,
-                    "VamConfig" = settings$VamConfig,
-                    "ObsModel" = settings$ObsModel,
-                    "c_iz" = c_iz,
-                    "b_i" = b_i,
-                    "a_i" = a_i,
-                    "v_i" = v_i,
-                    "s_i" = spatial_list$knot_i-1,
-                    "t_i" = t_i,
-                    "spatial_list" = spatial_list,
-                    "Options" = settings$Options,
-                    "Aniso" = settings$use_anisotropy,
-                    "X1config_cp" = X1config_cp,
-                    "X2config_cp" = X2config_cp,
-                    "covariate_data" = covariate_data,
-                    "X1_formula" = X1_formula,
-                    "X2_formula" = X2_formula,
-                    "Q1config_k" = Q1config_k,
-                    "Q2config_k" = Q2config_k,
-                    "catchability_data" = catchability_data,
-                    "Q1_formula" = Q1_formula,
-                    "Q2_formula" = Q2_formula )
-  data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
-  data_list = do.call( what=make_data, args=data_args_input )
-  #return(data_list) }
+  if( is.null(extra_args$data_list) ){
+    message("\n### Making data object") # VAST::
+    if(missing(covariate_data)) covariate_data = NULL
+    if(missing(catchability_data)) catchability_data = NULL
+    data_args_default = list( "Version" = settings$Version,
+                      "FieldConfig" = settings$FieldConfig,
+                      "OverdispersionConfig" = settings$OverdispersionConfig,
+                      "RhoConfig" = settings$RhoConfig,
+                      "VamConfig" = settings$VamConfig,
+                      "ObsModel" = settings$ObsModel,
+                      "c_iz" = c_iz,
+                      "b_i" = b_i,
+                      "a_i" = a_i,
+                      "v_i" = v_i,
+                      "s_i" = spatial_list$knot_i-1,
+                      "t_i" = t_i,
+                      "spatial_list" = spatial_list,
+                      "Options" = settings$Options,
+                      "Aniso" = settings$use_anisotropy,
+                      "X1config_cp" = X1config_cp,
+                      "X2config_cp" = X2config_cp,
+                      "covariate_data" = covariate_data,
+                      "X1_formula" = X1_formula,
+                      "X2_formula" = X2_formula,
+                      "Q1config_k" = Q1config_k,
+                      "Q2config_k" = Q2config_k,
+                      "catchability_data" = catchability_data,
+                      "Q1_formula" = Q1_formula,
+                      "Q2_formula" = Q2_formula )
+    data_args_input = combine_lists( input=extra_args, default=data_args_default )  # Do *not* use args_to_use
+    data_list = do.call( what=make_data, args=data_args_input )
+    #return(data_list) }
+  }else{
+    data_args_input = NULL
+    data_list = extra_args$data_list
+  }
 
   # Build object
   message("\n### Making TMB object")
@@ -215,7 +235,8 @@ function( settings,
                      "RhoConfig" = settings$RhoConfig,
                      "loc_x" = spatial_list$loc_x,
                      "Method" = spatial_list$Method,
-                     "build_model" = build_model)
+                     "build_model" = build_model,
+                     "framework" = framework )
   model_args_input = combine_lists( input=extra_args, default=model_args_default, args_to_use=formalArgs(make_model) )
   tmb_list = do.call( what=make_model, args=model_args_input )
 
@@ -244,14 +265,14 @@ function( settings,
 
   # Check for obvious problems with model
   if( test_fit==TRUE ){
-    message("\n### Testing model at initial values")
+    message("\n### Checking model at initial values")
     LogLike0 = tmb_list$Obj$fn( tmb_list$Obj$par )
     Gradient0 = tmb_list$Obj$gr( tmb_list$Obj$par )
     if( any( Gradient0==0 ) ){
       message("\n")
       stop("Please check model structure; some parameter has a gradient of zero at starting values\n", call.=FALSE)
     }else{
-      message("No problem detected: All fixed effects have a nonzero gradient")
+      message("All fixed effects have a nonzero gradient")
     }
   }
 
@@ -260,14 +281,14 @@ function( settings,
   # have user override upper, lower, and loopnum
   optimize_args_default1 = list( lower = tmb_list$Lower,
                          upper = tmb_list$Upper,
-                         loopnum = 2)
+                         loopnum = 1)
   optimize_args_default1 = combine_lists( default=optimize_args_default1, input=extra_args, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # auto-override user inputs for optimizer-related inputs for first test run
   optimize_args_input1 = list(obj = tmb_list$Obj,
                        savedir = NULL,
                        newtonsteps = 0,
                        bias.correct = FALSE,
-                       control = list(eval.max = 10000, iter.max = 10000, trace = 1),
+                       control = list(eval.max = 50000, iter.max = 50000, trace = 1),
                        quiet = TRUE,
                        getsd = FALSE )
   # combine
@@ -283,6 +304,16 @@ function( settings,
     }
   }
 
+  # Override default bias-correction
+  if( (use_new_epsilon==TRUE) & (settings$bias.correct==TRUE) & (framework=="TMBad") & ("Index_ctl" %in% settings$vars_to_correct) ){
+    settings$vars_to_correct = setdiff(settings$vars_to_correct, c("Index_ctl","Index_cyl"))
+    # If length(settings$vars_to_correct)==0, then fit_tmb currently bias-corrects all parameters, so fixing that here
+    if( length(settings$vars_to_correct)==0 ){
+      settings$bias.correct = FALSE
+    }
+    settings$vars_to_correct = c( settings$vars_to_correct, "eps_Index_ctl" )
+  }
+
   # Restart estimates after checking parameters
   optimize_args_default2 = list( obj = tmb_list$Obj,
                          lower = tmb_list$Lower,
@@ -293,16 +324,28 @@ function( settings,
                          bias.correct.control = list(sd = FALSE, split = NULL, nsplit = 1, vars_to_correct = settings$vars_to_correct),
                          control = list(eval.max = 10000, iter.max = 10000, trace = 1),
                          loopnum = 1,
-                         getJointPrecision = TRUE)
+                         getJointPrecision = TRUE,
+                         start_time_elapsed = parameter_estimates1$time_for_run )
   # combine while over-riding defaults using user inputs
   optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
   # over-ride inputs to start from previous MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates1$par), default=optimize_args_input2 )
   parameter_estimates2 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
 
+  # Override default bias-correction
+  if( (use_new_epsilon==TRUE) & (framework=="TMBad") & ("eps_Index_ctl" %in% settings$vars_to_correct) & !is.null(parameter_estimates2$SD) ){
+    message("\n### Applying faster epsilon bias-correction estimator")
+    fit = list( "parameter_estimates"=parameter_estimates2, "tmb_list"=tmb_list, "input_args"=list("model_args_input"=list("framework"=framework)) )
+    parameter_estimates2$SD = apply_epsilon( fit )
+  }
+
   # Extract standard outputs
   if( "par" %in% names(parameter_estimates2) ){
-    Report = tmb_list$Obj$report()
+    if( !is.null(tmb_list$Obj$env$intern) && tmb_list$Obj$env$intern==TRUE ){
+      Report = as.list(tmb_list$Obj$env$reportenv)
+    }else{
+      Report = tmb_list$Obj$report()
+    }
     ParHat = tmb_list$Obj$env$parList( parameter_estimates2$par )
 
     # Label stuff
@@ -347,7 +390,8 @@ function( settings,
          "Q2config_k" = Q1config_k,
          "catchability_data" = catchability_data,
          "Q1_formula" = Q1_formula,
-         "Q2_formula" = Q2_formula)
+         "Q2_formula" = Q2_formula,
+         "total_time" = Sys.time() - start_time )
 
   # Add stuff for effects package
   Return$effects = list()
@@ -457,6 +501,7 @@ plot.fit_model <- function(x, what="results", ...)
 #' to other methods.
 #'
 #' @inheritParams simulate_data
+#' @inheritParams DHARMa::plotResiduals
 #'
 #' @param x Output from \code{\link{fit_model}}
 #' @param what String indicating what to summarize; options are `density` or `residuals`
@@ -467,15 +512,24 @@ plot.fit_model <- function(x, what="results", ...)
 #' @seealso \code{\link{plot_quantile_residuals}} to plot output of \code{summary.fit_model(x,what="residuals")}
 #' @method summary fit_model
 #' @export
-summary.fit_model <- function(x,
-                  what="density",
-                  n_samples=250,
-                  working_dir=NULL,
-                  type=1,
-                  random_seed = NULL,
-                  ...)
+summary.fit_model <-
+function( x,
+          what = "density",
+          n_samples = 250,
+          working_dir = NULL,
+          type = 1,
+          random_seed = NULL,
+          form = NULL,
+          category_names = x$category_names,
+          year_labels = x$year_labels,
+          ...)
 {
   ans = NULL
+
+  # Check and implement units and labels
+  x$Report = amend_output( fit = fit,
+                           year_labels = year_labels,
+                           category_names = category_names )
 
   if( tolower(what) == "density" ){
     # Load location of extrapolation-grid
@@ -490,14 +544,16 @@ summary.fit_model <- function(x,
         index_tmp = x$spatial_list$NN_Extrap$nn.idx[ which(x$extrapolation_list[["Area_km2_x"]]>0), 1 ]
         ans[["Density_array"]] = ans[["Density_array"]][ index_tmp,,,drop=FALSE]
       }
-      dimnames(ans[["Density_array"]]) = list( rownames(ans[["extrapolation_grid"]]), paste0("Category_",1:dim(ans[["Density_array"]])[[2]]), x$year_labels )
+      if( any(sapply(dimnames(ans[["Density_array"]]),FUN=is.null)) ){
+        dimnames(ans[["Density_array"]]) = list( rownames(ans[["extrapolation_grid"]]), paste0("Category_",1:dim(ans[["Density_array"]])[[2]]), x$year_labels )
+      }
       # Expand as grid
       Density_dataframe = expand.grid("Grid"=1:dim(ans[["Density_array"]])[[1]], "Category"=dimnames(ans[["Density_array"]])[[2]], "Year"=dimnames(ans[["Density_array"]])[[3]])
       Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Grid'],], "Density"=as.vector(ans[["Density_array"]]) )
       ans[["Density_dataframe"]] = Density_dataframe
       ans[['year_labels']] = x[['year_labels']]
       rownames(Density_dataframe) = NULL
-      cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object")
+      cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object\n")
       print(head(Density_dataframe))
       print(tail(Density_dataframe))
     }else{
@@ -602,7 +658,7 @@ summary.fit_model <- function(x,
       plot_dharma(dharmaRes, ...)
     }else if(!is.na(working_dir) ){
       png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
-        plot_dharma(dharmaRes, ...)
+        plot_dharma(dharmaRes, form=form, ...)
       dev.off()
     }
 

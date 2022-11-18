@@ -11,6 +11,9 @@
   working_dir = NULL,
   type = 1,
   random_seed = NULL,
+  form = NULL,
+  category_names = x$category_names,
+  year_labels = x$year_labels,
   ...
 )
 }
@@ -32,6 +35,8 @@ and new data conditional upon these values.
 }}
 
 \item{random_seed}{integer passed to \code{set.seed}, where the default value \code{random_seed=NULL} resets the random-number seed.}
+
+\item{form}{optional predictor against which the residuals should be plotted. Default is to used the predicted(simulationOutput)}
 
 \item{...}{additional arguments passed to \code{\link[DHARMa]{plotResiduals}} when \code{what="residuals"}}
 }

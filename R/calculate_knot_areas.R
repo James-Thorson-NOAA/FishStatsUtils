@@ -1,9 +1,9 @@
 
 #' Calculate areas and covariates for a given triangulated mesh
 #'
-#' \code{Calc_Polygon_Areas_and_Polygons_Fn} builds outputs for a given triangulated mesh used for approximating spatial variation
+#' \code{calculate_knot_areas} builds outputs for a given triangulated mesh used for approximating spatial variation
 #'
-#' @inheritParams Calc_Anisotropic_Mesh
+#' @inheritParams make_mesh
 
 #' @param Data_Extrap the output from e.g., \code{Extrapolation_List <- Prepare_WCGBTS_Extrapolation_Data_Fn()} using slot \code{Extrapolation_List$Data_Extrap}
 #' @param Covariates character vector giving names of columns from Data_Extrap that should be used as covariates (default="none", which results in a design matrix with one columns of 1s)
@@ -15,8 +15,11 @@
 #' }
 
 #' @export
-Calc_Polygon_Areas_and_Polygons_Fn <-
-function( loc_x, Data_Extrap, Covariates="none", a_el=NULL ){
+calculate_knot_areas <-
+function( loc_x,
+          Data_Extrap,
+          Covariates = "none",
+          a_el = NULL ){
 
   # Calculate a_el if missing
   if( is.null(a_el) ){

@@ -20,7 +20,7 @@
 #'        As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
 #'        where argument \code{+lon_0} allows the user to center eastings on a specified longitude.
 #' @param n_cells Integer used to determine the argument \code{cell.size} passed
-#'        to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+#'        to \code{\link[raster]{rasterize}} when converting output at extrapolation-grid cells
 #'        to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
 #'        \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 #'        will often need to be modified for a given purpose.
@@ -47,7 +47,7 @@
 #' @export
 plot_variable <-
 function( Y_gt,
-          map_list,
+          map_list = NULL,
           panel_labels = NULL,
           projargs = '+proj=longlat',
           map_resolution = "medium",
@@ -64,15 +64,15 @@ function( Y_gt,
           legend_x = c(0,0.05),
           legend_y = c(0.05,0.45),
           cex.legend = 1,
-          mfrow,
+          mfrow = NULL,
           land_color = "grey",
           n_cells = NULL,
-          xlim,
-          ylim,
+          xlim = NULL,
+          ylim = NULL,
           country = NULL,
           contour_nlevels = 0,
           fun = mean,
-          format = "raster",
+          format = "sf",
           cex.points = 1,
           legend_digits = 1,
           ...){
@@ -82,6 +82,10 @@ function( Y_gt,
   ###################
 
   # Check for problems and fill in missing stuff
+  if( is.data.frame(Y_gt) ){
+    warning("`Y_gt` is a data.frame in `plot_variable`")
+    Y_gt = as.matrix(Y_gt)
+  }
   if( !is.matrix(Y_gt) ){
     # as.numeric needed to strip units for is.vector to work
     Y_gt = matrix(Y_gt, ncol=1)
@@ -89,15 +93,15 @@ function( Y_gt,
   if( is.null(zlim)){
     zlim = range(Y_gt, na.rm=TRUE)
   }
-  if( missing(map_list) || is.null(map_list$MapSizeRatio) ){
+  if( is.null(map_list$MapSizeRatio) ){
     MapSizeRatio = c(3, 3)
   }else{
     MapSizeRatio = map_list$MapSizeRatio
   }
   if( !("PlotDF" %in% names(map_list)) ) stop("Check input `map_list`")
   Y_gt = Y_gt[ map_list$PlotDF[which(map_list$PlotDF[,'Include']>0),'x2i'], , drop=FALSE]
-  if(missing(n_cells) || is.null(n_cells)) n_cells = nrow(Y_gt)
-  if( missing(mfrow) ){
+  if(is.null(n_cells)) n_cells = nrow(Y_gt)
+  if( is.null(mfrow) ){
     mfrow = ceiling(sqrt(ncol(Y_gt)))
     mfrow = c( mfrow, ceiling(ncol(Y_gt)/mfrow) )
   }
@@ -111,9 +115,9 @@ function( Y_gt,
   if( is.null(col)){
     col = colorRampPalette(colors=c("darkblue","blue","lightblue","lightgreen","yellow","orange","red"))
   }
-  if( is.function(col)){
-    col = col(1000)
-  }
+  #if( is.function(col)){
+  #  col = col(1000)
+  #}
   if( !any(is.na(c(legend_x,legend_y))) ){
     if( any(c(legend_x,legend_y) > 1.2) | any(c(legend_x,legend_y) < -0.2) ){
       stop("Check values for `legend_x` and `legend_y`")
@@ -162,6 +166,7 @@ function( Y_gt,
   if(add==FALSE) par( Par )
 
   # Loop across columns (years)
+  Raster_proj = vector("list", length=ncol(Y_gt))
   for( tI in 1:ncol(Y_gt) ){
     # Read extrapolation grid
     Points_orig = sp::SpatialPointsDataFrame( coords=loc_g, data=data.frame("y"=Y_gt[,tI]), proj4string=CRS_orig )
@@ -175,8 +180,8 @@ function( Y_gt,
     # Get Zlim
     Zlim = zlim
     if(is.na(Zlim[1])) Zlim = range(Y_gt[,tI],na.rm=TRUE)
-    if(missing(xlim)) xlim = Points_proj@bbox[1,]
-    if(missing(ylim)) ylim = Points_proj@bbox[2,]
+    if(is.null(xlim)) xlim = Points_proj@bbox[1,]
+    if(is.null(ylim)) ylim = Points_proj@bbox[2,]
 
     # Do plot
     if( format=="raster"  ){
@@ -186,25 +191,32 @@ function( Y_gt,
       }else{
         plot( x=Points_proj@coords[,1], y=Points_proj@coords[,2], type="n", xaxt="n", yaxt="n", xlim=xlim, ylim=ylim, xlab="", ylab="" )
         cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
-        # Experimental
-        if( TRUE ){
-          Raster_layer = raster::raster( Points_proj, crs=CRS_proj, nrows=floor(sqrt(n_cells)), ncols=floor(sqrt(n_cells)) )
-          Raster_proj = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
-          raster::image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
-        }else{
-          # Interpolate and plot as raster
-          Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
-          image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
-        }
+        # plot using raster
+        #out = list( Points_proj=Points_proj, CRS_proj=CRS_proj, n_cells=n_cells ); save(out, file=paste0(run_dir,"out.RData"))
+        Raster_layer = raster::raster( Points_proj, crs=CRS_proj, nrows=floor(sqrt(n_cells)), ncols=floor(sqrt(n_cells)) )
+        Raster_proj[[tI]] = raster::rasterize( x=Points_proj@coords, y=Raster_layer, field=as.numeric(Points_proj@data[,1]), fun=mean )
+        raster::image( Raster_proj[[tI]], col=col(1000), zlim=Zlim, add=TRUE )
+        # Interpolate and plot as raster
+        #Raster_proj = plotKML::vect2rast( Points_proj, cell.size=cell.size, fun=fun )
+        #image( Raster_proj, col=col, zlim=Zlim, add=TRUE )
         # Add contour lines
         if( contour_nlevels > 0 ){
-          contour( Raster_proj, add=TRUE, nlevels=contour_nlevels )
+          contour( Raster_proj[[tI]], add=TRUE, nlevels=contour_nlevels )
         }
       }
+    }else if( format=="sf" ){
+      cell.size = mean(diff(Points_proj@bbox[1,]),diff(Points_proj@bbox[2,])) / floor(sqrt(n_cells))
+      Points_sf = sf::st_as_sf( Points_proj )
+      grid = sf::st_make_grid( Points_sf, cellsize=cell.size )
+      grid_i = sf::st_intersects( Points_sf, grid )
+      grid = sf::st_sf(grid, y=tapply(Points_sf$y, INDEX=factor(as.numeric(grid_i),levels=1:length(grid)), FUN=mean, na.rm=TRUE) )
+      plot( grid, pal=col, border=NA, axes=FALSE, key.pos = NULL, reset=FALSE, breaks=seq(Zlim[1],Zlim[2],length=21), main=NULL )
     }else if( format=="points" ){
       # Plot points
-      Points_col = col[cut(Y_gt[,tI],breaks=seq(Zlim[1],Zlim[2],length=length(col)),include.lowest=TRUE)]
+      Points_col = col(1000)[cut(Y_gt[,tI],breaks=seq(Zlim[1],Zlim[2],length=length(1000)),include.lowest=TRUE)]
       points( x=Points_proj@coords[,1], y=Points_proj@coords[,2], col=Points_col, pch=20, cex=cex.points, xaxt="n", yaxt="n" )
+    }else{
+      stop( "wrong `format` ")
     }
 
     # Plot maps using rnaturalearth
@@ -228,7 +240,7 @@ function( Y_gt,
         align = c("lt","rb")[1]
         gradient = c("x","y")[1]
       }
-      plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),legend_digits), rect.col=col, cex=cex.legend, align=align, gradient=gradient)
+      plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),legend_digits), rect.col=col(1000), cex=cex.legend, align=align, gradient=gradient)
     }
   }
 
@@ -237,5 +249,5 @@ function( Y_gt,
   if(add==FALSE) mtext(side=2, outer=TRUE, outermargintext[2], cex=1.75, line=par()$oma[2]/2)
 
   # return stuff as necessary
-  return( invisible(list("Par"=Par, "cell.size"=cell.size, "n_cells"=n_cells, "xlim"=xlim, "ylim"=ylim)) )
+  return( invisible(list("Raster_proj"=Raster_proj, "Par"=Par, "n_cells"=n_cells, "xlim"=xlim, "ylim"=ylim)) )
 }

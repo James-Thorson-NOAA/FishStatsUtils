@@ -14,8 +14,9 @@ plot_results(
   category_names = fit$category_names,
   strata_names = fit$strata_names,
   use_biascorr = TRUE,
-  map_list,
+  map_list = NULL,
   check_residuals = TRUE,
+  cluster_results = TRUE,
   projargs = "+proj=longlat",
   zrange,
   n_samples = 100,
@@ -25,6 +26,7 @@ plot_results(
   n_cells_residuals = NULL,
   RotationMethod = "PCA",
   quantiles = c(0.05, 0.5, 0.95),
+  similarity_metric = c("hclust", "Correlation", "Dissimilarity", "Covariance")[1],
   ...
 )
 }
@@ -35,27 +37,24 @@ plot_results(
 
 \item{plot_set}{integer-vector defining plots to create
 \describe{
-  \item{plot_set=1}{Probability of encounter/non-encounter}
-  \item{plot_set=2}{Log-expected positive catch rate}
-  \item{plot_set=3}{Log-predicted density (product of encounter probability and positive catch rates)}
-  \item{plot_set=4}{Log-positive catch rates (rescaled)}
-  \item{plot_set=5}{Log-predicted density (rescaled)}
-  \item{plot_set=6}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model)}
-  \item{plot_set=7}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model)}
-  \item{plot_set=8}{Linear predictor for encounter probability}
-  \item{plot_set=9}{Linear predictor for positive catch rates}
-  \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
-  \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
-  \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
-  \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
-  \item{plot_set=14}{Covariate effects on encounter probability}
-  \item{plot_set=15}{Covariate effects on positive catch rates}
-  \item{plot_set=16}{Spatial variation for 1st linear predictor (Omega1)}
-  \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
-  \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
-  \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
-  \item{plot_set=20}{Spatially-varying response for catchability covariates in 1st linear predictor (Phi1)}
-  \item{plot_set=21}{Spatially-varying response for catchability covariates in 2nd linear predictor (Phi2)}
+  \item{\code{plot_set=1}}{Link-transformed 1st linear predictor, \code{Report$R1_gct}}
+  \item{\code{plot_set=2}}{Link-transformed 2nd linear predictor, logged for interpretable plotting scale, \code{log(Report$R2_gct)}}
+  \item{\code{plot_set=3}}{Log-predicted density, derived from link-transform of both linear predictors, \code{log(Report$D_gct)}}
+  \item{\code{plot_set=6}}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model), \code{Report$Epsilon1_gct}}
+  \item{\code{plot_set=7}}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model), \code{Report$Epsilon2_gct}}
+  \item{\code{plot_set=8}}{1st linear predictor, \code{Report$P1_gct}}
+  \item{\code{plot_set=9}}{2nd linear predictor, \code{Report$P2_gct}}
+  \item{\code{plot_set=11}}{Covariates that are included in the model for the 1st linear predictor, \code{Report$X1_gcp}}
+  \item{\code{plot_set=12}}{Covariates that are included in the model for the 2nd linear predictor, \code{Report$X2_gcp}}
+  \item{\code{plot_set=13}}{Total biomass across all categories (only useful in a multivariate model)}
+  \item{\code{plot_set=14}}{Covariate effects on 1st linear predictor, \code{Report$eta1_gct}}
+  \item{\code{plot_set=15}}{Covariate effects on 2nd linear predictor, \code{Report$eta2_gct}}
+  \item{\code{plot_set=16}}{Spatial variation for 1st linear predictor, \code{Report$Omega1_gc}}
+  \item{\code{plot_set=17}}{Spatial variation for 2nd linear predictor, \code{Report$Omega2_gc}}
+  \item{\code{plot_set=18}}{Spatially-varying response for density covariates in 1st linear predictor, \code{Report$Xi1_gcp}}
+  \item{\code{plot_set=19}}{Spatially-varying response for density covariates in 2nd linear predictor, \code{Report$Xi2_gcp}}
+  \item{\code{plot_set=20}}{Spatially-varying response for catchability covariates in 1st linear predictor, \code{Report$Phi1_gk}}
+  \item{\code{plot_set=21}}{Spatially-varying response for catchability covariates in 2nd linear predictor, \code{Report$Phi2_gk}}
 }}
 
 \item{working_dir}{Directory for plots}
@@ -72,7 +71,13 @@ plot_results(
 
 \item{check_residuals}{Boolean indicating whether to run or skip residual diagnostic plots (which can be slow as currently implemented)}
 
-\item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
+\item{cluster_results}{Boolean whether to run \code{\link{plot_clusters}}, which can be slow for analyses involving a large number
+of extrapolation-grid cells}
+
+\item{projargs}{Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
+where argument \code{+lon_0} allows the user to center eastings on a specified longitude.}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 
@@ -92,7 +97,7 @@ and new data conditional upon these values.
 }}
 
 \item{n_cells}{Integer used to determine the argument \code{cell.size} passed
-to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to \code{\link[raster]{rasterize}} when converting output at extrapolation-grid cells
 to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
 \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 will often need to be modified for a given purpose.}
@@ -104,19 +109,24 @@ Options: "PCA" (recommended) or "Varimax"}
 
 \item{quantiles}{vector specifying quantiles to use for calculating range edges}
 
+\item{similarity_metric}{approach used to visualize similarity among years/categories
+resulting from estimated loadings matrices.  Available options include
+\code{"hclust", "Correlation", "Dissimilarity", "Covariance"}}
+
 \item{...}{additional settings to pass to \code{\link{plot_maps}}}
 }
 \value{
 Invisibly returns a tagged list of outputs generated by standard plots. See linked functions for details
 \describe{
-  \item{dharmaRes}{Output from \code{\link{summary.fit_model}}, representing quantile residuals calculated using package DHARMa}
-  \item{Enc_prob}{Output from \code{\link{plot_encounter_diagnostic}}}
-  \item{Index}{Output from \code{\link{plot_biomass_index}}}
-  \item{Proportions}{Output from \code{\link{calculate_proportion}}}
-  \item{Range}{Output from \code{\link{plot_range_index}}}
-  \item{Dens_xt}{Output from \code{\link{plot_maps}}}
-  \item{Edge}{Output from \code{\link{plot_range_edge}}}
-  \item{Factors}{Output from \code{\link{plot_factors}}}
+  \item{\code{dharmaRes}}{Output from \code{\link{summary.fit_model}}, representing quantile residuals calculated using package DHARMa}
+  \item{\code{Enc_prob}}{Output from \code{\link{plot_encounter_diagnostic}}}
+  \item{\code{Index}}{Output from \code{\link{plot_biomass_index}}}
+  \item{\code{Proportions}}{Output from \code{\link{calculate_proportion}}}
+  \item{\code{Range}}{Output from \code{\link{plot_range_index}}}
+  \item{\code{Dens_xt}}{Output from \code{\link{plot_maps}}}
+  \item{\code{Edge}}{Output from \code{\link{plot_range_edge}}}
+  \item{\code{Factors}}{Output from \code{\link{plot_factors}}}
+  \item{\code{Clusters}}{Output from \code{\link{plot_clusters}}}
 }
 }
 \description{

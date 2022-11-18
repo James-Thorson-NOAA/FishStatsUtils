@@ -12,7 +12,15 @@
 
 #' @export
 make_mesh <-
-function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL, fine_scale=FALSE, ...){
+function( loc_x,
+          loc_g,
+          loc_i,
+          Method,
+          Extrapolation_List,
+          anisotropic_mesh = NULL,
+          fine_scale = FALSE,
+          map_data,
+          ...){
 
   #######################
   # Create the anisotropic SPDE mesh using 2D coordinates
@@ -45,8 +53,10 @@ function(loc_x, loc_g, loc_i, Method, Extrapolation_List, anisotropic_mesh=NULL,
   # Pre-processing for barriers
   # Barriers don't affect projection matrix A
   # Obtain polygon for water
-  map_data = rnaturalearth::ne_countries( scale=switch("medium", "low"=110, "medium"=50, "high"=10, 50) )
-  attr(map_data,"proj4string") = sp::CRS("+proj=longlat +datum=WGS84")
+  if( missing(map_data) ){
+    map_data = rnaturalearth::ne_countries( scale=switch("medium", "low"=110, "medium"=50, "high"=10, 50) )
+    attr(map_data,"proj4string") = sp::CRS("+proj=longlat +datum=WGS84")
+  }
 
   # Calculate centroid of each triangle in mesh and convert to SpatialPoints
   n_triangles = length(anisotropic_mesh$graph$tv[,1])

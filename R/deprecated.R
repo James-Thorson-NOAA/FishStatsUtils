@@ -1,6 +1,272 @@
 
 
 
+
+#' Copy of FishStatsUtils::calculate_knot_areas
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::calculate_knot_areas} to see list of arguments
+#' and usage
+#' @param ... Arguments to be passed to \code{calculate_knot_areas}
+#' @export
+Calc_Polygon_Areas_and_Polygons_Fn = function( ... ){
+  .Deprecated( new="FishStatsUtils::calculate_knot_areas" )
+  calculate_knot_areas( ... )
+}
+
+#' Copy of FishStatsUtils::make_mesh
+#'
+#' Included for continuity when using old scripts
+#'
+#' Please use \code{?FishStatsUtils::make_mesh} to see list of arguments
+#' and usage
+#' @param ... Arguments to be passed to \code{make_mesh}
+#' @export
+Calc_Anisotropic_Mesh = function( ... ){
+  .Deprecated( new="FishStatsUtils::make_mesh" )
+  make_mesh( ... )
+}
+
+#' Plot variance of GMRF knots
+#'
+#' \code{map_hypervariance} Plot variance of GMRF knots
+#'
+#' @param report Report from TmbObj (e.g., TmbList[["Obj"]])
+#' @param Spatial_List Output from FishStatsUtils::Spatial_Information_Fn()
+#' @param method Choose whether to plot anisotropic or isotropic covariance matrix
+#' @examples
+#' map_hypervariance(report = Save$Report,
+#'                   Spatial_List = Spatial_List,
+#'                   method = "anisotropic")
+map_hypervariance <- function(report, Spatial_List, method){
+  solveSubset <- function(Q) {
+    require(Matrix)
+    require(TMB)
+    L <- Cholesky(Q, super=TRUE, perm=TRUE)
+    invQ <- .Call("tmb_invQ", L, PACKAGE = "TMB")
+    iperm <- invPerm(L@perm + 1L)
+    invQ[iperm, iperm, drop=TRUE]
+  }
+
+  if (method == "anisotropic") {
+    mesh <- Spatial_List$MeshList$anisotropic_mesh
+  } else if (method == "isotropic") {
+    mesh <- Spatial_List$MeshList$isotropic_mesh
+  }
+
+
+  # Q1 is the covariance matrix for the GMRF of the encounter model
+  # Q2 is the covariance matrix for the GMRF of the catch-rate model
+  # Mesh is the knots associated with the GMRF
+
+  diag_sigma <- matrix(data = NA, nrow = length(diag(report$Q1)), ncol = 2)
+  for( i in 1:2 ){
+    Sigma = solveSubset( report[[ c("Q1","Q2")[i] ]] )
+    diag_sigma[,i] <- log(diag(Sigma))
+  }
+
+  boundary_id <- mesh$segm$bnd$idx
+  df2plot0 <-
+    data.frame(E_km = mesh$loc[,1],
+               N_km = mesh$loc[,2],
+               sigma_q1 = diag_sigma[,1],
+               sigma_q2 = diag_sigma[,2],
+               label = rep(c("Encounter GMRF", "Catch-rate GMRF"),
+                           each = length(RelVar[,1])))
+  df2plot <-
+    tidyr::gather(df2plot0, variable, value, -E_km, -N_km, -label)
+
+  p <-
+    ggplot2::ggplot(df2plot, ggplot2::aes(x = E_km, y = N_km)) +
+    ggplot2::geom_point(ggplot2::aes(color = value)) +
+    ggplot2::scale_color_gradient(low = "blue", high = "red") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.title = ggplot2::element_blank()) +
+    ggplot2::facet_wrap(~label) +
+    ggplot2::ggtitle("Log-variance of GMRF knots")
+
+  print(p)
+}
+
+
+#' Explore spatio-temporal covariance
+#'
+#' \code{summarize_covariance} plots and returns spatio-temporal covariance among categories
+#'
+#' @inheritParams plot_overdispersion
+#' @param category_order integer-vector to re-order categories while plotting
+#' @param category_names character-vector listing name for each category
+#' @param plotdir directory (absolute path) for plots
+#' @param figname character for first-part of figure names
+#' @param plotTF integer-vector (length 4) specifying which covariances to plot (recommended: use \code{plotTF=FieldConfig})
+#' @param plot_cor Boolean, whether to plot correlation or covariance
+#' @param mgp passed to \code{par}
+#' @param tck passed to \code{par}
+#' @param oma passed to \code{par}
+#' @param ... passed to \code{ThorsonUtilities::save_fig}
+summarize_covariance <-
+function( Report,
+          Data,
+          ParHat,
+          SD=NULL,
+          category_order = 1:Data$n_c,
+          category_names = 1:Data$n_c,
+          plotdir = paste0(getwd(),"/"),
+          figname = "Cov",
+          plotTF = NULL,
+          plot_cor = TRUE,
+          mgp = c(2,0.5,0),
+          tck = -0.02,
+          oma = c(0,5,2,0),
+          ...){
+
+  #
+  .Deprecated( new="FishStatsUtils::plot_similarities" )
+
+  # Adds intercept defaults to FieldConfig if missing
+  if( is.vector(Data[["FieldConfig"]]) && length(Data[["FieldConfig"]])==4 ){
+    Data[["FieldConfig"]] = rbind( matrix(Data[["FieldConfig"]],ncol=2,dimnames=list(c("Omega","Epsilon"),c("Component_1","Component_2"))), "Beta"=c("Beta1"=-2,"Beta2"=-2) )
+  }else{
+    if( !is.matrix(Data[["FieldConfig"]]) || !all(dim(Data[["FieldConfig"]])==c(3,2)) ){
+      stop("`FieldConfig` has the wrong dimensions in `Summarize_Covariance`")
+    }
+  }
+
+  # Add default for plotTF, or coerce Data$FieldConfig to a vector
+  if( is.null(plotTF) ){
+    plotTF = as.vector( Data[["FieldConfig"]]>0 )
+  }else{
+    plotTF = as.vector(plotTF)
+  }
+
+  # Object to return
+  Return = list()
+
+  # Extract
+  for(i in which(Data[["FieldConfig"]]>=0) ){
+    Par_name = c("omega1", "epsilon1", "beta1", "omega2", "epsilon2", "beta2")[i]
+    L_name = paste0("L_",Par_name,"_z")
+
+    # Extract estimates and standard errors
+    if( !is.null(SD) ){
+      # Object to build
+      sd_summary = summary(SD)
+      Slot_name = paste0("lowercov_uppercor_",Par_name)
+      if( Slot_name %in% rownames(sd_summary) ){
+        # Extract covariances
+        Cor = Cov = Mat = ThorsonUtilities::Extract_SE( SD=SD, parname=Slot_name, columns=1:2, Dim=c(Data$n_c,Data$n_c) )
+        dimnames(Cor) = dimnames(Cov) = list( category_names, category_names, c("Estimate","Std.Error") )
+        # Cor
+        Cor[,,1][lower.tri(Cor[,,1])] = t(Mat[,,1])[lower.tri(Mat[,,1])]
+        diag(Cor[,,1]) = 1
+        Cor[,,2][lower.tri(Cor[,,2])] = t(Mat[,,2])[lower.tri(Mat[,,2])]
+        diag(Cor[,,2]) = NA
+        # Cov
+        Cov[,,1][upper.tri(Cov[,,1])] = t(Mat[,,1])[upper.tri(Mat[,,1])]
+        Cov[,,2][upper.tri(Cov[,,2])] = t(Mat[,,2])[upper.tri(Mat[,,2])]
+      }else{
+        Cov = Cor = NULL
+      }
+    }else{
+      Cov = Cor = NULL
+    }
+
+    # Extract estimates
+    if( is.null(Cov) | is.null(Cor) ){
+      Cov = Cor = array( NA, dim=c(Data$n_c,Data$n_c,2), dimnames=list(category_names,category_names,c("Estimate","Std.Error") ) )
+      Cov[,,'Estimate'] = calc_cov( L_z=ParHat[[L_name]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c )
+      Cor[,,'Estimate'] = cov2cor( Cov[,,'Estimate'] )
+    }                       #
+
+    # Add to return
+    List = list( Cor, Cov )
+    names(List) = paste0(c("Cor_","Cov_"), Par_name)
+    Return = c( Return, List )
+  }
+
+  # Plot covariances
+  if( !is.null(figname) ){
+    # Work out dimensions
+    Dim = c(3,2)
+    if( sum(ifelse(plotTF>0,1,0))==1 ) Dim = c(1,1)
+    if( all(ifelse(plotTF>0,1,0)==c(1,1,0,0,0,0)) | all(ifelse(plotTF>0,1,0)==c(0,0,1,1,0,0)) ) Dim=c(1,2)
+    if( all(ifelse(plotTF>0,1,0)==c(1,0,1,0,0,0)) | all(ifelse(plotTF>0,1,0)==c(0,1,0,1,0,0)) ) Dim=c(2,1)
+
+    # Conversion function
+    if(plot_cor==TRUE){
+      convert = function(Cov) ifelse(is.na(cov2cor(Cov)),0,cov2cor(Cov))
+    }else{
+      convert = function(Cov) ifelse(is.na(Cov),0,Cov)
+    }
+
+    # Plot analytic
+    ThorsonUtilities::save_fig( file=paste0(plotdir,figname,"--Analytic.png"), width=Dim[2]*4+1, height=Dim[1]*4, ... )
+      par(mfrow=Dim, mar=c(0,1,1,0), mgp=mgp, tck=tck, oma=oma)
+      for(i in 1:6 ){      #
+        if( i %in% which(plotTF>0) ){
+          Cov_cc = calc_cov( L_z=ParHat[c('L_omega1_z','L_epsilon1_z','L_beta1_z','L_omega2_z','L_epsilon2_z','L_beta2_z')][[i]], n_f=as.vector(Data[["FieldConfig"]])[i], n_c=Data$n_c )
+          plot_cov( Cov=convert(Cov_cc)[category_order,category_order], names=list(category_names[category_order],NA)[[ifelse(i==1|i==3|Dim[2]==1,1,2)]], names2=list(1:nrow(Cov_cc),NA)[[ifelse(i==1|i==2,1,2)]], digits=1, font=2 )
+          #if(i==1 | Dim[1]==1) mtext(side=3, text="Spatial", line=1.5, font=2)
+          #if(i==2 | Dim[1]==1) mtext(side=3, text="Spatio-temporal", line=1.5, font=2)
+          #if(i==2 | (Dim[2]==1&i==1)) mtext(side=4, text=ifelse(length(Data$ObsModel)==1||Data$ObsModel[2]==0,"Encounter probability","Component #1"), line=0.5, font=2)
+          #if(i==4 | (Dim[2]==1&i==3)) mtext(side=4, text=ifelse(length(Data$ObsModel)==1||Data$ObsModel[2]==0,"Positive catch rate","Component #2"), line=0.5, font=2)
+        }
+        #if( length(Return[[paste0( "Cov_", c("omega1", "epsilon1", "omega2", "epsilon2")[i])]])==0 ){
+        #  Return[[paste0( "Cov_", c("omega1", "epsilon1", "omega2", "epsilon2")[i])]] = Cov_cc
+        #  if( !is.null(Cov_cc)) Return[[paste0( "Cor_", c("omega1", "epsilon1", "omega2", "epsilon2")[i])]] = cov2cor(Cov_cc)
+        #}
+      }
+    dev.off()
+
+#    # Plot sample
+#    ThorsonUtilities::save_fig( file=paste0(plotdir,figname,"--Sample.png"), width=Dim[2]*4+1, height=Dim[1]*4, ... )
+#      par(mfrow=Dim, mar=c(0,1,1,0), mgp=mgp, tck=tck, oma=oma)
+#      for(i in which(plotTF>0) ){
+#        if(i==1) Cov_cc = cov(Report$Omega1_sc)
+#        if(i==2) Cov_cc = cov(apply(Report$Epsilon1_sct,MARGIN=2,FUN=as.vector))
+#        if(i==3) Cov_cc =
+#        if(i==4) Cov_cc = cov(Report$Omega2_sc)
+#        if(i==5) Cov_cc = cov(apply(Report$Epsilon2_sct,MARGIN=2,FUN=as.vector))
+#        if(i==6)
+#        plot_cov( Cov=convert(Cov_cc)[category_order,category_order], names=list(category_names[category_order],NA)[[ifelse(i==1|i==3|Dim[2]==1,1,2)]], names2=list(1:nrow(Cov_cc),NA)[[ifelse(i==1|i==2,1,2)]], digits=1, font=2 )
+#        if(i==1 | Dim[1]==1) mtext(side=3, text="Spatial", line=1.5, font=2)
+#        if(i==2 | Dim[1]==1) mtext(side=3, text="Spatio-temporal", line=1.5, font=2)
+#        if(i==2 | (Dim[2]==1&i==1)) mtext(side=4, text=ifelse(length(Data$ObsModel)==1||Data$ObsModel[2]==0,"Encounter probability","Component #1"), line=0.5, font=2)
+#        if(i==4 | (Dim[2]==1&i==3)) mtext(side=4, text=ifelse(length(Data$ObsModel)==1||Data$ObsModel[2]==0,"Positive catch rate","Component #2"), line=0.5, font=2)
+#      }
+#    dev.off()
+  }
+
+  # Return
+  return( invisible(Return) )
+}
+
+#' Plot covariance matrix
+#'
+#' \code{plot_cov} plots and formats a covariance matrix
+#'
+#' @param Cov matrix (covariance or correlation) used for plotting
+#' @param zlim numeric-vector (length 2) defining bounds for color-scale of covariance
+#' @param names Labels for y-axis
+#' @param names2 Labels for x-axis (on top of covariance)
+#' @param ncolors Number of colors for color-scale
+#' @param digits Number of digits for text-labels of covariance
+#' @param ... passed to \code{text} for labelling covariances
+plot_cov = function( Cov, zlim=NULL, names=1:nrow(Cov), names2=names, ncolors=21, digits=2, ... ){
+  Col = colorRampPalette(colors=c("blue","white","red"))
+  if(is.null(zlim) ) zlim = c(-1,1)*max(abs(Cov))
+  image(z=Cov[1:nrow(Cov),nrow(Cov):1], x=seq(0,1,length=nrow(Cov)), y=seq(0,1,length=nrow(Cov)), col=Col(ncolors), xaxt="n", yaxt="n", zlim=zlim, yaxt="n", ylab="", xlab="" )
+  if(length(names)>1) axis(side=2, at=seq(0,1,length=nrow(Cov)), labels=rev(names), las=1)
+  if(length(names2)>1) axis(side=3, at=seq(0,1,length=nrow(Cov)), labels=names2, las=ifelse(all(nchar(names2)==1),1,2) )
+  for(i in 1:nrow(Cov)){
+  for(j in 1:nrow(Cov)){
+    Label = formatC(Cov[i,j],digits=digits,format="f")
+    text( y=seq(1,0,length=nrow(Cov))[i], x=seq(0,1,length=nrow(Cov))[j], labels=Label, ...)
+  }}
+  box()
+}
+
 #' Explore counter-factual scenario
 #'
 #' \code{Rerun_Fn} re-builds a model while fixing a subset of parameters at zero
@@ -16,13 +282,11 @@
 #' @param year_set set of parameters to include
 #' @param c_set set of categories to include
 #' @param ... additional arguments passed to \code{VAST::Build_TMB_Fn}
-
 #' @return Tagged list
 #' \describe{
 #'   \item{Report}{Report output for counter-factual run}
 #'   \item{NewBuild_List}{Output from \code{VAST::Build_TMB_Fn} using counter-factual parameters}
 #' }
-
 #' @examples
 #' \dontrun{
 #' # Run without GMRF
@@ -32,7 +296,6 @@
 #'          loc_x = Spatial_List$loc_x,
 #'          TmbData = TmbData, Version = "VAST_v4_0_0")
 #' }
-
 Rerun_Fn = function( parhat0, turnoff_pars, loc_x, cov_to_turnoff=1:dim(parhat0[["gamma2_ctp"]])[3], calculate_COG=TRUE, figname=NULL,
   Map="generate", MapDetails_List=NULL, year_set=1:ncol(parhat0[["beta1_ct"]]), c_set=1:nrow(parhat0[["beta1_ct"]]), ... ){
 
@@ -131,7 +394,6 @@ Rerun_Fn = function( parhat0, turnoff_pars, loc_x, cov_to_turnoff=1:dim(parhat0[
 #' @inheritParams plot_overdispersion
 #' @inheritParams VAST::make_data
 #' @param covhat estimated covariance used for calculating coherence
-
 #' @return Tagged list containing measures of synchrony
 #' \describe{
 #'   \item{phi_xz}{Synchrony index for each site (x) and each period (row of \code{yearbounds_zz})}
@@ -139,7 +401,6 @@ Rerun_Fn = function( parhat0, turnoff_pars, loc_x, cov_to_turnoff=1:dim(parhat0[
 #'   \item{psi}{Measure of proportion of variance explained by leading eigen-vectors}
 #'   \item{L_c}{Cholesky decomposition of \code{covhat}}
 #' }
-
 calc_coherence = function( Report, Data, covhat=NULL, yearbounds_zz=matrix(c(1,Data$n_t),nrow=1) ){
 
   ##################
@@ -222,13 +483,11 @@ calc_coherence = function( Report, Data, covhat=NULL, yearbounds_zz=matrix(c(1,D
 #'
 #' @inheritParams plot_overdispersion
 #' @inheritParams VAST::make_data
-
 #' @return Tagged list containing measures of synchrony
 #' \describe{
 #'   \item{phi_xz}{Synchrony index for each site (x) and each period (row of \code{yearbounds_zz})}
 #'   \item{phi_z}{weighted-average of \code{phi_xz} for each period, weighted by average community-abundance at each site in that period}
 #' }
-
 calc_synchrony = function( Report, Data, yearbounds_zz=matrix(c(1,Data$n_t),nrow=1) ){
 
   # Index lengths
@@ -363,7 +622,6 @@ calc_synchrony = function( Report, Data, yearbounds_zz=matrix(c(1,Data$n_t),nrow
 #' @inheritParams plot_overdispersion
 #' @inheritParams VAST::make_data
 #' @param covhat estimated covariance used for calculating coherence
-
 #' @return Tagged list containing measures of synchrony
 #' \describe{
 #'   \item{phi_xz}{Synchrony index for each site (x) and each period (row of \code{yearbounds_zz})}
@@ -371,7 +629,6 @@ calc_synchrony = function( Report, Data, yearbounds_zz=matrix(c(1,Data$n_t),nrow
 #'   \item{psi}{Measure of proportion of variance explained by leading eigen-vectors}
 #'   \item{L_c}{Cholesky decomposition of \code{covhat}}
 #' }
-
 Coherence = function( Report, Data, covhat=NULL, yearbounds_zz=matrix(c(1,Data$n_t),nrow=1) ){
 
   ##################
@@ -461,9 +718,7 @@ Coherence = function( Report, Data, covhat=NULL, yearbounds_zz=matrix(c(1,Data$n
 #' @param skip_finished boolean specifying whether to rerun (skip_finished==FALSE) or skip (skip_finished==TRUE) previously completed runs (Default=FALSE)
 #' @param newtonsteps number of extra newton steps to take after optimization (alternative to \code{loopnum})
 #' @param ... Additional arguments to pass to \code{VAST::Build_TMB_Fn}
-
 #' @return Results a matrix with total predictive negative log-likelihood for each crossvalidation partition, and number of crossvalidation samples for that partition
-
 Crossvalidate_Fn = function(record_dir, parhat, original_data, group_i=NULL, kfold=10, newtonsteps=1, skip_finished=FALSE, ... ){
   # Lump observations into groups
   if( is.null(group_i) || length(group_i)!=original_data$n_i ){
@@ -634,7 +889,6 @@ function(Report, FileName, Year_Set, ControlList=list("Width"=4*3, "Height"=2*3,
 #'
 #' @return Return Tagged list of output
 #'
-
 Vessel_Fn <-
 function( TmbData, Sdreport, FileName_VYplot=NULL ){
   Summary = TMB:::summary.sdreport(Sdreport)
@@ -683,20 +937,17 @@ function( TmbData, Sdreport, FileName_VYplot=NULL ){
 #' @param xyz2, 2D location and height of second neighbor
 #' @param xyz3, 2D location and height of third neighbor
 #' @param xypred, 2D location of location to interpolate
-
 #' @return Tagged list of useful output
 #' \describe{
 #'   \item{zpred}{height at location \code{xypred}}
 #'   \item{phi}{Coefficients for interpolation}
 #' }
-
 #' @examples
 #'
 #'   \dontrun{
 #'   bilinear_interp( xyz1=c(0,0,0), xyz2=c(1,-1,1), xyz3=c(0,1,2), xypred=c(0.1,0.7))
 #'   # Should equal 1.7
 #'   }
-
 bilinear_interp = function( xyz1, xyz2, xyz3, xypred ){
   # Make constaint matrix
   #  1st row:  sum to one
@@ -788,13 +1039,11 @@ Plot_range_quantiles = function( Data_Extrap, Report, TmbData, a_xl, NN_Extrap, 
 #' @param Lat vector of latitudes
 #' @param Lon vector of longitudes
 #' @param crs EPSG reference for coordinate reference system (CRS) defining Eastings-Northings after transformation
-
 #' @return A data frame with the following columns
 #' \describe{
 #'   \item{E_km}{The eastings for each value of Lon (in kilometers)}
 #'   \item{N_km}{The northings for each value of Lat (in kilometers)}
 #' }
-
 Convert_LL_to_EastNorth_Fn <-
 function( Lon, Lat, crs=NA ){
   # SEE:  https://github.com/nwfsc-assess/geostatistical_delta-GLMM/issues/25#issuecomment-345825230
@@ -827,13 +1076,11 @@ function( Lon, Lat, crs=NA ){
 #' @param Lon vector of longitudes
 #' @param zone UTM zone (integer between 1 and 60) or alphanumeric CRS code used by package rgdal to convert latitude-longitude coordinates to projection in kilometers; \code{zone=NA} uses UTM and automatically detects the appropriate zone
 #' @param flip_around_dateline boolean specifying whether to flip Lat-Lon locations around the dateline, and then retransform back (only useful if Lat-Lon straddle the dateline)
-
 #' @return A data frame with the following columns
 #' \describe{
 #'   \item{X}{The UTM eastings for each value of Lon}
 #'   \item{Y}{The UTM northings measured from the equator for each Lat}
 #' }
-
 Convert_LL_to_UTM_Fn <-
 function( Lon, Lat, zone=NA, flip_around_dateline=FALSE ){
 
@@ -866,8 +1113,6 @@ function( Lon, Lat, zone=NA, flip_around_dateline=FALSE ){
 #' truncating the cocuntry boundaries within the plotting region (which \code{mapproj::mapproject} appears to do prior to projection,
 #' so that the post-projection is often missing boundaries that are within the plotting rectangle).  I use rectangular projections by default, but Lamberts or Albers conformal
 #' projections would also be useful for many cases.
-
-#' @export
 PlotMap_Fn <-
 function(MappingDetails, Mat, PlotDF, MapSizeRatio=c('Width(in)'=4,'Height(in)'=4), Xlim, Ylim, FileName=paste0(getwd(),"/"), Year_Set,
          Rescale=FALSE, Rotate=0, Format="png", Res=200, zone=NA, Cex=0.01, textmargin="", add=FALSE, pch=15,
@@ -1018,23 +1263,6 @@ function( colvec, heatrange, textmargin=NULL, labeltransform="uniform", dopar=TR
   #mtext(side=1, outer=TRUE, line=1, "Legend")
 }
 
-#' @export
-plot_lines = function( x, y, ybounds, fn=lines, col_bounds="black", bounds_type="whiskers", border=NA,
-  border_lty="solid", lwd_bounds=1, ... ){
-
-  # Function still used in plot_index
-  #warning( "`plot_lines` is soft-deprecated" )
-
-  fn( y=y, x=x, ... )
-  if( bounds_type=="whiskers" ){
-    for(t in 1:length(y)){
-      lines( x=rep(x[t],2), y=ybounds[t,], col=col_bounds, lty=border_lty, lwd=lwd_bounds)
-    }
-  }
-  if( bounds_type=="shading" ){
-    polygon( x=c(x,rev(x)), y=c(ybounds[,1],rev(ybounds[,2])), col=col_bounds, border=border, lty=border_lty)
-  }
-}
 
 #' Inset small plot within figure
 #'
@@ -1103,14 +1331,11 @@ smallPlot <- function( expr, x=c(5,70), y=c(50,100), x1,y1,x2,y2, mar=c(12, 14, 
 #' @param FUN, function used to aggregate observations associated with each knot-time combination
 #' @param Year_Set, Set of times \code{t_e} used when generating \code{Cov_xtp}
 #' @param na.omit, What to do when some knot-time combination has no observation. Options include \code{"error"} which throw an error, or \code{"time-average"} which fills in the average for other years with observations for each knot
-
 #' @return Tagged list of useful output
 #' \describe{
 #'   \item{Cov_xtp}{3-dimensional array for use in \code{VAST::Data_Fn}}
 #'   \item{var_p}{a matrix summarizing the data-level variance, variance among knots, and lost variance when aggregating from data to knots for each covariate}
 #' }
-
-#' @export
 format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spatial_List, FUN=mean, Year_Set=min(t_e):max(t_e), na.omit="error" ){
 
   # Knots in UTM: Spatial_List$loc_x
@@ -1203,13 +1428,11 @@ format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spa
 #' @inheritParams make_spatial_info
 #' @param Data_Geostat A data frame with column headers \code{c('Lon','Lat','Year','Vessel','AreaSwept_km2')} containing sample design to mimic
 #' @param standardize_fields Boolean, whether to ensure that random fields have sample mean and standard deviation equal to their inputted values
-
 #' @return Return Tagged list of output
 #' \describe{
 #'   \item{Data_Geostat}{Simulated data for analysis}
 #'   \item{B_tl}{True biomass for each year and stratum}
 #' }
-
 #' @examples
 #' ## Do not run (will be slow, due to simulating fine-scale spatial variation for many sites):
 #' ##
@@ -1221,8 +1444,6 @@ format_covariates = function( Lat_e, Lon_e, t_e, Cov_ep, Extrapolation_List, Spa
 #' ## # Use function
 #' ## SimList = FishStatsUtils::Geostat_Sim(Sim_Settings=list(), Extrapolation_List, Data_Geostat=Data_Geostat )
 #' ## Data_Sim = SimList$Data_Geostat
-
-#' @export
 Geostat_Sim <-
 function(Sim_Settings, Extrapolation_List, Data_Geostat=NULL, MakePlot=FALSE, DateFile=paste0(getwd(),"/"), standardize_fields=FALSE ){
   # Terminology
@@ -1494,7 +1715,6 @@ function(Sim_Settings, Extrapolation_List, Data_Geostat=NULL, MakePlot=FALSE, Da
 #' @param FileName_Qhist If NULL is specified then do not save this type of plot
 #' @examples Q <- QQ_Fn(TmbData = TmbData, Report = Report)
 #' @return A list containing results for each specified categories
-#' @export
 plot_quantile_diagnostic <- function(TmbData,
                   Report,
                   DateFile=paste0(getwd(),"/"),
@@ -1668,8 +1888,6 @@ plot_quantile_diagnostic <- function(TmbData,
 #'   \item{Q1_xt}{Matrix of average residuals for encounter/non-encounter component by site \code{x} and year \code{t}}
 #'   \item{Q2_xt}{Matrix of average residuals for positive-catch-rate component by site \code{x} and year \code{t}}
 #' }
-
-#' @export
 plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=longlat',
          working_dir=paste0(getwd(),"/"), spatial_list, extrapolation_list,
          Year_Set=NULL, Years2Include=NULL, zrange, ... ){
@@ -1831,8 +2049,6 @@ plot_residuals = function( Lat_i, Lon_i, TmbData, Report, Q, projargs='+proj=lon
 #'   \item{Diag_i}{Diagnostic output for each sample \code{i}}
 #'   \item{Diag_z}{Diagnostic output for each bin \code{z}}
 #' }
-
-#' @export
 plot_encounter_diagnostic = function( Report, Data_Geostat, cutpoints_z=seq(0,1,length=21), interval_width=1.96, DirName=paste0(getwd(),"/"),
   PlotName="Diag--Encounter_prob.png", ... ){
 

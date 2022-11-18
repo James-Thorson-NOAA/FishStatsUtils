@@ -36,6 +36,12 @@ latlon_to_SpatialPolygons = function( lat, lon, alpha=1 ){
   # Convert arcs to lines
   #========================
 
+
+
+  #========================
+  # Convert arcs to lines
+  #========================
+
   # function to convert an arc into line segments
   # given the center of the arc, the radius, the vector, and the angle (radians)
   arc2line = function(center, r, vector, theta, npoints = 100) {
@@ -129,6 +135,7 @@ latlon_to_SpatialPolygons = function( lat, lon, alpha=1 ){
   }
 
   lonlat = cbind( lon, lat )
+  lonlat = unique(lonlat)
   alphahull = alphahull::ahull(lonlat, alpha=alpha )
   SpatialPolygons = ahull2poly(alphahull)
   return(SpatialPolygons)

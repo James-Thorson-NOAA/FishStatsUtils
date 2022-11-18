@@ -23,8 +23,15 @@
 
 #' @export
 make_kmeans <-
-function( n_x, loc_orig, nstart=100, randomseed=1, iter.max=1000, DirPath=paste0(getwd(),"/"),
-  Save_Results=TRUE, kmeans_purpose="spatial", backwards_compatible_kmeans=FALSE ){
+function( n_x,
+          loc_orig,
+          nstart = 100,
+          randomseed = 1,
+          iter.max = 1000,
+          DirPath = paste0(getwd(),"/"),
+          Save_Results = TRUE,
+          kmeans_purpose = "spatial",
+          backwards_compatible_kmeans = FALSE ){
 
   # get old seed
   oldseed = ceiling(runif(1,min=1,max=1e6))

@@ -15,7 +15,7 @@ plot_range_index(
   FileName_COG = paste0(PlotDir, "/center_of_gravity.png"),
   FileName_Area = paste0(PlotDir, "/Area.png"),
   FileName_EffArea = paste0(PlotDir, "/Effective_Area.png"),
-  Znames = rep("", ncol(TmbData$Z_xm)),
+  Znames = rep("", ncol(TmbData$Z_gm)),
   use_biascorr = TRUE,
   category_names = NULL,
   interval_width = 1,

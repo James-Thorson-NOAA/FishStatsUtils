@@ -6,7 +6,7 @@
 \usage{
 plot_variable(
   Y_gt,
-  map_list,
+  map_list = NULL,
   panel_labels = NULL,
   projargs = "+proj=longlat",
   map_resolution = "medium",
@@ -23,15 +23,15 @@ plot_variable(
   legend_x = c(0, 0.05),
   legend_y = c(0.05, 0.45),
   cex.legend = 1,
-  mfrow,
+  mfrow = NULL,
   land_color = "grey",
   n_cells = NULL,
-  xlim,
-  ylim,
+  xlim = NULL,
+  ylim = NULL,
   country = NULL,
   contour_nlevels = 0,
   fun = mean,
-  format = "raster",
+  format = "sf",
   cex.points = 1,
   legend_digits = 1,
   ...
@@ -66,7 +66,7 @@ generate colorbars that are just outside the plotting window) giving left and ri
 \item{land_color}{color for filling in land (use \code{land_color=rgb(0,0,0,alpha=0)} for transparent land)}
 
 \item{n_cells}{Integer used to determine the argument \code{cell.size} passed
-to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to \code{\link[raster]{rasterize}} when converting output at extrapolation-grid cells
 to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
 \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 will often need to be modified for a given purpose.}

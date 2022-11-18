@@ -5,7 +5,12 @@
 #' @description
 #' \code{sample_variable} samples from the joint distribution of random and fixed effects to approximate the predictive distribution for a variable
 #'
-#' Exploratory testing suggests that calling \code{Obj$report(newvalues)} within a function like \code{sample_variable(.)} doesn't affect the results of subsequent calls of \code{Obj$report()} so this function does not appear to change anything in the global environment
+#' Using \code{sample_fixed=TRUE} (the default) in \code{\link{sample_variable}} is similar to using \code{type=3} in \code{\link{simulate_data}}, while
+#'       using \code{sample_fixed=TRUE} in \code{\link{sample_variable}} is similar to using \code{type=4} in \code{\link{simulate_data}}.
+#'       Sampling fixed effects will sometimes cause numerical under- or overflow (i.e., output values of \code{NA}) in cases when
+#'       variance parameters are estimated imprecisely.  In these cases, the multivariate normal approximation being used is a poor
+#'       representation of the tail probabilities, and results in some samples with implausibly high (or negative) variances,
+#'       such that the associated random effects then have implausibly high magnitude.
 #'
 #' @param Sdreport TMB output from `\code{TMB::sdreport(Obj)}`
 #' @param Obj Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`
@@ -72,6 +77,7 @@ function( Sdreport,
       message( "  Finished sample ", rI, " of ",n_samples )
     }
     Var = Obj$report( par=u_zr[,rI] )[[variable_name]]
+    if(is.vector(Var)) Var = as.array(Var)
     if(rI==1) Var_zr = Var
     if(rI>=2){
       Var_zr = abind::abind( Var_zr, Var, along=length(dim(Var))+1 )

@@ -31,6 +31,8 @@ fit_model(
   test_fit = TRUE,
   category_names = NULL,
   year_labels = NULL,
+  framework = "TMBad",
+  use_new_epsilon = TRUE,
   ...
 )
 }
@@ -90,11 +92,14 @@ providing sampling category (e.g., vessel or tow) associated with overdispersed 
 which is then estimated independently for each model category \code{c_i}, e.g.,
 use \code{X1_formula=~BOT_DEPTH+BOT_DEPTH^2} for a quadratic effect of variable \code{BOT_DEPTH}
 that is estimated independently for each category.
-The effect of an estimated effect also used upon when predicting the value for each location
+The effect of an estimated effect is also used when predicting the value for each location
 in the extrapolation-grid.  Therefore, \code{X1_formula} is interepreted as affecting the "true"
 underlying value of each variable, and it affects both samples and extrapolated values.
 It is allowed to include \code{Year} in the formula, although please check whether it is
-interpreted as numeric or factor-valued.}
+interpreted as numeric or factor-valued.
+Note that \code{X1_formula} is internally updated (and resulting design-matrices are modified) to avoid
+any intercept from arising in \code{X1_ip} and \code{X1_gctp}, to avoid identifiability issues between covariates and
+intercepts for each category.}
 
 \item{X2_formula}{same as \code{X1_formula} but affecting the 2nd linear predictor.}
 
@@ -110,12 +115,18 @@ by default (but can be specified to do so when an appropriate `formula` is suppl
 However, the effect of \code{Q1_formula} is not used when predicting values at extrapolation-grid locations.
 Therefore, the \code{Q1_formula} is interpreted as affecting "catchability" (a.k.a. "detectabiility"), and it represents
 processes that affect the outcome of sampling but not the "true" underlying value of a variable being sampled.
-For example, a factor representing gear-type might be included to estimate the relative performacne of each gear type
-(relative to the base level of that factor).
+For example, to estimate the relative performance of differeng gear types, include \code{catchability_data = data.frame(gear=gear_factor)}
+where \code{gear_factor} is a factor-valued indicator for different gear types and \code{Q1_formula = ... + gear},
+and this will estimate the catchability for each level relative to the base level of that factor.
 Note that \code{Q1_formula} defines a relationship that is applied to all samples (regardless of category \code{c_i}),
 whereas \code{X1_formula} defines a relationship that is estimated independently for each category.
-For a catchability covariate that varies by category, please include the category as factor in \code{catchability_data}
-and then include an interaction with category in \code{Q1_formula} for any variable which has an effect that varies among categories.}
+Also note that \code{\link[VAST]{make_data}} includes \code{c_iz[,1]} as a column labeled \code{category} in \code{catchability_data},
+and that \code{Q1_formula} is internally updated (and resulting design-matrices are modified) to avoid
+any category-specific intercept from arising in \code{Q1_ik}, to avoid identifiability issues between category-specific
+covariates and intercepts.
+For example, for a catchability covariate that varies by category, include an interaction with category in \code{Q1_formula},
+e.g., \code{Q1_formula = ... + category:gear} where \code{gear} is a factor to estimate category-specific catchability ratio for
+different levels of \code{gear}.}
 
 \item{Q2_formula}{same as \code{Q2_formula} but affecting the 2nd linear predictor.}
 
@@ -133,11 +144,13 @@ when fixed effects are at upper or lower bounds.}
 
 \item{run_model}{Boolean indicating whether to run the model or simply return the inputs and built TMB object}
 
-\item{test_fit}{Boolean indicating whether to apply \code{VAST::check_fit} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
+\item{test_fit}{Boolean indicating whether to apply \code{\link[VAST]{check_fit}} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE}
 
 \item{category_names}{character vector specifying names for labeling categories \code{c_i}}
 
 \item{year_labels}{character vector specifying names for labeling times \code{t_i}}
+
+\item{framework}{Which AD framework to use ('TMBad' or 'CppAD')}
 
 \item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
@@ -223,6 +236,10 @@ plot_results( settings=settings, fit=fit )
 \code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities and an explanation of DHARMa Probability-Integral-Transform residuals
 
 \code{\link{predict.fit_model}} for methods to predict at new locations using existing or updated covariate values
+
+VAST wiki \url{https://github.com/James-Thorson-NOAA/VAST/wiki} for examples documenting many different use-cases and features.
+
+GitHub mainpage \url{https://github.com/James-Thorson-NOAA/VAST#description} for a list of user resources and publications documenting features
 
 Other wrapper functions: 
 \code{\link{make_settings}()},

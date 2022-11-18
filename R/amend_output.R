@@ -85,18 +85,24 @@ function( fit = NULL,
   }
 
   # Determine year-category pairs with no data
-  Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
-  Num_ctl = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
-  Num_ctm = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_m)
-  if( treat_missing_as_zero==TRUE ){
-    # if treat_missing_as_zero==TRUE, then switch density from year-categories with no data to zero
-    Report$D_gct = ifelse(Num_gct==0, 0, Report$D_gct)
-    Report$Index_ctl = ifelse(Num_ctl==0, 0, Report$Index_ctl)
-  }else{
-    # If some intercepts are mapped off, then switch density from year-categories with no data to NA
-    if( any(is.na(Map$beta2_ft)) | any(is.na(Map$beta2_ft)) ){
-      Report$D_gct = ifelse(Num_gct==0, NA, Report$D_gct)
-      Report$Index_ctl = ifelse(Num_ctl==0, NA, Report$Index_ctl)
+  if( "metadata_ctz" %in% names(TmbData$Options_list) ){
+    Num_gct = rep(1,TmbData$n_g) %o% abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3)
+    Num_ctl = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_l)
+    Num_ctm = abind::adrop(TmbData$Options_list$metadata_ctz[,,'num_notna',drop=FALSE], drop=3) %o% rep(1,TmbData$n_m)
+    if( treat_missing_as_zero==TRUE ){
+      # if treat_missing_as_zero==TRUE, then switch density from year-categories with no data to zero
+      if("D_gct"%in%names(Report)) Report$D_gct = ifelse(Num_gct==0, 0, Report$D_gct)
+      if("D_gcy"%in%names(Report)) Report$D_gcy = ifelse(Num_gct==0, 0, Report$D_gcy)
+      if("Index_ctl"%in%names(Report)) Report$Index_ctl = ifelse(Num_ctl==0, 0, Report$Index_ctl)
+      if("Index_cyl"%in%names(Report)) Report$Index_cyl = ifelse(Num_ctl==0, 0, Report$Index_cyl)
+    }else{
+      # If some intercepts are mapped off, then switch density from year-categories with no data to NA
+      if( any(is.na(Map$beta2_ft)) | any(is.na(Map$beta2_ft)) ){
+        if("D_gct"%in%names(Report)) Report$D_gct = ifelse(Num_gct==0, NA, Report$D_gct)
+        if("D_gcy"%in%names(Report)) Report$D_gcy = ifelse(Num_gct==0, NA, Report$D_gcy)
+        if("Index_ctl"%in%names(Report)) Report$Index_ctl = ifelse(Num_ctl==0, NA, Report$Index_ctl)
+        if("Index_cyl"%in%names(Report)) Report$Index_cyl = ifelse(Num_ctl==0, NA, Report$Index_cyl)
+      }
     }
   }
 
@@ -110,27 +116,27 @@ function( fit = NULL,
   # Add labels for all variables plotted using `plot_maps`
   Report = add_dimnames( Report = Report,
                          report_names = c("P1_gct","P2_gct","R1_gct","R2_gct","D_gct","Epsilon1_gct","Epsilon2_gct","eta1_gct","eta2_gct"),
-                         dimnames = list(NULL, "Category"=category_names, "Time"=year_labels) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Time"=year_labels) )
   Report = add_dimnames( Report = Report,
                          report_names = c("Omega1_gc","Omega2_gc"),
-                         dimnames = list(NULL, "Category"=category_names) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names) )
   Report = add_dimnames( Report = Report,
                          report_names = "Xi1_gcp",
-                         dimnames = list(NULL, "Category"=category_names, "Covariate"=colnames(TmbData$X1_ip)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Covariate"=colnames(TmbData$X1_ip)) )
   Report = add_dimnames( Report = Report,
                          report_names = "Xi2_gcp",
-                         dimnames = list(NULL, "Category"=category_names, "Covariate"=colnames(TmbData$X2_ip)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Covariate"=colnames(TmbData$X2_ip)) )
   Report = add_dimnames( Report = Report,
                          report_names = "Phi1_gk",
-                         dimnames = list(NULL, "Covariate"=colnames(TmbData$Q1_ik)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Covariate"=colnames(TmbData$Q1_ik)) )
   Report = add_dimnames( Report = Report,
                          report_names = "Phi2_gk",
-                         dimnames = list(NULL, "Covariate"=colnames(TmbData$Q2_ik)) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Covariate"=colnames(TmbData$Q2_ik)) )
   Report = add_dimnames( Report = Report,
                          report_names = c("L_omega1_cf","L_omega2_cf","L_beta1_cf","L_beta2_cf","L_epsilon1_cf","L_epsilon2_cf"),
                          dimnames = list("Category"=category_names, NULL) )
   Report = add_dimnames( Report = Report,
-                         report_names = c("Ltime_epsilon2_tf","Ltime_epsilon2_tf"),
+                         report_names = c("Ltime_epsilon1_tf","Ltime_epsilon2_tf"),
                          dimnames = list("Time"=year_labels, NULL) )
   Report = add_dimnames( Report = Report,
                          report_names = c("beta1_tc","beta2_tc"),
@@ -138,11 +144,14 @@ function( fit = NULL,
 
   # Add labels for other useful variables
   Report = add_dimnames( Report = Report,
-                         report_names = c("Index_ctl","effective_area_ctl","mean_D_ctl"),
+                         report_names = c("Index_ctl","effective_area_ctl","mean_D_ctl","Bratio_ctl"),
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
   Report = add_dimnames( Report = Report,
+                         report_names = c("Fratio_ct"),
+                         dimnames = list("Category"=category_names, "Time"=year_labels) )
+  Report = add_dimnames( Report = Report,
                          report_names = c("Index_gctl"),
-                         dimnames = list(NULL, "Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
+                         dimnames = list("Site"=seq_len(TmbData$n_g), "Category"=category_names, "Time"=year_labels, "Stratum"=strata_names) )
   Report = add_dimnames( Report = Report,
                          report_names = "mean_Z_ctm",
                          dimnames = list("Category"=category_names, "Time"=year_labels, "Spatial_axis"=colnames(TmbData$Z_gm)) )
@@ -154,6 +163,8 @@ function( fit = NULL,
 
   # Add units
   if("Index_ctl" %in% names(Report)) units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
+  if("Fratio_ct" %in% names(Report)) units(Report$Fratio_ct) = units(unitless)
+  if("Bratio_ctl" %in% names(Report)) units(Report$Bratio_ctl) = units(unitless)
   if("D_gct" %in% names(Report)) units(Report$D_gct) = units(TmbData$b_i / TmbData$a_i)
 
   # Add units for COG, see: https://github.com/r-quantities/units/issues/291

@@ -68,18 +68,26 @@ function( fit,
   dimnames(Data$FieldConfig) = list( c("Omega","Epsilon","Beta","Epsilon_time"), c("Component_1","Component_2") )
 
   # Fill in missing inputs
-  if( "D_gct" %in% names(Report) ){
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gct)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_gct)[2]
-  }
-  if( "D_xcy" %in% names(Report) ){
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xcy)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
-  }
-  if( "D_gcy" %in% names(Report) ){
-    if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gcy)[3]
-    if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
-  }
+  # COULD REPLACE WITH amend_output, except missing `extrapolation_list`
+  #if( "D_gct" %in% names(Report) ){
+  #  if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gct)[3]
+  #  if( is.null(category_names) ) category_names = 1:dim(Report$D_gct)[2]
+  #}
+  #if( "D_xcy" %in% names(Report) ){
+  #  if( is.null(year_labels) ) year_labels = 1:dim(Report$D_xcy)[3]
+  #  if( is.null(category_names) ) category_names = 1:dim(Report$D_xcy)[2]
+  #}
+  #if( "D_gcy" %in% names(Report) ){
+  #  if( is.null(year_labels) ) year_labels = 1:dim(Report$D_gcy)[3]
+  #  if( is.null(category_names) ) category_names = 1:dim(Report$D_gcy)[2]
+  #}
+  # Overwrite labels using run-time user inputs if provided
+  Report = amend_output( fit = fit,
+                         TmbData = Data,
+                         Report = Report,
+                         Sdreport = SD,
+                         year_labels = year_labels,
+                         category_names = category_names )
 
   # Dimensions for plotting
   Dim = function( num ) c(ceiling(sqrt(num)), ceiling(num/ceiling(sqrt(num))) )

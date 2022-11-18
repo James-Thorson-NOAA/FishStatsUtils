@@ -15,7 +15,7 @@ plot_maps(
   category_names = NULL,
   quiet = FALSE,
   working_dir = paste0(getwd(), "/"),
-  MapSizeRatio,
+  MapSizeRatio = NULL,
   n_cells,
   plot_value = "estimate",
   n_samples = 100,
@@ -34,32 +34,32 @@ plot_maps(
 \arguments{
 \item{plot_set}{integer-vector defining plots to create
 \describe{
-  \item{plot_set=1}{Probability of encounter/non-encounter}
-  \item{plot_set=2}{Log-expected positive catch rate}
-  \item{plot_set=3}{Log-predicted density (product of encounter probability and positive catch rates)}
-  \item{plot_set=4}{Log-positive catch rates (rescaled)}
-  \item{plot_set=5}{Log-predicted density (rescaled)}
-  \item{plot_set=6}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model)}
-  \item{plot_set=7}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model)}
-  \item{plot_set=8}{Linear predictor for encounter probability}
-  \item{plot_set=9}{Linear predictor for positive catch rates}
-  \item{plot_set=10}{Coefficient of variation for predicted density (available only if \code{Data_Fn(...,Options=c('SD_site_logdensity'=1,...))}}
-  \item{plot_set=11}{Covariates that are included in the model for the 1st linear predictor}
-  \item{plot_set=12}{Covariates that are included in the model for the 2nd linear predictor}
-  \item{plot_set=13}{Total biomass across all categories (only useful in a multivariate model)}
-  \item{plot_set=14}{Covariate effects on encounter probability}
-  \item{plot_set=15}{Covariate effects on positive catch rates}
-  \item{plot_set=16}{Spatial variation for 1st linear predictor (Omega1)}
-  \item{plot_set=17}{Spatial variation for 2nd linear predictor (Omega2)}
-  \item{plot_set=18}{Spatially-varying response for density covariates in 1st linear predictor (Xi1)}
-  \item{plot_set=19}{Spatially-varying response for density covariates in 2nd linear predictor (Xi2)}
-  \item{plot_set=20}{Spatially-varying response for catchability covariates in 1st linear predictor (Phi1)}
-  \item{plot_set=21}{Spatially-varying response for catchability covariates in 2nd linear predictor (Phi2)}
+  \item{\code{plot_set=1}}{Link-transformed 1st linear predictor, \code{Report$R1_gct}}
+  \item{\code{plot_set=2}}{Link-transformed 2nd linear predictor, logged for interpretable plotting scale, \code{log(Report$R2_gct)}}
+  \item{\code{plot_set=3}}{Log-predicted density, derived from link-transform of both linear predictors, \code{log(Report$D_gct)}}
+  \item{\code{plot_set=6}}{Spatio-temporal variation in 1st linear predictor (e.g., encounter probability when using a conventional delta-model), \code{Report$Epsilon1_gct}}
+  \item{\code{plot_set=7}}{Spatio-temporal variation in 2nd linear predictor (e.g., log-positive catch rates  when using a conventional delta-model), \code{Report$Epsilon2_gct}}
+  \item{\code{plot_set=8}}{1st linear predictor, \code{Report$P1_gct}}
+  \item{\code{plot_set=9}}{2nd linear predictor, \code{Report$P2_gct}}
+  \item{\code{plot_set=11}}{Covariates that are included in the model for the 1st linear predictor, \code{Report$X1_gcp}}
+  \item{\code{plot_set=12}}{Covariates that are included in the model for the 2nd linear predictor, \code{Report$X2_gcp}}
+  \item{\code{plot_set=13}}{Total biomass across all categories (only useful in a multivariate model)}
+  \item{\code{plot_set=14}}{Covariate effects on 1st linear predictor, \code{Report$eta1_gct}}
+  \item{\code{plot_set=15}}{Covariate effects on 2nd linear predictor, \code{Report$eta2_gct}}
+  \item{\code{plot_set=16}}{Spatial variation for 1st linear predictor, \code{Report$Omega1_gc}}
+  \item{\code{plot_set=17}}{Spatial variation for 2nd linear predictor, \code{Report$Omega2_gc}}
+  \item{\code{plot_set=18}}{Spatially-varying response for density covariates in 1st linear predictor, \code{Report$Xi1_gcp}}
+  \item{\code{plot_set=19}}{Spatially-varying response for density covariates in 2nd linear predictor, \code{Report$Xi2_gcp}}
+  \item{\code{plot_set=20}}{Spatially-varying response for catchability covariates in 1st linear predictor, \code{Report$Phi1_gk}}
+  \item{\code{plot_set=21}}{Spatially-varying response for catchability covariates in 2nd linear predictor, \code{Report$Phi2_gk}}
 }}
 
-\item{projargs}{a CRS, e.g. "+proj=utm +datum=WGS84 +units=km +zone=3", which is recommended for displaying the entirety of Alaska in a single plot.See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}. I often prefer \code{projargs='+proj=natearth +lat_0=0 +units=km'} where argument \code{+lat_0} allows the user to center eastings on a specified latitude.}
+\item{projargs}{Character passed to \code{\link[sp]{CRS}} and see that documentation for description.
+See \url{https://proj.org/operations/projections/index.html} for a list of projections to pass via \code{projargs}.
+As a stable default please consider \code{projargs='+proj=natearth +lon_0=0 +units=km'}
+where argument \code{+lon_0} allows the user to center eastings on a specified longitude.}
 
-\item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year ((\code{Panel="Year"})  in each panel figure}
+\item{Panel}{Whether to plot years for a given category (\code{Panel="Category"}) or categories for a given year (\code{Panel="Year"})  in each panel figure}
 
 \item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
@@ -70,7 +70,7 @@ plot_maps(
 \item{MapSizeRatio}{Default size for each panel}
 
 \item{n_cells}{Integer used to determine the argument \code{cell.size} passed
-to \code{\link[plotKML]{vect2rast}} when converting output at extrapolation-grid cells
+to \code{\link[raster]{rasterize}} when converting output at extrapolation-grid cells
 to a raster prior to plotting mapped outputs using \code{\link{plot_variable}}.  An increased \code{n_cells} results in a decreased
 \code{cell.size} and hence higher resolution plots.  The default value for \code{n_cells}
 will often need to be modified for a given purpose.}
@@ -79,7 +79,7 @@ will often need to be modified for a given purpose.}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 
-\item{country}{optional list of countries to display, e.g. c("united states of america", "canada"). If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
+\item{country}{optional list of countries to display, e.g. \code{country = c("united states of america", "canada")}. If maps are generating visual artefacts, please try using argument \code{country} to simplify the polygons used to represent land features.}
 
 \item{sample_fixed}{whether to sample fixed and random effects, \code{sample_fixed=TRUE} as by default, or just sample random effects, \code{sample_fixed=FALSE}}
 
@@ -94,10 +94,10 @@ If \code{zlim=NULL}, then a constant scale is inferred
 from the range of the plotted variable and a color-legend is plotted in the last panel.
 If \code{zlim=NA} then a different range is used in each panel from the range of \code{Y_gt[,t]} and a color-legend is plotted in every panel.}
 
-\item{...}{arguments passed to \code{FishStatsUtils::plot_variable}}
+\item{...}{arguments passed to \code{\link{plot_variable}}}
 }
 \value{
-Mat_xt a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}
+\code{Mat_xt} a matrix (rows: modeled knots; column: modeled year) for plotted output of last element of \code{plot_set}
 }
 \description{
 \code{plot_maps} plots a standard set of diagnostic maps

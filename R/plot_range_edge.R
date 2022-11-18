@@ -74,6 +74,11 @@ function( Sdreport,
 
   ##### Local function
   D_gctr = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name=D_name, n_samples=n_samples, seed=seed )
+  if(any(D_gctr==Inf)) stop("`sample_variable` in `plot_range_edge` is producing D=Inf; please use `n_samples=0` to avoid error")
+  # If some are NA, check to see what variable is going haywire
+  if( FALSE ){
+    D_gctr = sample_variable( Sdreport=Sdreport, Obj=Obj, variable_name="L_epsilon2_cf", n_samples=n_samples, seed=seed )
+  }
 
   # Calculate quantiles from observed and sampled densities D_gcy
   E_zctm = array(NA, dim=c(length(quantiles),dim(Report[[D_name]])[2:3],ncol(TmbData$Z_gm)) )
