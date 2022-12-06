@@ -335,7 +335,7 @@ function( settings,
   # Override default bias-correction
   if( (use_new_epsilon==TRUE) & (framework=="TMBad") & ("eps_Index_ctl" %in% settings$vars_to_correct) & !is.null(parameter_estimates2$SD) ){
     message("\n### Applying faster epsilon bias-correction estimator")
-    fit = list( "parameter_estimates"=parameter_estimates2, "tmb_list"=tmb_list, "input_args"=list("model_args_input"=list("framework"=framework)) )
+    fit = list( "parameter_estimates"=parameter_estimates2, "tmb_list"=tmb_list, "input_args"=list("model_args_input"=model_args_input) )
     parameter_estimates2$SD = apply_epsilon( fit )
   }
 
