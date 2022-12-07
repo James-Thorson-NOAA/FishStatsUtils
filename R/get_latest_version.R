@@ -17,6 +17,13 @@
 #' @export
 get_latest_version <- function(version = NULL, package = "VAST", path=NULL) {
 
+  # Add file type to avoid compiled renames
+  if (!is.null(version)) {
+    version_extension = paste0( version, ".cpp" )
+  }else{
+    version_extension = NULL
+  }
+
   # Determine location of files on machine
   if(!is.null(path)){
     thedir <- path
@@ -34,8 +41,8 @@ get_latest_version <- function(version = NULL, package = "VAST", path=NULL) {
          "the version number, or try reinstalling ", package)
 
   # Determine list of available files
-  if (!is.null(version)) {
-    thefile <- dir(thedir, pattern = version, ignore.case = TRUE, full.names = FALSE)
+  if (!is.null(version_extension)) {
+    thefile <- dir(thedir, pattern = version_extension, ignore.case = TRUE, full.names = FALSE)
     if( length(thefile)==0 ){
       stop("The file ", version, " was not found in the dir, ", thedir, ".")
     }
@@ -51,6 +58,7 @@ get_latest_version <- function(version = NULL, package = "VAST", path=NULL) {
     if(i==1) semantic_version = convert_version_name(thefile[1])
     if(i>=2) semantic_version = c( semantic_version, convert_version_name(thefile[i]) )
   }
+  #semantic_version = sapply( thefile, FUN=convert_version_name )
   if( max(semantic_version) == numeric_version("0.0.0") ) stop("Problem with `get_latest_version`")
   thefile = thefile[which(semantic_version==max(semantic_version))]
 
