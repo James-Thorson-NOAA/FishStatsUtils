@@ -51,6 +51,10 @@ get_latest_version <- function(version = NULL, package = "VAST", path=NULL) {
     if( length(thefile)==0 ){
       stop("cpp files were not found in the dir, ", thedir, ".")
     }
+    # remove _TMBad and _CppAD
+    thefile = gsub( thefile, pattern="_TMBad", replacement="", ignore.case=TRUE )
+    thefile = gsub( thefile, pattern="_CppAD", replacement="", ignore.case=TRUE )
+    thefile = unique(thefile)
   }
 
   # Determine which is latest version
