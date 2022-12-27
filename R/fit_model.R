@@ -630,7 +630,7 @@ function( x,
       dharmaRes$scaledResiduals = PIT_i
     }else if( type==0 ){
       # Check for issues
-      if( !all(x$data_list$ObsModel_ez[1,] %in% c(1,2)) ){
+      if( !all(x$data_list$ObsModel_ez[,1] %in% c(1,2)) ){
         stop("oneStepAhead residuals only code for gamma and lognormal distributions")
       }
 
