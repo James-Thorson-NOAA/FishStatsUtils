@@ -527,7 +527,7 @@ function( x,
   ans = NULL
 
   # Check and implement units and labels
-  x$Report = amend_output( fit = fit,
+  x$Report = amend_output( fit = x,
                            year_labels = year_labels,
                            category_names = category_names )
 
