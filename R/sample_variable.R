@@ -14,7 +14,7 @@
 #'
 #' @param Sdreport TMB output from `\code{TMB::sdreport(Obj)}`
 #' @param Obj Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`
-#' @param variable_name name of variable available in report using \code{Obj$report()}
+#' @param variable_name name of variable available in report using \code{Obj$report()} or parameters using \code{Obj$env$parList()}
 #' @param n_samples number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.
 #' @param seed integer used to set random-number seed when sampling variables, as passed to \code{set.seed(.)}
 #' @param sample_fixed whether to sample fixed and random effects, \code{sample_fixed=TRUE} as by default, or just sample random effects, \code{sample_fixed=FALSE}
@@ -43,8 +43,17 @@ function( Sdreport,
   if( !("jointPrecision" %in% names(Sdreport)) ){
     stop("jointPrecision not present in Sdreport; please re-run with `getJointPrecision=TRUE`")
   }
-  if( !(variable_name %in% names(Obj$report())) ){
-    stop( variable_name, " not found in report(.); please choose check your requested variable name from available list: ", paste(names(Obj$report()),collapse=", ") )
+  # Combine Report and ParHat, and check for issues
+  Report = Obj$report()
+  ParHat = Obj$env$parList()
+  Intersect = intersect(names(Report), names(ParHat))
+  if( isFALSE(all.equal(Report[Intersect],ParHat[Intersect])) ){
+    stop("Duplicate entries in `Obj$report()` and `Obj$env$parList()` are not identical when calling `sample_variable`")
+  }
+  Output = c( Report, ParHat )
+  # Check that variable_name is available
+  if( !(variable_name %in% names(Output)) ){
+    stop( variable_name, " not found in `Obj$report()` or `Obj$env$parList()`; please choose check your requested variable name from available list: ", paste(names(Output),collapse=", ") )
   }
 
   #### Local function
@@ -76,7 +85,13 @@ function( Sdreport,
     if( rI%%max(1,floor(n_samples/10)) == 0 ){
       message( "  Finished sample ", rI, " of ",n_samples )
     }
-    Var = Obj$report( par=u_zr[,rI] )[[variable_name]]
+    Report = Obj$report( par=u_zr[,rI] )
+    ParHat = Obj$env$parList( x=u_zr[,rI][Obj$env$lfixed()], par=u_zr[,rI] )
+    if( isFALSE(all.equal(Report[Intersect],ParHat[Intersect])) ){
+      stop("Duplicate entries in `Obj$report()` and `Obj$env$parList()` are not identical when calling `sample_variable`")
+    }
+    Output = c( Report, ParHat )
+    Var = Output[[variable_name]]
     if(is.vector(Var)) Var = as.array(Var)
     if(rI==1) Var_zr = Var
     if(rI>=2){
