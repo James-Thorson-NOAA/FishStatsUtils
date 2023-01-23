@@ -44,7 +44,8 @@ Depends:
     R (>= 3.5.0),
     units
 Enhances:
-    tidyr
+    tidyr,
+    marginaleffects
 Suggests:
     testthat
 Remotes: 

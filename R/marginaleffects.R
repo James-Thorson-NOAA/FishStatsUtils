@@ -1,62 +1,62 @@
 #' @export
-get_coef.fit_model = function(x, covariate, ...){
+get_coef.fit_model = function(model, covariate, ...){
   if(covariate=="X1") param = "gamma1_cp"
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
-  x$ParHat[[param]]
+  model$ParHat[[param]]
 }
 
 #' @export
-get_vcov.fit_model = function(x, covariate, ...){
+get_vcov.fit_model = function(model, covariate, ...){
   if(covariate=="X1") param = "gamma1_cp"
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
-  whichrows = which( names(x$parameter_estimates$par) == param )
-  if( is.null(x$parameter_estimates$SD) ){
+  whichrows = which( names(model$parameter_estimates$par) == param )
+  if( is.null(model$parameter_estimates$SD) ){
     out = NULL
   }else{
-    out = array(x$parameter_estimates$SD$cov.fixed[whichrows,whichrows],dim=rep(length(whichrows),2))
+    out = array(model$parameter_estimates$SD$cov.fixed[whichrows,whichrows],dim=rep(length(whichrows),2))
   }
   return(out)
 }
 
 #' @export
-set_coef.fit_model = function(x, newpar, covariate, ...){
+set_coef.fit_model = function(model, newpar, covariate, ...){
   if(covariate=="X1") param = "gamma1_cp"
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
-  if( length(newpar) != length(x$ParHat[[param]]) ){
+  if( length(newpar) != length(model$ParHat[[param]]) ){
     stop("Check length of 'newpar'")
   }
-  x$ParHat[[param]][] <- newpar
-  return(x)
+  model$ParHat[[param]][] <- newpar
+  return(model)
 }
 
 #' @export
-get_predict.fit_model = function(x, newdata, covariate, center=FALSE, ...){
+get_predict.fit_model = function(model, newdata, covariate, center=FALSE, ...){
   # update formula (following logic in make_covariates)
   if(covariate=="X1"){
-    formula = update.formula(x$X1_formula, ~.+1)
+    formula = update.formula(model$X1_formula, ~.+1)
     param = "gamma1_cp"
-    data = x$effects$covariate_data_full
+    data = model$effects$covariate_data_full
   }
   if(covariate=="X2"){
-    formula = update.formula(x$X2_formula, ~.+1)
+    formula = update.formula(model$X2_formula, ~.+1)
     param = "gamma2_cp"
-    data = x$effects$covariate_data_full
+    data = model$effects$covariate_data_full
   }
   if(covariate=="Q1"){
-    formula = update.formula(x$Q1_formula, ~.+1)
+    formula = update.formula(model$Q1_formula, ~.+1)
     param = "lambda1_k"
-    data = x$effects$catchability_data_full
+    data = model$effects$catchability_data_full
   }
   if(covariate=="Q2"){
-    formula = update.formula(x$Q2_formula, ~.+1)
+    formula = update.formula(model$Q2_formula, ~.+1)
     param = "lambda2_k"
-    data = x$effects$catchability_data_full
+    data = model$effects$catchability_data_full
   }
 
   # build original model.frame
@@ -74,13 +74,13 @@ get_predict.fit_model = function(x, newdata, covariate, center=FALSE, ...){
   X_ip = X_ip[,Columns_to_keep,drop=FALSE]
 
   # Multiply and center
-  gamma_cp = get_coef(x, covariate=covariate)
+  gamma_cp = get_coef(model, covariate=covariate)
   yhat_ic = X_ip %*% t(gamma_cp)
   if(center==TRUE) yhat_ic = yhat_ic - outer(rep(1,nrow(yhat_ic)),colMeans(yhat_ic))
 
   # Return
   if( covariate %in% c("X1","X2") ){
-    out = expand.grid( rowid=seq_along(yhat_ic[,1]), category=x$category_names )
+    out = expand.grid( rowid=seq_along(yhat_ic[,1]), category=model$category_names )
     out$predicted = as.vector(yhat_ic)
   }
   if( covariate %in% c("Q1","Q2") ){
