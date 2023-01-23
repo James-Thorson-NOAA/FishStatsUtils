@@ -42,10 +42,10 @@ Imports:
     gstat
 Depends:
     R (>= 3.5.0),
-    units
-Enhances:
-    tidyr,
+    units,
     marginaleffects
+Enhances:
+    tidyr
 Suggests:
     testthat
 Remotes: 
