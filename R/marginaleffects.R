@@ -1,11 +1,14 @@
 #' @method get_coef fit_model
 #' @export
 get_coef.fit_model = function(model, covariate, ...){
+  # Select covariate
   if(covariate=="X1") param = "gamma1_cp"
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
-  model$ParHat[[param]]
+  out = model$last.par.best[grep(param,names(model$last.par.best))]
+  #out = model$ParHat[[param]]
+  return(out)
 }
 
 #' @method get_vcov fit_model
@@ -35,12 +38,16 @@ set_coef.fit_model = function(model, newpar, covariate, ...){
   #  stop("Check length of 'newpar'")
   #}
   # Make substitution
-  if( param%in%names(fit$tmb_list$Map) & any(is.na(fit$tmb_list$Map[[param]])) ){
-    newvec = newpar[fit$tmb_list$Map[[param]]]
-    model$ParHat[[param]][] <- ifelse( is.na(newvec), model$ParHat[[param]][], newvec )
-  }else{
-    model$ParHat[[param]][] <- newpar
+  #if( param%in%names(fit$tmb_list$Map) & any(is.na(fit$tmb_list$Map[[param]])) ){
+  #  newvec = newpar[fit$tmb_list$Map[[param]]]
+  #  model$ParHat[[param]][] <- ifelse( is.na(newvec), model$ParHat[[param]][], newvec )
+  #}else{
+  #  model$ParHat[[param]][] <- newpar
+  #}
+  if( length(newpar) != length(grep(param,names(model$last.par.best))) ){
+    stop("Check length of 'newpar'")
   }
+  model$last.par.best[grep(param,names(model$last.par.best))] <- newpar
   return(model)
 }
 
@@ -84,7 +91,12 @@ get_predict.fit_model = function(model, newdata, covariate, center=FALSE, ...){
   X_ip = X_ip[,Columns_to_keep,drop=FALSE]
 
   # Multiply and center
-  gamma_cp = get_coef(model, covariate=covariate)
+  #new_coef = get_coef(model, covariate=covariate)
+  # Tmp = set_coef(model, newpar=c(1,2,3), covariate="X1")$tmb_list$Obj$env$last.par.best
+  # Tmp[grep(param,names(Tmp))]
+  #model$tmb_list$Obj$env$parList( par=set_coef(model, newpar=c(1,2,3), covariate="X1")$last.par.best )
+  ParHat = model$tmb_list$Obj$env$parList( par=model$last.par.best )
+  gamma_cp = ParHat[[param]]
   yhat_ic = X_ip %*% t(gamma_cp)
   if(center==TRUE) yhat_ic = yhat_ic - outer(rep(1,nrow(yhat_ic)),colMeans(yhat_ic))
 

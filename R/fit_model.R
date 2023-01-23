@@ -412,6 +412,9 @@ function( settings,
     Return$effects = c( Return$effects, list(call_X1=call_X1, call_X2=call_X2, covariate_data_full=covariate_data_full) )
   }
 
+  # Add stuff for marginaleffects package
+  Return$last.par.best =  tmb_list$Obj$env$last.par.best
+
   # class and return
   class(Return) = "fit_model"
   return( Return )
