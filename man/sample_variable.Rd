@@ -18,7 +18,7 @@ sample_variable(
 
 \item{Obj}{Fitted TMB object from package `VAST`, i.e., output from `\code{fit_model(...)$tmb_list$Obj}`}
 
-\item{variable_name}{name of variable available in report using \code{Obj$report()}}
+\item{variable_name}{name of variable available in report using \code{Obj$report()} or parameters using \code{Obj$env$parList()}}
 
 \item{n_samples}{number of samples from the joint predictive distribution for fixed and random effects.  Default is 100, which is slow.}
 
