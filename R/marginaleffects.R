@@ -6,8 +6,8 @@ get_coef.fit_model = function(model, covariate, ...){
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
+  # extract params
   out = model$last.par.best[grep(param,names(model$last.par.best))]
-  #out = model$ParHat[[param]]
   return(out)
 }
 
@@ -18,6 +18,7 @@ get_vcov.fit_model = function(model, covariate, ...){
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
+  # Extract covariance
   whichrows = which( names(model$parameter_estimates$par) == param )
   if( is.null(model$parameter_estimates$SD) ){
     out = NULL
@@ -34,16 +35,7 @@ set_coef.fit_model = function(model, newpar, covariate, ...){
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
-  #if( length(newpar) != length(model$ParHat[[param]]) ){
-  #  stop("Check length of 'newpar'")
-  #}
-  # Make substitution
-  #if( param%in%names(fit$tmb_list$Map) & any(is.na(fit$tmb_list$Map[[param]])) ){
-  #  newvec = newpar[fit$tmb_list$Map[[param]]]
-  #  model$ParHat[[param]][] <- ifelse( is.na(newvec), model$ParHat[[param]][], newvec )
-  #}else{
-  #  model$ParHat[[param]][] <- newpar
-  #}
+  # modify and return params
   if( length(newpar) != length(grep(param,names(model$last.par.best))) ){
     stop("Check length of 'newpar'")
   }
@@ -58,22 +50,22 @@ get_predict.fit_model = function(model, newdata, covariate, center=FALSE, ...){
   if(covariate=="X1"){
     formula = update.formula(model$X1_formula, ~.+1)
     param = "gamma1_cp"
-    data = model$effects$covariate_data_full
+    data = model$covariate_data
   }
   if(covariate=="X2"){
     formula = update.formula(model$X2_formula, ~.+1)
     param = "gamma2_cp"
-    data = model$effects$covariate_data_full
+    data = model$covariate_data
   }
   if(covariate=="Q1"){
     formula = update.formula(model$Q1_formula, ~.+1)
     param = "lambda1_k"
-    data = model$effects$catchability_data_full
+    data = model$catchability_data
   }
   if(covariate=="Q2"){
     formula = update.formula(model$Q2_formula, ~.+1)
     param = "lambda2_k"
-    data = model$effects$catchability_data_full
+    data = model$catchability_data
   }
 
   # build original model.frame
@@ -91,10 +83,6 @@ get_predict.fit_model = function(model, newdata, covariate, center=FALSE, ...){
   X_ip = X_ip[,Columns_to_keep,drop=FALSE]
 
   # Multiply and center
-  #new_coef = get_coef(model, covariate=covariate)
-  # Tmp = set_coef(model, newpar=c(1,2,3), covariate="X1")$tmb_list$Obj$env$last.par.best
-  # Tmp[grep(param,names(Tmp))]
-  #model$tmb_list$Obj$env$parList( par=set_coef(model, newpar=c(1,2,3), covariate="X1")$last.par.best )
   ParHat = model$tmb_list$Obj$env$parList( par=model$last.par.best )
   gamma_cp = ParHat[[param]]
   yhat_ic = X_ip %*% t(gamma_cp)
