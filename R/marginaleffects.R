@@ -1,3 +1,4 @@
+#' @method get_coef fit_model
 #' @export
 get_coef.fit_model = function(model, covariate, ...){
   if(covariate=="X1") param = "gamma1_cp"
@@ -7,6 +8,7 @@ get_coef.fit_model = function(model, covariate, ...){
   model$ParHat[[param]]
 }
 
+#' @method get_vcov fit_model
 #' @export
 get_vcov.fit_model = function(model, covariate, ...){
   if(covariate=="X1") param = "gamma1_cp"
@@ -22,6 +24,7 @@ get_vcov.fit_model = function(model, covariate, ...){
   return(out)
 }
 
+#' @method set_coef fit_model
 #' @export
 set_coef.fit_model = function(model, newpar, covariate, ...){
   if(covariate=="X1") param = "gamma1_cp"
@@ -35,6 +38,7 @@ set_coef.fit_model = function(model, newpar, covariate, ...){
   return(model)
 }
 
+#' @method get_predict fit_model
 #' @export
 get_predict.fit_model = function(model, newdata, covariate, center=FALSE, ...){
   # update formula (following logic in make_covariates)
