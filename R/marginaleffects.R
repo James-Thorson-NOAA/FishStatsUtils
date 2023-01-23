@@ -31,10 +31,16 @@ set_coef.fit_model = function(model, newpar, covariate, ...){
   if(covariate=="X2") param = "gamma2_cp"
   if(covariate=="Q1") param = "lambda1_k"
   if(covariate=="Q2") param = "lambda2_k"
-  if( length(newpar) != length(model$ParHat[[param]]) ){
-    stop("Check length of 'newpar'")
+  #if( length(newpar) != length(model$ParHat[[param]]) ){
+  #  stop("Check length of 'newpar'")
+  #}
+  # Make substitution
+  if( param%in%names(fit$tmb_list$Map) & any(is.na(fit$tmb_list$Map[[param]])) ){
+    newvec = newpar[fit$tmb_list$Map[[param]]]
+    model$ParHat[[param]][] <- ifelse( is.na(newvec), model$ParHat[[param]][], newvec )
+  }else{
+    model$ParHat[[param]][] <- newpar
   }
-  model$ParHat[[param]][] <- newpar
   return(model)
 }
 
