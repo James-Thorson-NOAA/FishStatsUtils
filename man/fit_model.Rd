@@ -233,13 +233,13 @@ plot_results( settings=settings, fit=fit )
 \seealso{
 \code{\link[VAST]{VAST}} for general documentation, \code{\link[FishStatsUtils]{make_settings}} for generic settings, \code{\link[FishStatsUtils]{fit_model}} for model fitting, and \code{\link[FishStatsUtils]{plot_results}} for generic plots
 
-\code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities and an explanation of DHARMa Probability-Integral-Transform residuals
-
-\code{\link{predict.fit_model}} for methods to predict at new locations using existing or updated covariate values
-
 VAST wiki \url{https://github.com/James-Thorson-NOAA/VAST/wiki} for examples documenting many different use-cases and features.
 
 GitHub mainpage \url{https://github.com/James-Thorson-NOAA/VAST#description} for a list of user resources and publications documenting features
+
+\code{\link{summary.fit_model}} for methods to summarize output, including obtain a dataframe of estimated densities and an explanation of DHARMa Probability-Integral-Transform residuals
+
+\code{\link{predict.fit_model}} for methods to predict at new locations using existing or updated covariate values
 
 Other wrapper functions: 
 \code{\link{make_settings}()},

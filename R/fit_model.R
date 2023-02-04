@@ -335,7 +335,7 @@ function( settings,
   # Override default bias-correction
   if( (use_new_epsilon==TRUE) & (framework=="TMBad") & ("eps_Index_ctl" %in% settings$vars_to_correct) & !is.null(parameter_estimates2$SD) ){
     message("\n### Applying faster epsilon bias-correction estimator")
-    fit = list( "parameter_estimates"=parameter_estimates2, "tmb_list"=tmb_list, "input_args"=list("model_args_input"=list("framework"=framework)) )
+    fit = list( "parameter_estimates"=parameter_estimates2, "tmb_list"=tmb_list, "input_args"=list("model_args_input"=model_args_input) )
     parameter_estimates2$SD = apply_epsilon( fit )
   }
 
@@ -411,6 +411,9 @@ function( settings,
     call_X2 = lm( X2_formula_full, data=covariate_data_full)$call
     Return$effects = c( Return$effects, list(call_X1=call_X1, call_X2=call_X2, covariate_data_full=covariate_data_full) )
   }
+
+  # Add stuff for marginaleffects package
+  Return$last.par.best =  tmb_list$Obj$env$last.par.best
 
   # class and return
   class(Return) = "fit_model"
@@ -527,7 +530,7 @@ function( x,
   ans = NULL
 
   # Check and implement units and labels
-  x$Report = amend_output( fit = fit,
+  x$Report = amend_output( fit = x,
                            year_labels = year_labels,
                            category_names = category_names )
 
@@ -630,7 +633,7 @@ function( x,
       dharmaRes$scaledResiduals = PIT_i
     }else if( type==0 ){
       # Check for issues
-      if( !all(x$data_list$ObsModel_ez[1,] %in% c(1,2)) ){
+      if( !all(x$data_list$ObsModel_ez[,1] %in% c(1,2)) ){
         stop("oneStepAhead residuals only code for gamma and lognormal distributions")
       }
 

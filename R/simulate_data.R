@@ -58,7 +58,7 @@ function( fit,
   TMBdll <- sapply(dlls, isTMBdll)
   if( sum(TMBdll)==0 ){
     stop("VAST is not linked as a DLL, so `simulate_data` will not work.
-    Please re-run model (potentially from informative starting values to save time) to use `simulate_data`")
+    Please re-load model using `reload_model` to use `simulate_data`")
   }else if(sum(TMBdll)>=2){
     warning("VAST is linked to multiple DLLs. Please consider using dyn.unload() to unload
     earlier VAST runs to avoid potentially ambiguous behavior when running `simulate_data`")

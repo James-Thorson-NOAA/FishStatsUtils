@@ -162,10 +162,23 @@ function( fit = NULL,
   }
 
   # Add units
-  if("Index_ctl" %in% names(Report)) units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
+  if("Index_ctl" %in% names(Report)){
+    # Convert and simplify units ... rescales Report so might be confusing
+      #converted_units = as_units(1,units(TmbData$b_i)) / as_units(1,units(TmbData$a_i)) * as_units(1,units(extrapolation_list$Area_km2[1]))
+      #Report$Index_ctl = Report$Index_ctl * converted_units
+    # Label units without simplifying them ... clunky plots
+    units(Report$Index_ctl) = paste0( deparse_unit(TmbData$b_i), " / ", deparse_unit(TmbData$a_i), " * ", deparse_unit(extrapolation_list$Area_km2[1]) )
+  }
+  #if("Index_ctl" %in% names(Report)) units(Report$Index_ctl) = units(TmbData$b_i / TmbData$a_i * extrapolation_list$Area_km2[1])
   if("Fratio_ct" %in% names(Report)) units(Report$Fratio_ct) = units(unitless)
   if("Bratio_ctl" %in% names(Report)) units(Report$Bratio_ctl) = units(unitless)
-  if("D_gct" %in% names(Report)) units(Report$D_gct) = units(TmbData$b_i / TmbData$a_i)
+  if("D_gct" %in% names(Report)){
+    # Convert and simplify units ... rescales Report so might be confusing
+      #converted_units = as_units(1,units(TmbData$b_i)) / as_units(1,units(TmbData$a_i))
+      #Report$D_gct = Report$D_gct * converted_units
+    # Label units without simplifying them ... clunky plots
+    units(Report$D_gct) = paste0( deparse_unit(TmbData$b_i), " / ", deparse_unit(TmbData$a_i) )
+  }
 
   # Add units for COG, see: https://github.com/r-quantities/units/issues/291
   # In case of re-running amend_output on objects with existing units
