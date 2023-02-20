@@ -45,7 +45,7 @@ plot_results <-
 function( fit,
           settings = fit$settings,
           plot_set = 3,
-          working_dir = paste0(getwd(),"/"),
+          working_dir = getwd(),
           year_labels = fit$year_labels,
           years_to_plot = fit$years_to_plot,
           category_names = fit$category_names,
@@ -99,8 +99,8 @@ function( fit,
 
   # Plot anisotropy
   message("\n### Making plot of anisotropy")
-  plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"),
-                   Obj=fit$tmb_list$Obj )
+  plot_anisotropy( FileName = file.path(working_dir,"Aniso.png"),
+                   Obj = fit$tmb_list$Obj )
 
   # Plot index
   plot_biomass_index_args = list(...)
@@ -259,7 +259,11 @@ function( fit,
 
     # Plotting quantile residuals
     message("\n### Making quantile residuals using conditional simulation and package DHARMa")
-    dharmaRes = summary( fit, what="residuals", working_dir=working_dir, type=type, ... )
+    dharmaRes = summary( fit,
+                         what = "residuals",
+                         working_dir = working_dir,
+                         type = type,
+                         ... )
 
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")

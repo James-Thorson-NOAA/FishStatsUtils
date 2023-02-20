@@ -23,7 +23,7 @@ function( Extrapolation_List,
           Lat_i = Data_Geostat[,'Lat'],
           Lon_i = Data_Geostat[,'Lon'],
           Year_i = Data_Geostat[,'Year'],
-          PlotDir = paste0(getwd(),"/"),
+          PlotDir = getwd(),
           Plot1_name = "Data_and_knots.png",
           Plot2_name = "Data_by_year.png",
           col = "red",
@@ -83,7 +83,7 @@ function( Extrapolation_List,
     grid_data = sp::SpatialPoints( coords=Extrapolation_List$Data_Extrap[which_rows,c('Lon','Lat')], proj4string=CRS_orig )
     grid_proj = sp::spTransform( grid_data, CRSobj=CRS_proj)
 
-    png( file=paste0(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
+    png( file=file.path(PlotDir,Plot1_name), width=6, height=6, res=200, units="in")
       par( mfrow=c(2,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
       plot( grid_data@coords, cex=0.01, main="Extrapolation (Lat-Lon)" )
       sp::plot( map_data, col=land_color, add=TRUE )
@@ -100,7 +100,7 @@ function( Extrapolation_List,
   if( !any(unique(Year_i) %in% year_labels) ) year_labels = sort(unique(Year_i))
     Nrow = ceiling( sqrt(length(year_labels)) )
     Ncol = ceiling( length(year_labels)/Nrow )
-  if(!is.null(Plot2_name)) png( file=paste0(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
+  if(!is.null(Plot2_name)) png( file=file.path(PlotDir,Plot2_name), width=Ncol*2, height=Nrow*2, res=200, units="in")
     par( mfrow=c(Nrow,Ncol), mar=c(0,0,2,0), mgp=c(1.75,0.25,0), oma=c(4,4,0,0) )
     for( t in 1:length(year_labels) ){
       plot( 1, type="n", xlim=range(sample_proj@coords[,1]), ylim=range(sample_proj@coords[,2]), main=year_labels[t], xaxt="n", yaxt="n" )

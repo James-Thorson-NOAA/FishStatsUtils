@@ -13,7 +13,7 @@ function( fit,
           dharma_raster,
           dharmaRes,
           file_name = "quantile_residuals_semivariance",
-          working_dir = paste0(getwd(),"/") ){
+          working_dir = getwd() ){
 
   # Transform
   tmp = dharma_raster$Raster_proj
@@ -33,7 +33,7 @@ function( fit,
   residual_semivariance = gstat::variogram(values~1, stfdf, width=20, cutoff = 500, tlags=0:min(7,length(time)-1) )
 
   # Plot
-  ThorsonUtilities::save_fig( file=paste0(working_dir,file_name), width=6, height=5 )
+  ThorsonUtilities::save_fig( file=file.path(working_dir,file_name), width=6, height=5 )
     # gstat:::plot.gstatVariogram
     # gstat:::plot.StVariogram
     semivariance_plot = plot( residual_semivariance,

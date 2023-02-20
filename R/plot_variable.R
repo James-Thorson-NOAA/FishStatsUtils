@@ -52,7 +52,7 @@ function( Y_gt,
           projargs = '+proj=longlat',
           map_resolution = "medium",
           file_name = "density",
-          working_dir = paste0(getwd(),"/"),
+          working_dir = getwd(),
           Format = "png",
           Res = 200,
           add = FALSE,
@@ -146,19 +146,19 @@ function( Y_gt,
   # Define device
   Par = list( mfrow=mfrow, mar=mar, oma=oma, ...)
   if(Format=="png"){
-    png(file=paste0(working_dir,file_name,".png"),
+    png(file=file.path(working_dir,paste0(file_name,".png")),
         width=Par$mfrow[2]*MapSizeRatio[2],
         height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )
   }
   if(Format=="jpg"){
-    jpeg(file=paste0(working_dir,file_name,".jpg"),
+    jpeg(file=file.path(working_dir,paste0(file_name,".jpg")),
          width=Par$mfrow[2]*MapSizeRatio[2],
          height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )
   }
   if(Format%in%c("tif","tiff")){
-    tiff(file=paste0(working_dir,file_name,".tif"),
+    tiff(file=file.path(working_dir,paste0(file_name,".tif")),
          width=Par$mfrow[2]*MapSizeRatio[2],
          height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )

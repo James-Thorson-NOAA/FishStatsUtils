@@ -14,7 +14,7 @@ function( fit,
           year_labels = fit$year_labels,
           category_names = fit$category_names,
           similarity_metric = c("hclust", "Correlation", "Dissimilarity", "Covariance")[1],
-          working_dir = paste0(getwd(),"/"),
+          working_dir = getwd(),
           file_name = similarity_metric,
           panel_size = 3,
           Res = 200,
@@ -30,19 +30,19 @@ function( fit,
   if( fit$data_list$n_c >= 2 ){
     #
     if(Format=="png"){
-      png(file=paste0(working_dir,file_name,".png"),
+      png(file=file.path(working_dir,paste0(file_name,".png")),
            width=2 * panel_size,
            height=4 * panel_size, res=Res, units='in')
       on.exit( dev.off() )
     }
     if(Format=="jpg"){
-      jpeg(file=paste0(working_dir,file_name,".jpg"),
+      jpeg(file=file.path(working_dir,paste0(file_name,".jpg")),
            width=2 * panel_size,
            height=4 * panel_size, res=Res, units='in')
       on.exit( dev.off() )
     }
     if(Format%in%c("tif","tiff")){
-      tiff(file=paste0(working_dir,file_name,".tif"),
+      tiff(file=file.path(working_dir,paste0(file_name,".tif")),
            width = 2 * panel_size,
            height = 4 * panel_size, res=Res, units='in')
       on.exit( dev.off() )

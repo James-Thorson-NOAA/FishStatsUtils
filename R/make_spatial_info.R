@@ -107,8 +107,14 @@ make_spatial_info = function( n_x,
     Grid_bounds = (grid_size_km/110) * apply(loc_e/(grid_size_km/110), MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
-    if(is.null(Kmeans)) Kmeans = make_kmeans(n_x=n_x,
-    loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, kmeans_purpose='spatial', backwards_compatible_kmeans=backwards_compatible_kmeans, ... )
+    if(is.null(Kmeans)){
+      Kmeans = make_kmeans( n_x = n_x,
+                            loc_orig = loc_i[,c("Lon", "Lat")],
+                            randomseed = randomseed,
+                            kmeans_purpose = 'spatial',
+                            backwards_compatible_kmeans = backwards_compatible_kmeans,
+                            ... )
+    }
 
     # Calculate grid for 2D AR1 process
     loc_grid = expand.grid( 'Lon'=seq(Grid_bounds[1,1],Grid_bounds[2,1],by=grid_size_LL), 'Lat'=seq(Grid_bounds[1,2],Grid_bounds[2,2],by=grid_size_LL) )
@@ -146,6 +152,9 @@ make_spatial_info = function( n_x,
   }
   if( Method == "Stream_network" ){
     knot_i = Extrapolation_List$Data_Extrap[,"child_i"]
+    if( length(knot_i) != nrow(loc_i) ){
+      stop("Check `input_grid` input")
+    }
     loc_x = project_coordinates( X=Network_sz_LL[,"Lon"], Y=Network_sz_LL[,"Lat"], projargs=Extrapolation_List$projargs )
     colnames(loc_x) = c('E_km', 'N_km')
   }
