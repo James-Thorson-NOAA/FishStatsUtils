@@ -31,7 +31,7 @@ function( fit,
           Dim_year = NULL,
           Dim_species = NULL,
           projargs = '+proj=longlat',
-          plotdir = paste0(getwd(),"/"),
+          plotdir = getwd(),
           land_color = "grey",
           zlim = NA,
           testcutoff = 1e-4,
@@ -170,7 +170,7 @@ function( fit,
 
       # Extract SEs if available
       # Could also edit to extract L_SE_list and Psi2_SE_list
-      if( !missing(Obj) && class(SD)=="sdreport" ){
+      if( !is.null(Obj) && class(SD)=="sdreport" ){
         L_cfr = sample_variable( Sdreport=SD, Obj=Obj, variable_name=L_name, n_samples=100, sample_fixed=TRUE, seed=123456 )
         Psi_gjtr = sample_variable( Sdreport=SD, Obj=Obj, variable_name=Var2_name, n_samples=100, sample_fixed=TRUE, seed=123456 )
         if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
@@ -215,7 +215,7 @@ function( fit,
 
       # Plot loadings
       Dim_factor = Dim( as.vector(Data[["FieldConfig"]])[i] )
-      png( file=paste0(plotdir,"Factor_loadings--",Par_name,".png"), width=Dim_factor[2]*4, height=Dim_factor[1]*4, units="in", res=200 )
+      png( file=file.path(plotdir,paste0("Factor_loadings--",Par_name,".png")), width=Dim_factor[2]*4, height=Dim_factor[1]*4, units="in", res=200 )
         par( mfrow=Dim_factor, mar=c(2,2,1,0), oma=c(0,0,0,0), mgp=c(2,0.5,0), tck=-0.02 )
         for( cI in 1:as.vector(Data[["FieldConfig"]])[i] ){
           if( Par_name %in% c("EpsilonTime1","EpsilonTime2") ){
@@ -229,7 +229,7 @@ function( fit,
 
       # Plot Beta
       if( Par_name %in% c("Beta1","Beta2") ){
-        png(file=paste0(plotdir,"factor_values--",Par_name,".png"),
+        png(file=file.path(plotdir,paste0("factor_values--",Par_name,".png")),
             width=4, height=4, res=200, units='in')
         matplot( x = as.numeric(year_labels),
                  y = array(Psiprime_list[[i]][,,1],dim=dim(Psiprime_list[[i]])[1:2]),
@@ -256,31 +256,31 @@ function( fit,
           }
           plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
                      fit = fit,
-                     Report=Report2_tmp,
-                     PlotDF=mapdetails_list[["PlotDF"]],
-                     MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-                     working_dir=plotdir,
-                     year_labels=year_labels,
-                     category_names=factor_names,
-                     legend_x=mapdetails_list[["Legend"]]$x/100,
-                     legend_y=mapdetails_list[["Legend"]]$y/100,
-                     zlim=zlim,
-                     land_color=land_color,
-                     projargs=projargs,
+                     Report = Report2_tmp,
+                     PlotDF = mapdetails_list[["PlotDF"]],
+                     MapSizeRatio = mapdetails_list[["MapSizeRatio"]],
+                     working_dir = plotdir,
+                     year_labels = year_labels,
+                     category_names = factor_names,
+                     legend_x = mapdetails_list[["Legend"]]$x/100,
+                     legend_y = mapdetails_list[["Legend"]]$y/100,
+                     zlim = zlim,
+                     land_color = land_color,
+                     projargs = projargs,
                      plot_value = "estimate",
-                     ...)
+                     ... )
         }  #
 
         # Plot Omega
         # Use plot_variable to plot all factors on single figure
         if( Par_name %in% c("Omega1", "Omega2")){
-          plot_variable( Y_gt=array(Report2_tmp$D_gct[,,1],dim=dim(Report2_tmp$D_gct)[1:2]),
-                         map_list=mapdetails_list,
-                         working_dir=plotdir,
-                         panel_labels=paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
-                         file_name=paste0("Factor_maps--",Par_name),
-                         land_color=land_color,
-                         projargs=projargs,
+          plot_variable( Y_gt = array(Report2_tmp$D_gct[,,1],dim = dim(Report2_tmp$D_gct)[1:2]),
+                         map_list = mapdetails_list,
+                         working_dir = plotdir,
+                         panel_labels = paste0("Factor_",1:dim(Var_rot$Psi_rot)[2]),
+                         file_name = paste0("Factor_maps--",Par_name),
+                         land_color = land_color,
+                         projargs = projargs,
                          ... )
         }
 
@@ -295,17 +295,17 @@ function( fit,
           }
           plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
                      fit = fit,
-                     Report=Report2_tmp,
-                     PlotDF=mapdetails_list[["PlotDF"]],
-                     MapSizeRatio=mapdetails_list[["MapSizeRatio"]],
-                     working_dir=plotdir,
-                     category_names=factor_names,
-                     Panel="Year",
-                     legend_x=mapdetails_list[["Legend"]]$x/100,
-                     legend_y=mapdetails_list[["Legend"]]$y/100,
-                     zlim=zlim,
-                     land_color=land_color,
-                     projargs=projargs,
+                     Report = Report2_tmp,
+                     PlotDF = mapdetails_list[["PlotDF"]],
+                     MapSizeRatio = mapdetails_list[["MapSizeRatio"]],
+                     working_dir = plotdir,
+                     category_names = factor_names,
+                     Panel = "Year",
+                     legend_x = mapdetails_list[["Legend"]]$x/100,
+                     legend_y = mapdetails_list[["Legend"]]$y/100,
+                     zlim = zlim,
+                     land_color = land_color,
+                     projargs = projargs,
                      plot_value = "estimate",
                      ...)
         }  #
