@@ -318,7 +318,7 @@ function( fit,
   # Return stuff invisibly
   names(Hinv_list) = names(Psi2prime_list) = names(Psiprime_list) = names(Lprime_SE_list) = names(Lprime_list) = names(L_list) = c("Omega1", "Epsilon1", "Beta1", "EpsilonTime1", "Omega2", "Epsilon2", "Beta2", "EpsilonTime2")
   Return = list("Loadings"=L_list, "Rotated_loadings"=Lprime_list, "Rotated_factors"=Psiprime_list, "Rotated_projected_factors"=Psi2prime_list, "Rotation_matrices"=Hinv_list)
-  if( !missing(Obj) && class(SD)=="sdreport" ){
+  if( !is.null(Obj) && class(SD)=="sdreport" ){
     Return[["Rotated_loadings_SE"]] = Lprime_SE_list
     Return[["Rotated_projected_factors_SE"]] = Psi2prime_SE_list
   }
