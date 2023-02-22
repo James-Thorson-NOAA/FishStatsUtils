@@ -601,10 +601,10 @@ function( x,
 
       # Run DHARMa
       # Adding jitters because DHARMa version 0.3.2.0 sometimes still throws an error method="traditional" and integer=FALSE without jitters
-      dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz) + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
-        observedResponse=strip_units(x$data_list$b_i) + 1e-10*rnorm(length(x$data_list$b_i)),
-        fittedPredictedResponse=strip_units(x$Report$D_i),
-        integer=FALSE)
+      dharmaRes = DHARMa::createDHARMa( simulatedResponse = strip_units(b_iz) + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
+                                        observedResponse = strip_units(x$data_list$b_i) + 1e-10*rnorm(length(x$data_list$b_i)),
+                                        fittedPredictedResponse = strip_units(x$Report$D_i),
+                                        integer = FALSE)
       #dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz),
       #  observedResponse=strip_units(x$data_list$b_i),
       #  fittedPredictedResponse=strip_units(x$Report$D_i),
@@ -660,7 +660,7 @@ function( x,
     if( is.null(working_dir) ){
       plot_dharma(dharmaRes, ...)
     }else if(!is.na(working_dir) ){
-      png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
+      png(file=file.path(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
         plot_dharma(dharmaRes, form=form, ...)
       dev.off()
     }
