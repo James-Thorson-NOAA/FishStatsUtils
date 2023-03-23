@@ -11,7 +11,7 @@ plot_range_edge(
   years_to_plot = NULL,
   strata_names = NULL,
   category_names = NULL,
-  working_dir = paste0(getwd(), "/"),
+  working_dir = getwd(),
   quantiles = c(0.05, 0.95),
   n_samples = 100,
   interval_width = 1,

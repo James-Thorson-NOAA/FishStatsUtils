@@ -11,7 +11,7 @@ plot_variable(
   projargs = "+proj=longlat",
   map_resolution = "medium",
   file_name = "density",
-  working_dir = paste0(getwd(), "/"),
+  working_dir = getwd(),
   Format = "png",
   Res = 200,
   add = FALSE,

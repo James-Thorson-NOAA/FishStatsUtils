@@ -5,6 +5,7 @@
 \title{Calculate the compositional-expansion}
 \usage{
 calculate_proportion(
+  fit,
   TmbData,
   Index,
   Expansion_cz = NULL,
@@ -12,8 +13,9 @@ calculate_proportion(
   years_to_plot = NULL,
   strata_names = NULL,
   category_names = NULL,
+  sample_size_method = c("Taylor_series", "sample_based"),
   plot_legend = ifelse(TmbData$n_l > 1, TRUE, FALSE),
-  DirName = paste0(getwd(), "/"),
+  DirName = getwd(),
   PlotName = "Proportion.png",
   PlotName2 = "Average.png",
   interval_width = 1,
@@ -21,6 +23,7 @@ calculate_proportion(
   height = 6,
   xlab = "Category",
   ylab = "Proportion",
+  n_samples = 250,
   ...
 )
 }
@@ -47,6 +50,12 @@ where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
 \item{strata_names}{names for spatial strata}
 
 \item{category_names}{names for categories (if using package \code{`VAST`})}
+
+\item{sample_size_method}{Method used to calculate the variance in proportions, which is then converted to an approximately equivalent multinomial sample size that can be used as input-sample-size in a subsequent stock assessment model.  Options are:
+\describe{
+  \item{\code{sample_size_method="Taylor_series"}}{a Taylor-series approximation to the ratio of X/(X+Y) where X is the category-specific index and Y is the index for for all other categories}
+  \item{\code{sample_size_method="sample_based"}}{Taking samples from the joint precision of fixed and random effects, calculating proportions for each sample, and then computing the variance across those samples}
+}}
 
 \item{plot_legend}{Add legend for labelling colors}
 

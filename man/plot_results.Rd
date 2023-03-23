@@ -8,7 +8,7 @@ plot_results(
   fit,
   settings = fit$settings,
   plot_set = 3,
-  working_dir = paste0(getwd(), "/"),
+  working_dir = getwd(),
   year_labels = fit$year_labels,
   years_to_plot = fit$years_to_plot,
   category_names = fit$category_names,

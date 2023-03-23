@@ -13,7 +13,7 @@ plot_clusters(
   year_labels = fit$year_labels,
   category_names = fit$category_names,
   map_list = NULL,
-  working_dir = paste0(getwd(), "/"),
+  working_dir = getwd(),
   file_name = paste0("Class-", var_name),
   file_name2 = paste0("Class-", var_name, "-averages"),
   replace_Inf_with_NA = TRUE,

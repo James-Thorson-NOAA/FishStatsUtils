@@ -14,7 +14,7 @@ plot_maps(
   years_to_plot = NULL,
   category_names = NULL,
   quiet = FALSE,
-  working_dir = paste0(getwd(), "/"),
+  working_dir = getwd(),
   MapSizeRatio = NULL,
   n_cells,
   plot_value = "estimate",
