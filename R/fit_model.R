@@ -105,7 +105,7 @@ function( settings,
           a_i,
           c_iz = rep(0,length(b_i)),
           v_i = rep(0,length(b_i)),
-          working_dir = paste0(getwd(),"/"),
+          working_dir = tempdir(),
           X1config_cp = NULL,
           X2config_cp = NULL,
           covariate_data,
@@ -750,7 +750,7 @@ predict.fit_model <- function(x,
                   new_covariate_data = NULL,
                   new_catchability_data = NULL,
                   do_checks = TRUE,
-                  working_dir = paste0(getwd(),"/") )
+                  working_dir = getwd() )
 {
   message("`predict.fit_model(.)` is in beta-testing, and please explore results carefully prior to using")
 
