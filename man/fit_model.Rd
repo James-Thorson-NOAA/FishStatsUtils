@@ -13,7 +13,7 @@ fit_model(
   a_i,
   c_iz = rep(0, length(b_i)),
   v_i = rep(0, length(b_i)),
-  working_dir = paste0(getwd(), "/"),
+  working_dir = tempdir(),
   X1config_cp = NULL,
   X2config_cp = NULL,
   covariate_data,

@@ -16,7 +16,7 @@
   new_covariate_data = NULL,
   new_catchability_data = NULL,
   do_checks = TRUE,
-  working_dir = paste0(getwd(), "/")
+  working_dir = getwd()
 )
 }
 \arguments{

@@ -229,18 +229,19 @@ function( Y_gt,
 
     # Include legend
     if( !any(is.na(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
-      xl = (1-legend_x[1])*par('usr')[1] + (legend_x[1])*par('usr')[2]
-      xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
-      yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]
-      yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
-      if( diff(legend_y) > diff(legend_x) ){
-        align = c("lt","rb")[2]
-        gradient = c("x","y")[2]
-      }else{
-        align = c("lt","rb")[1]
-        gradient = c("x","y")[1]
-      }
-      plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),legend_digits), rect.col=col(1000), cex=cex.legend, align=align, gradient=gradient)
+      plot_legend( Zlim, legend_x=legend_x, legend_y=legend_y, cex.legend=cex.legend,col=col, legend_digits=legend_digits )
+      #xl = (1-legend_x[1])*par('usr')[1] + (legend_x[1])*par('usr')[2]
+      #xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
+      #yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]
+      #yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
+      #if( diff(legend_y) > diff(legend_x) ){
+      #  align = c("lt","rb")[2]
+      #  gradient = c("x","y")[2]
+      #}else{
+      #  align = c("lt","rb")[1]
+      #  gradient = c("x","y")[1]
+      #}
+      #plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),legend_digits), rect.col=col(1000), cex=cex.legend, align=align, gradient=gradient)
     }
   }
 

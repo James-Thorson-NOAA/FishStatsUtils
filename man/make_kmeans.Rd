@@ -10,7 +10,7 @@ make_kmeans(
   nstart = 100,
   randomseed = 1,
   iter.max = 1000,
-  DirPath = paste0(getwd(), "/"),
+  DirPath = getwd(),
   Save_Results = TRUE,
   kmeans_purpose = "spatial",
   backwards_compatible_kmeans = FALSE
