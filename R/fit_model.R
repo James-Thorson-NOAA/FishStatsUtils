@@ -507,7 +507,7 @@ plot.fit_model <- function(x, what="results", ...)
 #' @inheritParams DHARMa::plotResiduals
 #'
 #' @param x Output from \code{\link{fit_model}}
-#' @param what String indicating what to summarize; options are `density` or `residuals`
+#' @param what String indicating what to summarize; options are `density`, `index` or `residuals`
 #' @param n_samples Number of samples used when \code{what="residuals"}
 #' @param ... additional arguments passed to \code{\link[DHARMa]{plotResiduals}} when \code{what="residuals"}
 #'

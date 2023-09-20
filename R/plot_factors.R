@@ -293,6 +293,7 @@ function( fit,
           }else{
             factor_names = paste0("Factor_",1:dim(Var_rot$Psi_rot)[2])
           }
+          tmp_names = paste0("Factor_",1:dim(Var_rot$Psi_rot)[3])
           plot_maps( plot_set=c(6,6,NA,6,7,7,NA,7)[i],
                      fit = fit,
                      Report = Report2_tmp,
@@ -300,6 +301,7 @@ function( fit,
                      MapSizeRatio = mapdetails_list[["MapSizeRatio"]],
                      working_dir = plotdir,
                      category_names = factor_names,
+                     #year_labels = tmp_names,
                      Panel = "Year",
                      legend_x = mapdetails_list[["Legend"]]$x/100,
                      legend_y = mapdetails_list[["Legend"]]$y/100,
