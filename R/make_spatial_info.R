@@ -73,6 +73,7 @@ make_spatial_info = function( n_x,
     LON_intensity,
     LAT_intensity,
     backwards_compatible_kmeans = FALSE,
+    mesh_package = "INLA",
     ... ){
 
   # Deprecated options
@@ -184,10 +185,10 @@ make_spatial_info = function( n_x,
   # Diagnose issues:  assign("Kmeans", Kmeans, envir = .GlobalEnv)
   if(Method != "Stream_network"){
     MeshList = make_mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
-      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
+      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, mesh_package=mesh_package, ... )
   }else{
     MeshList = make_mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
-      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
+      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, mesh_package=mesh_package, ... )
   }
 
   # Deal with loc_s and latlon_s
@@ -235,9 +236,11 @@ make_spatial_info = function( n_x,
     A_gs = as( diag(n_x), "dgTMatrix" )
   }
   if( fine_scale==TRUE ){
-    A_is = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_i) )
+    #A_is = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_i) )
+    A_is = fm_evaluator( MeshList$anisotropic_mesh, loc=as.matrix(loc_i) )$proj$A
     if( class(A_is)=="dgCMatrix" ) A_is = as( A_is, "dgTMatrix" )
-    A_gs = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_g) )
+    #A_gs = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_g) )
+    A_gs = fm_evaluator( MeshList$anisotropic_mesh, loc=as.matrix(loc_g) )$proj$A
     if( class(A_gs)=="dgCMatrix" ) A_gs = as( A_gs, "dgTMatrix" )
     Check_i = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})
     Check_g = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})

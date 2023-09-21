@@ -43,7 +43,9 @@ to account for unlabeled multispecies data.}
 
 \item{v_i}{Vector of integers ranging from 0 to the number of vessels minus 1,
 providing sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
-(by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
+(by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig}).
+In some cases a portion of observations have a overdispersion-effect, but not others, and in this case the observations without
+are specified as \code{v_i=NA}}
 
 \item{keep_old_covariates}{Whether to add new_covariate_data to existing data.
 This is useful when predicting values at new locations, but does not work

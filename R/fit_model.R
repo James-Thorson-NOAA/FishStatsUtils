@@ -43,7 +43,7 @@
 #' @param year_labels character vector specifying names for labeling times \code{t_i}
 #' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 #' where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
-#' passes named arguments to \code{\link[INLA]{inla.mesh.create}}.
+#' passes named arguments to \code{\link[fmesher]{fm_mesh_2d}}.
 #'
 #' @return Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
 #' \describe{
@@ -180,8 +180,9 @@ function( settings,
                          DirPath = working_dir,
                          Save_Results = TRUE,
                          fine_scale = settings$fine_scale,
-                         knot_method = settings$knot_method)
-    spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
+                         knot_method = settings$knot_method,
+                         mesh_package = settings$mesh_package )
+    spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(fmesher::fm_mesh_2d)) )
     spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
   }else{
     spatial_args_input = NULL

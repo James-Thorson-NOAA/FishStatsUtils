@@ -25,6 +25,7 @@ make_spatial_info(
   LON_intensity,
   LAT_intensity,
   backwards_compatible_kmeans = FALSE,
+  mesh_package = "INLA",
   ...
 )
 }

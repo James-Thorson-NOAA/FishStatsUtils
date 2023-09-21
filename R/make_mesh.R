@@ -20,6 +20,7 @@ function( loc_x,
           anisotropic_mesh = NULL,
           fine_scale = FALSE,
           map_data,
+          mesh_package = "INLA",
           ...){
 
   #######################
@@ -29,15 +30,36 @@ function( loc_x,
   # 2D coordinates SPDE
   if( is.null(anisotropic_mesh)){
     if( fine_scale==FALSE ){
-      anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, ...)
+      if( mesh_package=="INLA" ){
+        if(!require(INLA)) stop("Please install INLA and retry")
+        anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, ...)
+      }else if( mesh_package=="fmesher" ){
+        anisotropic_mesh = fm_mesh_2d( loc_x, ... )
+      }else{
+        stop("`mesh_package` must be `fmesher` or `INLA`")
+      }
     }else{
-      loc_z = rbind( loc_x, loc_g, loc_i )
-      outer_hull = INLA::inla.nonconvex.hull( as.matrix(loc_z), convex = -0.05, concave = -0.05)
-      anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, ...)
+      if( mesh_package=="INLA" ){
+        loc_z = rbind( loc_x, loc_g, loc_i )
+        if(!require(INLA)) stop("Please install INLA and retry")
+        outer_hull = INLA::inla.nonconvex.hull( as.matrix(loc_z), convex = -0.05, concave = -0.05)
+        anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, ...)
+      }else if( mesh_package=="fmesher" ){
+        #outer_hull = fm_nonconvex_hull( as.matrix(loc_z), convex = -0.05, concave = -0.05 )
+        anisotropic_mesh = fm_mesh_2d( loc_x, ... ) # , boundary=outer_hull, ... )
+      }else{
+        stop("`mesh_package` must be `fmesher` or `INLA`")
+      }
     }
   }
 
-  anisotropic_spde = INLA::inla.spde2.matern(anisotropic_mesh, alpha=2)
+  #anisotropic_spde = INLA::inla.spde2.matern(anisotropic_mesh, alpha=2)
+  anisotropic_spde = fm_fem( anisotropic_mesh, order=2 )
+  anisotropic_spde$param.inla = list( "M0" = anisotropic_spde$c0,
+                                      "M1" = anisotropic_spde$g1,
+                                      "M2" = anisotropic_spde$g2)
+  anisotropic_spde$mesh = anisotropic_mesh
+  anisotropic_spde$n.spde = anisotropic_mesh$n
 
   # Pre-processing in R for anisotropy
   Dset = 1:2
@@ -80,7 +102,7 @@ function( loc_x,
   # Create Barrier object if requested
     # Don't do this unless necessary, because it sometimes throws an error
   #Diagnose issues:  assign("anisotropic_mesh", anisotropic_mesh, envir = .GlobalEnv)
-  barrier_finite_elements = INLA:::inla.barrier.fem(mesh=anisotropic_mesh,
+  barrier_finite_elements = FishStatsUtils:::inla.barrier.fem.copy(mesh=anisotropic_mesh,
     barrier.triangles=anisotropic_mesh_triangles_over_land)
   barrier_list = list(C0 = barrier_finite_elements$C[[1]],
     C1 = barrier_finite_elements$C[[2]],
@@ -104,19 +126,32 @@ function( loc_x,
     isotropic_mesh = anisotropic_mesh
   }
   if(Method %in% c("Spherical_mesh")){
-    loc_isotropic_mesh = INLA::inla.mesh.map(loc_x, projection="longlat", inverse=TRUE) # Project from lat/long to mesh coordinates
-    isotropic_mesh = INLA::inla.mesh.create( loc_isotropic_mesh, plot.delay=NULL, ...)
+    #loc_isotropic_mesh = INLA::inla.mesh.map(loc_x, projection="longlat", inverse=TRUE) # Project from lat/long to mesh coordinates
+    #isotropic_mesh = INLA::inla.mesh.create( loc_isotropic_mesh, plot.delay=NULL, ...)
+    stop("Method `Spherical_mesh` no longer supported")
   }
-  isotropic_spde = INLA::inla.spde2.matern(isotropic_mesh, alpha=2)
+  #isotropic_spde = INLA::inla.spde2.matern(isotropic_mesh, alpha=2)
+  isotropic_spde = fm_fem(isotropic_mesh, order=2)
+  isotropic_spde$param.inla = list( "M0" = isotropic_spde$c0,
+                                    "M1" = isotropic_spde$g1,
+                                    "M2" = isotropic_spde$g2)
+  isotropic_spde$mesh = isotropic_mesh
+  isotropic_spde$n.spde = isotropic_mesh$n
 
   ####################
   # Return stuff
   ####################
   #if( isotropic_mesh$n != anisotropic_mesh$n ) stop("Check `Calc_Anisotropic_Mesh` for problem")
 
-  Return = list("loc_x"=loc_x, "loc_isotropic_mesh"=loc_isotropic_mesh, "isotropic_mesh"=isotropic_mesh,
-    "isotropic_spde"=isotropic_spde, "anisotropic_mesh"=anisotropic_mesh, "anisotropic_spde"=anisotropic_spde,
-    "Tri_Area"=Tri_Area, "TV"=TV, "E0"=E0, "E1"=E1, "E2"=E2,
-    "anisotropic_mesh_triangles_over_land"=anisotropic_mesh_triangles_over_land, "barrier_list"=barrier_list )
+  Return = list( "loc_x"=loc_x,
+                "loc_isotropic_mesh"=loc_isotropic_mesh,
+                "isotropic_mesh"=isotropic_mesh,
+                "isotropic_spde"=isotropic_spde,
+                "anisotropic_mesh"=anisotropic_mesh,
+                "anisotropic_spde"=anisotropic_spde,
+                "Tri_Area"=Tri_Area,
+                "TV"=TV, "E0"=E0, "E1"=E1, "E2"=E2,
+                "anisotropic_mesh_triangles_over_land"=anisotropic_mesh_triangles_over_land,
+                "barrier_list"=barrier_list )
   return(Return)
 }

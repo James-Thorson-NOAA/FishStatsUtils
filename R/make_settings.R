@@ -54,7 +54,8 @@ function( n_x,
           n_categories,
           VamConfig,
           max_cells,
-          knot_method ){
+          knot_method,
+          mesh_package ){
 
   # Get version
   if(missing(Version)) Version = FishStatsUtils::get_latest_version()
@@ -83,6 +84,7 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
+    if(missing(mesh_package)) mesh_package = "INLA"
   }
 
   # Current
@@ -103,6 +105,26 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "grid"
     if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
+    if(missing(mesh_package)) mesh_package = "INLA"
+  }
+  if( tolower(purpose) == "index3" ){
+    purpose_found = TRUE
+    if( convert_version_name(Version) >= convert_version_name("VAST_v7_0_0") ){
+      if(missing(FieldConfig)) FieldConfig = matrix( "IID", ncol=2, nrow=3, dimnames=list(c("Omega","Epsilon","Beta"),c("Component_1","Component_2")) )
+    }else{
+      if(missing(FieldConfig)) FieldConfig = c("Omega1"="IID", "Epsilon1"="IID", "Omega2"="IID", "Epsilon2"="IID")
+    }
+    if(missing(RhoConfig)) RhoConfig = c("Beta1"=0, "Beta2"=0, "Epsilon1"=0, "Epsilon2"=0)
+    if(missing(VamConfig)) VamConfig = c("Method"=0, "Rank"=0, "Timing"=0)
+    if(missing(OverdispersionConfig)) OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
+    if(missing(ObsModel)) ObsModel = c(2,1)
+    if(missing(bias.correct)) bias.correct = TRUE
+    if(missing(treat_nonencounter_as_zero)) treat_nonencounter_as_zero = TRUE
+    if(missing(Options)) Options =  c( "Calculate_Range"=TRUE, "Calculate_effective_area"=TRUE, "treat_nonencounter_as_zero"=treat_nonencounter_as_zero )
+    if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
+    if(missing(knot_method)) knot_method = "grid"
+    if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
+    if(missing(mesh_package)) mesh_package = "fmesher"
   }
 
   ###################
@@ -126,6 +148,7 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
+    if(missing(mesh_package)) mesh_package = "INLA"
   }
 
   ###################
@@ -149,6 +172,7 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Bratio_cyl", "Index_ctl", "Bratio_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
+    if(missing(mesh_package)) mesh_package = "INLA"
   }
 
   ###################
@@ -171,6 +195,7 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
+    if(missing(mesh_package)) mesh_package = "INLA"
   }
 
   ###################
@@ -195,6 +220,7 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "samples"
     if(missing(max_cells)) max_cells = Inf
+    if(missing(mesh_package)) mesh_package = "INLA"
   }
 
   if( tolower(purpose) %in% c("eof2") ){
@@ -213,6 +239,7 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "grid"
     if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
+    if(missing(mesh_package)) mesh_package = "INLA"
   }
 
   if( tolower(purpose) %in% c("eof3") ){
@@ -230,6 +257,7 @@ function( n_x,
     if(missing(vars_to_correct)) vars_to_correct = c( "Index_cyl", "Index_ctl" )
     if(missing(knot_method)) knot_method = "grid"
     if(missing(max_cells)) max_cells = max( 2000, n_x*10 )
+    if(missing(mesh_package)) mesh_package = "INLA"
   }
 
   ###################
@@ -268,6 +296,7 @@ function( n_x,
              "Method" = Method,
              "use_anisotropy" = use_anisotropy,
              "fine_scale" = fine_scale,
-             "bias.correct" = bias.correct )
+             "bias.correct" = bias.correct,
+             "mesh_package" = mesh_package )
   return(settings)
 }

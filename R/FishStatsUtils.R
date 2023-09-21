@@ -6,4 +6,5 @@
 #'
 #' @docType package
 #' @name FishStatsUtils
+#' @importFrom fmesher fm_mesh_2d fm_fem fm_evaluator
 NULL
