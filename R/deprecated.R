@@ -1049,8 +1049,10 @@ function( Lon, Lat, crs=NA ){
   # SEE:  https://github.com/nwfsc-assess/geostatistical_delta-GLMM/issues/25#issuecomment-345825230
 
   # Attach package
-  require(rgdal)
-  on.exit( detach("package:rgdal") )
+  #require(rgdal)
+  #on.exit( detach("package:rgdal") )
+  require(sp)
+  on.exit( detach("package:sp") )
 
   # Transform
   dstart<-data.frame(lon=Lon, lat=Lat) # that's the object

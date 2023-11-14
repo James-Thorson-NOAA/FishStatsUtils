@@ -27,7 +27,6 @@ Imports:
     sf,
     raster,
     reshape2,
-    rgdal,
     rnaturalearth,
     rnaturalearthdata,
     seriation,

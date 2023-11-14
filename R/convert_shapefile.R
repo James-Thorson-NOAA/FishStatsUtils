@@ -30,7 +30,9 @@ convert_shapefile = function( file_path,
     area_tolerance = 0.05,
     ... ){
 
-  shapefile_input = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
+  #shapefile_input = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
+  shapefile_input = sf::st_read( file_path )
+    st_crs(shapefile_input) = st_crs(projargs_for_shapefile)
   # rgdal::writeOGR
   message("Reading shapefile with projargs: ", print(shapefile_input@proj4string))
   # raster::shapefile(.) has simplified read-write interface for future reference

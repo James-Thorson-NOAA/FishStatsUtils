@@ -20,35 +20,32 @@ function( loc_x,
           anisotropic_mesh = NULL,
           fine_scale = FALSE,
           map_data,
-          mesh_package = "INLA",
+          mesh_package = c("INLA","fmesher"),
           ...){
 
   #######################
   # Create the anisotropic SPDE mesh using 2D coordinates
   #######################
+  mesh_package = match.arg( mesh_package )
 
   # 2D coordinates SPDE
   if( is.null(anisotropic_mesh)){
     if( fine_scale==FALSE ){
       if( mesh_package=="INLA" ){
-        if(!require(INLA)) stop("Please install INLA and retry")
+        if(!require(INLA)) stop("Please install INLA or switch to `settings$mesh_package=`fmesher`")
         anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, ...)
-      }else if( mesh_package=="fmesher" ){
+      }else( mesh_package=="fmesher" ){
         anisotropic_mesh = fm_mesh_2d( loc_x, ... )
-      }else{
-        stop("`mesh_package` must be `fmesher` or `INLA`")
       }
     }else{
       if( mesh_package=="INLA" ){
         loc_z = rbind( loc_x, loc_g, loc_i )
-        if(!require(INLA)) stop("Please install INLA and retry")
+        if(!require(INLA)) stop("Please install INLA or switch to `settings$mesh_package=`fmesher`")
         outer_hull = INLA::inla.nonconvex.hull( as.matrix(loc_z), convex = -0.05, concave = -0.05)
         anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, ...)
-      }else if( mesh_package=="fmesher" ){
+      }else( mesh_package=="fmesher" ){
         #outer_hull = fm_nonconvex_hull( as.matrix(loc_z), convex = -0.05, concave = -0.05 )
         anisotropic_mesh = fm_mesh_2d( loc_x, ... ) # , boundary=outer_hull, ... )
-      }else{
-        stop("`mesh_package` must be `fmesher` or `INLA`")
       }
     }
   }
