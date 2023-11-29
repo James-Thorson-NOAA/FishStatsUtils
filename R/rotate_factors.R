@@ -132,10 +132,13 @@ function( L_pj = NULL,
 
   # Flip around
   for( j in 1:dim(L_pj_rot)[2] ){
+    Sign = sign(sum(L_pj_rot[,j]))
+    # sign(0) = 0, so switch 0 to 1 in that case
+    Sign = ifelse(Sign==0, 1, Sign)
     if( !is.null(Psi_sjt) ){
-      Psi_rot[,j,] = Psi_rot[,j,] * sign(sum(L_pj_rot[,j]))
+      Psi_rot[,j,] = Psi_rot[,j,] * Sign
     }
-    L_pj_rot[,j] = L_pj_rot[,j] * sign(sum(L_pj_rot[,j]))
+    L_pj_rot[,j] = L_pj_rot[,j] * Sign
   }
 
   # Check for errors
