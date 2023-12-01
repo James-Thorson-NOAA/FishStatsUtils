@@ -34,7 +34,7 @@ function( loc_x,
       if( mesh_package=="INLA" ){
         if(!require(INLA)) stop("Please install INLA or switch to `settings$mesh_package=`fmesher`")
         anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, ...)
-      }else( mesh_package=="fmesher" ){
+      }else{
         anisotropic_mesh = fm_mesh_2d( loc_x, ... )
       }
     }else{
@@ -43,7 +43,7 @@ function( loc_x,
         if(!require(INLA)) stop("Please install INLA or switch to `settings$mesh_package=`fmesher`")
         outer_hull = INLA::inla.nonconvex.hull( as.matrix(loc_z), convex = -0.05, concave = -0.05)
         anisotropic_mesh = INLA::inla.mesh.create( loc_x, plot.delay=NULL, boundary=outer_hull, ...)
-      }else( mesh_package=="fmesher" ){
+      }else{
         #outer_hull = fm_nonconvex_hull( as.matrix(loc_z), convex = -0.05, concave = -0.05 )
         anisotropic_mesh = fm_mesh_2d( loc_x, ... ) # , boundary=outer_hull, ... )
       }
