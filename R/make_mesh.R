@@ -73,8 +73,10 @@ function( loc_x,
   # Barriers don't affect projection matrix A
   # Obtain polygon for water
   if( missing(map_data) ){
-    map_data = rnaturalearth::ne_countries( scale=switch("medium", "low"=110, "medium"=50, "high"=10, 50) )
-    attr(map_data,"proj4string") = sp::CRS("+proj=longlat +datum=WGS84")
+    map_data = rnaturalearth::ne_countries( scale=50, returnclass="sf" )
+    #map_data = sf::as_Spatial( map_data )
+    #attr(map_data,"proj4string") = sp::CRS("+proj=longlat +datum=WGS84")
+    #proj4string(map_data) = sp::CRS("+proj=longlat +datum=WGS84")
   }
 
   # Calculate centroid of each triangle in mesh and convert to SpatialPoints
@@ -84,12 +86,15 @@ function( loc_x,
     temp = anisotropic_mesh$loc[ anisotropic_mesh$graph$tv[tri_index,], ]
     posTri[tri_index,] = colMeans(temp)[c(1,2)]
   }
-  posTri = sp::SpatialPoints(posTri, proj4string=sp::CRS(Extrapolation_List$projargs) )
-  posTri = sp::spTransform(posTri, CRSobj=map_data@proj4string )
+  #posTri = sp::SpatialPoints(posTri, proj4string=sp::CRS(Extrapolation_List$projargs) )
+  #posTri = sp::spTransform(posTri, CRSobj=sp::CRS(map_data) )
+  posTri = sf::st_sfc( sf::st_multipoint(posTri), crs=sf::st_crs(Extrapolation_List$projargs) )
+  posTri = sf::st_transform( posTri, crs=sf::st_crs(map_data) )
 
   # Calculate set of triangles barrier.triangles with centroid over land
   if( Method == "Barrier" ){
-    anisotropic_mesh_triangles_over_land = unlist(sp::over(map_data, posTri, returnList=TRUE))
+    #anisotropic_mesh_triangles_over_land = unlist(sp::over(map_data, posTri, returnList=TRUE))
+    anisotropic_mesh_triangles_over_land = unlist(sf::st_intersects(map_data, posTri))
   }else{
     anisotropic_mesh_triangles_over_land = vector()
   }

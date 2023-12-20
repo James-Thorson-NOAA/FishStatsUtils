@@ -65,12 +65,15 @@ function( Extrapolation_List,
   CRS_proj = sp::CRS( projargs )
 
   # Data for mapping
-  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
+  map_data = rnaturalearth::ne_countries( scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50),
+                                          country=country, returnclass="sf" )
   # Fix warning messages from projecting rnaturalearth object
   # Solution: Recreate SpatialPolygonsDataFrame from output
-  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
+  #map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
   # comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
-  map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
+  #map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
+  map_proj = sf::st_transform(map_data, crs=sf::st_crs(CRS_proj) )
+  map_proj = sf::as_Spatial( map_proj )
 
   # project Lat_i/Lon_i
   sample_data = sp::SpatialPoints( coords=cbind(Lon_i,Lat_i), proj4string=CRS_orig )
