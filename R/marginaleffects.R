@@ -90,11 +90,13 @@ get_predict.fit_model = function(model, newdata, covariate, center=FALSE, ...){
 
   # Return
   if( covariate %in% c("X1","X2") ){
-    out = expand.grid( rowid=seq_along(yhat_ic[,1]), category=model$category_names )
-    out$predicted = as.vector(yhat_ic)
+    out = expand.grid( rowid=seq_along(yhat_ic[,1]),
+                       category=model$category_names )
+    out$estimate = as.vector(yhat_ic)
   }
   if( covariate %in% c("Q1","Q2") ){
-    out = data.frame( rowid=seq_along(yhat_ic[,1]), predicted=yhat_ic[,1] )
+    out = data.frame( rowid=seq_along(yhat_ic[,1]),
+                      estimate=yhat_ic[,1] )
   }
   return(out)
 }

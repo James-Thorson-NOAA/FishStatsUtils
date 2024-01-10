@@ -1,8 +1,8 @@
 Package: FishStatsUtils
 Type: Package
 Title: Utilities (shared code and data) for FishStats spatio-temporal modeling toolbox
-Version: 2.12.1
-Date: 2022-11-18
+Version: 2.13.0
+Date: 2024-01-10
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -21,13 +21,12 @@ Imports:
     DHARMa,
     ecodist,
     fastcluster,
-    INLA,
+    fmesher,
     plotrix,
     RANN,
     sf,
     raster,
     reshape2,
-    rgdal,
     rnaturalearth,
     rnaturalearthdata,
     seriation,
@@ -45,7 +44,8 @@ Depends:
     units,
     marginaleffects
 Enhances:
-    tidyr
+    tidyr,
+    INLA,
 Suggests:
     testthat
 Remotes: 

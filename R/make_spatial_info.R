@@ -68,11 +68,12 @@ make_spatial_info = function( n_x,
     iter.max = 1000,
     randomseed = 1,
     nstart = 100,
-    DirPath = paste0(getwd(),"/"),
+    DirPath = getwd(),
     Save_Results = FALSE,
     LON_intensity,
     LAT_intensity,
     backwards_compatible_kmeans = FALSE,
+    mesh_package = "INLA",
     ... ){
 
   # Deprecated options
@@ -107,8 +108,14 @@ make_spatial_info = function( n_x,
     Grid_bounds = (grid_size_km/110) * apply(loc_e/(grid_size_km/110), MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
-    if(is.null(Kmeans)) Kmeans = make_kmeans(n_x=n_x,
-    loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, kmeans_purpose='spatial', backwards_compatible_kmeans=backwards_compatible_kmeans, ... )
+    if(is.null(Kmeans)){
+      Kmeans = make_kmeans( n_x = n_x,
+                            loc_orig = loc_i[,c("Lon", "Lat")],
+                            randomseed = randomseed,
+                            kmeans_purpose = 'spatial',
+                            backwards_compatible_kmeans = backwards_compatible_kmeans,
+                            ... )
+    }
 
     # Calculate grid for 2D AR1 process
     loc_grid = expand.grid( 'Lon'=seq(Grid_bounds[1,1],Grid_bounds[2,1],by=grid_size_LL), 'Lat'=seq(Grid_bounds[1,2],Grid_bounds[2,2],by=grid_size_LL) )
@@ -146,6 +153,9 @@ make_spatial_info = function( n_x,
   }
   if( Method == "Stream_network" ){
     knot_i = Extrapolation_List$Data_Extrap[,"child_i"]
+    if( length(knot_i) != nrow(loc_i) ){
+      stop("Check `input_grid` input")
+    }
     loc_x = project_coordinates( X=Network_sz_LL[,"Lon"], Y=Network_sz_LL[,"Lat"], projargs=Extrapolation_List$projargs )
     colnames(loc_x) = c('E_km', 'N_km')
   }
@@ -175,10 +185,10 @@ make_spatial_info = function( n_x,
   # Diagnose issues:  assign("Kmeans", Kmeans, envir = .GlobalEnv)
   if(Method != "Stream_network"){
     MeshList = make_mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
-      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
+      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, mesh_package=mesh_package, ... )
   }else{
     MeshList = make_mesh( Method=Method, loc_x=loc_x, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List,
-      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, ... )
+      fine_scale=fine_scale, anisotropic_mesh=anisotropic_mesh, mesh_package=mesh_package, ... )
   }
 
   # Deal with loc_s and latlon_s
@@ -226,9 +236,11 @@ make_spatial_info = function( n_x,
     A_gs = as( diag(n_x), "dgTMatrix" )
   }
   if( fine_scale==TRUE ){
-    A_is = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_i) )
+    #A_is = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_i) )
+    A_is = fm_evaluator( MeshList$anisotropic_mesh, loc=as.matrix(loc_i) )$proj$A
     if( class(A_is)=="dgCMatrix" ) A_is = as( A_is, "dgTMatrix" )
-    A_gs = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_g) )
+    #A_gs = INLA::inla.spde.make.A( MeshList$anisotropic_mesh, loc=as.matrix(loc_g) )
+    A_gs = fm_evaluator( MeshList$anisotropic_mesh, loc=as.matrix(loc_g) )$proj$A
     if( class(A_gs)=="dgCMatrix" ) A_gs = as( A_gs, "dgTMatrix" )
     Check_i = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})
     Check_g = apply( A_is, MARGIN=1, FUN=function(vec){sum(vec>0)})

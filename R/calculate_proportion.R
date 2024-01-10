@@ -6,6 +6,12 @@
 #'
 #' @inheritParams plot_biomass_index
 #' @inheritParams VAST::make_data
+#' @param sample_size_method Method used to calculate the variance in proportions, which is then converted to an approximately equivalent multinomial sample size that can be used as input-sample-size in a subsequent stock assessment model.  Options are:
+#' \describe{
+#'   \item{\code{sample_size_method="Taylor_series"}}{a Taylor-series approximation to the ratio of X/(X+Y) where X is the category-specific index and Y is the index for for all other categories}
+#'   \item{\code{sample_size_method="sample_based"}}{Taking samples from the joint precision of fixed and random effects, calculating proportions for each sample, and then computing the variance across those samples}
+#' }
+#' The sample-based approximation is expected to have higher variance and therefore lower approximate sample size.  However, it may also have poor performance in cases when variance estimates are imprecise (such that the multivariate-normal approximation to joint precision is poor), and has not been thoroughly groundtested in real-world cases.
 #' @param Index output from \code{FishStatsUtils::plot_biomass_index}
 #' @param ... list of arguments to pass to \code{plot_index}
 #'
@@ -18,15 +24,17 @@
 #' @references For details regarding multivariate index standardization and expansion see \url{https://cdnsciencepub.com/doi/full/10.1139/cjfas-2018-0015}
 #' @export
 calculate_proportion <-
-function( TmbData,
+function( fit,
+          TmbData,
           Index,
           Expansion_cz = NULL,
           year_labels = NULL,
           years_to_plot = NULL,
           strata_names = NULL,
           category_names = NULL,
+          sample_size_method = c("Taylor_series","sample_based"),
           plot_legend = ifelse(TmbData$n_l>1,TRUE,FALSE),
-          DirName = paste0(getwd(),"/"),
+          DirName = getwd(),
           PlotName = "Proportion.png",
           PlotName2 = "Average.png",
           interval_width = 1,
@@ -34,6 +42,7 @@ function( TmbData,
           height = 6,
           xlab = "Category",
           ylab = "Proportion",
+          n_samples = 250,
           ... ){
 
   # Warnings and errors
@@ -55,19 +64,32 @@ function( TmbData,
   Index_tl = apply(Index_ctl,MARGIN=2:3,FUN=sum)
   SE_Index_tl = sqrt(apply(SE_Index_ctl^2,MARGIN=2:3,FUN=sum,na.rm=TRUE))
 
-  # Approximate variance for proportions, and effective sample size
-  Neff_ctl = var_Prop_ctl = array(NA,dim=dim(Prop_ctl))
-  for( cI in 1:dim(var_Prop_ctl)[1]){
-  for( tI in 1:dim(var_Prop_ctl)[2]){
-  for( lI in 1:dim(var_Prop_ctl)[3]){
-    # Original version
-    #var_Prop_ctl[cI,tI,lI] = Index_ctl[cI,tI,lI]^2/Index_tl[tI,lI]^2 * (SE_Index_ctl[cI,tI,lI]^2/Index_ctl[cI,tI,lI]^2  + SE_Index_tl[tI,lI]^2/Index_tl[tI,lI]^2 )
-    # Slightly extended version
-    var_Prop_ctl[cI,tI,lI] = Index_ctl[cI,tI,lI]^2/Index_tl[tI,lI]^2 * (SE_Index_ctl[cI,tI,lI]^2/Index_ctl[cI,tI,lI]^2 - 2*SE_Index_ctl[cI,tI,lI]^2/(Index_ctl[cI,tI,lI]*Index_tl[tI,lI]) + SE_Index_tl[tI,lI]^2/Index_tl[tI,lI]^2 )
-    var_Prop_ctl[cI,tI,lI] = ifelse( Index_ctl[cI,tI,lI]==0, 0, var_Prop_ctl[cI,tI,lI] )  # If dividing by zero, replace with 0
-    # Covert to effective sample size
-    Neff_ctl[cI,tI,lI] = Prop_ctl[cI,tI,lI] * (1-Prop_ctl[cI,tI,lI]) / var_Prop_ctl[cI,tI,lI]
-  }}}
+  if( tolower(sample_size_method[1]) == "taylor_series" ){
+    # Approximate variance for proportions, and effective sample size
+    Neff_ctl = var_Prop_ctl = array(NA,dim=dim(Prop_ctl))
+    for( cI in 1:dim(var_Prop_ctl)[1]){
+    for( tI in 1:dim(var_Prop_ctl)[2]){
+    for( lI in 1:dim(var_Prop_ctl)[3]){
+      # Original version
+      #var_Prop_ctl[cI,tI,lI] = Index_ctl[cI,tI,lI]^2/Index_tl[tI,lI]^2 * (SE_Index_ctl[cI,tI,lI]^2/Index_ctl[cI,tI,lI]^2  + SE_Index_tl[tI,lI]^2/Index_tl[tI,lI]^2 )
+      # Slightly extended version
+      var_Prop_ctl[cI,tI,lI] = Index_ctl[cI,tI,lI]^2/Index_tl[tI,lI]^2 * (SE_Index_ctl[cI,tI,lI]^2/Index_ctl[cI,tI,lI]^2 - 2*SE_Index_ctl[cI,tI,lI]^2/(Index_ctl[cI,tI,lI]*Index_tl[tI,lI]) + SE_Index_tl[tI,lI]^2/Index_tl[tI,lI]^2 )
+      var_Prop_ctl[cI,tI,lI] = ifelse( Index_ctl[cI,tI,lI]==0, 0, var_Prop_ctl[cI,tI,lI] )  # If dividing by zero, replace with 0
+      # Covert to effective sample size
+      #Neff_ctl[cI,tI,lI] = Prop_ctl[cI,tI,lI] * (1-Prop_ctl[cI,tI,lI]) / var_Prop_ctl[cI,tI,lI]
+    }}}
+  }else{
+    Index_ctlr = sample_variable( Sdreport = fit$parameter_estimates$SD, 
+                            Obj = fit$tmb_list$Obj, 
+                            variable_name = "Index_ctl", 
+                            n_samples = n_samples, 
+                            sample_fixed = TRUE )
+    Prop_ctlr = Index_ctlr / outer( rep(1,dim(Index_ctlr)[1]), apply(Index_ctlr,MARGIN=2:4,FUN=sum) )
+    var_Prop_ctl = apply(Prop_ctlr, MARGIN=1:3, FUN=var)
+  }
+
+  # Covert to effective sample size
+  Neff_ctl = Prop_ctl * (1-Prop_ctl) / var_Prop_ctl
 
   # Median effective sample size across categories
   Neff_tl = apply(Neff_ctl, MARGIN=2:3, FUN=median, na.rm=TRUE)

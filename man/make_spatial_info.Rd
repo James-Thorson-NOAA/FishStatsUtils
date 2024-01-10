@@ -20,11 +20,12 @@ make_spatial_info(
   iter.max = 1000,
   randomseed = 1,
   nstart = 100,
-  DirPath = paste0(getwd(), "/"),
+  DirPath = getwd(),
   Save_Results = FALSE,
   LON_intensity,
   LAT_intensity,
   backwards_compatible_kmeans = FALSE,
+  mesh_package = "INLA",
   ...
 )
 }

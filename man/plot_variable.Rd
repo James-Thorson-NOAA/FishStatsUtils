@@ -11,7 +11,7 @@ plot_variable(
   projargs = "+proj=longlat",
   map_resolution = "medium",
   file_name = "density",
-  working_dir = paste0(getwd(), "/"),
+  working_dir = getwd(),
   Format = "png",
   Res = 200,
   add = FALSE,
@@ -78,7 +78,7 @@ will often need to be modified for a given purpose.}
 \item{fun}{function or character. To determine what values to assign to cells that are covered by multiple spatial features. You can use functions such as \code{min, max}, or \code{mean}, or one of the following character values: \code{'first'}, \code{'last'}, \code{'count'}. The default value is \code{'last'}. In the case of SpatialLines*, \code{'length'} is also allowed (currently for planar coordinate systems only).
 
 
-If \code{x} represents points, \code{fun} must accept a \code{na.rm} argument, either explicitly or through 'dots'. This means that \code{fun=length} fails, but \code{fun=function(x,...)length(x)} works, although it ignores the \code{na.rm} argument. To use the \code{na.rm} argument you can use a function like this: fun=function(x, na.rm){if (na.rm) length(na.omit(x)) else (length(x)}, or use a function that removes \code{NA} values in all cases, like this function to compute the number of unique values per grid cell "richness": \code{fun=function(x, ...) {length(unique(na.omit(x)))} }. If you want to count the number of points in each grid cell, you can use \code{ fun='count'} or  \code{fun=function(x,...){length(x)}}.
+If \code{x} represents points, \code{fun} must accept a \code{na.rm} argument, either explicitly or through the ellipses ('dots'). This means that \code{fun=length} fails, but \code{fun=function(x,...)length(x)} works, although it ignores the \code{na.rm} argument. To use the \code{na.rm} argument you can use a function like this: \code{fun=function(x, na.rm){if (na.rm) length(na.omit(x)) else (length(x)}}, or use a function that removes \code{NA} values in all cases, like this function to compute the number of unique values per grid cell "richness": \code{fun=function(x, ...) {length(unique(na.omit(x)))} }. If you want to count the number of points in each grid cell, you can use \code{ fun='count'} or  \code{fun=function(x,...){length(x)}}.
 
 You can also pass multiple functions using a statement like \code{fun=function(x, ...) c(length(x),mean(x))}, in which case the returned object is a RasterBrick (multiple layers).
 }

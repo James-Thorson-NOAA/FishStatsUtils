@@ -26,7 +26,7 @@ function( Index_ctl,
           category_names = NULL,
           scale = "uniform",
           plot_legend = NULL,
-          DirName = paste0(getwd(),"/"),
+          DirName = getwd(),
           PlotName = "Index.png",
           interval_width = 1,
           width = NULL,
@@ -126,7 +126,7 @@ function( Index_ctl,
   # Plot
   Par = combine_lists( default=list(mar=c(2,2,1,0),mgp=c(2,0.5,0),tck=-0.02,yaxs="i",oma=c(2,2,0,0),mfrow=mfrow), input=list(...) )
   if(!is.na(PlotName)){
-    png( file=paste0(DirName,PlotName), width=width, height=height, res=200, units="in")  # paste0(DirName,ifelse(DirName=="","","/"),PlotName)
+    png( file=file.path(DirName,PlotName), width=width, height=height, res=200, units="in")  # paste0(DirName,ifelse(DirName=="","","/"),PlotName)
     on.exit( dev.off() )
   }
   if(add==FALSE) par( Par )

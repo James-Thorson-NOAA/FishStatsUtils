@@ -11,7 +11,7 @@ plot_data(
   Lat_i = Data_Geostat[, "Lat"],
   Lon_i = Data_Geostat[, "Lon"],
   Year_i = Data_Geostat[, "Year"],
-  PlotDir = paste0(getwd(), "/"),
+  PlotDir = getwd(),
   Plot1_name = "Data_and_knots.png",
   Plot2_name = "Data_by_year.png",
   col = "red",

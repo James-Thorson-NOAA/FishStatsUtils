@@ -25,7 +25,7 @@ function( Sdreport,
           years_to_plot = NULL,
           strata_names = NULL,
           category_names = NULL,
-          working_dir = paste0(getwd(),"/"),
+          working_dir = getwd(),
           quantiles = c(0.05,0.95),
           n_samples = 100,
           interval_width = 1,
@@ -125,20 +125,20 @@ function( Sdreport,
   for( mI in 1:dim(Edge_zctm)[4] ){
     Index_zct = array(Edge_zctm[,,,mI,'Estimate'],dim(Edge_zctm)[1:3])
     sd_Index_zct = array(Edge_zctm[,,,mI,'Std. Error'],dim(Edge_zctm)[1:3])
-    plot_index( Index_ctl=aperm(Index_zct,c(2,3,1)),
-                sd_Index_ctl=aperm(sd_Index_zct,c(2,3,1)),
-                year_labels=year_labels,
-                years_to_plot=years_to_plot,
-                strata_names=quantiles,
-                category_names=category_names,
-                DirName=working_dir,
-                PlotName=paste0("RangeEdge_",m_labels[mI],".png"),
-                Yrange=c(NA,NA),
-                interval_width=interval_width,
-                width=width,
-                height=height,
-                xlab="Year",
-                ylab=paste0("Quantiles (",m_labels[mI],")") )
+    plot_index( Index_ctl = aperm(Index_zct,c(2,3,1)),
+                sd_Index_ctl = aperm(sd_Index_zct,c(2,3,1)),
+                year_labels = year_labels,
+                years_to_plot = years_to_plot,
+                strata_names = quantiles,
+                category_names = category_names,
+                DirName = working_dir,
+                PlotName = paste0("RangeEdge_",m_labels[mI],".png"),
+                Yrange = c(NA,NA),
+                interval_width = interval_width,
+                width = width,
+                height = height,
+                xlab = "Year",
+                ylab = paste0("Quantiles (",m_labels[mI],")") )
   }
 
   # Return list of stuff

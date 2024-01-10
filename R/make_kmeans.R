@@ -28,7 +28,7 @@ function( n_x,
           nstart = 100,
           randomseed = 1,
           iter.max = 1000,
-          DirPath = paste0(getwd(),"/"),
+          DirPath = getwd(),
           Save_Results = TRUE,
           kmeans_purpose = "spatial",
           backwards_compatible_kmeans = FALSE ){
@@ -76,8 +76,8 @@ function( n_x,
   }else{
     if(tmpfile  %in% list.files(DirPath) ){
       # If previously saved knots are available
-      load( file=paste0(DirPath,"/",tmpfile))
-      message( "Loaded from ", DirPath, "/", tmpfile)
+      load( file=file.path(DirPath, tmpfile))
+      message( "Loaded from ", file.path(DirPath, tmpfile) )
     }else{
       # Multiple runs to find optimal knots
       message("Using ", nstart, " iterations to find optimal ",
@@ -97,8 +97,8 @@ function( n_x,
       }
       message("Iter=", nstart, ': Final=', round(Kmeans$tot.withinss,0), " after ", tries, " iterations")
       if(Save_Results==TRUE){
-        save( Kmeans, file=paste0(DirPath, tmpfile))
-        message( "Results saved to ", DirPath, tmpfile, "\n for subsequent runs by default (delete it to override)")
+        save( Kmeans, file=file.path(DirPath, tmpfile))
+        message( "Results saved to ", file.path(DirPath, tmpfile), "\n for subsequent runs by default (delete it to override)")
       }
     }
   }

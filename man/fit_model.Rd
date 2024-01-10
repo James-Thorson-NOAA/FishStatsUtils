@@ -13,7 +13,7 @@ fit_model(
   a_i,
   c_iz = rep(0, length(b_i)),
   v_i = rep(0, length(b_i)),
-  working_dir = paste0(getwd(), "/"),
+  working_dir = tempdir(),
   X1config_cp = NULL,
   X2config_cp = NULL,
   covariate_data,
@@ -69,7 +69,9 @@ to account for unlabeled multispecies data.}
 
 \item{v_i}{Vector of integers ranging from 0 to the number of vessels minus 1,
 providing sampling category (e.g., vessel or tow) associated with overdispersed variation for each observation i
-(by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig})}
+(by default \code{v_i=0} for all samples, which will not affect things given the default values for \code{OverdispersionConfig}).
+In some cases a portion of observations have a overdispersion-effect, but not others, and in this case the observations without
+are specified as \code{v_i=NA}}
 
 \item{X1config_cp}{matrix of settings for each density covariate for the 1st lienar predictor,
        where the row corresponds to model category, and column corresponds to each density covariate
@@ -154,7 +156,7 @@ when fixed effects are at upper or lower bounds.}
 
 \item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
-passes named arguments to \code{\link[INLA]{inla.mesh.create}}.}
+passes named arguments to \code{\link[fmesher]{fm_mesh_2d}}.}
 }
 \value{
 Object of class \code{fit_model}, containing formatted inputs and outputs from VAST

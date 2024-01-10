@@ -5,6 +5,7 @@
 \title{Calculate the compositional-expansion}
 \usage{
 calculate_proportion(
+  fit,
   TmbData,
   Index,
   Expansion_cz = NULL,
@@ -12,8 +13,9 @@ calculate_proportion(
   years_to_plot = NULL,
   strata_names = NULL,
   category_names = NULL,
+  sample_size_method = c("Taylor_series", "sample_based"),
   plot_legend = ifelse(TmbData$n_l > 1, TRUE, FALSE),
-  DirName = paste0(getwd(), "/"),
+  DirName = getwd(),
   PlotName = "Proportion.png",
   PlotName2 = "Average.png",
   interval_width = 1,
@@ -21,6 +23,7 @@ calculate_proportion(
   height = 6,
   xlab = "Category",
   ylab = "Proportion",
+  n_samples = 250,
   ...
 )
 }
@@ -30,15 +33,17 @@ calculate_proportion(
 \item{Index}{output from \code{FishStatsUtils::plot_biomass_index}}
 
 \item{Expansion_cz}{matrix specifying how densities are expanded when calculating annual indices, with a row for each category \code{c} and two columns.
-The first column specifies whether to calculate annual index for category \code{c} as the weighted-sum across density estimates,
-where density is weighted by area ("area-weighted expansion", \code{Expansion[c,1]=0}, the default),
-where density is weighted by the expanded value for another category ("abundance weighted expansion" \code{Expansion[c1,1]=1}),
-the index is calculated as the weighted average of density weighted by the expanded value for another category
-("abundance weighted-average expansion" \code{Expansion[c1,1]=2}), or the area-weighted abundance is added to the expanded
-abundance for a prior category \code{Expansion[c1,1]=3}).
-The 2nd column is used when \code{Expansion[c1,1]=1} or \code{Expansion[c1,1]=2} or \code{Expansion[c1,1]=3},
-and specifies the category to use for abundance-weighted expansion/average/summation,
-where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
+       The first column specifies whether to calculate annual index for category \code{c} as the weighted-sum across density estimates as follows:
+\describe{
+  \item{\code{Expansion[c,1]=0}}{ density is weighted by area ("area-weighted expansion", the default) }
+  \item{\code{Expansion[c,1]=1}}{ density is weighted by the expanded value for another category ("abundance weighted expansion") }
+  \item{\code{Expansion[c,1]=2}}{ the index is calculated as the weighted average of density weighted by the expanded value for another category ("abundance weighted-average expansion") }
+  \item{\code{Expansion[c,1]=3}}{ area-weighted abundance is added to the expanded abundance for a prior category ("area-weighted cumulative total") }
+  \item{\code{Expansion[c,1]=4}}{ The fraction across categories is calculated, and then multiplied by another area-weighted index ("abundance weighted proportional expansion") }
+}
+       The 2nd column is used when \code{Expansion[c1,1]=1} or \code{Expansion[c1,1]=2} or \code{Expansion[c1,1]=3} or \code{Expansion[c1,1]=4},
+       and specifies the category to use for abundance-weighted expansion/average/summation/proportions,
+       where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
 
 \item{year_labels}{character vector specifying names for labeling times \code{t_i}}
 
@@ -47,6 +52,13 @@ where \code{Expansion[c1,2]=c2} and \code{c2} must be lower than \code{c1}.}
 \item{strata_names}{names for spatial strata}
 
 \item{category_names}{names for categories (if using package \code{`VAST`})}
+
+\item{sample_size_method}{Method used to calculate the variance in proportions, which is then converted to an approximately equivalent multinomial sample size that can be used as input-sample-size in a subsequent stock assessment model.  Options are:
+\describe{
+  \item{\code{sample_size_method="Taylor_series"}}{a Taylor-series approximation to the ratio of X/(X+Y) where X is the category-specific index and Y is the index for for all other categories}
+  \item{\code{sample_size_method="sample_based"}}{Taking samples from the joint precision of fixed and random effects, calculating proportions for each sample, and then computing the variance across those samples}
+}
+The sample-based approximation is expected to have higher variance and therefore lower approximate sample size.  However, it may also have poor performance in cases when variance estimates are imprecise (such that the multivariate-normal approximation to joint precision is poor), and has not been thoroughly groundtested in real-world cases.}
 
 \item{plot_legend}{Add legend for labelling colors}
 

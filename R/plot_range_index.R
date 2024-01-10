@@ -32,10 +32,10 @@ function( Sdreport,
           year_labels = NULL,
           years_to_plot = NULL,
           strata_names = NULL,
-          PlotDir = paste0(getwd(),"/"),
-          FileName_COG = paste0(PlotDir,"/center_of_gravity.png"),
-          FileName_Area = paste0(PlotDir,"/Area.png"),
-          FileName_EffArea = paste0(PlotDir,"/Effective_Area.png"),
+          PlotDir = getwd(),
+          FileName_COG = "center_of_gravity.png",
+          #FileName_Area = file.path(PlotDir,"Area.png"),
+          FileName_EffArea = "Effective_Area.png",
           Znames = rep("",ncol(TmbData$Z_gm)),
           use_biascorr = TRUE,
           category_names = NULL,
@@ -97,7 +97,7 @@ function( Sdreport,
 
     # Plot center of gravity
     # Can't use `FishStatsUtils::plot_index` because of 2-column format
-    png( file=FileName_COG, width=6.5, height=TmbData$n_c*2, res=200, units="in")
+    png( file=file.path(PlotDir,"center_of_gravity.png"), width=6.5, height=TmbData$n_c*2, res=200, units="in")
       par( mar=c(2,2,1,0), mgp=c(1.75,0.25,0), tck=-0.02, oma=c(1,1,0,1.5), mfrow=c(TmbData$n_c,dim(SD_mean_Z_ctm)[[3]]), ... )  #
       for( cI in 1:TmbData$n_c ){
       for( mI in 1:dim(SD_mean_Z_ctm)[[3]]){
@@ -195,7 +195,7 @@ function( Sdreport,
                 years_to_plot = years_to_plot,
                 strata_names = strata_names,
                 category_names = category_names,
-                DirName = "",
+                DirName = PlotDir,
                 PlotName = FileName_EffArea,
                 scale = "log",
                 interval_width = interval_width,

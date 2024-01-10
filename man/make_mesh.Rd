@@ -13,6 +13,7 @@ make_mesh(
   anisotropic_mesh = NULL,
   fine_scale = FALSE,
   map_data,
+  mesh_package = c("INLA", "fmesher"),
   ...
 )
 }

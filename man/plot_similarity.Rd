@@ -9,7 +9,7 @@ plot_similarity(
   year_labels = fit$year_labels,
   category_names = fit$category_names,
   similarity_metric = c("hclust", "Correlation", "Dissimilarity", "Covariance")[1],
-  working_dir = paste0(getwd(), "/"),
+  working_dir = getwd(),
   file_name = similarity_metric,
   panel_size = 3,
   Res = 200,

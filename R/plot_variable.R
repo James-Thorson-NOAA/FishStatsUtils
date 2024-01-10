@@ -52,7 +52,7 @@ function( Y_gt,
           projargs = '+proj=longlat',
           map_resolution = "medium",
           file_name = "density",
-          working_dir = paste0(getwd(),"/"),
+          working_dir = getwd(),
           Format = "png",
           Res = 200,
           add = FALSE,
@@ -132,12 +132,15 @@ function( Y_gt,
 
   # Data for mapping
   #map_data = rnaturalearth::ne_coastline(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), continent="america")
-  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50), country=country)
+  map_data = rnaturalearth::ne_countries( scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50),
+                                          country=country, returnclass="sf" )
   # Fix warning messages from projecting rnaturalearth object
   # Solution: Recreate SpatialPolygonsDataFrame from output
-  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
+  #map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
   # comment(slot(map_data, "proj4string")) =  comment(sp::CRS("+proj=longlat"))
-  map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
+  #map_proj = sp::spTransform(map_data, CRSobj=CRS_proj)
+  map_proj = sf::st_transform(map_data, crs=sf::st_crs(CRS_proj) )
+  map_proj = sf::as_Spatial( map_proj )
 
   ###################
   # Make panel figure
@@ -146,19 +149,19 @@ function( Y_gt,
   # Define device
   Par = list( mfrow=mfrow, mar=mar, oma=oma, ...)
   if(Format=="png"){
-    png(file=paste0(working_dir,file_name,".png"),
+    png(file=file.path(working_dir,paste0(file_name,".png")),
         width=Par$mfrow[2]*MapSizeRatio[2],
         height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )
   }
   if(Format=="jpg"){
-    jpeg(file=paste0(working_dir,file_name,".jpg"),
+    jpeg(file=file.path(working_dir,paste0(file_name,".jpg")),
          width=Par$mfrow[2]*MapSizeRatio[2],
          height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )
   }
   if(Format%in%c("tif","tiff")){
-    tiff(file=paste0(working_dir,file_name,".tif"),
+    tiff(file=file.path(working_dir,paste0(file_name,".tif")),
          width=Par$mfrow[2]*MapSizeRatio[2],
          height=Par$mfrow[1]*MapSizeRatio[1], res=Res, units='in')
     on.exit( dev.off() )
@@ -229,18 +232,19 @@ function( Y_gt,
 
     # Include legend
     if( !any(is.na(c(legend_x,legend_y))) & (tI==ncol(Y_gt) | is.na(zlim[1])) ){
-      xl = (1-legend_x[1])*par('usr')[1] + (legend_x[1])*par('usr')[2]
-      xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
-      yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]
-      yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
-      if( diff(legend_y) > diff(legend_x) ){
-        align = c("lt","rb")[2]
-        gradient = c("x","y")[2]
-      }else{
-        align = c("lt","rb")[1]
-        gradient = c("x","y")[1]
-      }
-      plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),legend_digits), rect.col=col(1000), cex=cex.legend, align=align, gradient=gradient)
+      plot_legend( Zlim, legend_x=legend_x, legend_y=legend_y, cex.legend=cex.legend, col=col, legend_digits=legend_digits )
+      #xl = (1-legend_x[1])*par('usr')[1] + (legend_x[1])*par('usr')[2]
+      #xr = (1-legend_x[2])*par('usr')[1] + (legend_x[2])*par('usr')[2]
+      #yb = (1-legend_y[1])*par('usr')[3] + (legend_y[1])*par('usr')[4]
+      #yt = (1-legend_y[2])*par('usr')[3] + (legend_y[2])*par('usr')[4]
+      #if( diff(legend_y) > diff(legend_x) ){
+      #  align = c("lt","rb")[2]
+      #  gradient = c("x","y")[2]
+      #}else{
+      #  align = c("lt","rb")[1]
+      #  gradient = c("x","y")[1]
+      #}
+      #plotrix::color.legend(xl=xl, yb=yb, xr=xr, yt=yt, legend=round(seq(Zlim[1],Zlim[2],length=4),legend_digits), rect.col=col(1000), cex=cex.legend, align=align, gradient=gradient)
     }
   }
 

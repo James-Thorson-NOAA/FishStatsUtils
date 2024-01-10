@@ -9,7 +9,7 @@ plot_residual_semivariance(
   dharma_raster,
   dharmaRes,
   file_name = "quantile_residuals_semivariance",
-  working_dir = paste0(getwd(), "/")
+  working_dir = getwd()
 )
 }
 \description{

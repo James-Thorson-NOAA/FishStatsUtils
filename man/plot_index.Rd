@@ -13,7 +13,7 @@ plot_index(
   category_names = NULL,
   scale = "uniform",
   plot_legend = NULL,
-  DirName = paste0(getwd(), "/"),
+  DirName = getwd(),
   PlotName = "Index.png",
   interval_width = 1,
   width = NULL,

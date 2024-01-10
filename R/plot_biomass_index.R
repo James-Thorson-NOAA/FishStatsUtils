@@ -29,7 +29,7 @@
 #' @export
 plot_biomass_index <-
 function( fit,
-          DirName = paste0(getwd(),"/"),
+          DirName = getwd(),
           PlotName = "Index",
           interval_width = 1,
           years_to_plot = NULL,
@@ -195,7 +195,7 @@ function( fit,
   if( all(c("Fratio_ct","Bratio_ctl") %in% names(par_hat)) ){
     Par = list( mar=c(2,2,1,0), mgp=c(2,0.5,0), tck=-0.02, yaxs="i", oma=c(1,2,0,0), mfrow=mfrow, ... )
     Col = colorRampPalette(colors=c("blue","purple","red"))
-    png( file=paste0(DirName,"/",PlotName,"-Status.png"), width=width, height=height, res=200, units="in")
+    png( file=file.path(DirName,paste0(PlotName,"-Status.png")), width=width, height=height, res=200, units="in")
       par( Par )
       Array1_ct = abind::abind( "Estimate"=matrix(par_hat[["Bratio_ctl"]][,,1],nrow=TmbData$n_c,dimnames=dimnames(par_hat[["Bratio_ctl"]])[1:2]), "Std. Error"=matrix(par_SE[["Bratio_ctl"]][,,1],nrow=TmbData$n_c,dimnames=dimnames(par_hat[["Bratio_ctl"]])[1:2]), along=3 )
       Array1_ct = ifelse( Array1_ct==0, NA, Array1_ct )
@@ -226,7 +226,7 @@ function( fit,
     "Estimate" = as.vector(par_hat[[index_name]]),
     "Std. Error for Estimate" = as.vector(par_SE[[index_name]]),
     "Std. Error for ln(Estimate)" = as.vector(par_SE[[log_index_name]]) )
-  write.csv( Table, file=paste0(DirName,"/Index.csv"), row.names=FALSE)
+  write.csv( Table, file=file.path(DirName,"Index.csv"), row.names=FALSE)
 
   # Return stuff
     # Necessary to provide "log_Index_ctl" and "Index_ctl" for use in calculate_proportion, which has been fixed for zeros here

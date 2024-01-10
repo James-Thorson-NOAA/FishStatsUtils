@@ -18,7 +18,7 @@ plot_factors(
   Dim_year = NULL,
   Dim_species = NULL,
   projargs = "+proj=longlat",
-  plotdir = paste0(getwd(), "/"),
+  plotdir = getwd(),
   land_color = "grey",
   zlim = NA,
   testcutoff = 1e-04,

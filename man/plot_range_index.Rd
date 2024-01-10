@@ -11,10 +11,9 @@ plot_range_index(
   year_labels = NULL,
   years_to_plot = NULL,
   strata_names = NULL,
-  PlotDir = paste0(getwd(), "/"),
-  FileName_COG = paste0(PlotDir, "/center_of_gravity.png"),
-  FileName_Area = paste0(PlotDir, "/Area.png"),
-  FileName_EffArea = paste0(PlotDir, "/Effective_Area.png"),
+  PlotDir = getwd(),
+  FileName_COG = "center_of_gravity.png",
+  FileName_EffArea = "Effective_Area.png",
   Znames = rep("", ncol(TmbData$Z_gm)),
   use_biascorr = TRUE,
   category_names = NULL,
@@ -39,8 +38,6 @@ plot_range_index(
 
 \item{FileName_COG}{Full filename (including directory) for center-of-gravity plot}
 
-\item{FileName_Area}{Full filename (including directory) for center-of-gravity plot}
-
 \item{FileName_EffArea}{Full filename (including directory) for center-of-gravity plot}
 
 \item{Znames}{Names for center-of-gravity summary statistics}
@@ -52,6 +49,8 @@ plot_range_index(
 \item{interval_width}{width for confidence intervals}
 
 \item{...}{Other inputs to `par()`}
+
+\item{FileName_Area}{Full filename (including directory) for center-of-gravity plot}
 }
 \value{
 Return Tagged list of output

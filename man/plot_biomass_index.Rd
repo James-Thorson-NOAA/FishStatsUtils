@@ -6,7 +6,7 @@
 \usage{
 plot_biomass_index(
   fit,
-  DirName = paste0(getwd(), "/"),
+  DirName = getwd(),
   PlotName = "Index",
   interval_width = 1,
   years_to_plot = NULL,

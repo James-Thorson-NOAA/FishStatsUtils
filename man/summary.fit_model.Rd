@@ -20,7 +20,7 @@
 \arguments{
 \item{x}{Output from \code{\link{fit_model}}}
 
-\item{what}{String indicating what to summarize; options are `density` or `residuals`}
+\item{what}{String indicating what to summarize; options are `density`, `index` or `residuals`}
 
 \item{n_samples}{Number of samples used when \code{what="residuals"}}
 

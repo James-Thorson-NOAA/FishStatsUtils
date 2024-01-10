@@ -43,7 +43,7 @@
 #' @param year_labels character vector specifying names for labeling times \code{t_i}
 #' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
 #' where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
-#' passes named arguments to \code{\link[INLA]{inla.mesh.create}}.
+#' passes named arguments to \code{\link[fmesher]{fm_mesh_2d}}.
 #'
 #' @return Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
 #' \describe{
@@ -105,7 +105,7 @@ function( settings,
           a_i,
           c_iz = rep(0,length(b_i)),
           v_i = rep(0,length(b_i)),
-          working_dir = paste0(getwd(),"/"),
+          working_dir = tempdir(),
           X1config_cp = NULL,
           X2config_cp = NULL,
           covariate_data,
@@ -180,8 +180,9 @@ function( settings,
                          DirPath = working_dir,
                          Save_Results = TRUE,
                          fine_scale = settings$fine_scale,
-                         knot_method = settings$knot_method)
-    spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(INLA::inla.mesh.create)) )
+                         knot_method = settings$knot_method,
+                         mesh_package = settings$mesh_package )
+    spatial_args_input = combine_lists( input=extra_args, default=spatial_args_default, args_to_use=c(formalArgs(make_spatial_info),formalArgs(fmesher::fm_mesh_2d)) )
     spatial_list = do.call( what=make_spatial_info, args=spatial_args_input )
   }else{
     spatial_args_input = NULL
@@ -507,7 +508,7 @@ plot.fit_model <- function(x, what="results", ...)
 #' @inheritParams DHARMa::plotResiduals
 #'
 #' @param x Output from \code{\link{fit_model}}
-#' @param what String indicating what to summarize; options are `density` or `residuals`
+#' @param what String indicating what to summarize; options are `density`, `index` or `residuals`
 #' @param n_samples Number of samples used when \code{what="residuals"}
 #' @param ... additional arguments passed to \code{\link[DHARMa]{plotResiduals}} when \code{what="residuals"}
 #'
@@ -534,34 +535,41 @@ function( x,
                            year_labels = year_labels,
                            category_names = category_names )
 
-  if( tolower(what) == "density" ){
+  if( tolower(what) %in% c("density","index") ){
     # Load location of extrapolation-grid
     ans[["extrapolation_grid"]] = print( x$extrapolation_list, quiet=TRUE )
 
     # Load density estimates
-    if( any(c("D_gct","D_gcy") %in% names(x$Report)) ){
-      if("D_gcy" %in% names(x$Report)) Dvar_name = "D_gcy"
-      if("D_gct" %in% names(x$Report)) Dvar_name = "D_gct"
-      ans[["Density_array"]] =  x$Report[[Dvar_name]]
-      if( !( x$settings$fine_scale==TRUE | x$spatial_list$Method=="Stream_network" ) ){
-        index_tmp = x$spatial_list$NN_Extrap$nn.idx[ which(x$extrapolation_list[["Area_km2_x"]]>0), 1 ]
-        ans[["Density_array"]] = ans[["Density_array"]][ index_tmp,,,drop=FALSE]
-      }
-      if( any(sapply(dimnames(ans[["Density_array"]]),FUN=is.null)) ){
-        dimnames(ans[["Density_array"]]) = list( rownames(ans[["extrapolation_grid"]]), paste0("Category_",1:dim(ans[["Density_array"]])[[2]]), x$year_labels )
-      }
-      # Expand as grid
-      Density_dataframe = expand.grid("Grid"=1:dim(ans[["Density_array"]])[[1]], "Category"=dimnames(ans[["Density_array"]])[[2]], "Year"=dimnames(ans[["Density_array"]])[[3]])
-      Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Grid'],], "Density"=as.vector(ans[["Density_array"]]) )
-      ans[["Density_dataframe"]] = Density_dataframe
-      ans[['year_labels']] = x[['year_labels']]
-      rownames(Density_dataframe) = NULL
-      cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object\n")
-      print(head(Density_dataframe))
-      print(tail(Density_dataframe))
-    }else{
-      stop( "`summary.fit_model` not implemented for the version of `VAST` being used" )
+    if( tolower(what) == "density" ){
+      ans[["Density_array"]] =  x$Report[["D_gct"]]
+    }else if( tolower(what) == "index" ){
+      ans[["Density_array"]] =  x$Report[["Index_gctl"]]
     }
+
+    # Exclude boundary knots
+    if( !( x$settings$fine_scale==TRUE | x$spatial_list$Method=="Stream_network" ) ){
+      index_tmp = x$spatial_list$NN_Extrap$nn.idx[ which(x$extrapolation_list[["Area_km2_x"]]>0), 1 ]
+      ans[["Density_array"]] = ans[["Density_array"]][ index_tmp,,,drop=FALSE]
+    }
+    # Error check
+    if( any(sapply(dimnames(ans[["Density_array"]]),FUN=is.null)) ){
+      stop("`summary.fit_model` assumes that arrays are labeled")
+    }
+
+    # Expand as grid
+    Density_dataframe = expand.grid( dimnames(ans[["Density_array"]]) )
+    Density_dataframe = cbind( Density_dataframe, ans[["extrapolation_grid"]][Density_dataframe[,'Site'],], as.vector(ans[["Density_array"]]) )
+    colnames(Density_dataframe)[ncol(Density_dataframe)] = tolower(what)
+
+    # Save output
+    ans[["Density_dataframe"]] = Density_dataframe
+    ans[['year_labels']] = x[['year_labels']]
+    rownames(Density_dataframe) = NULL
+
+    # Print to terminal
+    cat("\n### Printing head of and tail `Density_dataframe`, and returning data frame in output object\n")
+    print(head(Density_dataframe))
+    print(tail(Density_dataframe))
   }
 
   # Residuals
@@ -601,10 +609,10 @@ function( x,
 
       # Run DHARMa
       # Adding jitters because DHARMa version 0.3.2.0 sometimes still throws an error method="traditional" and integer=FALSE without jitters
-      dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz) + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
-        observedResponse=strip_units(x$data_list$b_i) + 1e-10*rnorm(length(x$data_list$b_i)),
-        fittedPredictedResponse=strip_units(x$Report$D_i),
-        integer=FALSE)
+      dharmaRes = DHARMa::createDHARMa( simulatedResponse = strip_units(b_iz) + 1e-10*array(rnorm(prod(dim(b_iz))),dim=dim(b_iz)),
+                                        observedResponse = strip_units(x$data_list$b_i) + 1e-10*rnorm(length(x$data_list$b_i)),
+                                        fittedPredictedResponse = strip_units(x$Report$D_i),
+                                        integer = FALSE)
       #dharmaRes = DHARMa::createDHARMa(simulatedResponse=strip_units(b_iz),
       #  observedResponse=strip_units(x$data_list$b_i),
       #  fittedPredictedResponse=strip_units(x$Report$D_i),
@@ -660,7 +668,7 @@ function( x,
     if( is.null(working_dir) ){
       plot_dharma(dharmaRes, ...)
     }else if(!is.na(working_dir) ){
-      png(file=paste0(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
+      png(file=file.path(working_dir,"quantile_residuals.png"), width=8, height=4, res=200, units='in')
         plot_dharma(dharmaRes, form=form, ...)
       dev.off()
     }
@@ -750,7 +758,7 @@ predict.fit_model <- function(x,
                   new_covariate_data = NULL,
                   new_catchability_data = NULL,
                   do_checks = TRUE,
-                  working_dir = paste0(getwd(),"/") )
+                  working_dir = getwd() )
 {
   message("`predict.fit_model(.)` is in beta-testing, and please explore results carefully prior to using")
 

@@ -45,7 +45,7 @@ plot_results <-
 function( fit,
           settings = fit$settings,
           plot_set = 3,
-          working_dir = paste0(getwd(),"/"),
+          working_dir = getwd(),
           year_labels = fit$year_labels,
           years_to_plot = fit$years_to_plot,
           category_names = fit$category_names,
@@ -99,8 +99,8 @@ function( fit,
 
   # Plot anisotropy
   message("\n### Making plot of anisotropy")
-  plot_anisotropy( FileName=paste0(working_dir,"Aniso.png"),
-                   Obj=fit$tmb_list$Obj )
+  plot_anisotropy( FileName = file.path(working_dir,"Aniso.png"),
+                   Obj = fit$tmb_list$Obj )
 
   # Plot index
   plot_biomass_index_args = list(...)
@@ -139,13 +139,15 @@ function( fit,
     #if( !all(is.numeric(year_labels)) ) stop("`plot_biomass_index` isn't built to handle non-numeric `year_labels`")
     calculate_proportion_args = list(...)
     calculate_proportion_args = combine_lists( "input"=calculate_proportion_args, "args_to_use"=formalArgs(calculate_proportion),
-      "default" = list( TmbData = fit$data_list,
+      "default" = list( fit = fit, 
+                        TmbData = fit$data_list,
                         Index = Index,
                         year_labels = year_labels,
                         years_to_plot = years_to_plot,
                         use_biascorr = use_biascorr,
                         category_names = category_names,
-                        DirName = working_dir ) )
+                        DirName = working_dir,
+                        n_samples = n_samples ) )
     Proportions = do.call( what=calculate_proportion, args=calculate_proportion_args )
     #Compositions = plot_biomass_index( DirName=working_dir, TmbData=fit$data_list, Sdreport=fit$parameter_estimates$SD, year_labels=year_labels,
     #  years_to_plot=years_to_plot, use_biascorr=use_biascorr, category_names=category_names )
@@ -259,7 +261,11 @@ function( fit,
 
     # Plotting quantile residuals
     message("\n### Making quantile residuals using conditional simulation and package DHARMa")
-    dharmaRes = summary( fit, what="residuals", working_dir=working_dir, type=type, ... )
+    dharmaRes = summary( fit,
+                         what = "residuals",
+                         working_dir = working_dir,
+                         type = type,
+                         ... )
 
     # Mapping quantile residuals
     message("\n### Plotting quantile residuals ")

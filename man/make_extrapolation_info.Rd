@@ -27,7 +27,7 @@ make_extrapolation_info(
   nstart = 100,
   area_tolerance = 0.05,
   backwards_compatible_kmeans = FALSE,
-  DirPath = paste0(getwd(), "/"),
+  DirPath = getwd(),
   ...
 )
 }

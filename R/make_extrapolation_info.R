@@ -111,7 +111,7 @@ make_extrapolation_info = function( Region,
         nstart = 100,
         area_tolerance = 0.05,
         backwards_compatible_kmeans = FALSE,
-        DirPath = paste0(getwd(),"/"),
+        DirPath = getwd(),
         ... ){
 
   # Note: flip_around_dateline must appear in arguments for argument-matching in fit_model
@@ -196,7 +196,7 @@ make_extrapolation_info = function( Region,
       "rockfish_recruitment_coastwide","rockfish_recruitment_core")
     if( toupper(Region[rI]) %in% toupper(Shapefile_set) ){
       if( Region[rI]=="SP-ARSA" ) stop("There's some problem with `SP-ARSA` which precludes it's use")
-      Conversion = convert_shapefile( file_path=paste0(system.file("region_shapefiles",package="FishStatsUtils"),"/",toupper(Region[rI]),"/Shapefile.shp"),
+      Conversion = convert_shapefile( file_path=file.path(system.file("region_shapefiles",package="FishStatsUtils"), toupper(Region[rI]), "Shapefile.shp"),
         projargs_for_shapefile="+proj=longlat +ellps=WGS84 +no_defs", projargs=projargs, grid_dim_km=grid_dim_km, area_tolerance=area_tolerance, ... )
       Extrapolation_List = list( "a_el"=matrix(Conversion$extrapolation_grid[,'Area_km2'],ncol=1), "Data_Extrap"=Conversion$extrapolation_grid,
         "zone"=NA, "projargs"=Conversion$projargs, "flip_around_dateline"=FALSE, "Area_km2_x"=Conversion$extrapolation_grid[,'Area_km2'])
