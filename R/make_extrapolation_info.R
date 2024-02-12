@@ -305,21 +305,19 @@ make_extrapolation_info = function( Region,
 plot.make_extrapolation_info <- function(x, cex=0.01, land_color="grey", map_resolution="medium", ...)
 {
   par( mfrow=c(1,2), mar=c(3,3,2,0), mgp=c(1.75,0.25,0) )
+  require(sf)
 
   # CRS for original and new projections
-  CRS_orig = sp::CRS( '+proj=longlat' )
-  CRS_proj = sp::CRS( x$projargs )
+  CRS_orig = st_crs( '+proj=longlat' )
+  CRS_proj = st_crs( x$projargs )
 
   # Data for mapping
-  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ))
-  # Fix warning messages from projecting rnaturalearth object
-  # Solution: Recreate SpatialPolygonsDataFrame from output
-  map_data = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(slot(map_data,"polygons"),proj4string=CRS_orig), data=slot(map_data,"data") )
+  map_data = rnaturalearth::ne_countries(scale=switch(map_resolution, "low"=110, "medium"=50, "high"=10, 50 ), return="sf")
 
   # Plot #1 -- Latitude
   plot( x$Data_Extrap[which(strip_units(x$Area_km2_x)>0),c('Lon','Lat')], cex=cex, main="Extrapolation (Lat-Lon)", ... )
-  map_data_orig = sp::spTransform(map_data, CRSobj=CRS_orig)
-  sp::plot( map_data_orig, col=land_color, add=TRUE )
+  map_data_orig = st_transform(map_data, crs=CRS_orig)
+  plot( map_data_orig, col=land_color, add=TRUE )
 
   # Plot #2 -- Projection coordinates
   if( !any(is.na(x$Data_Extrap[,c('E_km','N_km')])) ){
