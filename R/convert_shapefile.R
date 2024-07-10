@@ -32,6 +32,9 @@ convert_shapefile = function( file_path,
 
   #shapefile_input = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
   shapefile_input = sf::st_read( file_path )
+
+  # Need to run sf::st_make_valid to ensure sf::st_area works later
+  shapefile_input = sf::st_make_valid( shapefile_input )
   #  sf::st_crs(shapefile_input) = sf::st_crs(projargs_for_shapefile)
   # rgdal::writeOGR
   message("Reading shapefile with projargs: ", print(sf::st_crs(shapefile_input)))
