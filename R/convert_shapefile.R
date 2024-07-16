@@ -32,51 +32,58 @@ convert_shapefile = function( file_path,
 
   #shapefile_input = rgdal::readOGR( file_path, verbose=FALSE, p4s=projargs_for_shapefile )
   shapefile_input = sf::st_read( file_path )
-    st_crs(shapefile_input) = st_crs(projargs_for_shapefile)
+
+  # Need to run sf::st_make_valid to ensure sf::st_area works later
+  shapefile_input = sf::st_make_valid( shapefile_input )
+  #  sf::st_crs(shapefile_input) = sf::st_crs(projargs_for_shapefile)
   # rgdal::writeOGR
-  message("Reading shapefile with projargs: ", print(shapefile_input@proj4string))
-  # raster::shapefile(.) has simplified read-write interface for future reference
-  if( !(shapefile_input@class %in% c("SpatialPolygonsDataFrame","SpatialPolygons")) ){
-    warning( "object at `file_path` doesn't appear to be a shapefile")
+  message("Reading shapefile with projargs: ", print(sf::st_crs(shapefile_input)))
+  #
+  if( is.null(sf::st_crs(shapefile_input)) ){
+    sf::st_crs(shapefile_input) = sf::st_crs(projargs_for_shapefile)
   }
+  # raster::shapefile(.) has simplified read-write interface for future reference
+  #if( !(shapefile_input %in% c("SpatialPolygonsDataFrame","SpatialPolygons")) ){
+  #  warning( "object at `file_path` doesn't appear to be a shapefile")
+  #}
   proj_orig = "+proj=longlat +ellps=WGS84 +no_defs"
-  shapefile_orig = sp::spTransform(shapefile_input, CRSobj=sp::CRS(proj_orig) )
+  shapefile_orig = sf::st_transform(shapefile_input, crs=sf::st_crs(proj_orig) )
   #shapefile_orig@proj4string = sp::CRS(proj_orig)
 
   # Infer projargs if missing, and project
-  utm_zone = floor((mean(sp::bbox(shapefile_orig)[1,]) + 180) / 6) + 1
+  utm_zone = floor((mean(sf::st_bbox(shapefile_orig)[c('xmin','xmax')]) + 180) / 6) + 1
   projargs_utm = paste0("+proj=utm +zone=",utm_zone," +ellps=WGS84 +datum=WGS84 +units=km +no_defs ")
   if( is.null(projargs) || is.na(projargs) ){
     projargs = projargs_utm
   }
-  shapefile_proj = sp::spTransform(shapefile_orig, CRSobj=sp::CRS(projargs) )
+  shapefile_proj = sf::st_transform(shapefile_orig, crs=sf::st_crs(projargs) )
 
   # Check for total area
-  Total_area = sum(raster::area(shapefile_proj))
-  if( Total_area < 100 ){
+  Total_area = as.numeric(sum(sf::st_area(shapefile_proj)))
+  if( (Total_area) < 100 ){
     warning("Total area for polygons in shapefile is ", Total_area, " km^2 and this might indicate an issue with identifying or specifying the projection" )
   }
 
   # Determine bounds for box
-  bbox = shapefile_proj@bbox
-  bbox[,1] = floor(bbox[,1] / grid_dim_km[1]) * grid_dim_km[1]
-  bbox[,2] = ceiling(bbox[,2] / grid_dim_km[2]) * grid_dim_km[2]
+  bbox = sf::st_bbox(shapefile_proj)
+  bbox[c('xmin','xmax')] = floor(bbox[c('xmin','xmax')] / grid_dim_km[1]) * grid_dim_km[1]
+  bbox[c('ymin','ymax')] = ceiling(bbox[c('ymin','ymax')] / grid_dim_km[2]) * grid_dim_km[2]
 
   # Make grid
-  grid_proj = expand.grid(X=seq(bbox[1,1],bbox[1,2],by=grid_dim_km[1]), Y=seq(bbox[2,1],bbox[2,2],by=grid_dim_km[2]))
-  grid_proj = sp::SpatialPointsDataFrame( coords=grid_proj[,c("X","Y")], data=grid_proj[,1:2], proj4string=sp::CRS(projargs) )
+  grid_proj = expand.grid(X=seq(bbox['xmin'],bbox['xmax'],by=grid_dim_km[1]), Y=seq(bbox['ymin'],bbox['ymax'],by=grid_dim_km[2]))
+  grid_proj = sf::st_as_sf( grid_proj[,c("X","Y")], coords=1:2, crs=sf::st_crs(projargs) )
 
   # Restrict points to those within a polygon
-  grid_proj@data = sp::over(grid_proj, shapefile_proj)
-  grid_proj = subset( grid_proj, !apply(grid_proj@data,MARGIN=1,FUN=function(vec){all(is.na(vec))}) )
+  grid_proj = sf::st_intersection(grid_proj, shapefile_proj)
+  grid_proj_coordinates = sf::st_coordinates(grid_proj)
 
   # Return to original coordinates
-  grid_orig = sp::spTransform( grid_proj, CRSobj=sp::CRS(proj_orig) )
-  grid_orig = as.data.frame(grid_orig)
+  grid_orig = sf::st_transform( grid_proj, crs=sf::st_crs(proj_orig) )
+  grid_orig = sf::st_coordinates(grid_orig)
 
   # Combine
   extrapolation_grid = data.frame( "Lat"=grid_orig[,'Y'], "Lon"=grid_orig[,'X'], "Area_km2"=prod(grid_dim_km), # "Stratum"=grid_orig[,'AreaName'],
-    "Include"=1, "E_km"=grid_proj@coords[,'X'], "N_km"=grid_proj@coords[,'Y'] )
+    "Include"=1, "E_km"=grid_proj_coordinates[,'X'], "N_km"=grid_proj_coordinates[,'Y'] )
 
   # make plots
   if( make_plots==TRUE ){
@@ -100,9 +107,9 @@ convert_shapefile = function( file_path,
   }
 
   # Compare areas
-  area_shapefile_input = sum( raster::area(shapefile_input) )
-  area_shapefile_orig = sum( raster::area(shapefile_orig) ) / 1000^2  # Convert to square-kiometers
-  area_shapefile_proj = sum( raster::area(shapefile_proj) )
+  area_shapefile_input = as.numeric(sum( sf::st_area(shapefile_input) ))
+  area_shapefile_orig = as.numeric(sum( sf::st_area(shapefile_orig) )) / 1000^2  # Convert to square-kiometers
+  area_shapefile_proj = as.numeric(sum( sf::st_area(shapefile_proj) ))
   area_grid_proj = sum( extrapolation_grid[,'Area_km2'] )
 
   # Messages
