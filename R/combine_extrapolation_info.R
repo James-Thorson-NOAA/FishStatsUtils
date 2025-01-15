@@ -72,6 +72,19 @@ combine_extrapolation_info = function( ..., create_strata_per_region=FALSE ){
   }
 
   # Return
-  Return = list( "a_el"=a_el, "Data_Extrap"=Data_Extrap, "zone"=Zone[1], "flip_around_dateline"=Flip[1], "projargs"=Projargs[1], "Area_km2_x"=Area_km2_x)
+  Return = list( "a_el"=a_el,
+                 "Data_Extrap"=Data_Extrap,
+                 "zone"=Zone[1],
+                 "flip_around_dateline"=Flip[1],
+                 "projargs"=Projargs[1],
+                 "Area_km2_x"=Area_km2_x)
+
+  # Add units
+  units(Return$a_el) = "km^2"
+  units(Return$Area_km2_x) = "km^2"
+
+  # Return
+  class(Return) = "make_extrapolation_info"
+  return( Return )
 }
 
