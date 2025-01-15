@@ -79,6 +79,9 @@ combine_extrapolation_info = function( ..., create_strata_per_region=FALSE ){
                  "projargs"=Projargs[1],
                  "Area_km2_x"=Area_km2_x)
 
+  # Fix rowname duplicates
+  rownames(Return$Data_Extrap) = seq_len(nrow(Return$Data_Extrap))
+
   # Add units
   units(Return$a_el) = "km^2"
   units(Return$Area_km2_x) = "km^2"
