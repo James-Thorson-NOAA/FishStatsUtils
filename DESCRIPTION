@@ -43,9 +43,9 @@ Depends:
     units,
     marginaleffects
 Enhances:
-    INLA,
     tidyr,
 Suggests:
+    INLA,
     testthat
 Additional_repositories: https://inla.r-inla-download.org/R/stable
 License: GPL-3
