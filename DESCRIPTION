@@ -34,7 +34,6 @@ Imports:
     sp,
     stats,
     TMB (>= 1.8.0),
-    TMBhelper (>= 1.4.0),
     utils,
     viridisLite,
     spacetime,
@@ -44,12 +43,10 @@ Depends:
     units,
     marginaleffects
 Enhances:
-    tidyr,
     INLA,
+    tidyr,
 Suggests:
     testthat
-Remotes: 
-    kaskr/TMB_contrib_R/TMBhelper
 Additional_repositories: https://inla.r-inla-download.org/R/stable
 License: GPL-3
 LazyData: yes

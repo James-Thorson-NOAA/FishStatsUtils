@@ -9,11 +9,11 @@ plot_dharma(dharmaRes, form = NULL, rank = TRUE, ...)
 \arguments{
 \item{dharmaRes}{Output from \code{\link{plot}} using slot \code{$dharmaRes}}
 
-\item{form}{optional predictor against which the residuals should be plotted. Default is to used the predicted(simulationOutput)}
+\item{form}{Optional predictor against which the residuals should be plotted. Default is to used the predicted(simulationOutput).}
 
-\item{rank}{if T, the values provided in form will be rank transformed. This will usually make patterns easier to spot visually, especially if the distribution of the predictor is skewed. If form is a factor, this has no effect.}
+\item{rank}{If T, the values provided in form will be rank transformed. This will usually make patterns easier to spot visually, especially if the distribution of the predictor is skewed. If form is a factor, this has no effect.}
 
-\item{...}{additional arguments to plot / boxplot.}
+\item{...}{Additional arguments to plot / boxplot.}
 }
 \description{
 Plot DHARMa residuals

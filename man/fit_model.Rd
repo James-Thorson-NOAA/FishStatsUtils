@@ -154,14 +154,14 @@ when fixed effects are at upper or lower bounds.}
 
 \item{framework}{Which AD framework to use ('TMBad' or 'CppAD')}
 
-\item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
+\item{...}{additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{fit_tmb},
 where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
 passes named arguments to \code{\link[fmesher]{fm_mesh_2d}}.}
 }
 \value{
 Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
 \describe{
-\item{\code{parameter_estimates}}{Output from \code{\link[TMBhelper]{fit_tmb}}; see that documentation for definition of contents}
+\item{\code{parameter_estimates}}{Output from \code{fit_tmb}; see that documentation for definition of contents}
 \item{\code{extrapolation_list}}{Output from \code{\link{make_extrapolation_info}}; see that documentation for definition of contents}
 \item{\code{spatial_list}}{Output from \code{\link{make_spatial_info}}; see that documentation for definition of contents}
 \item{\code{data_list}}{Output from \code{\link[VAST]{make_data}}; see that documentation for definition of contents}
@@ -171,9 +171,6 @@ Object of class \code{fit_model}, containing formatted inputs and outputs from V
 }
 }
 \description{
-\code{fit_model} fits a spatio-temporal model to data
-}
-\details{
 This function is the user-interface for the multiple mid-level functions that
 perform separate components of a spatio-temporal analysis:
 \itemize{
@@ -182,11 +179,12 @@ perform separate components of a spatio-temporal analysis:
 \item build covariates from a formula interface \code{\link{make_covariates}},
 \item assemble data \code{\link[VAST]{make_data}},
 \item build model \code{\link[VAST]{make_model}},
-\item estimate parameters \code{\link[TMBhelper]{fit_tmb}}, and
+\item estimate parameters \code{fit_tmb}, and
 \item check for obvious problems with the estimates \code{\link[VAST]{check_fit}}.
 }
 Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
-
+}
+\details{
 Specifically, the mid-level functions called by \code{fit_model(.)} look for arguments in the following order of precedence (from highest to lowest precedence):
 \enumerate{
 \item \code{fit_model(.)} prioritizes using named arguments passed directly to \code{fit_model(.)}. If arguments are passed this way, they are used instead of other options below.

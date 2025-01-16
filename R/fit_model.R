@@ -1,8 +1,6 @@
 
 #' Fit VAST to data
 #'
-#' \code{fit_model} fits a spatio-temporal model to data
-#'
 #' This function is the user-interface for the multiple mid-level functions that
 #' perform separate components of a spatio-temporal analysis:
 #' \itemize{
@@ -11,7 +9,7 @@
 #' \item build covariates from a formula interface \code{\link{make_covariates}},
 #' \item assemble data \code{\link[VAST]{make_data}},
 #' \item build model \code{\link[VAST]{make_model}},
-#' \item estimate parameters \code{\link[TMBhelper]{fit_tmb}}, and
+#' \item estimate parameters \code{fit_tmb}, and
 #' \item check for obvious problems with the estimates \code{\link[VAST]{check_fit}}.
 #' }
 #' Please see reference documetation for each of those functions (e.g., \code{?make_extrapolation_info}) to see a list of arguments used by each mid-level function.
@@ -35,19 +33,19 @@
 #' @inheritParams make_covariates
 #' @inheritParams VAST::make_data
 #' @inheritParams VAST::make_model
-#' @inheritParams TMBhelper::fit_tmb
+#' @inheritParams fit_tmb
 #' @param settings Output from \code{\link{make_settings}}
 #' @param run_model Boolean indicating whether to run the model or simply return the inputs and built TMB object
 #' @param test_fit Boolean indicating whether to apply \code{\link[VAST]{check_fit}} before calculating standard errors, to test for parameters hitting bounds etc; defaults to TRUE
 #' @param category_names character vector specifying names for labeling categories \code{c_i}
 #' @param year_labels character vector specifying names for labeling times \code{t_i}
-#' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{\link[TMBhelper]{fit_tmb}},
+#' @param ... additional arguments to pass to \code{\link{make_extrapolation_info}}, \code{\link{make_spatial_info}}, \code{\link[VAST]{make_data}}, \code{\link[VAST]{make_model}}, or \code{fit_tmb},
 #' where arguments are matched by name against each function.  If an argument doesn't match, it is still passed to \code{\link[VAST]{make_data}}.  Note that \code{\link{make_spatial_info}}
 #' passes named arguments to \code{\link[fmesher]{fm_mesh_2d}}.
 #'
 #' @return Object of class \code{fit_model}, containing formatted inputs and outputs from VAST
 #' \describe{
-#'   \item{\code{parameter_estimates}}{Output from \code{\link[TMBhelper]{fit_tmb}}; see that documentation for definition of contents}
+#'   \item{\code{parameter_estimates}}{Output from \code{fit_tmb}; see that documentation for definition of contents}
 #'   \item{\code{extrapolation_list}}{Output from \code{\link{make_extrapolation_info}}; see that documentation for definition of contents}
 #'   \item{\code{spatial_list}}{Output from \code{\link{make_spatial_info}}; see that documentation for definition of contents}
 #'   \item{\code{data_list}}{Output from \code{\link[VAST]{make_data}}; see that documentation for definition of contents}
@@ -283,7 +281,7 @@ function( settings,
   optimize_args_default1 = list( lower = tmb_list$Lower,
                          upper = tmb_list$Upper,
                          loopnum = 1)
-  optimize_args_default1 = combine_lists( default=optimize_args_default1, input=extra_args, args_to_use=formalArgs(TMBhelper::fit_tmb) )
+  optimize_args_default1 = combine_lists( default=optimize_args_default1, input=extra_args, args_to_use=formalArgs(fit_tmb) )
   # auto-override user inputs for optimizer-related inputs for first test run
   optimize_args_input1 = list(obj = tmb_list$Obj,
                        savedir = NULL,
@@ -293,8 +291,8 @@ function( settings,
                        quiet = TRUE,
                        getsd = FALSE )
   # combine
-  optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1, args_to_use=formalArgs(TMBhelper::fit_tmb) )
-  parameter_estimates1 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input1 )
+  optimize_args_input1 = combine_lists( default=optimize_args_default1, input=optimize_args_input1, args_to_use=formalArgs(fit_tmb) )
+  parameter_estimates1 = do.call( what=fit_tmb, args=optimize_args_input1 )
 
   # Check fit of model (i.e., evidence of non-convergence based on bounds, approaching zero, etc)
   if(exists("check_fit") & test_fit==TRUE ){
@@ -328,10 +326,10 @@ function( settings,
                          getJointPrecision = TRUE,
                          start_time_elapsed = parameter_estimates1$time_for_run )
   # combine while over-riding defaults using user inputs
-  optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(TMBhelper::fit_tmb) )
+  optimize_args_input2 = combine_lists( input=extra_args, default=optimize_args_default2, args_to_use=formalArgs(fit_tmb) )
   # over-ride inputs to start from previous MLE
   optimize_args_input2 = combine_lists( input=list(startpar=parameter_estimates1$par), default=optimize_args_input2 )
-  parameter_estimates2 = do.call( what=TMBhelper::fit_tmb, args=optimize_args_input2 )
+  parameter_estimates2 = do.call( what=fit_tmb, args=optimize_args_input2 )
 
   # Override default bias-correction
   if( (use_new_epsilon==TRUE) & (framework=="TMBad") & ("eps_Index_ctl" %in% settings$vars_to_correct) & !is.null(parameter_estimates2$SD) ){
@@ -647,7 +645,7 @@ function( x,
 
       # Run OSA
       message( "Running oneStepPredict_deltaModel for each observation, to then load them into DHARMa object for plotting" )
-      osa = TMBhelper::oneStepPredict_deltaModel( obj = x$tmb_list$Obj,
+      osa = oneStepPredict_deltaModel( obj = x$tmb_list$Obj,
         observation.name = "b_i",
         method = "cdf",
         data.term.indicator = "keep",

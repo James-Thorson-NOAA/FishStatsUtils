@@ -2,6 +2,7 @@
 % Please edit documentation in R/FishStatsUtils.R
 \docType{package}
 \name{FishStatsUtils}
+\alias{FishStatsUtils-package}
 \alias{FishStatsUtils}
 \title{FishStatsUtils}
 \description{
@@ -9,4 +10,16 @@ FishStatsUtils provides utilities (shared code and data) for spatio-temporal mod
 }
 \details{
 Please see examples folder on github \url{http://github.com/james-thorson/VAST/tree/master/examples} for up-to-date examples
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://github.com/james-thorson-NOAA/FishStatsUtils}
+  \item Report bugs at \url{http://github.com/james-thorson-NOAA/FishStatsUtils/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: James Thorson \email{James.Thorson@noaa.gov} (\href{https://orcid.org/0000-0001-7415-1010}{ORCID})
+
 }
