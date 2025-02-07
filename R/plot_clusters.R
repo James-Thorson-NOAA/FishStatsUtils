@@ -125,7 +125,6 @@ function( fit,
 
   # Plot cluster memberships
   Ybar_kc = apply( Y_zc, MARGIN=2, FUN=function(y_z,class_z){tapply(y_z,INDEX=class_z,FUN=mean)}, class_z=Class_z )
-  ThorsonUtilities::save_fig
   if(yaxis_log==TRUE){f=exp}else{f=identity}
   png( file=file.path(working_dir,paste0(file_name2,".png")), width=6, height=6, units="in", res=200 )
     par( mar=c(7,3,1,1), mgp=c(2,0.5,0), tck=-0.02 )
